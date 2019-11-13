@@ -1496,7 +1496,8 @@ The following type trait primitives are supported by Clang. Those traits marked
   of the given type, and then destroying the source object, is known to be
   functionally equivalent to copying the underlying bytes and then dropping the
   source object on the floor. This is true of trivial types and types which
-  were made trivially relocatable via the ``clang::trivial_abi`` attribute.
+  were made trivially relocatable via the ``clang::trivial_abi`` or
+  ``clang::trivially_relocatable`` attributes.
 * ``__is_unbounded_array`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_union`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_unsigned`` (C++, Embarcadero):
