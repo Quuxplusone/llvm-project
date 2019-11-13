@@ -95,7 +95,10 @@ CXXRecordDecl::DefinitionData::DefinitionData(CXXRecordDecl *D)
       DefaultedDestructorIsDeleted(false), HasTrivialSpecialMembers(SMF_All),
       HasTrivialSpecialMembersForCall(SMF_All),
       DeclaredNonTrivialSpecialMembers(0),
-      DeclaredNonTrivialSpecialMembersForCall(0), HasIrrelevantDestructor(true),
+      DeclaredNonTrivialSpecialMembersForCall(0),
+      IsNaturallyTriviallyRelocatable(true),
+      HasNonTriviallyRelocatableSubobject(false),
+      HasIrrelevantDestructor(true),
       HasConstexprNonCopyMoveConstructor(false),
       HasDefaultedDefaultConstructor(false),
       DefaultedDefaultConstructorIsConstexpr(true),
@@ -279,6 +282,12 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
 
       //   An aggregate is a class with [...] no virtual functions.
       data().Aggregate = false;
+
+      // A move-constructible, destructible object type T is a trivially relocatable type if it is: [...]
+      // -- a (possibly cv-qualified) class type which: [...]
+      //    -- has no virtual member functions
+      setIsNotNaturallyTriviallyRelocatable();
+      setHasNonTriviallyRelocatableSubobject();
     }
 
     // C++0x [class]p7:
@@ -292,6 +301,11 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
     // Record if this base is the first non-literal field or base.
     if (!hasNonLiteralTypeFieldsOrBases() && !BaseType->isLiteralType(C))
       data().HasNonLiteralTypeFieldsOrBases = true;
+
+    if (Base->isVirtual() || !BaseClassDecl->isTriviallyRelocatable()) {
+      setIsNotNaturallyTriviallyRelocatable();
+      setHasNonTriviallyRelocatableSubobject();
+    }
 
     // Now go through all virtual bases of this base and add them.
     for (const auto &VBase : BaseClassDecl->vbases()) {
@@ -570,6 +584,14 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
   return !forallBases([](const CXXRecordDecl *) { return true; });
 }
 
+bool CXXRecordDecl::isTriviallyRelocatable() const {
+  return (data().IsNaturallyTriviallyRelocatable ||
+          hasAttr<TriviallyRelocatableAttr>() ||
+          hasAttr<TrivialABIAttr>() ||
+          (hasAttr<MaybeTriviallyRelocatableAttr>() &&
+           !data().HasNonTriviallyRelocatableSubobject));
+}
+
 bool CXXRecordDecl::isTriviallyCopyable() const {
   // C++0x [class]p5:
   //   A trivially copyable class is a class that:
@@ -746,6 +768,12 @@ void CXXRecordDecl::addedMember(Decl *D) {
       //    -- has no virtual functions
       data().IsStandardLayout = false;
       data().IsCXX11StandardLayout = false;
+
+      // A move-constructible, destructible object type T is a trivially relocatable type if it is: [...]
+      // -- a (possibly cv-qualified) class type which: [...]
+      //    -- has no virtual member functions
+      setIsNotNaturallyTriviallyRelocatable();
+      setHasNonTriviallyRelocatableSubobject();
     }
   }
 
@@ -812,6 +840,14 @@ void CXXRecordDecl::addedMember(Decl *D) {
               ? !Constructor->isImplicit()
               : (Constructor->isUserProvided() || Constructor->isExplicit()))
         data().Aggregate = false;
+
+      // A move-constructible, destructible object type T is a trivially relocatable type if it is:
+      // -- a (possibly cv-qualified) class type which: [...]
+      //    -- has no user-provided move constructors or move assignment operators,
+      //    -- has no user-provided copy constructors or copy assignment operators,
+      if (Constructor->isUserProvided() && (Constructor->isCopyConstructor() ||
+                                            Constructor->isMoveConstructor()))
+        setIsNotNaturallyTriviallyRelocatable();
     }
   }
 
@@ -841,10 +877,17 @@ void CXXRecordDecl::addedMember(Decl *D) {
           Method->getParamDecl(0)->getType()->getAs<ReferenceType>();
       if (!ParamTy || ParamTy->getPointeeType().isConstQualified())
         data().HasDeclaredCopyAssignmentWithConstParam = true;
+
+      if (Method->isUserProvided())
+        setIsNotNaturallyTriviallyRelocatable();
     }
 
-    if (Method->isMoveAssignmentOperator())
+    if (Method->isMoveAssignmentOperator()) {
       SMKind |= SMF_MoveAssignment;
+
+      if (Method->isUserProvided())
+        setIsNotNaturallyTriviallyRelocatable();
+    }
 
     // Keep the list of conversion functions up-to-date.
     if (auto *Conversion = dyn_cast<CXXConversionDecl>(D)) {
@@ -1383,8 +1426,10 @@ void CXXRecordDecl::addedEligibleSpecialMemberFunction(const CXXMethodDecl *MD,
   // See https://github.com/llvm/llvm-project/issues/59206
 
   if (const auto *DD = dyn_cast<CXXDestructorDecl>(MD)) {
-    if (DD->isUserProvided())
+    if (DD->isUserProvided()) {
       data().HasIrrelevantDestructor = false;
+      setIsNotNaturallyTriviallyRelocatable();
+    }
     // If the destructor is explicitly defaulted and not trivial or not public
     // or if the destructor is deleted, we clear HasIrrelevantDestructor in
     // finishedDefaultedOrDeletedMember.
