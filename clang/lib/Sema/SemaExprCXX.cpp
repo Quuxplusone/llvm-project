@@ -5230,7 +5230,6 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
       }
     }
     return true;
-
   case UTT_HasTrivialDestructor:
     // http://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html
     //   If __is_pod (type) is true or type is a reference type
