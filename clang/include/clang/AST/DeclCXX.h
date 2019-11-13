@@ -1290,6 +1290,27 @@ public:
         (SMF_CopyConstructor | SMF_MoveConstructor | SMF_Destructor);
   }
 
+  /// Determine whether this class is trivially relocatable
+  bool isTriviallyRelocatable() const {
+    return (
+        data().IsNaturallyTriviallyRelocatable ||
+        hasAttr<TriviallyRelocatableAttr>() ||
+        (hasAttr<MaybeTriviallyRelocatableAttr>() && !data().HasNonTriviallyRelocatableSubobject)
+    );
+  }
+
+  void setIsNotNaturallyTriviallyRelocatable() {
+    data().IsNaturallyTriviallyRelocatable = false;
+  }
+
+  bool hasNonTriviallyRelocatableSubobject() const {
+    return data().HasNonTriviallyRelocatableSubobject;
+  }
+
+  void setHasNonTriviallyRelocatableSubobject() {
+    data().HasNonTriviallyRelocatableSubobject = true;
+  }
+
   /// Determine whether declaring a const variable with this type is ok
   /// per core issue 253.
   bool allowConstDefaultInit() const {
