@@ -147,7 +147,7 @@ struct __attribute__((trivial_abi)) MoveDeleted {
   MoveDeleted(const MoveDeleted &) = default;
   MoveDeleted(MoveDeleted &&) = delete;
 };
-static_assert(__is_trivially_relocatable(MoveDeleted), "");
+static_assert(!__is_trivially_relocatable(MoveDeleted), "");
 
 struct __attribute__((trivial_abi)) S19 { // expected-warning {{'trivial_abi' cannot be applied to 'S19'}} expected-note {{copy constructors and move constructors are all deleted}}
   CopyDeleted a;
