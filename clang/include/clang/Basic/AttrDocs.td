@@ -3485,6 +3485,28 @@ Attribute ``trivial_abi`` has no effect in the following cases:
   }];
 }
 
+def TriviallyRelocatableDocs : Documentation {
+  let Category = DocCatVariable;
+  let Content = [{
+The ``trivially_relocatable`` attribute can be applied to a C++ class, struct, or union.
+It warrants to the compiler that moving an object of that type, and then destroying the
+source object, is functionally equivalent to copying the underlying bytes
+and then dropping the source object on the floor.
+  }];
+}
+
+def MaybeTriviallyRelocatableDocs : Documentation {
+  let Category = DocCatVariable;
+  let Content = [{
+The ``maybe_trivially_relocatable`` attribute can be applied to a C++ class, struct, or union.
+It warrants to the compiler that moving an object of that type, and then destroying the
+source object, is functionally equivalent to copying the underlying bytes
+and then dropping the source object on the floor... But, if the type to which it
+is applied has any direct subobjects of non-trivially relocatable type, then this
+attribute has no effect.
+  }];
+}
+
 def MSInheritanceDocs : Documentation {
   let Category = DocCatDecl;
   let Heading = "__single_inhertiance, __multiple_inheritance, __virtual_inheritance";
