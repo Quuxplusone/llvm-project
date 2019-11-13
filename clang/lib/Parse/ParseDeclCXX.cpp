@@ -3927,6 +3927,7 @@ static bool IsBuiltInOrStandardCXX11Attribute(IdentifierInfo *AttrName,
   case ParsedAttr::AT_FallThrough:
   case ParsedAttr::AT_CXX11NoReturn:
   case ParsedAttr::AT_NoUniqueAddress:
+  case ParsedAttr::AT_TriviallyRelocatable:
     return true;
   case ParsedAttr::AT_WarnUnusedResult:
     return !ScopeName && AttrName->getName().equals("nodiscard");
