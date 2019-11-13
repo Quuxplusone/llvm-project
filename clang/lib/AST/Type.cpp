@@ -2573,20 +2573,24 @@ bool QualType::isTriviallyCopyableType(const ASTContext &Context) const {
 }
 
 bool QualType::isTriviallyRelocatableType(const ASTContext &Context) const {
-  QualType BaseElementType = Context.getBaseElementType(*this);
-
-  if (BaseElementType->isIncompleteType()) {
+  QualType BaseElementType = Context.getBaseElementType(getCanonicalType());
+  if (BaseElementType->isIncompleteType() || BaseElementType->isDependentType()) {
     return false;
-  } else if (const auto *RD = BaseElementType->getAsRecordDecl()) {
-    return RD->canPassInRegisters();
+  } else if (!BaseElementType->isObjectType()) {
+    return false;
+  } else if (CXXRecordDecl *RD = BaseElementType->getAsCXXRecordDecl()) {
+    return RD->isTriviallyRelocatable();
+  } else if (BaseElementType.isTriviallyCopyableType(Context)) {
+    return true;
   } else {
     switch (isNonTrivialToPrimitiveDestructiveMove()) {
-    case PCK_Trivial:
-      return !isDestructedType();
-    case PCK_ARCStrong:
-      return true;
-    default:
-      return false;
+      case PCK_ARCStrong:
+      case PCK_Trivial:
+      case PCK_VolatileTrivial:
+        return true;
+      case PCK_ARCWeak:
+      case PCK_Struct:
+        return false;
     }
   }
 }
