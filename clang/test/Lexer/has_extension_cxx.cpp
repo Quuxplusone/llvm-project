@@ -76,3 +76,9 @@ int has_variable_templates();
 #if __has_extension(cxx_init_captures)
 int has_init_captures();
 #endif
+
+// CHECK-NOT: has_trivially_relocatable
+// CHECK11: has_trivially_relocatable
+#if __has_extension(trivially_relocatable)
+int has_trivially_relocatable();
+#endif
