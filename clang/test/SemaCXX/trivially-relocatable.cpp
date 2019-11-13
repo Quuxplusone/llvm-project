@@ -7,10 +7,19 @@ static_assert(__has_extension(trivially_relocatable), "");
 // and no attribute-argument-clause shall be present.
 
 struct [[clang::trivially_relocatable, clang::trivially_relocatable]] B1 {}; // should really be an error
+// expected-error@-1{{attribute 'trivially_relocatable' cannot appear multiple times in an attribute specifier}}
 
 struct [[clang::trivially_relocatable]] [[clang::trivially_relocatable]] B2 {}; // should really be an error
 
 struct [[clang::trivially_relocatable(42)]] B3 {};
+
+struct [[trivially_relocatable, trivially_relocatable]] B4 {};
+// expected-error@-1{{attribute 'trivially_relocatable' cannot appear multiple times in an attribute specifier}}
+struct [[trivially_relocatable]] [[trivially_relocatable]] B5 {}; // should really be an error
+struct [[trivially_relocatable(42)]] B6 {};
+struct [[trivially_relocatable, clang::trivially_relocatable]] B7 {};
+// expected-error@-1{{attribute 'trivially_relocatable' cannot appear multiple times in an attribute specifier}}
+struct [[trivially_relocatable]] [[clang::trivially_relocatable]] B8 {}; // should really be an error
 
 
 //   The first declaration of a type shall specify the
