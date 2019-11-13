@@ -7106,6 +7106,63 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
     else if (Record->hasAttr<CUDADeviceBuiltinTextureTypeAttr>())
       checkCUDADeviceBuiltinTextureClassTemplate(*this, Record);
   }
+
+  if (getLangOpts().CPlusPlus11 && !Record->isDependentContext()) {
+
+    // Deal with [[trivially_relocatable(condition)]].
+    if (auto *TRA = Record->getAttr<TriviallyRelocatableAttr>()) {
+      if (Expr *Arg = TRA->getCond()) {
+        // Evaluate the condition. If it's ill-formed, ignore the attribute.
+        // If it's well-formed and false, render this type NOT trivially relocatable.
+        SFINAETrap Trap(*this);
+        bool Result = false;
+        if (!Arg->EvaluateAsBooleanCondition(Result, Context)) {
+          // An ill-formed, non-constant, or non-boolean expression drops the attribute.
+          Record->dropAttr<TriviallyRelocatableAttr>();
+        } else if (!Result) {
+          // A well-formed "false" disables trivial relocation for this class.
+          // I have no use-case for this behavior, but it seems more logical than
+          // allowing a [[trivially_relocatable(false)]] class to be trivially
+          // relocatable.
+          Record->setIsNotNaturallyTriviallyRelocatable();
+          Record->dropAttr<TriviallyRelocatableAttr>();
+        }
+      }
+    }
+
+    // A move-constructible, destructible object type T is a
+    // trivially relocatable type if [...]
+
+    if (Record->hasAttr<TriviallyRelocatableAttr>() ||
+        Record->hasAttr<MaybeTriviallyRelocatableAttr>()) {
+      int Reason = 0;
+      SpecialMemberOverloadResult SMOR = LookupSpecialMember(
+        Record, Sema::CXXDestructor, false, false, false, false, false);
+      if (SMOR.getKind() != SpecialMemberOverloadResult::Success) {
+        Reason = 1;
+      } else {
+        SMOR = LookupSpecialMember(
+          Record, Sema::CXXMoveConstructor, false, false, false, false, false);
+        if (SMOR.getKind() != SpecialMemberOverloadResult::Success)
+          Reason = 2;
+      }
+
+      if (Reason != 0) {
+        Record->setIsNotNaturallyTriviallyRelocatable();
+        if (Record->hasAttr<TriviallyRelocatableAttr>()) {
+          Record->dropAttr<TriviallyRelocatableAttr>();
+          if (!isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
+            Diag(Record->getLocation(),
+                 diag::err_trivially_relocatable_class_is_not_relocatable)
+                << Record->getCanonicalDecl()->getTagKind()
+                << Context.getRecordType(Record) << (Reason == 1);
+          }
+        }
+        if (Record->hasAttr<MaybeTriviallyRelocatableAttr>())
+          Record->dropAttr<MaybeTriviallyRelocatableAttr>();
+      }
+    }
+  }
 }
 
 /// Look up the special member function that would be called by a special
