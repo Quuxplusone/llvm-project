@@ -6717,6 +6717,36 @@ ReportOverrides(Sema &S, unsigned DiagID, const CXXMethodDecl *MD,
   return IssuedDiagnostic;
 }
 
+static bool
+LookupTrivialDestructor(Sema &S, CXXRecordDecl *R, bool AlwaysUseLookup) {
+  if (AlwaysUseLookup || R->hasUserDeclaredDestructor() ||
+      R->needsOverloadResolutionForDestructor() ||
+      (R->needsImplicitDestructor() && !R->hasTrivialDestructor())) {
+
+    Sema::SpecialMemberOverloadResult SMOR = S.LookupSpecialMember(
+        R, Sema::CXXDestructor, false, false, false, false, false);
+    return SMOR.getKind() == Sema::SpecialMemberOverloadResult::Success;
+  }
+
+  return R->hasTrivialDestructor();
+}
+
+static bool
+LookupTrivialMoveConstructor(Sema &S, CXXRecordDecl *R, bool AlwaysUseLookup) {
+  if (AlwaysUseLookup || R->hasUserDeclaredMoveConstructor() ||
+      R->needsOverloadResolutionForMoveConstructor() ||
+      (R->needsImplicitMoveConstructor() && !R->hasTrivialMoveConstructor()) ||
+      !R->hasMoveConstructor()) {
+
+    Sema::SpecialMemberOverloadResult SMOR = S.LookupSpecialMember(
+        R, Sema::CXXMoveConstructor, false, false, false, false, false);
+
+    return SMOR.getKind() == Sema::SpecialMemberOverloadResult::Success;
+  }
+
+  return R->hasTrivialMoveConstructor();
+}
+
 /// Perform semantic checks on a class definition that has been
 /// completing, introducing implicitly-declared members, checking for
 /// abstract types, etc.
@@ -6917,6 +6947,27 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       Record->setTrivialForCallFlags(M);
     }
 
+    // A move-constructible, destructible object type T is a
+    // trivially relocatable type if it ...
+    if (CSM == CXXMoveConstructor && M->isUserProvided()) {
+      // - has no user-provided move constructors,
+      Record->setIsNotNaturallyTriviallyRelocatable();
+    } else if (CSM == CXXCopyConstructor && M->isUserProvided()) {
+      // - either has at least one move constructor or
+      // has no user-provided copy constructors,
+      if (!Record->hasMoveConstructor())
+        Record->setIsNotNaturallyTriviallyRelocatable();
+    } else if (CSM == CXXDestructor &&
+               (M->isUserProvided() || M->isDeleted())) {
+      // - has a defaulted, non-deleted destructor,
+      Record->setIsNotNaturallyTriviallyRelocatable();
+    } else if (CSM == CXXDestructor && M->isVirtual()) {
+      // - either is final, or has a final destructor,
+      // or has a non-virtual destructor ...
+      if (!M->hasAttr<FinalAttr>() && !Record->hasAttr<FinalAttr>())
+        Record->setIsNotNaturallyTriviallyRelocatable();
+    }
+
     if (!M->isInvalidDecl() && M->isExplicitlyDefaulted() &&
         M->hasAttr<DLLExportAttr>()) {
       if (getLangOpts().isCompatibleWithMSVC(LangOptions::MSVC2015) &&
@@ -7043,6 +7094,73 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       checkCUDADeviceBuiltinSurfaceClassTemplate(*this, Record);
     else if (Record->hasAttr<CUDADeviceBuiltinTextureTypeAttr>())
       checkCUDADeviceBuiltinTextureClassTemplate(*this, Record);
+  }
+
+  if (getLangOpts().CPlusPlus11 && !Record->isDependentContext()) {
+
+    // Deal with [[trivially_relocatable(condition)]].
+    if (auto *TRA = Record->getAttr<TriviallyRelocatableAttr>()) {
+      if (Expr *Arg = TRA->getCond()) {
+        // Evaluate the condition. If it's ill-formed, ignore the attribute.
+        // If it's well-formed and false, render this type NOT trivially relocatable.
+        SFINAETrap Trap(*this);
+        bool Result = false;
+        if (!Arg->EvaluateAsBooleanCondition(Result, Context)) {
+          // An ill-formed, non-constant, or non-boolean expression drops the attribute.
+          Record->dropAttr<TriviallyRelocatableAttr>();
+        } else if (!Result) {
+          // A well-formed "false" disables trivial relocation for this class.
+          // I have no use-case for this behavior, but it seems more logical than
+          // allowing a [[trivially_relocatable(false)]] class to be trivially
+          // relocatable.
+          Record->setIsNotNaturallyTriviallyRelocatable();
+          Record->dropAttr<TriviallyRelocatableAttr>();
+        }
+      }
+    }
+
+    // Determine whether a Record is TriviallyRelocatable. The helper functions
+    // can use two methods:
+    // - Call Sema::LookupSpecialMember this call always works but it adds
+    //   special member function declarations to the CXXRecordDecl record. This
+    //   is increases the size of the AST for simple classes, which is
+    //   unwanted. For example the type_traits helper classes.
+    // - Look at the DefinitionData's HasTrivialSpecialMembers field. This
+    //   value isn't always reliable. Therefore we need to test whether we can
+    //   use this value.
+    // If AlwaysUseLookup represents the cases where we always need to use the
+    // call to Sema::LookupSpecialMember. The helper functions themselves have
+    // additional tests for their specific call.
+    bool AlwaysUseLookup = Record->isPolymorphic() ||
+                           Record->hasAttr<TriviallyRelocatableAttr>() ||
+                           Record->hasAttr<MaybeTriviallyRelocatableAttr>();
+    if (!LookupTrivialDestructor(*this, Record, AlwaysUseLookup)) {
+      Record->setIsNotNaturallyTriviallyRelocatable();
+      if (Record->hasAttr<TriviallyRelocatableAttr>()) {
+        Record->dropAttr<TriviallyRelocatableAttr>();
+        if (!isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
+          Diag(Record->getLocation(),
+               diag::err_trivially_relocatable_class_is_not_relocatable)
+              << Record->getCanonicalDecl()->getTagKind()
+              << Context.getRecordType(Record) << true;
+        }
+      }
+      if (Record->hasAttr<MaybeTriviallyRelocatableAttr>())
+        Record->dropAttr<MaybeTriviallyRelocatableAttr>();
+    } else if (!LookupTrivialMoveConstructor(*this, Record, AlwaysUseLookup)) {
+      Record->setIsNotNaturallyTriviallyRelocatable();
+      if (Record->hasAttr<TriviallyRelocatableAttr>()) {
+        Record->dropAttr<TriviallyRelocatableAttr>();
+        if (!isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
+          Diag(Record->getLocation(),
+               diag::err_trivially_relocatable_class_is_not_relocatable)
+              << Record->getCanonicalDecl()->getTagKind()
+              << Context.getRecordType(Record) << false;
+        }
+      }
+      if (Record->hasAttr<MaybeTriviallyRelocatableAttr>())
+        Record->dropAttr<MaybeTriviallyRelocatableAttr>();
+    }
   }
 }
 

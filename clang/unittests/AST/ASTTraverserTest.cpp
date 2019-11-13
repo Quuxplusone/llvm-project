@@ -1607,7 +1607,9 @@ ClassTemplateDecl 'TemplStruct'
 | |-CXXDestructorDecl '~TemplStruct'
 | | `-CompoundStmt
 | |-AccessSpecDecl
-| `-FieldDecl 'm_t'
+| |-FieldDecl 'm_t'
+| `-CXXConstructorDecl 'TemplStruct'
+|   `-ParmVarDecl ''
 |-ClassTemplateSpecializationDecl 'TemplStruct'
 | |-TemplateArgument type long
 | | `-BuiltinType
@@ -1615,7 +1617,9 @@ ClassTemplateDecl 'TemplStruct'
 | |-CXXConstructorDecl 'TemplStruct'
 | |-CXXDestructorDecl '~TemplStruct'
 | |-AccessSpecDecl
-| `-FieldDecl 'm_t'
+| |-FieldDecl 'm_t'
+| `-CXXConstructorDecl 'TemplStruct'
+|   `-ParmVarDecl ''
 `-ClassTemplateSpecializationDecl 'TemplStruct'
   |-TemplateArgument type _Bool
   | `-BuiltinType
@@ -1627,7 +1631,9 @@ ClassTemplateDecl 'TemplStruct'
   |-CXXMethodDecl 'foo'
   | `-CompoundStmt
   |-AccessSpecDecl
-  `-FieldDecl 'm_t'
+  |-FieldDecl 'm_t'
+  `-CXXConstructorDecl 'TemplStruct'
+    `-ParmVarDecl ''
 )cpp");
   }
   {
@@ -1652,7 +1658,9 @@ ClassTemplateSpecializationDecl 'TemplStruct'
 |-CXXMethodDecl 'foo'
 | `-CompoundStmt
 |-AccessSpecDecl
-`-FieldDecl 'm_t'
+|-FieldDecl 'm_t'
+`-CXXConstructorDecl 'TemplStruct'
+  `-ParmVarDecl ''
 )cpp");
 
     EXPECT_EQ(dumpASTString(TK_IgnoreUnlessSpelledInSource,
@@ -1777,7 +1785,9 @@ ClassTemplateSpecializationDecl 'TemplStruct'
 |-CXXDestructorDecl '~TemplStruct'
 | `-CompoundStmt
 |-AccessSpecDecl
-`-FieldDecl 'm_t'
+|-FieldDecl 'm_t'
+`-CXXConstructorDecl 'TemplStruct'
+  `-ParmVarDecl ''
 )cpp");
   }
 }

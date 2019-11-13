@@ -4810,6 +4810,7 @@ static bool CheckUnaryTypeTraitTypeCompleteness(Sema &S, TypeTrait UTT,
   case UTT_IsDestructible:
   case UTT_IsNothrowDestructible:
   case UTT_IsTriviallyDestructible:
+  case UTT_IsTriviallyRelocatable:
   case UTT_HasUniqueObjectRepresentations:
     if (ArgTy->isIncompleteArrayType() || ArgTy->isVoidType())
       return true;
@@ -5101,7 +5102,8 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
       }
     }
     return true;
-
+  case UTT_IsTriviallyRelocatable:
+    return T.isTriviallyRelocatableType(C);
   case UTT_HasTrivialDestructor:
     // http://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html
     //   If __is_pod (type) is true or type is a reference type

@@ -2505,6 +2505,19 @@ bool QualType::isTriviallyCopyableType(const ASTContext &Context) const {
   return false;
 }
 
+bool QualType::isTriviallyRelocatableType(const ASTContext &Context) const {
+  QualType T = Context.getBaseElementType(getCanonicalType());
+  if (T->isIncompleteType())
+    return false;
+  if (CXXRecordDecl *RD = T->getAsCXXRecordDecl()) {
+    return RD->isTriviallyRelocatable();
+  } else {
+    // Non-class types are always both move-constructible and destructible,
+    // so just check whether a non-class type is trivially copyable.
+    return T.isTriviallyCopyableType(Context);
+  }
+}
+
 bool QualType::isNonWeakInMRRWithObjCWeak(const ASTContext &Context) const {
   return !Context.getLangOpts().ObjCAutoRefCount &&
          Context.getLangOpts().ObjCWeak &&

@@ -95,7 +95,10 @@ CXXRecordDecl::DefinitionData::DefinitionData(CXXRecordDecl *D)
       DefaultedDestructorIsDeleted(false), HasTrivialSpecialMembers(SMF_All),
       HasTrivialSpecialMembersForCall(SMF_All),
       DeclaredNonTrivialSpecialMembers(0),
-      DeclaredNonTrivialSpecialMembersForCall(0), HasIrrelevantDestructor(true),
+      DeclaredNonTrivialSpecialMembersForCall(0),
+      IsNaturallyTriviallyRelocatable(true),
+      HasNonTriviallyRelocatableSubobject(false),
+      HasIrrelevantDestructor(true),
       HasConstexprNonCopyMoveConstructor(false),
       HasDefaultedDefaultConstructor(false),
       DefaultedDefaultConstructorIsConstexpr(true),
@@ -292,6 +295,11 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
     // Record if this base is the first non-literal field or base.
     if (!hasNonLiteralTypeFieldsOrBases() && !BaseType->isLiteralType(C))
       data().HasNonLiteralTypeFieldsOrBases = true;
+
+    if (Base->isVirtual() || !BaseClassDecl->isTriviallyRelocatable()) {
+      setIsNotNaturallyTriviallyRelocatable();
+      setHasNonTriviallyRelocatableSubobject();
+    }
 
     // Now go through all virtual bases of this base and add them.
     for (const auto &VBase : BaseClassDecl->vbases()) {
@@ -568,6 +576,13 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
     return false;
 
   return !forallBases([](const CXXRecordDecl *) { return true; });
+}
+
+bool CXXRecordDecl::isTriviallyRelocatable() const {
+  return (data().IsNaturallyTriviallyRelocatable ||
+          hasAttr<TriviallyRelocatableAttr>() ||
+          (hasAttr<MaybeTriviallyRelocatableAttr>() &&
+           !data().HasNonTriviallyRelocatableSubobject));
 }
 
 bool CXXRecordDecl::isTriviallyCopyable() const {

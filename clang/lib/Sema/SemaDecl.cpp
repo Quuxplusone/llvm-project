@@ -17931,6 +17931,28 @@ void Sema::ActOnFields(Scope *S, SourceLocation RecLoc, Decl *EnclosingDecl,
         Record->setArgPassingRestrictions(RecordDecl::APK_CanNeverPassInRegs);
     }
 
+    if (CXXRecord) {
+      QualType FT = FD->getType();
+      if (FD->isMutable() || FT.isVolatileQualified()) {
+        CXXRecord->setIsNotNaturallyTriviallyRelocatable();
+        CXXRecord->setHasNonTriviallyRelocatableSubobject();
+      } else if (!FT->isReferenceType() && !FT.isTriviallyRelocatableType(Context)) {
+        CXXRecord->setIsNotNaturallyTriviallyRelocatable();
+        bool cxx_record_has_nontrivially_relocatable_subobject = true;
+        if (FD->isAnonymousStructOrUnion()) {
+          // Anonymous unions are "see-through."
+          QualType T = Context.getBaseElementType(FT.getCanonicalType());
+          if (CXXRecordDecl *RD = T->getAsCXXRecordDecl()) {
+            cxx_record_has_nontrivially_relocatable_subobject =
+              RD->hasNonTriviallyRelocatableSubobject();
+          }
+        }
+        if (cxx_record_has_nontrivially_relocatable_subobject) {
+          CXXRecord->setHasNonTriviallyRelocatableSubobject();
+        }
+      }
+    }
+
     if (Record && FD->getType().isVolatileQualified())
       Record->setHasVolatileMember(true);
     // Keep track of the number of named members.
