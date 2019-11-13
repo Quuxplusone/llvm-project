@@ -18,4 +18,4 @@ union U {
   E e;
 };
 // CHECK-LABEL: CXXRecordDecl {{.*}} union U
-// CHECK: Destructor non_trivial needs_implicit defaulted_is_deleted
+// CHECK: Destructor non_trivial defaulted_is_deleted
