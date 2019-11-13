@@ -6072,6 +6072,44 @@ static void handleLayoutVersion(Sema &S, Decl *D, const ParsedAttr &AL) {
   D->addAttr(::new (S.Context) LayoutVersionAttr(S.Context, AL, Version));
 }
 
+#if 0
+template<class AttrType>
+static void checkAttributeNotOnFirstDecl(Sema &S, Decl *D, const ParsedAttr &AL) {
+  Decl *FirstD = D->getCanonicalDecl();
+  if (FirstD != D && !FirstD->hasAttr<AttrType>()) {
+    NamedDecl *ND = dyn_cast<NamedDecl>(D);
+    S.Diag(AL.getLoc(), diag::err_attribute_missing_on_first_decl)
+      << (ND ? ND->getDeclName().getAsString() : "<unnamed>") << AL.getName();
+    S.Diag(FirstD->getLocation(), diag::note_attribute_missing_first_decl)
+      << AL.getName()
+      << FirstD->getSourceRange();
+  }
+}
+#endif
+
+static void handleTriviallyRelocatableAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
+  // checkAttributeNotOnFirstDecl<TriviallyRelocatableAttr>(S, D, AL);
+
+  Expr *Cond = nullptr;
+  if (AL.getNumArgs() == 1) {
+    Cond = AL.getArgAsExpr(0);
+    if (!Cond->isTypeDependent()) {
+      ExprResult Converted = S.PerformContextuallyConvertToBool(Cond);
+      if (Converted.isInvalid()) {
+        return;
+      }
+      Cond = Converted.get();
+    }
+  }
+
+  D->addAttr(::new (S.Context) TriviallyRelocatableAttr(S.Context, AL, Cond));
+}
+
+static void handleMaybeTriviallyRelocatableAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
+  // checkAttributeNotOnFirstDecl<MaybeTriviallyRelocatableAttr>(S, D, AL);
+  handleSimpleAttribute<MaybeTriviallyRelocatableAttr>(S, D, AL);
+}
+
 DLLImportAttr *Sema::mergeDLLImportAttr(Decl *D,
                                         const AttributeCommonInfo &CI) {
   if (D->hasAttr<DLLExportAttr>()) {
@@ -7231,6 +7269,12 @@ static void ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D,
     break;
   case ParsedAttr::AT_TrivialABI:
     handleSimpleAttribute<TrivialABIAttr>(S, D, AL);
+    break;
+  case ParsedAttr::AT_TriviallyRelocatable:
+    handleTriviallyRelocatableAttr(S, D, AL);
+    break;
+  case ParsedAttr::AT_MaybeTriviallyRelocatable:
+    handleMaybeTriviallyRelocatableAttr(S, D, AL);
     break;
   case ParsedAttr::AT_MSNoVTable:
     handleSimpleAttribute<MSNoVTableAttr>(S, D, AL);

@@ -3131,6 +3131,11 @@ def err_attribute_output_parameter : Error<
 def ext_cannot_use_trivial_abi : ExtWarn<
   "'trivial_abi' cannot be applied to %0">, InGroup<IgnoredAttributes>;
 
+def err_trivially_relocatable_class_is_not_relocatable : Error<
+  "'trivially_relocatable' cannot be applied to "
+  "%select{struct|interface|union|class|enum}0 %1 because it is "
+  "not %select{move-constructible|destructible}2">;
+
 // Availability attribute
 def warn_availability_unknown_platform : Warning<
   "unknown platform %0 in availability macro">, InGroup<Availability>;
@@ -8804,6 +8809,11 @@ def err_block_on_nonlocal : Error<
   "__block attribute not allowed, only allowed on local variables">;
 def err_block_on_vm : Error<
   "__block attribute not allowed on declaration with a variably modified type">;
+
+def err_attribute_missing_on_first_decl : Error<
+  "type %0 declared %1 after its first declaration">;
+def note_attribute_missing_first_decl : Note<
+  "declaration missing %0 attribute is here">;
 
 def err_vec_builtin_non_vector : Error<
  "first two arguments to %0 must be vectors">;
