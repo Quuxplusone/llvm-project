@@ -274,6 +274,7 @@ EXTENSION(cxx_generalized_nttp, LangOpts.CPlusPlus20)
 //C++23
 EXTENSION(cxx_explicit_this_parameter, LangOpts.CPlusPlus23)
 // Miscellaneous language extensions
+EXTENSION(trivially_relocatable, LangOpts.CPlusPlus11)
 EXTENSION(overloadable_unmarked, true)
 EXTENSION(pragma_clang_attribute_namespaces, true)
 EXTENSION(pragma_clang_attribute_external_declaration, true)
