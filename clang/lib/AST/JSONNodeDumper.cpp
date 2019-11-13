@@ -486,6 +486,7 @@ JSONNodeDumper::createCXXRecordDefinitionData(const CXXRecordDecl *RD) {
   FIELD1(isAggregate);
   FIELD1(isStandardLayout);
   FIELD1(isTriviallyCopyable);
+  FIELD1(isTriviallyRelocatable);
   FIELD1(isPOD);
   FIELD1(isTrivial);
   FIELD1(isPolymorphic);
