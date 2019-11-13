@@ -5219,7 +5219,6 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
       }
     }
     return true;
-
   case UTT_HasTrivialDestructor:
     // http://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html
     //   If __is_pod (type) is true or type is a reference type
@@ -5371,7 +5370,20 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
   case UTT_HasUniqueObjectRepresentations:
     return C.hasUniqueObjectRepresentations(T);
   case UTT_IsTriviallyRelocatable:
-    return T.isTriviallyRelocatableType(C);
+    if (!T.isTriviallyRelocatableType(C))
+      return false;
+    if (auto *Record = T->getAsCXXRecordDecl()) {
+      // A move-constructible, destructible object type [...]
+      Sema::SpecialMemberOverloadResult SMOR = Self.LookupSpecialMember(
+        Record, Sema::CXXDestructor, false, false, false, false, false);
+      if (SMOR.getKind() != Sema::SpecialMemberOverloadResult::Success)
+        return false;
+      SMOR = Self.LookupSpecialMember(
+        Record, Sema::CXXMoveConstructor, false, false, false, false, false);
+      if (SMOR.getKind() != Sema::SpecialMemberOverloadResult::Success)
+        return false;
+    }
+    return true;
   case UTT_IsReferenceable:
     return T.isReferenceable();
   case UTT_CanPassInRegs:
