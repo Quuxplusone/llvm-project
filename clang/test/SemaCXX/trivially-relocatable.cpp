@@ -12,6 +12,12 @@ struct [[clang::trivially_relocatable]] [[clang::trivially_relocatable]] B2 {}; 
 
 struct [[clang::trivially_relocatable(42)]] B3 {};
 
+struct [[trivially_relocatable, trivially_relocatable]] B4 {};
+struct [[trivially_relocatable]] [[trivially_relocatable]] B5 {}; // should really be an error
+struct [[trivially_relocatable(42)]] B6 {};
+struct [[trivially_relocatable, clang::trivially_relocatable]] B7 {};
+struct [[trivially_relocatable]] [[clang::trivially_relocatable]] B8 {}; // should really be an error
+
 
 //   The first declaration of a type shall specify the
 //   trivially_relocatable attribute if any declaration of that
