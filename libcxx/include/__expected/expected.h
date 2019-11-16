@@ -444,7 +444,12 @@ private:
 };
 
 template <class _Tp, class _Err>
-class expected : private __expected_base<_Tp, _Err> {
+inline constexpr bool __expected_be_trivially_relocatable_v =
+  __libcpp_is_trivially_relocatable<_Err>::value &&
+  (__libcpp_is_trivially_relocatable<_Tp>::value || is_void_v<_Tp>);
+
+template <class _Tp, class _Err>
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__expected_be_trivially_relocatable_v<_Tp, _Err>)) expected : private __expected_base<_Tp, _Err> {
   static_assert(!is_reference_v<_Tp> && !is_function_v<_Tp> && !is_same_v<remove_cv_t<_Tp>, in_place_t> &&
                     !is_same_v<remove_cv_t<_Tp>, unexpect_t> && !__is_std_unexpected<remove_cv_t<_Tp>>::value &&
                     __valid_std_unexpected<_Err>::value,
@@ -1352,7 +1357,7 @@ private:
 
 template <class _Tp, class _Err>
   requires is_void_v<_Tp>
-class expected<_Tp, _Err> : private __expected_void_base<_Err> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__expected_be_trivially_relocatable_v<void, _Err>)) expected<_Tp, _Err> : private __expected_void_base<_Err> {
   static_assert(__valid_std_unexpected<_Err>::value,
                 "[expected.void.general] A program that instantiates expected<T, E> with a E that is not a "
                 "valid argument for unexpected<E> is ill-formed");
