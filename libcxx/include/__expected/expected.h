@@ -39,6 +39,7 @@
 #include <__type_traits/is_trivially_copy_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_move_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_void.h>
 #include <__type_traits/lazy.h>
 #include <__type_traits/negation.h>
@@ -76,7 +77,7 @@ _LIBCPP_HIDE_FROM_ABI void __throw_bad_expected_access(_Arg&& __arg) {
 } // namespace __expected
 
 template <class _Tp, class _Err>
-class expected {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Tp>::value && __libcpp_is_trivially_relocatable<_Err>::value)) expected {
   static_assert(
       !is_reference_v<_Tp> &&
           !is_function_v<_Tp> &&
