@@ -21,9 +21,8 @@
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_copy_constructible.h>
 #include <__type_traits/is_trivially_assignable.h>
-#include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_copyable.h>
-#include <__type_traits/is_trivially_destructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_volatile.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
@@ -43,6 +42,7 @@ struct __can_lower_copy_assignment_to_memmove {
   static const bool value =
     // If the types are always bitcastable, it's valid to do a bitwise copy between them.
     __is_always_bitcastable<_From, _To>::value &&
+    is_trivially_copyable<_To>::value &&
     // Reject conversions that wouldn't be performed by the regular built-in assignment (e.g. between arrays).
     is_trivially_assignable<_To&, const _From&>::value &&
     // `memmove` doesn't accept `volatile` pointers, make sure the optimization SFINAEs away in that case.
@@ -54,6 +54,7 @@ template <class _From, class _To>
 struct __can_lower_move_assignment_to_memmove {
   static const bool value =
     __is_always_bitcastable<_From, _To>::value &&
+    is_trivially_copyable<_To>::value &&
     is_trivially_assignable<_To&, _From&&>::value &&
     !is_volatile<_From>::value &&
     !is_volatile<_To>::value;
@@ -64,11 +65,7 @@ struct __can_lower_swap_to_memswap {
   static const bool value =
     __is_always_bitcastable<_From, _To>::value &&
     __is_always_bitcastable<_To, _From>::value &&
-    // These are the operations performed by `From& = std::exchange(To&, From&&)`.
-    is_trivially_constructible<_To, _To&&>::value &&
-    is_trivially_assignable<_To&, _From&&>::value &&
-    is_trivially_assignable<_From&, _To&&>::value &&
-    is_trivially_destructible<_To>::value &&
+    __libcpp_is_trivially_relocatable<_To>::value &&
     !is_volatile<_From>::value &&
     !is_volatile<_To>::value;
 };
