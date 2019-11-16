@@ -17,10 +17,21 @@
 #include "../CartesianBenchmarks.h"
 #include "../GenerateInput.h"
 
-enum class ValueType { Uint32, Uint64, Pair, Tuple, String, Float };
-struct AllValueTypes : EnumValuesAsTuple<AllValueTypes, ValueType, 6> {
+struct TriviallyRelocatableType {
+  std::string m_;
+  explicit TriviallyRelocatableType(std::string m) : m_(m) {}
+  friend bool operator==(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ == b.m_; }
+  friend bool operator!=(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ != b.m_; }
+  friend bool operator<(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ < b.m_; }
+  friend bool operator<=(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ <= b.m_; }
+  friend bool operator>(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ > b.m_; }
+  friend bool operator>=(const TriviallyRelocatableType& a, const TriviallyRelocatableType& b) { return a.m_ >= b.m_; }
+};
+
+enum class ValueType { Uint32, Uint64, Pair, Tuple, String, Float, Trivre };
+struct AllValueTypes : EnumValuesAsTuple<AllValueTypes, ValueType, 7> {
   static constexpr const char* Names[] = {
-      "uint32", "uint64", "pair<uint32, uint32>", "tuple<uint32, uint64, uint32>", "string", "float"};
+      "uint32", "uint64", "pair<uint32, uint32>", "tuple<uint32, uint64, uint32>", "string", "float", "trivre"};
 };
 
 using Types =
@@ -29,7 +40,8 @@ using Types =
                std::pair<uint32_t, uint32_t>,
                std::tuple<uint32_t, uint64_t, uint32_t>,
                std::string,
-               float>;
+               float,
+               TriviallyRelocatableType>;
 
 template <class V>
 using Value = std::tuple_element_t<(int)V::value, Types>;
@@ -146,6 +158,15 @@ inline void fillValues(std::vector<std::string>& V, size_t N, Order O) {
   } else {
     while (V.size() < N)
       V.push_back(getRandomString(64));
+  }
+}
+
+inline void fillValues(std::vector<TriviallyRelocatableType>& V, size_t N, Order O) {
+  if (O == Order::SingleElement) {
+    V.resize(N, TriviallyRelocatableType(getRandomString(1024)));
+  } else {
+    while (V.size() < N)
+      V.emplace_back(getRandomString(1024));
   }
 }
 
