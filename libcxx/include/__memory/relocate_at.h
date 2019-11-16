@@ -56,6 +56,14 @@ _Tp __libcpp_relocate(_Tp *__source)
     return std::move(*__source);
 }
 
+template<class _Tp>
+inline _LIBCPP_INLINE_VISIBILITY
+_Tp relocate(_Tp *__source)
+    _NOEXCEPT_(noexcept(_VSTD::__libcpp_relocate(__source)))
+{
+    return _VSTD::__libcpp_relocate(__source);
+}
+
 // __libcpp_relocate_at
 
 template<class _St, class _Dt>
@@ -84,6 +92,14 @@ _Tp *__libcpp_relocate_at(_Tp *__source, _Tp *__dest)
     _NOEXCEPT_(noexcept(std::__libcpp_relocate_at2(0, __source, __dest)))
 {
     return std::__libcpp_relocate_at2(0, __source, __dest);
+}
+
+template<class _Tp>
+inline _LIBCPP_INLINE_VISIBILITY
+_Tp *relocate_at(_Tp *__source, _Tp *__dest)
+    _NOEXCEPT_(noexcept(_VSTD::__libcpp_relocate_at(__source, __dest)))
+{
+    return _VSTD::__libcpp_relocate_at(__source, __dest);
 }
 
 _LIBCPP_END_NAMESPACE_STD
