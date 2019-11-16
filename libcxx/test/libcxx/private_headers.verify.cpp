@@ -334,6 +334,7 @@ END-SCRIPT
 #include <__memory/ranges_construct_at.h> // expected-error@*:* {{use of private header from outside its module: '__memory/ranges_construct_at.h'}}
 #include <__memory/ranges_uninitialized_algorithms.h> // expected-error@*:* {{use of private header from outside its module: '__memory/ranges_uninitialized_algorithms.h'}}
 #include <__memory/raw_storage_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__memory/raw_storage_iterator.h'}}
+#include <__memory/relocate_at.h> // expected-error@*:* {{use of private header from outside its module: '__memory/relocate_at.h'}}
 #include <__memory/shared_ptr.h> // expected-error@*:* {{use of private header from outside its module: '__memory/shared_ptr.h'}}
 #include <__memory/temporary_buffer.h> // expected-error@*:* {{use of private header from outside its module: '__memory/temporary_buffer.h'}}
 #include <__memory/uninitialized_algorithms.h> // expected-error@*:* {{use of private header from outside its module: '__memory/uninitialized_algorithms.h'}}

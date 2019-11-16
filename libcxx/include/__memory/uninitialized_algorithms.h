@@ -15,10 +15,13 @@
 #include <__memory/addressof.h>
 #include <__memory/allocator_traits.h>
 #include <__memory/construct_at.h>
+#include <__memory/pointer_traits.h>
+#include <__memory/relocate_at.h>
 #include <__memory/voidify.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
 #include <__utility/transaction.h>
+#include <cstring>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -345,6 +348,159 @@ uninitialized_move_n(_InputIterator __ifirst, _Size __n, _ForwardIterator __ofir
 
   return _VSTD::__uninitialized_move_n<_ValueType>(_VSTD::move(__ifirst), __n, _VSTD::move(__ofirst),
                                                    __unreachable_sentinel(), __iter_move);
+}
+
+// __libcpp_uninitialized_relocate
+
+template<class _InputIt, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+_ForwardIt
+__uninitialized_relocate_impl(_InputIt __first, _InputIt __last,
+                              _ForwardIt __result, false_type, false_type)
+{
+    _ForwardIt __orig_result = __result;
+    for (; __first != __last; ++__result, void(), ++__first) {
+#ifndef _LIBCPP_NO_EXCEPTIONS
+        try {
+#endif
+        _VSTD::__libcpp_relocate_at2(0, _VSTD::addressof(*__first), _VSTD::addressof(*__result));
+#ifndef _LIBCPP_NO_EXCEPTIONS
+        } catch (...) {
+            _VSTD::destroy(__orig_result, __result);
+            ++__first;
+            _VSTD::destroy(__first, __last);
+            throw;
+        }
+#endif
+    }
+    return __result;
+}
+
+template<class _InputIt, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+_ForwardIt
+__uninitialized_relocate_impl(_InputIt __first, _InputIt __last,
+                              _ForwardIt __result, false_type, true_type)
+{
+    for (; __first != __last; ++__result, void(), ++__first) {
+        _VSTD::__libcpp_relocate_at2(0, _VSTD::addressof(*__first), _VSTD::addressof(*__result));
+    }
+    return __result;
+}
+
+template<class _InputIt, class _ForwardIt, class _LoopWithoutCatchIgnored>
+inline _LIBCPP_INLINE_VISIBILITY
+_ForwardIt
+__uninitialized_relocate_impl(_InputIt __first, _InputIt __last,
+                              _ForwardIt __result, true_type, _LoopWithoutCatchIgnored)
+{
+    auto __count = __last - __first;
+    if (__count != 0) {
+        char *__firstbyte = (char *)_VSTD::__to_address(__first);
+        size_t __nbytes = (char *)_VSTD::__to_address(__last) - __firstbyte;
+        _VSTD::memmove(_VSTD::__to_address(__result), __firstbyte, __nbytes);
+        __result += __count;
+    }
+    return __result;
+}
+
+template<class _InputIt, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+_ForwardIt
+__libcpp_uninitialized_relocate(_InputIt __first, _InputIt __last,
+                                _ForwardIt __result)
+{
+    using _St = decltype(_VSTD::move(*__first));
+    using _Dt = typename iterator_traits<_ForwardIt>::value_type;
+    using _ElementTypeIsMemcpyable = integral_constant<bool,
+        __is_same_uncvref<_St, _Dt>::value &&
+        __libcpp_is_trivially_relocatable<_Dt>::value &&
+        !is_volatile<_St>::value && !is_volatile<_Dt>::value
+    >;
+    using _SingleMemcpy = integral_constant<bool,
+        _ElementTypeIsMemcpyable::value &&
+        __is_cpp17_contiguous_iterator<_InputIt>::value &&
+        __is_cpp17_contiguous_iterator<_ForwardIt>::value
+    >;
+    using _LoopWithoutCatch = is_nothrow_constructible<_Dt, _St>;
+    return _VSTD::__uninitialized_relocate_impl(__first, __last, __result,
+        _SingleMemcpy(), _LoopWithoutCatch());
+}
+
+// __libcpp_uninitialized_relocate_n
+
+template<class _InputIt, class _Size, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+pair<_InputIt, _ForwardIt>
+__uninitialized_relocate_n_impl(_InputIt __first, _Size __n,
+                                _ForwardIt __result, false_type, false_type)
+{
+    _ForwardIt __orig_result = __result;
+    for (; __n > 0; ++__result, void(), ++__first, void(), --__n) {
+#ifndef _LIBCPP_NO_EXCEPTIONS
+        try {
+#endif
+        _VSTD::__libcpp_relocate_at2(0, _VSTD::addressof(*__first), _VSTD::addressof(*__result));
+#ifndef _LIBCPP_NO_EXCEPTIONS
+        } catch (...) {
+            _VSTD::destroy(__orig_result, __result);
+            for (++__first, void(), --__n; __n > 0; ++__first, void(), --__n) {
+                _VSTD::destroy_at(_VSTD::addressof(*__first));
+            }
+            throw;
+        }
+#endif
+    }
+    return {__first, __result};
+}
+
+template<class _InputIt, class _Size, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+pair<_InputIt, _ForwardIt>
+__uninitialized_relocate_n_impl(_InputIt __first, _Size __n,
+                                _ForwardIt __result, false_type, true_type)
+{
+    for (; __n > 0; ++__result, ++__first, void(), --__n) {
+        _VSTD::__libcpp_relocate_at2(0, _VSTD::addressof(*__first), _VSTD::addressof(*__result));
+    }
+    return {__first, __result};
+}
+
+template<class _InputIt, class _Size, class _ForwardIt, class _LoopWithoutCatchIgnored>
+inline _LIBCPP_INLINE_VISIBILITY
+pair<_InputIt, _ForwardIt>
+__uninitialized_relocate_n_impl(_InputIt __first, _Size __n,
+                                _ForwardIt __result, true_type, _LoopWithoutCatchIgnored)
+{
+    using _Dt = typename iterator_traits<_ForwardIt>::value_type;
+    if (__n != 0) {
+        _VSTD::memmove(_VSTD::addressof(*__result), _VSTD::addressof(*__first), __n * sizeof (_Dt));
+        __first += __n;
+        __result += __n;
+    }
+    return {__first, __result};
+}
+
+template<class _InputIt, class _Size, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+pair<_InputIt, _ForwardIt>
+__libcpp_uninitialized_relocate_n(_InputIt __first, _Size __n, _ForwardIt __result)
+{
+    using _St = decltype(_VSTD::move(*__first));
+    using _Dt = typename iterator_traits<_ForwardIt>::value_type;
+    using _ElementTypeIsMemcpyable = integral_constant<bool,
+        __is_same_uncvref<_St, _Dt>::value &&
+        __libcpp_is_trivially_relocatable<_Dt>::value &&
+        !is_volatile<_St>::value && !is_volatile<_Dt>::value
+    >;
+    using _SingleMemcpy = integral_constant<bool,
+        _ElementTypeIsMemcpyable::value &&
+        __is_cpp17_contiguous_iterator<_InputIt>::value &&
+        __is_cpp17_contiguous_iterator<_ForwardIt>::value
+    >;
+    using _LoopWithoutCatch = is_nothrow_constructible<_Dt, _St>;
+    return _VSTD::__uninitialized_relocate_n_impl(__first, __n, __result,
+        _SingleMemcpy(), _LoopWithoutCatch());
 }
 
 #endif // _LIBCPP_STD_VER > 14

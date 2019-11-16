@@ -303,6 +303,7 @@ set(files
   __memory/ranges_construct_at.h
   __memory/ranges_uninitialized_algorithms.h
   __memory/raw_storage_iterator.h
+  __memory/relocate_at.h
   __memory/shared_ptr.h
   __memory/temporary_buffer.h
   __memory/uninitialized_algorithms.h
