@@ -1,31 +1,43 @@
 //===----------------------------------------------------------------------===//
 //
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//                     The LLVM Compiler Infrastructure
+//
+// This file is dual licensed under the MIT and the University of Illinois Open
+// Source Licenses. See LICENSE.TXT for details.
 //
 //===----------------------------------------------------------------------===//
 
-// <utility>
+// The test fails due to the missing is_trivially_constructible intrinsic.
+// XFAIL: gcc-4.9
+// UNSUPPORTED: c++03, c++11, c++14
 
-// template <class T1, class T2> struct pair
+// <optional>
+
+// template <class T> class optional
 
 // Test that we properly provide the trivial copy operations by default.
 
-// FreeBSD still provides the old ABI for std::pair.
-// XFAIL: freebsd
-// ADDITIONAL_COMPILE_FLAGS: -Wno-invalid-offsetof
+// FreeBSD provides the old ABI. This test checks the new ABI so we need
+// to manually turn it on.
+#if defined(__FreeBSD__)
+#define _LIBCPP_ABI_UNSTABLE
+#endif
 
-#include <utility>
+#include <optional>
 #include <type_traits>
+#include <utility>
 #include <cstdlib>
-#include <cstddef>
 #include <cassert>
 
 #include "test_macros.h"
 
 // Define the P1144 name for convenience.
 #define is_trivially_relocatable __libcpp_is_trivially_relocatable
+
+
+#if defined(_LIBCPP_DEPRECATED_ABI_DISABLE_PAIR_TRIVIAL_COPY_CTOR)
+#error Non-trivial ctor ABI macro defined
+#endif
 
 template <class T>
 struct HasTrivialABI : std::integral_constant<bool,
@@ -93,23 +105,23 @@ struct _LIBCPP_TRIVIALLY_RELOCATABLE TrivialReloc {
 static_assert(std::is_trivially_relocatable<TrivialReloc>::value, "");
 #endif
 
-void test_trivial()
+int main()
 {
     {
-        typedef std::pair<int, short> P;
+        typedef std::optional<short> P;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(HasTrivialABI<P>::value, "");
         static_assert(std::is_trivially_relocatable<P>::value, "");
     }
 #if TEST_STD_VER >= 11
     {
-        typedef std::pair<int, short> P;
+        typedef std::optional<short> P;
         static_assert(std::is_move_constructible<P>::value, "");
         static_assert(HasTrivialABI<P>::value, "");
         static_assert(std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<NonTrivialDtor, int>;
+        using P = std::optional<NonTrivialDtor>;
         static_assert(!std::is_trivially_destructible<P>::value, "");
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
@@ -119,7 +131,7 @@ void test_trivial()
         static_assert(!std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<NonTrivialCopy, int>;
+        using P = std::optional<NonTrivialCopy>;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -128,7 +140,7 @@ void test_trivial()
         static_assert(!std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<NonTrivialMove, int>;
+        using P = std::optional<NonTrivialMove>;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -137,7 +149,7 @@ void test_trivial()
         static_assert(!std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<DeletedCopy, int>;
+        using P = std::optional<DeletedCopy>;
         static_assert(!std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -146,7 +158,7 @@ void test_trivial()
         static_assert(std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<Trivial, int>;
+        using P = std::optional<Trivial>;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -155,7 +167,7 @@ void test_trivial()
         static_assert(std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<TrivialMove, int>;
+        using P = std::optional<TrivialMove>;
         static_assert(!std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -165,7 +177,7 @@ void test_trivial()
     }
 #if __has_extension(trivially_relocatable)
     {
-        using P = std::pair<TrivialReloc, int>;
+        using P = std::optional<TrivialReloc>;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -174,7 +186,7 @@ void test_trivial()
         static_assert(std::is_trivially_relocatable<P>::value, "");
     }
     {
-        using P = std::pair<TrivialRelocEmpty, int>;
+        using P = std::optional<TrivialRelocEmpty>;
         static_assert(std::is_copy_constructible<P>::value, "");
         static_assert(!std::is_trivially_copy_constructible<P>::value, "");
         static_assert(std::is_move_constructible<P>::value, "");
@@ -184,17 +196,4 @@ void test_trivial()
     }
 #endif
 #endif
-}
-
-void test_layout() {
-    typedef std::pair<std::pair<char, char>, char> PairT;
-    static_assert(sizeof(PairT) == 3, "");
-    static_assert(TEST_ALIGNOF(PairT) == TEST_ALIGNOF(char), "");
-    static_assert(offsetof(PairT, first) == 0, "");
-}
-
-int main(int, char**) {
-    test_trivial();
-    test_layout();
-    return 0;
 }
