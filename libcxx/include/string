@@ -653,8 +653,23 @@ struct __can_be_converted_to_string_view : public _BoolConstant<
 
 struct __uninitialized_size_tag {};
 
+template<class _Allocator>
+struct __basic_string_is_trivially_relocatable {
+#ifdef _LIBCPP_ENABLE_DEBUG_MODE
+    typedef false_type type;
+#else
+    typedef typename allocator_traits<_Allocator>::pointer pointer;
+    typedef integral_constant<bool,
+        __libcpp_is_trivially_relocatable<pointer>::value &&
+        __libcpp_is_trivially_relocatable<_Allocator>::value
+    > type;
+#endif
+};
+
 template<class _CharT, class _Traits, class _Allocator>
-class basic_string
+class
+    _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__basic_string_is_trivially_relocatable<_Allocator>::type::value)
+    basic_string
 {
 public:
     typedef basic_string                                 __self;

@@ -7,16 +7,14 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// UNSUPPORTED: c++98, c++03, c++11, c++14, c++17
+// UNSUPPORTED: c++98, c++03, c++11, c++14, c++17, c++20
 //
 // <type_traits>
 //
 // Test that many standard types are trivially relocatable.
 
-#include <barrier>
-#include <latch>
-#include <semaphore>
-#include <span>
+#include <functional>
+#include <type_traits>
 
 
 struct T { T(); T(const T&); ~T(); };
@@ -35,7 +33,7 @@ struct K {
 template<> struct std::hash<K> { size_t operator()(const K&) const; };
 
 //static const bool NotDebug =
-//#if _LIBCPP_DEBUG_LEVEL >= 2
+//#ifdef _LIBCPP_ENABLE_DEBUG_MODE
 //    false;
 //#else
 //    true;
@@ -46,15 +44,4 @@ template<> struct std::hash<K> { size_t operator()(const K&) const; };
 
 static_assert(std::is_trivially_relocatable<R>::value, "");
 static_assert(!std::is_trivially_relocatable<T>::value, "");
-static_assert(std::is_trivially_relocatable<std::span<T>>::value, "");
-
-// The following types are not move-constructible at all.
-static_assert(!std::is_trivially_relocatable<std::barrier<>>::value, "");
-static_assert(!std::is_trivially_relocatable<std::latch>::value, "");
-static_assert(!std::is_trivially_relocatable<std::counting_semaphore<3>>::value, "");
-static_assert(!std::is_trivially_relocatable<std::binary_semaphore>::value, "");
-
-int main(int, char**)
-{
-    return 0;
-}
+static_assert(std::is_trivially_relocatable<std::move_only_function<T(T)>>::value, "");
