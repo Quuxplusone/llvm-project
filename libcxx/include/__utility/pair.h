@@ -37,6 +37,7 @@
 #include <__type_traits/is_nothrow_move_assignable.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_swappable.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/nat.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
@@ -58,7 +59,7 @@ struct __non_trivially_copyable_base {
 };
 
 template <class _T1, class _T2>
-struct _LIBCPP_TEMPLATE_VIS pair
+struct _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_T1>::value && __libcpp_is_trivially_relocatable<_T2>::value)) pair
 #if defined(_LIBCPP_DEPRECATED_ABI_DISABLE_PAIR_TRIVIAL_COPY_CTOR)
 : private __non_trivially_copyable_base<_T1, _T2>
 #endif
