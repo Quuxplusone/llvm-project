@@ -1125,11 +1125,13 @@ module std [system] {
         export algorithm.__algorithm.in_out_result
       }
       module raw_storage_iterator            { private header "__memory/raw_storage_iterator.h" }
+      module relocate_at                     { private header "__memory/relocate_at.h" }
       module shared_ptr                      { private header "__memory/shared_ptr.h" }
       module swap_allocator                  { private header "__memory/swap_allocator.h" }
       module temp_value                      { private header "__memory/temp_value.h" }
       module temporary_buffer                { private header "__memory/temporary_buffer.h" }
       module uninitialized_algorithms        { private header "__memory/uninitialized_algorithms.h" }
+      module uninitialized_relocate          { private header "__memory/uninitialized_relocate.h" }
       module unique_ptr                      { private header "__memory/unique_ptr.h" }
       module uses_allocator                  { private header "__memory/uses_allocator.h" }
       module uses_allocator_construction     { private header "__memory/uses_allocator_construction.h" }
@@ -1519,6 +1521,7 @@ module std [system] {
     module is_nothrow_destructible             { private header "__type_traits/is_nothrow_destructible.h" }
     module is_nothrow_move_assignable          { private header "__type_traits/is_nothrow_move_assignable.h" }
     module is_nothrow_move_constructible       { private header "__type_traits/is_nothrow_move_constructible.h" }
+    module is_nothrow_relocatable              { private header "__type_traits/is_nothrow_relocatable.h" }
     module is_null_pointer                     { private header "__type_traits/is_null_pointer.h" }
     module is_object                           { private header "__type_traits/is_object.h" }
     module is_pod                              { private header "__type_traits/is_pod.h" }
@@ -1528,6 +1531,7 @@ module std [system] {
     module is_reference                        { private header "__type_traits/is_reference.h" }
     module is_reference_wrapper                { private header "__type_traits/is_reference_wrapper.h" }
     module is_referenceable                    { private header "__type_traits/is_referenceable.h" }
+    module is_relocatable                      { private header "__type_traits/is_relocatable.h" }
     module is_same                             {
       private header "__type_traits/is_same.h"
       export type_traits.integral_constant

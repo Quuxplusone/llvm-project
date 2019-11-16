@@ -451,11 +451,13 @@ set(files
   __memory/ranges_construct_at.h
   __memory/ranges_uninitialized_algorithms.h
   __memory/raw_storage_iterator.h
+  __memory/relocate_at.h
   __memory/shared_ptr.h
   __memory/swap_allocator.h
   __memory/temp_value.h
   __memory/temporary_buffer.h
   __memory/uninitialized_algorithms.h
+  __memory/uninitialized_relocate.h
   __memory/unique_ptr.h
   __memory/uses_allocator.h
   __memory/uses_allocator_construction.h
@@ -662,6 +664,7 @@ set(files
   __type_traits/is_nothrow_destructible.h
   __type_traits/is_nothrow_move_assignable.h
   __type_traits/is_nothrow_move_constructible.h
+  __type_traits/is_nothrow_relocatable.h
   __type_traits/is_null_pointer.h
   __type_traits/is_object.h
   __type_traits/is_pod.h
@@ -671,6 +674,7 @@ set(files
   __type_traits/is_reference.h
   __type_traits/is_reference_wrapper.h
   __type_traits/is_referenceable.h
+  __type_traits/is_relocatable.h
   __type_traits/is_same.h
   __type_traits/is_scalar.h
   __type_traits/is_scoped_enum.h
