@@ -100,20 +100,20 @@ static_assert(std::is_trivially_relocatable_v<std::default_delete<T>>);
 static_assert(std::is_trivially_relocatable_v<std::hash<std::string>>);
 static_assert(std::is_trivially_relocatable_v<std::less<T>>);
 static_assert(std::is_trivially_relocatable_v<std::less<void>>);
-static_assert(!std::is_trivially_relocatable_v<std::unique_ptr<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_ptr<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::weak_ptr<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::pair<R,R>>);
+static_assert(std::is_trivially_relocatable_v<std::unique_ptr<T>>);
+static_assert(std::is_trivially_relocatable_v<std::shared_ptr<T>>);
+static_assert(std::is_trivially_relocatable_v<std::weak_ptr<T>>);
+static_assert(std::is_trivially_relocatable_v<std::pair<R,R>>);
 static_assert(!std::is_trivially_relocatable_v<std::pair<R,T>>);
-static_assert(!std::is_trivially_relocatable_v<std::tuple<R,R,R>>);
+static_assert(std::is_trivially_relocatable_v<std::tuple<R,R,R>>);
 static_assert(!std::is_trivially_relocatable_v<std::tuple<R,T,R>>);
 static_assert(std::is_trivially_relocatable_v<std::variant<R,R,R>>);
 static_assert(!std::is_trivially_relocatable_v<std::variant<R,T,R>>);
 static_assert(std::is_trivially_relocatable_v<std::optional<R>>);
 static_assert(!std::is_trivially_relocatable_v<std::optional<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::any>);
-static_assert(!std::is_trivially_relocatable_v<std::locale>);
-static_assert(!std::is_trivially_relocatable_v<std::exception_ptr>);
+static_assert(std::is_trivially_relocatable_v<std::locale>);
+static_assert(std::is_trivially_relocatable_v<std::exception_ptr>);
 static_assert(!std::is_trivially_relocatable_v<std::exception>);  // virtual destructor
 static_assert(!std::is_trivially_relocatable_v<std::error_category>);
 static_assert(std::is_trivially_relocatable_v<std::error_code>);
@@ -122,39 +122,39 @@ static_assert(std::is_trivially_relocatable_v<std::errc>);
 static_assert(std::is_trivially_relocatable_v<std::type_index>);
 static_assert(std::is_trivially_relocatable_v<std::array<R, 5>>);
 static_assert(!std::is_trivially_relocatable_v<std::array<T, 5>>);
-static_assert(!std::is_trivially_relocatable_v<std::deque<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::forward_list<T>>);
+static_assert(std::is_trivially_relocatable_v<std::deque<T>>);
+static_assert(std::is_trivially_relocatable_v<std::forward_list<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::list<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::map<K,T>>);
 static_assert(!std::is_trivially_relocatable_v<std::multimap<K,T>>);
 static_assert(!std::is_trivially_relocatable_v<std::multiset<K>>);
 static_assert(!std::is_trivially_relocatable_v<std::set<K>>);
-static_assert(std::is_trivially_relocatable_v<std::unordered_map<K,T>> == false);
-static_assert(std::is_trivially_relocatable_v<std::unordered_multimap<K,T>> == false);
-static_assert(std::is_trivially_relocatable_v<std::unordered_multiset<K>> == false);
-static_assert(std::is_trivially_relocatable_v<std::unordered_set<K>> == false);
-static_assert(std::is_trivially_relocatable_v<std::vector<T>> == false);
-static_assert(!std::is_trivially_relocatable_v<std::vector<bool>>);
-static_assert(!std::is_trivially_relocatable_v<std::stack<T>>);
+static_assert(std::is_trivially_relocatable_v<std::unordered_map<K,T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::unordered_multimap<K,T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::unordered_multiset<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::unordered_set<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::vector<T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::vector<bool>>);
+static_assert(std::is_trivially_relocatable_v<std::stack<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::stack<T, std::list<T>>>);
-static_assert(!std::is_trivially_relocatable_v<std::queue<T>>);
+static_assert(std::is_trivially_relocatable_v<std::queue<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::queue<T, std::list<T>>>);
-static_assert(std::is_trivially_relocatable_v<std::priority_queue<K>> == false);
-static_assert(!std::is_trivially_relocatable_v<std::priority_queue<K, std::deque<K>>>);
+static_assert(std::is_trivially_relocatable_v<std::priority_queue<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::priority_queue<K, std::deque<K>>>);
 static_assert(!std::is_trivially_relocatable_v<std::priority_queue<K, std::deque<K>, K::Cmp>>);
-static_assert(!std::is_trivially_relocatable_v<std::pmr::deque<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::pmr::forward_list<T>>);
+static_assert(std::is_trivially_relocatable_v<std::pmr::deque<T>>);
+static_assert(std::is_trivially_relocatable_v<std::pmr::forward_list<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::pmr::list<T>>);
 static_assert(!std::is_trivially_relocatable_v<std::pmr::map<K,T>>);
 static_assert(!std::is_trivially_relocatable_v<std::pmr::multimap<K,T>>);
 static_assert(!std::is_trivially_relocatable_v<std::pmr::multiset<K>>);
 static_assert(!std::is_trivially_relocatable_v<std::pmr::set<K>>);
-static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_map<K,T>> == false);
-static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_multimap<K,T>> == false);
-static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_multiset<K>> == false);
-static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_set<K>> == false);
-static_assert(std::is_trivially_relocatable_v<std::pmr::vector<T>> == false);
-static_assert(!std::is_trivially_relocatable_v<std::pmr::vector<bool>>);
+static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_map<K,T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_multimap<K,T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_multiset<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::pmr::unordered_set<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::pmr::vector<T>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::pmr::vector<bool>>);
 static_assert(std::is_trivially_relocatable_v<std::array<R, 5>::iterator>);
 static_assert(std::is_trivially_relocatable_v<std::array<T, 5>::iterator>);
 static_assert(std::is_trivially_relocatable_v<std::deque<T>::iterator>);
@@ -174,35 +174,35 @@ static_assert(std::is_trivially_relocatable_v<std::unordered_multiset<K>::local_
 static_assert(std::is_trivially_relocatable_v<std::unordered_set<K>::local_iterator> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::vector<T>::iterator> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::vector<T>::const_iterator> == NotDebug);
-static_assert(!std::is_trivially_relocatable_v<std::vector<bool>::iterator>);
+static_assert(std::is_trivially_relocatable_v<std::vector<bool>::iterator>);
 static_assert(std::is_trivially_relocatable_v<std::vector<bool>::const_iterator>);
 static_assert(std::is_trivially_relocatable_v<std::reverse_iterator<int*>>);
 static_assert(std::is_trivially_relocatable_v<std::back_insert_iterator<std::deque<int>>>);
 static_assert(std::is_trivially_relocatable_v<std::front_insert_iterator<std::list<int>>>);
 static_assert(std::is_trivially_relocatable_v<std::insert_iterator<std::vector<int>>> == NotDebug);
-static_assert(!std::is_trivially_relocatable_v<std::insert_iterator<std::vector<bool>>>);
+static_assert(std::is_trivially_relocatable_v<std::insert_iterator<std::vector<bool>>>);
 static_assert(std::is_trivially_relocatable_v<std::istream_iterator<R>>);
 static_assert(!std::is_trivially_relocatable_v<std::istream_iterator<T>>);
 static_assert(std::is_trivially_relocatable_v<std::ostream_iterator<R>>);
 static_assert(std::is_trivially_relocatable_v<std::ostream_iterator<T>>);
 static_assert(std::is_trivially_relocatable_v<std::char_traits<char>>);
-static_assert(!std::is_trivially_relocatable_v<std::regex_traits<char>>);  // contains a locale
-static_assert(!std::is_trivially_relocatable_v<std::regex>);  // contains a regex_traits
-static_assert(std::is_trivially_relocatable_v<std::cmatch> == false);  // contains a vector
-static_assert(std::is_trivially_relocatable_v<std::smatch> == false);  // contains a vector
-static_assert(std::is_trivially_relocatable_v<std::string> == false);
+static_assert(std::is_trivially_relocatable_v<std::regex_traits<char>>);  // contains a locale
+static_assert(std::is_trivially_relocatable_v<std::regex>);  // contains a regex_traits
+static_assert(std::is_trivially_relocatable_v<std::cmatch> == NotDebug);  // contains a vector
+static_assert(std::is_trivially_relocatable_v<std::smatch> == NotDebug);  // contains a vector
+static_assert(std::is_trivially_relocatable_v<std::string> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::string::iterator> == NotDebug);
-static_assert(std::is_trivially_relocatable_v<std::wstring> == false);
+static_assert(std::is_trivially_relocatable_v<std::wstring> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::wstring::iterator> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::string_view>);
 static_assert(std::is_trivially_relocatable_v<std::string_view::iterator>);
 static_assert(std::is_trivially_relocatable_v<std::wstring_view>);
 static_assert(std::is_trivially_relocatable_v<std::wstring_view::iterator>);
-static_assert(std::is_trivially_relocatable_v<std::pmr::cmatch> == false);  // contains a vector
-static_assert(std::is_trivially_relocatable_v<std::pmr::smatch> == false);  // contains a vector
-static_assert(std::is_trivially_relocatable_v<std::pmr::string> == false);
+static_assert(std::is_trivially_relocatable_v<std::pmr::cmatch> == NotDebug);  // contains a vector
+static_assert(std::is_trivially_relocatable_v<std::pmr::smatch> == NotDebug);  // contains a vector
+static_assert(std::is_trivially_relocatable_v<std::pmr::string> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::pmr::string::iterator> == NotDebug);
-static_assert(std::is_trivially_relocatable_v<std::pmr::wstring> == false);
+static_assert(std::is_trivially_relocatable_v<std::pmr::wstring> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::pmr::wstring::iterator> == NotDebug);
 static_assert(std::is_trivially_relocatable_v<std::integral_constant<int, 42>>);
 static_assert(std::is_trivially_relocatable_v<std::index_sequence<1,2,3,4>>);
@@ -212,19 +212,19 @@ static_assert(std::is_trivially_relocatable_v<std::chrono::system_clock::time_po
 static_assert(std::is_trivially_relocatable_v<std::streampos>);
 static_assert(std::is_trivially_relocatable_v<std::bitset<42>>);
 static_assert(std::is_trivially_relocatable_v<std::bitset<420>>);
-static_assert(!std::is_trivially_relocatable_v<std::unique_lock<std::mutex>>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_lock<SM>>);
-static_assert(!std::is_trivially_relocatable_v<std::thread>);
+static_assert(std::is_trivially_relocatable_v<std::unique_lock<std::mutex>>);
+static_assert(std::is_trivially_relocatable_v<std::shared_lock<SM>>);
+static_assert(std::is_trivially_relocatable_v<std::thread>);
 static_assert(std::is_trivially_relocatable_v<std::thread::id>);
-static_assert(!std::is_trivially_relocatable_v<std::promise<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::promise<T&>>);
-static_assert(!std::is_trivially_relocatable_v<std::promise<void>>);
-static_assert(!std::is_trivially_relocatable_v<std::future<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::future<T&>>);
-static_assert(!std::is_trivially_relocatable_v<std::future<void>>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_future<T>>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_future<T&>>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_future<void>>);
+static_assert(std::is_trivially_relocatable_v<std::promise<T>>);
+static_assert(std::is_trivially_relocatable_v<std::promise<T&>>);
+static_assert(std::is_trivially_relocatable_v<std::promise<void>>);
+static_assert(std::is_trivially_relocatable_v<std::future<T>>);
+static_assert(std::is_trivially_relocatable_v<std::future<T&>>);
+static_assert(std::is_trivially_relocatable_v<std::future<void>>);
+static_assert(std::is_trivially_relocatable_v<std::shared_future<T>>);
+static_assert(std::is_trivially_relocatable_v<std::shared_future<T&>>);
+static_assert(std::is_trivially_relocatable_v<std::shared_future<void>>);
 static_assert(!std::is_trivially_relocatable_v<std::function<void()>>);  // contains pointer into self
 static_assert(!std::is_trivially_relocatable_v<std::packaged_task<T(T)>>);  // contains pointer into self
 static_assert(!std::is_trivially_relocatable_v<std::packaged_task<T&(T)>>);  // contains pointer into self
@@ -259,8 +259,8 @@ static_assert(std::is_trivially_relocatable_v<std::weak_ordering>);
 #endif
 
 #if TEST_STD_VER >= 23
-static_assert(!std::is_trivially_relocatable_v<std::move_only_function<int()>>);
-static_assert(!std::is_trivially_relocatable_v<std::move_only_function<void()>>);
+static_assert(std::is_trivially_relocatable_v<std::move_only_function<int()>>);
+static_assert(std::is_trivially_relocatable_v<std::move_only_function<void()>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_map<K,T>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_map<K,bool>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multimap<K,T>>);
