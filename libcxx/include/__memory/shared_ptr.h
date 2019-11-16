@@ -410,7 +410,7 @@ struct __shared_ptr_deleter_ctor_reqs
 #endif
 
 template<class _Tp>
-class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS shared_ptr
+class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE shared_ptr
 {
 public:
 #if _LIBCPP_STD_VER > 14
@@ -1478,7 +1478,7 @@ get_deleter(const shared_ptr<_Tp>& __p) _NOEXCEPT
 #endif // _LIBCPP_NO_RTTI
 
 template<class _Tp>
-class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS weak_ptr
+class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE weak_ptr
 {
 public:
 #if _LIBCPP_STD_VER > 14
