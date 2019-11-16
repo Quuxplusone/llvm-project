@@ -108,8 +108,16 @@ struct __unique_ptr_deleter_sfinae<_Deleter&> {
 #  define _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI
 #endif
 
+template <class _Tp, class _Dp>
+struct __unique_ptr_is_trivially_relocatable {
+  typedef _Tp element_type;
+  typedef _Dp deleter_type;
+  typedef typename __pointer<_Tp, deleter_type>::type pointer;
+  typedef __libcpp_is_trivially_relocatable<__compressed_pair<pointer, deleter_type> > type;
+};
+
 template <class _Tp, class _Dp = default_delete<_Tp> >
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS unique_ptr {
+class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_is_trivially_relocatable<_Tp, _Dp>::type::value)) unique_ptr {
 public:
   typedef _Tp element_type;
   typedef _Dp deleter_type;
@@ -316,7 +324,7 @@ public:
 
 
 template <class _Tp, class _Dp>
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS unique_ptr<_Tp[], _Dp> {
+class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_is_trivially_relocatable<_Tp, _Dp>::type::value)) unique_ptr<_Tp[], _Dp> {
 public:
   typedef _Tp element_type;
   typedef _Dp deleter_type;

@@ -621,6 +621,19 @@ struct __can_be_converted_to_string_view : public _BoolConstant<
      !is_convertible<const _Tp&, const _CharT*>::value
     > {};
 
+template<class _Allocator>
+struct __basic_string_is_trivially_relocatable {
+#if _LIBCPP_DEBUG_LEVEL >= 2
+    typedef false_type type;
+#else
+    typedef typename allocator_traits<_Allocator>::pointer pointer;
+    typedef integral_constant<bool,
+        __libcpp_is_trivially_relocatable<pointer>::value &&
+        __libcpp_is_trivially_relocatable<_Allocator>::value
+    > type;
+#endif
+};
+
 #ifndef _LIBCPP_HAS_NO_CHAR8_T
 typedef basic_string<char8_t> u8string;
 #endif
@@ -642,6 +655,7 @@ class
     _LIBCPP_PREFERRED_NAME(u16string)
     _LIBCPP_PREFERRED_NAME(u32string)
 #endif
+    _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__basic_string_is_trivially_relocatable<_Allocator>::type::value)
     basic_string
 {
 public:

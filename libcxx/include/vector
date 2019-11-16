@@ -323,8 +323,18 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#if _LIBCPP_DEBUG_LEVEL >= 2
+template <class _Tp, class _Allocator>
+using __vector_allow_trivial_relocation = false_type;
+#else
+template <class _Tp, class _Allocator>
+using __vector_allow_trivial_relocation = __libcpp_is_trivially_relocatable<__compressed_pair<typename allocator_traits<_Allocator>::pointer, _Allocator> >;
+#endif
+
 template <class _Tp, class _Allocator /* = allocator<_Tp> */>
-class _LIBCPP_TEMPLATE_VIS vector
+class _LIBCPP_TEMPLATE_VIS
+    _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_allow_trivial_relocation<_Tp, _Allocator>::value))
+    vector
 {
 private:
     typedef allocator<_Tp>                                  __default_allocator_type;
@@ -2029,7 +2039,26 @@ struct __has_storage_type<vector<bool, _Allocator> >
 };
 
 template <class _Allocator>
-class _LIBCPP_TEMPLATE_VIS vector<bool, _Allocator>
+struct __vector_bool_is_trivially_relocatable {
+    typedef _Allocator                               allocator_type;
+    typedef allocator_traits<allocator_type>         __alloc_traits;
+    typedef typename __alloc_traits::size_type       size_type;
+    typedef size_type                                __storage_type;
+    typedef typename __rebind_alloc_helper<__alloc_traits, __storage_type>::type __storage_allocator;
+    typedef allocator_traits<__storage_allocator>    __storage_traits;
+    typedef typename __storage_traits::pointer       __storage_pointer;
+
+    typedef integral_constant<bool,
+        __libcpp_is_trivially_relocatable<__storage_pointer>::value &&
+        __libcpp_is_trivially_relocatable<size_type>::value &&
+        __libcpp_is_trivially_relocatable<__compressed_pair<size_type, __storage_allocator> >::value
+    > type;
+};
+
+template <class _Allocator>
+class _LIBCPP_TEMPLATE_VIS
+      _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_bool_is_trivially_relocatable<_Allocator>::type::value))
+    vector<bool, _Allocator>
 {
 public:
     typedef vector                                   __self;
@@ -2046,12 +2075,12 @@ public:
     typedef _VSTD::reverse_iterator<iterator>         reverse_iterator;
     typedef _VSTD::reverse_iterator<const_iterator>   const_reverse_iterator;
 
-private:
     typedef typename __rebind_alloc_helper<__alloc_traits, __storage_type>::type __storage_allocator;
     typedef allocator_traits<__storage_allocator>    __storage_traits;
     typedef typename __storage_traits::pointer       __storage_pointer;
     typedef typename __storage_traits::const_pointer __const_storage_pointer;
 
+private:
     __storage_pointer                                      __begin_;
     size_type                                              __size_;
     __compressed_pair<size_type, __storage_allocator> __cap_alloc_;
