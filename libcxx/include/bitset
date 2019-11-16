@@ -169,8 +169,6 @@ public:
   typedef ptrdiff_t difference_type;
   typedef size_t size_type;
   typedef size_type __storage_type;
-
-protected:
   typedef __bitset __self;
   typedef __storage_type* __storage_pointer;
   typedef const __storage_type* __const_storage_pointer;
@@ -182,6 +180,7 @@ protected:
   friend class __bit_iterator<__bitset, true>;
   friend struct __bit_array<__bitset>;
 
+protected:
   __storage_type __first_[_N_words];
 
   typedef __bit_reference<__bitset> reference;
@@ -428,8 +427,6 @@ public:
   typedef ptrdiff_t difference_type;
   typedef size_t size_type;
   typedef size_type __storage_type;
-
-protected:
   typedef __bitset __self;
   typedef __storage_type* __storage_pointer;
   typedef const __storage_type* __const_storage_pointer;
@@ -441,6 +438,7 @@ protected:
   friend class __bit_iterator<__bitset, true>;
   friend struct __bit_array<__bitset>;
 
+protected:
   __storage_type __first_;
 
   typedef __bit_reference<__bitset> reference;
@@ -545,8 +543,6 @@ public:
   typedef ptrdiff_t difference_type;
   typedef size_t size_type;
   typedef size_type __storage_type;
-
-protected:
   typedef __bitset __self;
   typedef __storage_type* __storage_pointer;
   typedef const __storage_type* __const_storage_pointer;
@@ -558,6 +554,7 @@ protected:
   friend class __bit_iterator<__bitset, true>;
   friend struct __bit_array<__bitset>;
 
+protected:
   typedef __bit_reference<__bitset> reference;
   typedef __bit_const_reference<__bitset> const_reference;
   typedef __bit_iterator<__bitset, false> iterator;

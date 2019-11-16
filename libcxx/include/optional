@@ -210,6 +210,7 @@ namespace std {
 #include <__type_traits/is_trivially_assignable.h>
 #include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/negation.h>
 #include <__type_traits/remove_const.h>
 #include <__type_traits/remove_cvref.h>
@@ -572,7 +573,9 @@ template <class _Tp>
 struct __is_std_optional<optional<_Tp>> : true_type {};
 
 template <class _Tp>
-class _LIBCPP_DECLSPEC_EMPTY_BASES optional
+class _LIBCPP_DECLSPEC_EMPTY_BASES
+      _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__libcpp_is_trivially_relocatable<_Tp>::value || is_reference_v<_Tp>)
+                                   optional
     : private __optional_move_assign_base<_Tp>,
       private __optional_sfinae_ctor_base_t<_Tp>,
       private __optional_sfinae_assign_base_t<_Tp> {
