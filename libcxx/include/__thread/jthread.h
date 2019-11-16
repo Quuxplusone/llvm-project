@@ -32,7 +32,7 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-class _LIBCPP_AVAILABILITY_SYNC jthread {
+class _LIBCPP_AVAILABILITY_SYNC _LIBCPP_TRIVIALLY_RELOCATABLE jthread {
 public:
   // types
   using id                 = thread::id;

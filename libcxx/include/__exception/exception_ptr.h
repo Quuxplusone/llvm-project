@@ -23,7 +23,7 @@ namespace std { // purposefully not using versioning namespace
 
 #ifndef _LIBCPP_ABI_MICROSOFT
 
-class _LIBCPP_EXPORTED_FROM_ABI exception_ptr {
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE exception_ptr {
   void* __ptr_;
 
 public:
