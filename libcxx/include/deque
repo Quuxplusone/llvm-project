@@ -215,6 +215,7 @@ template <class T, class Allocator, class Predicate>
 #include <__type_traits/is_allocator.h>
 #include <__type_traits/is_convertible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
@@ -442,8 +443,23 @@ template <class _ValueType, class _Pointer, class _Reference, class _MapPointer,
 const _DiffType __deque_iterator<_ValueType, _Pointer, _Reference, _MapPointer, _DiffType, _BlockSize>::__block_size =
     __deque_block_size<_ValueType, _DiffType>::value;
 
+template <class _Tp, class _Allocator>
+struct __deque_be_trivially_relocatable {
+  using __alloc_traits = allocator_traits<_Allocator>;
+  using pointer = typename __alloc_traits::pointer;
+  using __pointer_allocator = __rebind_alloc<__alloc_traits, pointer>;
+  using size_type = typename __alloc_traits::size_type;
+
+  static const bool value =
+    __libcpp_is_trivially_relocatable<pointer>::value &&
+    __libcpp_is_trivially_relocatable<__pointer_allocator>::value &&
+    __libcpp_is_trivially_relocatable<size_type>::value &&
+    __libcpp_is_trivially_relocatable<_Allocator>::value &&
+    __allocator_pocma_models_relocatable<_Allocator>::value;
+};
+
 template <class _Tp, class _Allocator /*= allocator<_Tp>*/>
-class _LIBCPP_TEMPLATE_VIS deque {
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__deque_be_trivially_relocatable<_Tp, _Allocator>::value)) deque {
 public:
   // types:
 

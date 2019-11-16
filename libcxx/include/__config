@@ -1207,6 +1207,21 @@ typedef __char32_t char32_t;
 #    define _LIBCPP_IF_WIDE_CHARACTERS(...) __VA_ARGS__
 #  endif
 
+#  if defined(_LIBCPP_TRIVIALLY_RELOCATABLE_IF)
+#    ifndef _LIBCPP_TRIVIALLY_RELOCATABLE
+#      define _LIBCPP_TRIVIALLY_RELOCATABLE _LIBCPP_TRIVIALLY_RELOCATABLE_IF(true)
+#    endif
+#  elif defined(_LIBCPP_TRIVIALLY_RELOCATABLE)
+#    warning "You probably meant to define _LIBCPP_TRIVIALLY_RELOCATABLE_IF instead"
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
+#  elif __has_attribute(__trivially_relocatable__) && defined(__cpp_impl_trivially_relocatable)
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x) __attribute__((__trivially_relocatable__(x)))
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE __attribute__((__trivially_relocatable__))
+#  else
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE
+#  endif // defined(_LIBCPP_TRIVIALLY_RELOCATABLE_IF)
+
 // This controls whether std::pmr::vector<int> is considered trivially
 // relocatable, despite the following infelicities:
 // - sometimes copy-and-destroy doesn't match move-and-destroy
