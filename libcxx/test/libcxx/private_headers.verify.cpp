@@ -467,11 +467,13 @@ END-SCRIPT
 #include <__memory/ranges_construct_at.h> // expected-error@*:* {{use of private header from outside its module: '__memory/ranges_construct_at.h'}}
 #include <__memory/ranges_uninitialized_algorithms.h> // expected-error@*:* {{use of private header from outside its module: '__memory/ranges_uninitialized_algorithms.h'}}
 #include <__memory/raw_storage_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__memory/raw_storage_iterator.h'}}
+#include <__memory/relocate_at.h> // expected-error@*:* {{use of private header from outside its module: '__memory/relocate_at.h'}}
 #include <__memory/shared_ptr.h> // expected-error@*:* {{use of private header from outside its module: '__memory/shared_ptr.h'}}
 #include <__memory/swap_allocator.h> // expected-error@*:* {{use of private header from outside its module: '__memory/swap_allocator.h'}}
 #include <__memory/temp_value.h> // expected-error@*:* {{use of private header from outside its module: '__memory/temp_value.h'}}
 #include <__memory/temporary_buffer.h> // expected-error@*:* {{use of private header from outside its module: '__memory/temporary_buffer.h'}}
 #include <__memory/uninitialized_algorithms.h> // expected-error@*:* {{use of private header from outside its module: '__memory/uninitialized_algorithms.h'}}
+#include <__memory/uninitialized_relocate.h> // expected-error@*:* {{use of private header from outside its module: '__memory/uninitialized_relocate.h'}}
 #include <__memory/unique_ptr.h> // expected-error@*:* {{use of private header from outside its module: '__memory/unique_ptr.h'}}
 #include <__memory/uses_allocator.h> // expected-error@*:* {{use of private header from outside its module: '__memory/uses_allocator.h'}}
 #include <__memory/uses_allocator_construction.h> // expected-error@*:* {{use of private header from outside its module: '__memory/uses_allocator_construction.h'}}
@@ -658,6 +660,7 @@ END-SCRIPT
 #include <__type_traits/is_nothrow_destructible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_nothrow_destructible.h'}}
 #include <__type_traits/is_nothrow_move_assignable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_nothrow_move_assignable.h'}}
 #include <__type_traits/is_nothrow_move_constructible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_nothrow_move_constructible.h'}}
+#include <__type_traits/is_nothrow_relocatable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_nothrow_relocatable.h'}}
 #include <__type_traits/is_null_pointer.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_null_pointer.h'}}
 #include <__type_traits/is_object.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_object.h'}}
 #include <__type_traits/is_pod.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_pod.h'}}
@@ -667,6 +670,7 @@ END-SCRIPT
 #include <__type_traits/is_reference.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_reference.h'}}
 #include <__type_traits/is_reference_wrapper.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_reference_wrapper.h'}}
 #include <__type_traits/is_referenceable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_referenceable.h'}}
+#include <__type_traits/is_relocatable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_relocatable.h'}}
 #include <__type_traits/is_same.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_same.h'}}
 #include <__type_traits/is_scalar.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_scalar.h'}}
 #include <__type_traits/is_scoped_enum.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_scoped_enum.h'}}
