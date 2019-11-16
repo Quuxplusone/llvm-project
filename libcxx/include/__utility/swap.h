@@ -11,15 +11,17 @@
 
 #include <__config>
 #include <__memory/addressof.h>
+#include <__type_traits/datasizeof.h>
 #include <__type_traits/is_assignable.h>
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_constructible.h>
+#include <__type_traits/is_constant_evaluated.h>
+#include <__type_traits/is_empty.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_swappable.h>
-#include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_volatile.h>
-#include <__utility/declval.h>
 #include <__utility/move.h>
 #include <cstddef>
 
@@ -66,9 +68,16 @@ inline _LIBCPP_HIDE_FROM_ABI void __libcpp_memswap(volatile void* __vpx, volatil
 template <class _Tp>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __generic_swap(_Tp& __x, _Tp& __y)
     _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value) {
-  _Tp __t(std::move(__x));
-  __x = std::move(__y);
-  __y = std::move(__t);
+  if (__libcpp_is_trivially_relocatable<_Tp>::value && !is_volatile<_Tp>::value && is_empty<_Tp>::value) {
+    // Swap nothing.
+  } else if (__libcpp_is_trivially_relocatable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
+    // Swap only "datasizeof" bytes.
+    std::__libcpp_memswap(std::addressof(__x), std::addressof(__y), __datasizeof_v<_Tp>);
+  } else {
+    _Tp __t(std::move(__x));
+    __x = std::move(__y);
+    __y = std::move(__t);
+  }
 }
 
 template <class _Tp>
@@ -80,7 +89,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 __swap_result_t<_Tp> 
 template <class _Tp, size_t _Np, __enable_if_t<__is_swappable_v<_Tp>, int> >
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void swap(_Tp (&__a)[_Np], _Tp (&__b)[_Np])
     _NOEXCEPT_(__is_nothrow_swappable_v<_Tp>) {
-  if (is_trivially_copyable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
+  if (__libcpp_is_trivially_relocatable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
     std::__libcpp_memswap(std::addressof(__a), std::addressof(__b), sizeof(__a));
   } else {
     for (size_t __i = 0; __i != _Np; ++__i) {
