@@ -36,7 +36,7 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-class jthread {
+class _LIBCPP_TRIVIALLY_RELOCATABLE jthread {
 public:
   // types
   using id                 = thread::id;

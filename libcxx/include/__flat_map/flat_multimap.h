@@ -55,6 +55,7 @@
 #include <__type_traits/is_allocator.h>
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__utility/exception_guard.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
@@ -79,7 +80,11 @@ template <class _Key,
           class _Compare         = less<_Key>,
           class _KeyContainer    = vector<_Key>,
           class _MappedContainer = vector<_Tp>>
-class flat_multimap {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(
+  __libcpp_is_trivially_relocatable<_KeyContainer>::value &&
+  __libcpp_is_trivially_relocatable<_MappedContainer>::value &&
+  __libcpp_is_trivially_relocatable<_Compare>::value
+) flat_multimap {
   template <class, class, class, class, class>
   friend class flat_multimap;
 
