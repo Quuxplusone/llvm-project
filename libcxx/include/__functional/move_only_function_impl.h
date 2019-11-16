@@ -123,6 +123,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 template <class _ReturnT, class... _ArgTypes>
 class
   _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI
+  _LIBCPP_TRIVIALLY_RELOCATABLE
   move_only_function<_ReturnT(_ArgTypes...) _LIBCPP_MOVE_ONLY_FUNCTION_CV_REF noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT)>
 {
   template <class...>
