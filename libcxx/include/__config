@@ -1090,7 +1090,11 @@ _LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
 #    define _LIBCPP_HAS_NO_CXX20_COROUTINES
 #  endif
 
-#  if __has_extension(trivially_relocatable)
+#  if defined(_LIBCPP_TRIVIALLY_RELOCATABLE)
+#    ifndef _LIBCPP_TRIVIALLY_RELOCATABLE_IF
+#      define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
+#    endif
+#  elif __has_extension(trivially_relocatable)
 #    define _LIBCPP_TRIVIALLY_RELOCATABLE [[clang::trivially_relocatable]]
 #    define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x) [[clang::trivially_relocatable(x)]]
 #  else
