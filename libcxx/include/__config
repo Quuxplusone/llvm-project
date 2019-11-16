@@ -1346,6 +1346,8 @@ extern "C" _LIBCPP_FUNC_VIS void __sanitizer_annotate_contiguous_container(
 #define _LIBCPP_HAS_NO_IS_AGGREGATE
 #endif
 
+#define _LIBCPP_TRIVIALLY_RELOCATABLE_VERSION 34
+
 #if defined(_LIBCPP_TRIVIALLY_RELOCATABLE)
 #ifndef _LIBCPP_TRIVIALLY_RELOCATABLE_IF
 #define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
