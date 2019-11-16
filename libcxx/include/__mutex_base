@@ -106,7 +106,7 @@ private:
 _LIBCPP_CTAD_SUPPORTED_FOR_TYPE(lock_guard);
 
 template <class _Mutex>
-class _LIBCPP_TEMPLATE_VIS unique_lock
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE unique_lock
 {
 public:
     typedef _Mutex mutex_type;
