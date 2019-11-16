@@ -14,7 +14,6 @@
 #include <__type_traits/is_integral.h>
 #include <__type_traits/is_object.h>
 #include <__type_traits/is_same.h>
-#include <__type_traits/is_trivially_copyable.h>
 #include <__type_traits/remove_cv.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -31,13 +30,16 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 // considered bit-castable.
 template <class _From, class _To>
 struct __is_always_bitcastable {
+  static_assert(std::is_object<_From>::value, "__is_always_bitcastable works only on object types");
+  static_assert(std::is_object<_To>::value, "__is_always_bitcastable works only on object types");
+
   using _UnqualFrom = __remove_cv_t<_From>;
   using _UnqualTo   = __remove_cv_t<_To>;
 
   // clang-format off
   static const bool value =
       // First, the simple case -- `From` and `To` are the same object type.
-      (is_same<_UnqualFrom, _UnqualTo>::value && is_trivially_copyable<_UnqualFrom>::value) ||
+      (is_same<_UnqualFrom, _UnqualTo>::value) ||
 
       // Beyond the simple case, we say that one type is "always bit-castable" to another if:
       // - (1) `From` and `To` have the same value representation, and in addition every possible value of `From` has
