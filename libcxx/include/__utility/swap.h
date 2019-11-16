@@ -10,9 +10,11 @@
 #define _LIBCPP___UTILITY_SWAP_H
 
 #include <__config>
+#include <__memory/addressof.h>
 #include <__utility/declval.h>
 #include <__utility/move.h>
 #include <cstddef>
+#include <cstring>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -31,10 +33,26 @@ using __swap_result_t = void;
 
 template <class _Tp>
 inline _LIBCPP_INLINE_VISIBILITY __swap_result_t<_Tp> _LIBCPP_CONSTEXPR_AFTER_CXX17 swap(_Tp& __x, _Tp& __y)
-    _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value&& is_nothrow_move_assignable<_Tp>::value) {
-  _Tp __t(_VSTD::move(__x));
-  __x = _VSTD::move(__y);
-  __y = _VSTD::move(__t);
+    _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value)
+{
+    if (__libcpp_is_trivially_relocatable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
+        if (!is_empty<_Tp>::value) {
+            // TODO: if either __x or __y is a "possibly overlapping subobject"
+            // in Itanium ABI terms, this will memcpy too much data. But the
+            // same caveat has applied to std::copy and friends, since forever.
+            char __t[sizeof (_Tp)];
+            // We cannot use __libcpp_relocate_at here, because the stack array
+            // is deliberately underaligned for an actual object of type _Tp.
+            // We are deliberately shuffling bytes here, not objects.
+            _VSTD::memcpy(__t, _VSTD::addressof(__x), sizeof(_Tp));
+            _VSTD::memcpy(_VSTD::addressof(__x), _VSTD::addressof(__y), sizeof(_Tp));
+            _VSTD::memcpy(_VSTD::addressof(__y), __t, sizeof(_Tp));
+        }
+    } else {
+        _Tp __t(_VSTD::move(__x));
+        __x = _VSTD::move(__y);
+        __y = _VSTD::move(__t);
+    }
 }
 
 template <class _Tp, size_t _Np>
