@@ -1230,6 +1230,14 @@ extern "C" _LIBCPP_FUNC_VIS void __sanitizer_annotate_contiguous_container(
 #define _LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
 #endif // _LIBCPP_ENABLE_CXX20_REMOVED_FEATURES
 
+#if __has_extension(trivially_relocatable)
+#define _LIBCPP_TRIVIALLY_RELOCATABLE [[clang::trivially_relocatable]]
+#define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x) [[clang::trivially_relocatable(x)]]
+#else
+#define _LIBCPP_TRIVIALLY_RELOCATABLE
+#define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
+#endif
+
 #if !defined(__cpp_impl_coroutine) || __cpp_impl_coroutine < 201902L
 #define _LIBCPP_HAS_NO_CXX20_COROUTINES
 #endif
