@@ -1324,6 +1324,8 @@ __sanitizer_verify_double_ended_contiguous_container(const void*, const void*, c
 #    define _LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
 #  endif // _LIBCPP_ENABLE_CXX20_REMOVED_FEATURES
 
+#  define _LIBCPP_TRIVIALLY_RELOCATABLE_VERSION 87
+
 #  if defined(_LIBCPP_TRIVIALLY_RELOCATABLE_IF)
 #    ifndef _LIBCPP_TRIVIALLY_RELOCATABLE
 #      define _LIBCPP_TRIVIALLY_RELOCATABLE _LIBCPP_TRIVIALLY_RELOCATABLE_IF(true)
