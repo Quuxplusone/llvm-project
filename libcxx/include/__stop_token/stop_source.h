@@ -31,7 +31,7 @@ struct nostopstate_t {
 
 inline constexpr nostopstate_t nostopstate{};
 
-class _LIBCPP_AVAILABILITY_SYNC stop_source {
+class _LIBCPP_AVAILABILITY_SYNC _LIBCPP_TRIVIALLY_RELOCATABLE stop_source {
 public:
   _LIBCPP_HIDE_FROM_ABI stop_source() : __state_(new __stop_state()) { __state_->__increment_stop_source_counter(); }
 
