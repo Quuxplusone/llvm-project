@@ -24,6 +24,7 @@ any version
 array compare
 array cstddef
 array cstdlib
+array cstring
 array initializer_list
 array limits
 array stdexcept
@@ -122,6 +123,7 @@ complex stdexcept
 complex type_traits
 complex version
 concepts cstddef
+concepts cstring
 concepts type_traits
 concepts version
 condition_variable atomic
@@ -204,6 +206,7 @@ experimental/memory_resource stdexcept
 experimental/memory_resource tuple
 experimental/memory_resource type_traits
 experimental/propagate_const cstddef
+experimental/propagate_const cstring
 experimental/propagate_const type_traits
 experimental/regex experimental/memory_resource
 experimental/regex experimental/string
@@ -252,6 +255,7 @@ filesystem compare
 filesystem cstddef
 filesystem cstdint
 filesystem cstdlib
+filesystem cstring
 filesystem ctime
 filesystem iomanip
 filesystem iosfwd
@@ -357,6 +361,7 @@ iostream ostream
 iostream streambuf
 iostream version
 istream cstddef
+istream cstring
 istream iosfwd
 istream ostream
 istream type_traits
@@ -365,6 +370,7 @@ iterator compare
 iterator concepts
 iterator cstddef
 iterator cstdlib
+iterator cstring
 iterator initializer_list
 iterator iosfwd
 iterator limits
@@ -408,6 +414,7 @@ locale version
 map compare
 map cstddef
 map cstdlib
+map cstring
 map initializer_list
 map limits
 map new
@@ -465,6 +472,7 @@ numbers type_traits
 numbers version
 numeric cmath
 numeric cstddef
+numeric cstring
 numeric limits
 numeric type_traits
 numeric version
@@ -498,6 +506,7 @@ ostream version
 queue compare
 queue cstddef
 queue cstdlib
+queue cstring
 queue deque
 queue initializer_list
 queue limits
@@ -509,6 +518,7 @@ random cmath
 random cstddef
 random cstdint
 random cstdlib
+random cstring
 random initializer_list
 random iosfwd
 random limits
@@ -520,6 +530,7 @@ random version
 ranges compare
 ranges cstddef
 ranges cstdlib
+ranges cstring
 ranges initializer_list
 ranges iosfwd
 ranges iterator
@@ -566,6 +577,7 @@ semaphore version
 set compare
 set cstddef
 set cstdlib
+set cstring
 set initializer_list
 set limits
 set new
@@ -583,11 +595,13 @@ shared_mutex type_traits
 shared_mutex version
 span array
 span cstddef
+span cstring
 span initializer_list
 span limits
 span type_traits
 span version
 sstream cstddef
+sstream cstring
 sstream istream
 sstream ostream
 sstream string
@@ -595,6 +609,7 @@ sstream type_traits
 sstream version
 stack compare
 stack cstddef
+stack cstring
 stack deque
 stack initializer_list
 stack type_traits
@@ -664,6 +679,7 @@ thread type_traits
 thread version
 tuple compare
 tuple cstddef
+tuple cstring
 tuple type_traits
 tuple version
 type_traits cstddef
@@ -708,6 +724,7 @@ unordered_set version
 utility compare
 utility cstddef
 utility cstdlib
+utility cstring
 utility initializer_list
 utility limits
 utility type_traits
