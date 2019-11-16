@@ -31,6 +31,15 @@ template <class _Tp>
 inline constexpr bool __libcpp_is_relocatable_v = __libcpp_is_relocatable<_Tp>::value;
 #endif
 
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS is_relocatable
+    : public __libcpp_is_relocatable<_Tp> {};
+
+#if _LIBCPP_STD_VER > 14
+template <class _Tp>
+inline constexpr bool is_relocatable_v = is_relocatable<_Tp>::value;
+#endif
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___TYPE_TRAITS_IS_RELOCATABLE_H
