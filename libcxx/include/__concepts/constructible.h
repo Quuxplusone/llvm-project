@@ -49,6 +49,10 @@ concept copy_constructible =
   constructible_from<_Tp, const _Tp&> && convertible_to<const _Tp&, _Tp> &&
   constructible_from<_Tp, const _Tp> && convertible_to<const _Tp, _Tp>;
 
+// [concept.relocatable]
+template<class _Tp>
+concept relocatable = move_constructible<_Tp>;
+
 #endif // _LIBCPP_STD_VER >= 20
 
 _LIBCPP_END_NAMESPACE_STD
