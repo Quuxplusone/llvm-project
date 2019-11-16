@@ -266,6 +266,15 @@ template <class _Tp, class _Up>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX20
 bool operator!=(const allocator<_Tp>&, const allocator<_Up>&) _NOEXCEPT {return false;}
 
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_copy_construct<allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_move_construct<allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_destroy<allocator<_Tp>, _Up> : true_type {};
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___MEMORY_ALLOCATOR_H

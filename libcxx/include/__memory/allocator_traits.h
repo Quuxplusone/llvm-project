@@ -18,6 +18,7 @@
 #include <__type_traits/is_empty.h>
 #include <__type_traits/is_move_constructible.h>
 #include <__type_traits/make_unsigned.h>
+#include <__type_traits/negation.h>
 #include <__type_traits/remove_reference.h>
 #include <__type_traits/void_t.h>
 #include <__utility/declval.h>
@@ -400,6 +401,18 @@ struct __is_cpp17_copy_insertable<_Alloc, __enable_if_t<
 > >
     : __is_cpp17_move_insertable<_Alloc>
 { };
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_copy_construct : _Not<__has_construct<_Alloc, _Type*, const _Type&> > {};
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_move_construct : _Not<__has_construct<_Alloc, _Type*, _Type&&> > {};
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_destroy : _Not<__has_destroy<_Alloc, _Type*> > {};
+
+template <class _Alloc>
+struct __allocator_allows_trivially_relocatable_containers : allocator_traits<_Alloc>::is_always_equal {};
 
 // ASan choices
 #ifndef _LIBCPP_HAS_NO_ASAN

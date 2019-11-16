@@ -171,6 +171,16 @@ DEFAULT_PARAMETERS = [
               AddFeature('sanitizer-new-delete') if sanitizer in ['Address', 'HWAddress', 'Memory', 'MemoryWithOrigins', 'Thread'] else None,
             ])),
 
+  Parameter(name='enable_trivially_relocatable_pmr_containers', choices=[True, False], type=bool, default=False,
+            help="Whether to advertise std::pmr::string as trivially relocatable.",
+            actions=lambda enabled: [
+              AddFeature('libcpp-has-trivially-relocatable-pmr-containers'),
+              AddCompileFlag('-D_LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS=1'),
+            ] if enabled else [
+              AddFeature('libcpp-has-no-trivially-relocatable-pmr-containers'),
+              AddCompileFlag('-D_LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS=0'),
+            ]),
+
   Parameter(name='enable_experimental', choices=[True, False], type=bool, default=True,
             help="Whether to enable tests for experimental C++ Library features.",
             actions=lambda experimental: [
