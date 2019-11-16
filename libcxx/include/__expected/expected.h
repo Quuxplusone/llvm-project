@@ -41,6 +41,7 @@
 #include <__type_traits/is_trivially_copy_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_move_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_void.h>
 #include <__type_traits/lazy.h>
 #include <__type_traits/negation.h>
@@ -89,7 +90,12 @@ _LIBCPP_HIDE_FROM_ABI void __throw_bad_expected_access(_Arg&& __arg) {
 }
 
 template <class _Tp, class _Err>
-class expected {
+inline constexpr bool __expected_be_trivially_relocatable_v =
+  __libcpp_is_trivially_relocatable<_Err>::value &&
+  (__libcpp_is_trivially_relocatable<_Tp>::value || is_void_v<_Tp>);
+
+template <class _Tp, class _Err>
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__expected_be_trivially_relocatable_v<_Tp, _Err>)) expected {
   static_assert(!is_reference_v<_Tp> && !is_function_v<_Tp> && !is_same_v<remove_cv_t<_Tp>, in_place_t> &&
                     !is_same_v<remove_cv_t<_Tp>, unexpect_t> && !__is_std_unexpected<remove_cv_t<_Tp>>::value &&
                     __valid_std_unexpected<_Err>::value,
@@ -918,7 +924,7 @@ private:
 
 template <class _Tp, class _Err>
   requires is_void_v<_Tp>
-class expected<_Tp, _Err> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__expected_be_trivially_relocatable_v<void, _Err>)) expected<_Tp, _Err> {
   static_assert(__valid_std_unexpected<_Err>::value,
                 "[expected.void.general] A program that instantiates expected<T, E> with a E that is not a "
                 "valid argument for unexpected<E> is ill-formed");
