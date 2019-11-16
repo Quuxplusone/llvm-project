@@ -207,11 +207,6 @@ constexpr void test() {
     check<true, types::type_list<VolatileMembersU>>();
   }
 
-  // References are not objects, and thus are not bit-castable.
-  {
-    check_both_ways<false, types::type_list<int&>, types::type_list<int&>>();
-  }
-
   // Arrays.
   {
     check<true, types::type_list<int[8]>>();
