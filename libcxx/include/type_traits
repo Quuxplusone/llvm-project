@@ -2969,6 +2969,17 @@ template <class _Tp>
 inline constexpr bool __libcpp_is_relocatable_v = __libcpp_is_relocatable<_Tp>::value;
 #endif
 
+// is_relocatable
+
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS is_relocatable
+    : public __libcpp_is_relocatable<_Tp> {};
+
+#if _LIBCPP_STD_VER > 14
+template <class _Tp>
+inline constexpr bool is_relocatable_v = is_relocatable<_Tp>::value;
+#endif
+
 // is_trivially_constructible
 
 template <class _Tp, class... _Args>
@@ -3097,6 +3108,17 @@ struct _LIBCPP_TEMPLATE_VIS __libcpp_is_trivially_relocatable
 #if _LIBCPP_STD_VER > 14
 template <class _Tp>
 inline constexpr bool __libcpp_is_trivially_relocatable_v = __libcpp_is_trivially_relocatable<_Tp>::value;
+#endif
+
+// is_trivially_relocatable
+
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS is_trivially_relocatable
+    : public __libcpp_is_trivially_relocatable<_Tp> {};
+
+#if _LIBCPP_STD_VER > 14 && !defined(_LIBCPP_HAS_NO_VARIABLE_TEMPLATES)
+template <class _Tp>
+inline constexpr bool is_trivially_relocatable_v = is_trivially_relocatable<_Tp>::value;
 #endif
 
 // is_nothrow_constructible
@@ -3319,6 +3341,17 @@ struct _LIBCPP_TEMPLATE_VIS __libcpp_is_nothrow_relocatable
 #if _LIBCPP_STD_VER > 14
 template <class _Tp>
 inline constexpr bool __libcpp_is_nothrow_relocatable_v = __libcpp_is_nothrow_relocatable<_Tp>::value;
+#endif
+
+// is_nothrow_relocatable
+
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS is_nothrow_relocatable
+    : public __libcpp_is_nothrow_relocatable<_Tp> {};
+
+#if _LIBCPP_STD_VER > 14 && !defined(_LIBCPP_HAS_NO_VARIABLE_TEMPLATES)
+template <class _Tp>
+inline constexpr bool is_nothrow_relocatable_v = is_nothrow_relocatable<_Tp>::value;
 #endif
 
 // is_pod
