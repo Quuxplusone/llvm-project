@@ -1139,7 +1139,11 @@ __sanitizer_verify_double_ended_contiguous_container(const void*, const void*, c
 #    define _LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
 #  endif // _LIBCPP_ENABLE_CXX20_REMOVED_FEATURES
 
-#  if __has_extension(trivially_relocatable)
+#  if defined(_LIBCPP_TRIVIALLY_RELOCATABLE)
+#    ifndef _LIBCPP_TRIVIALLY_RELOCATABLE_IF
+#      define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x)
+#    endif
+#  elif __has_extension(trivially_relocatable)
 #    define _LIBCPP_TRIVIALLY_RELOCATABLE [[clang::trivially_relocatable]]
 #    define _LIBCPP_TRIVIALLY_RELOCATABLE_IF(x) [[clang::trivially_relocatable(x)]]
 #  else
