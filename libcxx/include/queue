@@ -225,6 +225,7 @@ template <class T, class Container, class Compare>
 #include <__functional/operations.h>
 #include <__iterator/iterator_traits.h>
 #include <__memory/uses_allocator.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__utility/forward.h>
 #include <deque>
 #include <vector>
@@ -255,7 +256,7 @@ bool
 operator< (const queue<_Tp, _Container>& __x,const queue<_Tp, _Container>& __y);
 
 template <class _Tp, class _Container /*= deque<_Tp>*/>
-class _LIBCPP_TEMPLATE_VIS queue
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Container>::value)) queue
 {
 public:
     typedef _Container                               container_type;
@@ -491,7 +492,7 @@ struct _LIBCPP_TEMPLATE_VIS uses_allocator<queue<_Tp, _Container>, _Alloc>
 
 template <class _Tp, class _Container = vector<_Tp>,
           class _Compare = less<typename _Container::value_type> >
-class _LIBCPP_TEMPLATE_VIS priority_queue
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Container>::value && __libcpp_is_trivially_relocatable<_Compare>::value)) priority_queue
 {
 public:
     typedef _Container                               container_type;
