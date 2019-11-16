@@ -344,6 +344,9 @@ template<class T, class charT> requires is-vector-bool-reference<T> // Since C++
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_nothrow_move_assignable.h>
 #include <__type_traits/noexcept_move_assign_container.h>
+#include <__type_traits/is_trivially_move_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
+#include <__type_traits/is_volatile.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
@@ -379,8 +382,20 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+template <class _Allocator>
+struct __vector_be_trivially_relocatable {
+    typedef allocator_traits<_Allocator> __alloc_traits;
+    typedef typename __alloc_traits::pointer pointer;
+
+    static const bool value =
+        __libcpp_is_trivially_relocatable<__compressed_pair<pointer, _Allocator> >::value &&
+        __allocator_pocma_models_relocatable<_Allocator>::value;
+};
+
 template <class _Tp, class _Allocator /* = allocator<_Tp> */>
-class _LIBCPP_TEMPLATE_VIS vector
+class _LIBCPP_TEMPLATE_VIS
+    _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_be_trivially_relocatable<_Allocator>::value))
+    vector
 {
 private:
     typedef allocator<_Tp>                                  __default_allocator_type;
@@ -2060,7 +2075,26 @@ struct __has_storage_type<vector<bool, _Allocator> >
 };
 
 template <class _Allocator>
-class _LIBCPP_TEMPLATE_VIS vector<bool, _Allocator>
+struct __vector_bool_be_trivially_relocatable {
+    typedef _Allocator                               allocator_type;
+    typedef allocator_traits<allocator_type>         __alloc_traits;
+    typedef typename __alloc_traits::size_type       size_type;
+    typedef size_type                                __storage_type;
+    typedef __rebind_alloc<__alloc_traits, __storage_type> __storage_allocator;
+    typedef allocator_traits<__storage_allocator>    __storage_traits;
+    typedef typename __storage_traits::pointer       __storage_pointer;
+
+    static const bool value =
+        __libcpp_is_trivially_relocatable<__storage_pointer>::value &&
+        __libcpp_is_trivially_relocatable<size_type>::value &&
+        __libcpp_is_trivially_relocatable<__compressed_pair<size_type, __storage_allocator> >::value &&
+        __allocator_pocma_models_relocatable<__storage_allocator>::value;
+};
+
+template <class _Allocator>
+class _LIBCPP_TEMPLATE_VIS
+      _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_bool_be_trivially_relocatable<_Allocator>::value))
+    vector<bool, _Allocator>
 {
 public:
     typedef vector                                   __self;
@@ -2077,12 +2111,13 @@ public:
     typedef std::reverse_iterator<iterator>         reverse_iterator;
     typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
 
-private:
+    // These typedefs are public so that __bit_iterator can see them.
     typedef __rebind_alloc<__alloc_traits, __storage_type> __storage_allocator;
     typedef allocator_traits<__storage_allocator>    __storage_traits;
     typedef typename __storage_traits::pointer       __storage_pointer;
     typedef typename __storage_traits::const_pointer __const_storage_pointer;
 
+private:
     __storage_pointer                                      __begin_;
     size_type                                              __size_;
     __compressed_pair<size_type, __storage_allocator> __cap_alloc_;
