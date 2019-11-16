@@ -749,8 +749,21 @@ struct __can_be_converted_to_string_view
 struct __uninitialized_size_tag {};
 struct __init_with_sentinel_tag {};
 
+template <class _Allocator>
+struct __basic_string_be_trivially_relocatable {
+#if !defined(_LIBCPP_HAS_NO_ASAN) && defined(_LIBCPP_INSTRUMENTED_WITH_ASAN)
+  static const bool value = false;
+#else
+  typedef typename allocator_traits<_Allocator>::pointer pointer;
+  static const bool value =
+    __libcpp_is_trivially_relocatable<pointer>::value &&
+    __libcpp_is_trivially_relocatable<_Allocator>::value &&
+    __allocator_pocma_models_relocatable<_Allocator>::value;
+#endif
+};
+
 template <class _CharT, class _Traits, class _Allocator>
-class basic_string {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__basic_string_be_trivially_relocatable<_Allocator>::value) basic_string {
 private:
   using __default_allocator_type = allocator<_CharT>;
 
@@ -768,29 +781,6 @@ public:
   typedef typename __alloc_traits::pointer pointer;
   typedef typename __alloc_traits::const_pointer const_pointer;
 
-  // A basic_string contains the following members which may be trivially relocatable:
-  // - pointer: is currently assumed to be trivially relocatable, but is still checked in case that changes
-  // - size_type: is always trivially relocatable, since it has to be an integral type
-  // - value_type: is always trivially relocatable, since it has to be trivial
-  // - unsigned char: is a fundamental type, so it's trivially relocatable
-  // - allocator_type: may or may not be trivially relocatable, so it's checked
-  //
-  // This string implementation doesn't contain any references into itself. It only contains a bit that says whether
-  // it is in small or large string mode, so the entire structure is trivially relocatable if its members are.
-#if !defined(_LIBCPP_HAS_NO_ASAN) && defined(_LIBCPP_INSTRUMENTED_WITH_ASAN)
-  // When compiling with AddressSanitizer (ASan), basic_string cannot be trivially
-  // relocatable. Because the object's memory might be poisoned when its content
-  // is kept inside objects memory (short string optimization), instead of in allocated
-  // external memory. In such cases, the destructor is responsible for unpoisoning
-  // the memory to avoid triggering false positives.
-  // Therefore it's crucial to ensure the destructor is called.
-  using __trivially_relocatable = void;
-#else
-  using __trivially_relocatable = __conditional_t<
-      __libcpp_is_trivially_relocatable<allocator_type>::value && __libcpp_is_trivially_relocatable<pointer>::value,
-      basic_string,
-      void>;
-#endif
 #if !defined(_LIBCPP_HAS_NO_ASAN) && defined(_LIBCPP_INSTRUMENTED_WITH_ASAN)
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 pointer __asan_volatile_wrapper(pointer const& __ptr) const {
     if (__libcpp_is_constant_evaluated())
