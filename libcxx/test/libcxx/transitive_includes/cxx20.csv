@@ -38,6 +38,7 @@ array compare
 array concepts
 array cstddef
 array cstdlib
+array cstring
 array initializer_list
 array iterator
 array limits
@@ -159,6 +160,7 @@ complex stdexcept
 complex type_traits
 complex version
 concepts cstddef
+concepts cstring
 concepts type_traits
 concepts version
 condition_variable atomic
@@ -216,6 +218,7 @@ exception version
 execution version
 expected cstddef
 expected cstdlib
+expected cstring
 expected exception
 expected initializer_list
 expected new
@@ -281,6 +284,7 @@ experimental/memory_resource tuple
 experimental/memory_resource type_traits
 experimental/memory_resource variant
 experimental/propagate_const cstddef
+experimental/propagate_const cstring
 experimental/propagate_const type_traits
 experimental/regex experimental/memory_resource
 experimental/regex experimental/string
@@ -341,6 +345,7 @@ filesystem concepts
 filesystem cstddef
 filesystem cstdint
 filesystem cstdlib
+filesystem cstring
 filesystem ctime
 filesystem iomanip
 filesystem iosfwd
@@ -470,6 +475,7 @@ iostream streambuf
 iostream version
 istream concepts
 istream cstddef
+istream cstring
 istream iosfwd
 istream ostream
 istream type_traits
@@ -478,6 +484,7 @@ iterator compare
 iterator concepts
 iterator cstddef
 iterator cstdlib
+iterator cstring
 iterator exception
 iterator initializer_list
 iterator iosfwd
@@ -539,6 +546,7 @@ map compare
 map concepts
 map cstddef
 map cstdlib
+map cstring
 map functional
 map initializer_list
 map iterator
@@ -605,6 +613,7 @@ numbers version
 numeric cmath
 numeric concepts
 numeric cstddef
+numeric cstring
 numeric functional
 numeric iterator
 numeric limits
@@ -654,6 +663,7 @@ queue compare
 queue concepts
 queue cstddef
 queue cstdlib
+queue cstring
 queue deque
 queue functional
 queue initializer_list
@@ -668,6 +678,7 @@ random concepts
 random cstddef
 random cstdint
 random cstdlib
+random cstring
 random initializer_list
 random iosfwd
 random limits
@@ -679,6 +690,7 @@ random version
 ranges compare
 ranges cstddef
 ranges cstdlib
+ranges cstring
 ranges initializer_list
 ranges iosfwd
 ranges iterator
@@ -742,6 +754,7 @@ set compare
 set concepts
 set cstddef
 set cstdlib
+set cstring
 set functional
 set initializer_list
 set iterator
@@ -762,6 +775,7 @@ shared_mutex version
 span array
 span concepts
 span cstddef
+span cstring
 span functional
 span initializer_list
 span iterator
@@ -769,6 +783,7 @@ span limits
 span type_traits
 span version
 sstream cstddef
+sstream cstring
 sstream istream
 sstream ostream
 sstream string
@@ -777,6 +792,7 @@ sstream version
 stack compare
 stack concepts
 stack cstddef
+stack cstring
 stack deque
 stack functional
 stack initializer_list
@@ -859,6 +875,7 @@ thread type_traits
 thread version
 tuple compare
 tuple cstddef
+tuple cstring
 tuple exception
 tuple iosfwd
 tuple new
@@ -918,6 +935,7 @@ unordered_set version
 utility compare
 utility cstddef
 utility cstdlib
+utility cstring
 utility initializer_list
 utility iosfwd
 utility limits
