@@ -275,7 +275,7 @@ struct _LIBCPP_TEMPLATE_VIS formatter<__thread_id, _CharT> {
 };
 #endif // _LIBCPP_STD_VER >= 23
 
-class _LIBCPP_TYPE_VIS thread
+class _LIBCPP_TYPE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE thread
 {
     __libcpp_thread_t __t_;
 
