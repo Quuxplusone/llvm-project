@@ -603,6 +603,7 @@ basic_string<char32_t> operator""s( const char32_t *str, size_t len );          
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_standard_layout.h>
 #include <__type_traits/is_trivial.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/noexcept_move_assign_container.h>
 #include <__type_traits/remove_cvref.h>
 #include <__type_traits/void_t.h>
@@ -699,8 +700,19 @@ struct __can_be_converted_to_string_view : public _BoolConstant<
 struct __uninitialized_size_tag {};
 struct __init_with_sentinel_tag {};
 
+template<class _Allocator>
+struct __basic_string_be_trivially_relocatable {
+    typedef typename allocator_traits<_Allocator>::pointer pointer;
+    static const bool value =
+        __libcpp_is_trivially_relocatable<pointer>::value &&
+        __libcpp_is_trivially_relocatable<_Allocator>::value &&
+        __allocator_pocma_models_relocatable<_Allocator>::value;
+};
+
 template<class _CharT, class _Traits, class _Allocator>
-class basic_string
+class
+    _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__basic_string_be_trivially_relocatable<_Allocator>::value)
+    basic_string
 {
 public:
     typedef basic_string                                 __self;
