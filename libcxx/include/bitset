@@ -183,11 +183,11 @@ template <size_t _N_words, size_t _Size>
 class __bitset {
 public:
   typedef size_t __storage_type;
+  typedef __storage_type* __storage_pointer;
+  typedef const __storage_type* __const_storage_pointer;
 
 protected:
   typedef __bitset __self;
-  typedef __storage_type* __storage_pointer;
-  typedef const __storage_type* __const_storage_pointer;
   static const unsigned __bits_per_word = static_cast<unsigned>(sizeof(__storage_type) * CHAR_BIT);
 
   friend class __bit_reference<__bitset>;
@@ -408,11 +408,11 @@ template <size_t _Size>
 class __bitset<1, _Size> {
 public:
   typedef size_t __storage_type;
+  typedef __storage_type* __storage_pointer;
+  typedef const __storage_type* __const_storage_pointer;
 
 protected:
   typedef __bitset __self;
-  typedef __storage_type* __storage_pointer;
-  typedef const __storage_type* __const_storage_pointer;
   static const unsigned __bits_per_word = static_cast<unsigned>(sizeof(__storage_type) * CHAR_BIT);
 
   friend class __bit_reference<__bitset>;
@@ -548,11 +548,11 @@ template <>
 class __bitset<0, 0> {
 public:
   typedef size_t __storage_type;
+  typedef __storage_type* __storage_pointer;
+  typedef const __storage_type* __const_storage_pointer;
 
 protected:
   typedef __bitset __self;
-  typedef __storage_type* __storage_pointer;
-  typedef const __storage_type* __const_storage_pointer;
   static const unsigned __bits_per_word = static_cast<unsigned>(sizeof(__storage_type) * CHAR_BIT);
 
   friend class __bit_reference<__bitset>;
