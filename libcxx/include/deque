@@ -425,8 +425,22 @@ const _DiffType __deque_iterator<_ValueType, _Pointer, _Reference, _MapPointer,
                                  _DiffType, _BlockSize>::__block_size =
     __deque_block_size<_ValueType, _DiffType>::value;
 
+template <class _Tp, class _Allocator>
+struct __deque_allow_trivial_relocation {
+  using __alloc_traits = allocator_traits<_Allocator>;
+  using pointer = typename __alloc_traits::pointer;
+  using __pointer_allocator = __rebind_alloc<__alloc_traits, pointer>;
+  using size_type = typename __alloc_traits::size_type;
+
+  static const bool value =
+    __libcpp_is_trivially_relocatable<pointer>::value &&
+    __libcpp_is_trivially_relocatable<__pointer_allocator>::value &&
+    __libcpp_is_trivially_relocatable<size_type>::value &&
+    __libcpp_is_trivially_relocatable<_Allocator>::value;
+};
+
 template <class _Tp, class _Allocator /*= allocator<_Tp>*/>
-class _LIBCPP_TEMPLATE_VIS deque
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__deque_allow_trivial_relocation<_Tp, _Allocator>::value)) deque
 {
 public:
     // types:
