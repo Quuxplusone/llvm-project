@@ -75,6 +75,10 @@ export namespace std {
 
   using std::is_destructible;
 
+  using std::is_relocatable;
+  using std::is_nothrow_relocatable;
+  using std::is_trivially_relocatable;
+
   using std::is_trivially_constructible;
   using std::is_trivially_copy_constructible;
   using std::is_trivially_default_constructible;
@@ -255,9 +259,11 @@ export namespace std {
   using std::is_nothrow_destructible_v;
   using std::is_nothrow_move_assignable_v;
   using std::is_nothrow_move_constructible_v;
+  using std::is_nothrow_relocatable_v;
   using std::is_nothrow_swappable_v;
   using std::is_nothrow_swappable_with_v;
   using std::is_polymorphic_v;
+  using std::is_relocatable_v;
   using std::is_scoped_enum_v;
   using std::is_signed_v;
   using std::is_standard_layout_v;
@@ -273,6 +279,7 @@ export namespace std {
   using std::is_trivially_destructible_v;
   using std::is_trivially_move_assignable_v;
   using std::is_trivially_move_constructible_v;
+  using std::is_trivially_relocatable_v;
   using std::is_unbounded_array_v;
   using std::is_unsigned_v;
   using std::is_volatile_v;
