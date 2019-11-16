@@ -59,6 +59,9 @@ export namespace std {
   // [concept.copyconstructible], concept copy_constructible
   using std::copy_constructible;
 
+  // [concept.relocatable], concept relocatable
+  using std::relocatable;
+
   // [concepts.compare], comparison concepts
   // [concept.equalitycomparable], concept equality_comparable
   using std::equality_comparable;
