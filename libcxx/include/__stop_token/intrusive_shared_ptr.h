@@ -42,7 +42,7 @@ struct __intrusive_shared_ptr_traits;
 // is stored inside the class _Tp itself.
 // When the reference count goes to zero, the destructor of _Tp will be called
 template <class _Tp>
-struct __intrusive_shared_ptr {
+struct _LIBCPP_TRIVIALLY_RELOCATABLE __intrusive_shared_ptr {
   _LIBCPP_HIDE_FROM_ABI __intrusive_shared_ptr() = default;
 
   _LIBCPP_HIDE_FROM_ABI explicit __intrusive_shared_ptr(_Tp* __raw_ptr) : __raw_ptr_(__raw_ptr) {
