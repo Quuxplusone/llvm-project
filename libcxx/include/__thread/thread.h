@@ -130,7 +130,7 @@ basic_ostream<_CharT, _Traits>&
 operator<<(basic_ostream<_CharT, _Traits>& __os, __thread_id __id)
 {return __os << __id.__id_;}
 
-class _LIBCPP_EXPORTED_FROM_ABI thread
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE thread
 {
     __libcpp_thread_t __t_;
 
