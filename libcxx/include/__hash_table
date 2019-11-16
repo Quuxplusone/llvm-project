@@ -37,6 +37,7 @@
 #include <__type_traits/is_pointer.h>
 #include <__type_traits/is_reference.h>
 #include <__type_traits/is_swappable.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/remove_const.h>
 #include <__type_traits/remove_cvref.h>
 #include <__utility/forward.h>
@@ -620,7 +621,8 @@ private:
 };
 
 template <class _Alloc>
-class __bucket_list_deallocator
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<__compressed_pair<typename allocator_traits<_Alloc>::size_type, _Alloc>>::value))
+      __bucket_list_deallocator
 {
     typedef _Alloc                                          allocator_type;
     typedef allocator_traits<allocator_type>                __alloc_traits;
@@ -1221,6 +1223,16 @@ private:
 
     _LIBCPP_HIDE_FROM_ABI void __deallocate_node(__next_pointer __np) _NOEXCEPT;
     _LIBCPP_HIDE_FROM_ABI __next_pointer __detach() _NOEXCEPT;
+
+public:
+    typedef integral_constant<bool,
+        __libcpp_is_trivially_relocatable<__bucket_list>::value &&
+        __libcpp_is_trivially_relocatable<__first_node>::value &&
+        __libcpp_is_trivially_relocatable<__node_allocator>::value &&
+        __libcpp_is_trivially_relocatable<hasher>::value &&
+        __libcpp_is_trivially_relocatable<key_equal>::value &&
+        __allocator_pocma_models_relocatable<__node_allocator>::value
+    > __be_trivially_relocatable;
 
     template <class, class, class, class, class> friend class _LIBCPP_TEMPLATE_VIS unordered_map;
     template <class, class, class, class, class> friend class _LIBCPP_TEMPLATE_VIS unordered_multimap;
