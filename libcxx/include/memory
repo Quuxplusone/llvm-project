@@ -893,7 +893,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Alloc, class _Ptr>
 _LIBCPP_INLINE_VISIBILITY
-void __construct_forward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, _Ptr __end1, _Ptr& __begin2) {
+void __construct_forward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, _Ptr __end1, _Ptr& __begin2, false_type) {
     static_assert(__is_cpp17_move_insertable<_Alloc>::value,
         "The specified type does not meet the requirements of Cpp17MoveInsertable");
     typedef allocator_traits<_Alloc> _Traits;
@@ -908,15 +908,14 @@ void __construct_forward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, _
     }
 }
 
-template <class _Alloc, class _Tp, typename enable_if<
-    (__is_default_allocator<_Alloc>::value || !__has_construct<_Alloc, _Tp*, _Tp>::value) &&
-    is_trivially_move_constructible<_Tp>::value
->::type>
+template <class _Alloc, class _Ptr>
 _LIBCPP_INLINE_VISIBILITY
-void __construct_forward_with_exception_guarantees(_Alloc&, _Tp* __begin1, _Tp* __end1, _Tp*& __begin2) {
+void __construct_forward_with_exception_guarantees(_Alloc&, _Ptr __begin1, _Ptr __end1, _Ptr& __begin2, true_type) {
+    typedef typename iterator_traits<_Ptr>::value_type _Tp;
+    typedef typename remove_const<_Tp>::type _Vp;
     ptrdiff_t _Np = __end1 - __begin1;
     if (_Np > 0) {
-        _VSTD::memcpy(__begin2, __begin1, _Np * sizeof(_Tp));
+        _VSTD::memcpy(const_cast<_Vp*>(_VSTD::__to_address(__begin2)), _VSTD::__to_address(__begin1), _Np * sizeof(_Tp));
         __begin2 += _Np;
     }
 }
@@ -950,7 +949,7 @@ void __construct_range_forward(_Alloc&, _Source* __begin1, _Source* __end1, _Des
 
 template <class _Alloc, class _Ptr>
 _LIBCPP_INLINE_VISIBILITY
-void __construct_backward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, _Ptr __end1, _Ptr& __end2) {
+void __construct_backward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, _Ptr __end1, _Ptr& __end2, false_type) {
     static_assert(__is_cpp17_move_insertable<_Alloc>::value,
         "The specified type does not meet the requirements of Cpp17MoveInsertable");
     typedef allocator_traits<_Alloc> _Traits;
@@ -966,16 +965,16 @@ void __construct_backward_with_exception_guarantees(_Alloc& __a, _Ptr __begin1, 
     }
 }
 
-template <class _Alloc, class _Tp, class = typename enable_if<
-    (__is_default_allocator<_Alloc>::value || !__has_construct<_Alloc, _Tp*, _Tp>::value) &&
-    is_trivially_move_constructible<_Tp>::value
->::type>
+template <class _Alloc, class _Ptr>
 _LIBCPP_INLINE_VISIBILITY
-void __construct_backward_with_exception_guarantees(_Alloc&, _Tp* __begin1, _Tp* __end1, _Tp*& __end2) {
+void __construct_backward_with_exception_guarantees(_Alloc&, _Ptr __begin1, _Ptr __end1, _Ptr& __end2, true_type) {
+    typedef typename iterator_traits<_Ptr>::value_type _Tp;
+    typedef typename remove_const<_Tp>::type _Vp;
     ptrdiff_t _Np = __end1 - __begin1;
     __end2 -= _Np;
-    if (_Np > 0)
-        _VSTD::memcpy(static_cast<void*>(__end2), static_cast<void const*>(__begin1), _Np * sizeof(_Tp));
+    if (_Np > 0) {
+        _VSTD::memcpy(const_cast<_Vp*>(_VSTD::__to_address(__end2)), _VSTD::__to_address(__begin1), _Np * sizeof(_Tp));
+    }
 }
 
 struct __destruct_n
@@ -1135,6 +1134,18 @@ struct __builtin_new_allocator {
       __deallocate_bytes(__p, __n * sizeof(_Tp), _LIBCPP_ALIGNOF(_Tp));
   }
 };
+
+// __has_trivial_construct, __has_trivial_destroy
+
+template <class _Alloc, class _Tp, class... _Args>
+struct __has_trivial_construct : integral_constant<bool,
+    (__is_default_allocator<_Alloc>::value || !__has_construct<_Alloc, _Tp*, _Args...>::value)
+> {};
+
+template <class _Alloc, class _Tp>
+struct __has_trivial_destroy : integral_constant<bool,
+    (__is_default_allocator<_Alloc>::value || !__has_destroy<_Alloc, _Tp*>::value)
+> {};
 
 _LIBCPP_END_NAMESPACE_STD
 
