@@ -725,8 +725,21 @@ struct __padding {
 template <>
 struct __padding<0> {};
 
+template <class _Allocator>
+struct __basic_string_be_trivially_relocatable {
+#if __has_feature(address_sanitizer) && _LIBCPP_INSTRUMENTED_WITH_ASAN
+  static const bool value = false;
+#else
+  typedef typename allocator_traits<_Allocator>::pointer pointer;
+  static const bool value =
+    __libcpp_is_trivially_relocatable<pointer>::value &&
+    __libcpp_is_trivially_relocatable<_Allocator>::value &&
+    __allocator_pocma_models_relocatable<_Allocator>::value;
+#endif
+};
+
 template <class _CharT, class _Traits, class _Allocator>
-class basic_string {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__basic_string_be_trivially_relocatable<_Allocator>::value) basic_string {
 public:
   using __self _LIBCPP_NODEBUG         = basic_string;
   using __self_view _LIBCPP_NODEBUG    = basic_string_view<_CharT, _Traits>;

@@ -234,6 +234,7 @@ template <class T, class Allocator, class Predicate>
 #  include <__type_traits/is_pointer.h>
 #  include <__type_traits/is_same.h>
 #  include <__type_traits/is_swappable.h>
+#  include <__type_traits/is_trivially_relocatable.h>
 #  include <__type_traits/remove_cv.h>
 #  include <__type_traits/type_identity.h>
 #  include <__utility/forward.h>
@@ -585,6 +586,13 @@ private:
       _NOEXCEPT_(is_nothrow_move_assignable<__node_allocator>::value) {
     __alloc_ = std::move(__x.__alloc_);
   }
+
+public:
+  struct __be_trivially_relocatable : integral_constant<bool,
+    __libcpp_is_trivially_relocatable<__begin_node>::value &&
+    __libcpp_is_trivially_relocatable<__node_allocator>::value &&
+    __allocator_pocma_models_relocatable<__node_allocator>::value
+  > {};
 };
 
 #  ifndef _LIBCPP_CXX03_LANG
@@ -637,7 +645,8 @@ _LIBCPP_CONSTEXPR_SINCE_CXX26 void __forward_list_base<_Tp, _Alloc>::clear() _NO
 }
 
 template <class _Tp, class _Alloc /*= allocator<_Tp>*/>
-class forward_list : private __forward_list_base<_Tp, _Alloc> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__forward_list_base<_Tp, _Alloc>::__be_trivially_relocatable::value))
+      forward_list : private __forward_list_base<_Tp, _Alloc> {
   typedef __forward_list_base<_Tp, _Alloc> __base;
   typedef typename __base::__node_allocator __node_allocator;
   typedef typename __base::__node_type __node_type;

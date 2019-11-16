@@ -42,6 +42,7 @@
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
@@ -75,7 +76,24 @@ struct __has_storage_type<vector<bool, _Allocator> > {
 };
 
 template <class _Allocator>
-class vector<bool, _Allocator> {
+struct __vector_bool_be_trivially_relocatable {
+    typedef _Allocator                               allocator_type;
+    typedef allocator_traits<allocator_type>         __alloc_traits;
+    typedef typename __alloc_traits::size_type       size_type;
+    typedef size_type                                __storage_type;
+    typedef __rebind_alloc<__alloc_traits, __storage_type> __storage_allocator;
+    typedef allocator_traits<__storage_allocator>    __storage_traits;
+    typedef typename __storage_traits::pointer       __storage_pointer;
+
+    static const bool value =
+        __libcpp_is_trivially_relocatable<__storage_pointer>::value &&
+        __libcpp_is_trivially_relocatable<size_type>::value &&
+        __libcpp_is_trivially_relocatable<__storage_allocator>::value &&
+        __allocator_pocma_models_relocatable<__storage_allocator>::value;
+};
+
+template <class _Allocator>
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_bool_be_trivially_relocatable<_Allocator>::value)) vector<bool, _Allocator> {
 public:
   using __self _LIBCPP_NODEBUG         = vector;
   using value_type                     = bool;
@@ -91,12 +109,13 @@ public:
   using reverse_iterator               = std::reverse_iterator<iterator>;
   using const_reverse_iterator         = std::reverse_iterator<const_iterator>;
 
-private:
+  // These typedefs are public so that __bit_iterator can see them.
   using __storage_allocator _LIBCPP_NODEBUG     = __rebind_alloc<__alloc_traits, __storage_type>;
   using __storage_traits _LIBCPP_NODEBUG        = allocator_traits<__storage_allocator>;
   using __storage_pointer _LIBCPP_NODEBUG       = typename __storage_traits::pointer;
   using __const_storage_pointer _LIBCPP_NODEBUG = typename __storage_traits::const_pointer;
 
+private:
   __storage_pointer __begin_;
   size_type __size_;
   _LIBCPP_COMPRESSED_PAIR(size_type, __cap_, __storage_allocator, __alloc_);

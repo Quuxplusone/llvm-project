@@ -190,7 +190,7 @@ _LIBCPP_HIDE_FROM_ABI void* __thread_proxy_cxx03(void* __vp) {
 
 #  endif // _LIBCPP_CXX03_LANG
 
-class _LIBCPP_EXPORTED_FROM_ABI thread {
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE thread {
   __libcpp_thread_t __t_;
 
   thread(const thread&);

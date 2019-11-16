@@ -583,7 +583,9 @@ __memberwise_forward_assign(_Dest& __dest, _Source&& __source, __tuple_types<_Up
 }
 
 template <class... _Tp>
-class _LIBCPP_NO_SPECIALIZATIONS tuple {
+class _LIBCPP_NO_SPECIALIZATIONS
+      _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__all<__libcpp_is_trivially_relocatable<_Tp>::value...>::value))
+      tuple {
   typedef __tuple_impl<__make_index_sequence<sizeof...(_Tp)>, _Tp...> _BaseT;
 
   _BaseT __base_;
