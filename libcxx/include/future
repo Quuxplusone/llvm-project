@@ -919,7 +919,7 @@ template <class _Rp, class _Fp>
 _LIBCPP_HIDE_FROM_ABI future<_Rp> __make_async_assoc_state(_Fp&& __f);
 
 template <class _Rp>
-class future {
+class _LIBCPP_TRIVIALLY_RELOCATABLE future {
   __assoc_state<_Rp>* __state_;
 
   explicit _LIBCPP_HIDE_FROM_ABI future(__assoc_state<_Rp>* __state);
@@ -990,7 +990,7 @@ _Rp future<_Rp>::get() {
 }
 
 template <class _Rp>
-class future<_Rp&> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE future<_Rp&> {
   __assoc_state<_Rp&>* __state_;
 
   explicit _LIBCPP_HIDE_FROM_ABI future(__assoc_state<_Rp&>* __state);
@@ -1057,7 +1057,8 @@ _Rp& future<_Rp&>::get() {
 }
 
 template <>
-class _LIBCPP_EXPORTED_FROM_ABI future<void> {
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE
+                                future<void> {
   __assoc_sub_state* __state_;
 
   explicit future(__assoc_sub_state* __state);
@@ -1115,7 +1116,7 @@ template <class _Callable>
 class packaged_task;
 
 template <class _Rp>
-class promise {
+class _LIBCPP_TRIVIALLY_RELOCATABLE promise {
   __assoc_state<_Rp>* __state_;
 
   _LIBCPP_HIDE_FROM_ABI explicit promise(nullptr_t) _NOEXCEPT : __state_(nullptr) {}
@@ -1232,7 +1233,7 @@ void promise<_Rp>::set_exception_at_thread_exit(exception_ptr __p) {
 // promise<R&>
 
 template <class _Rp>
-class promise<_Rp&> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE promise<_Rp&> {
   __assoc_state<_Rp&>* __state_;
 
   _LIBCPP_HIDE_FROM_ABI explicit promise(nullptr_t) _NOEXCEPT : __state_(nullptr) {}
@@ -1333,7 +1334,8 @@ void promise<_Rp&>::set_exception_at_thread_exit(exception_ptr __p) {
 // promise<void>
 
 template <>
-class _LIBCPP_EXPORTED_FROM_ABI promise<void> {
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE
+                                promise<void> {
   __assoc_sub_state* __state_;
 
   _LIBCPP_HIDE_FROM_ABI explicit promise(nullptr_t) _NOEXCEPT : __state_(nullptr) {}
@@ -1893,7 +1895,7 @@ async(_Fp&& __f, _Args&&... __args) {
 // shared_future
 
 template <class _Rp>
-class shared_future {
+class _LIBCPP_TRIVIALLY_RELOCATABLE shared_future {
   __assoc_state<_Rp>* __state_;
 
 public:
@@ -1949,7 +1951,7 @@ shared_future<_Rp>& shared_future<_Rp>::operator=(const shared_future& __rhs) _N
 }
 
 template <class _Rp>
-class shared_future<_Rp&> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE shared_future<_Rp&> {
   __assoc_state<_Rp&>* __state_;
 
 public:
@@ -2005,7 +2007,8 @@ shared_future<_Rp&>& shared_future<_Rp&>::operator=(const shared_future& __rhs) 
 }
 
 template <>
-class _LIBCPP_EXPORTED_FROM_ABI shared_future<void> {
+class _LIBCPP_EXPORTED_FROM_ABI _LIBCPP_TRIVIALLY_RELOCATABLE
+                                shared_future<void> {
   __assoc_sub_state* __state_;
 
 public:
