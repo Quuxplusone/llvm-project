@@ -617,6 +617,7 @@ module std [system] {
       module pointer_safety           { private header "__memory/pointer_safety.h"           }
       module pointer_traits           { private header "__memory/pointer_traits.h"           }
       module raw_storage_iterator     { private header "__memory/raw_storage_iterator.h"     }
+      module relocate_at              { private header "__memory/relocate_at.h"              }
       module shared_ptr               { private header "__memory/shared_ptr.h"               }
       module temporary_buffer         { private header "__memory/temporary_buffer.h"         }
       module uninitialized_algorithms { private header "__memory/uninitialized_algorithms.h" }

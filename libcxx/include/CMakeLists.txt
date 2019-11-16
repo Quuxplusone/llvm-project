@@ -216,6 +216,7 @@ set(files
   __memory/pointer_safety.h
   __memory/pointer_traits.h
   __memory/raw_storage_iterator.h
+  __memory/relocate_at.h
   __memory/shared_ptr.h
   __memory/temporary_buffer.h
   __memory/uninitialized_algorithms.h
