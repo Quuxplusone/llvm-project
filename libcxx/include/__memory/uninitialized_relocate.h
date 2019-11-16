@@ -105,6 +105,15 @@ __libcpp_uninitialized_relocate(_InputIt __first, _InputIt __last,
         _SingleMemcpy(), _LoopWithoutCatch());
 }
 
+template<class _InputIt, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+_ForwardIt
+uninitialized_relocate(_InputIt __first, _InputIt __last,
+                       _ForwardIt __result)
+{
+    return std::__libcpp_uninitialized_relocate(__first, __last, __result);
+}
+
 // __libcpp_uninitialized_relocate_n
 
 template<class _InputIt, class _Size, class _ForwardIt>
@@ -179,6 +188,14 @@ __libcpp_uninitialized_relocate_n(_InputIt __first, _Size __n, _ForwardIt __resu
     using _LoopWithoutCatch = is_nothrow_constructible<_Dt, _St>;
     return std::__uninitialized_relocate_n_impl(__first, __n, __result,
         _SingleMemcpy(), _LoopWithoutCatch());
+}
+
+template<class _InputIt, class _Size, class _ForwardIt>
+inline _LIBCPP_INLINE_VISIBILITY
+pair<_InputIt, _ForwardIt>
+uninitialized_relocate_n(_InputIt __first, _Size __n, _ForwardIt __result)
+{
+    return _VSTD::__libcpp_uninitialized_relocate_n(__first, __n, __result);
 }
 
 _LIBCPP_END_NAMESPACE_STD
