@@ -130,8 +130,16 @@ struct __unique_ptr_deleter_sfinae<_Deleter&> {
 #  define _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI
 #endif
 
+template <class _Tp, class _Dp>
+struct __unique_ptr_be_trivially_relocatable {
+  typedef _Tp element_type;
+  typedef _Dp deleter_type;
+  typedef typename __pointer<_Tp, deleter_type>::type pointer;
+  static const bool value = __libcpp_is_trivially_relocatable<__compressed_pair<pointer, deleter_type> >::value;
+};
+
 template <class _Tp, class _Dp = default_delete<_Tp> >
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS unique_ptr {
+class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value)) unique_ptr {
 public:
   typedef _Tp element_type;
   typedef _Dp deleter_type;
@@ -146,7 +154,7 @@ public:
   // This unique_ptr implementation only contains a pointer to the unique object and a deleter, so there are no
   // references to itself. This means that the entire structure is trivially relocatable if its members are.
   using __trivially_relocatable = __conditional_t<
-      __libcpp_is_trivially_relocatable<pointer>::value && __libcpp_is_trivially_relocatable<deleter_type>::value,
+      __unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value,
       unique_ptr,
       void>;
 
@@ -291,7 +299,7 @@ public:
 };
 
 template <class _Tp, class _Dp>
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS unique_ptr<_Tp[], _Dp> {
+class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value)) unique_ptr<_Tp[], _Dp> {
 public:
   typedef _Tp element_type;
   typedef _Dp deleter_type;
@@ -304,7 +312,7 @@ public:
   // This unique_ptr implementation only contains a pointer to the unique object and a deleter, so there are no
   // references to itself. This means that the entire structure is trivially relocatable if its members are.
   using __trivially_relocatable = __conditional_t<
-      __libcpp_is_trivially_relocatable<pointer>::value && __libcpp_is_trivially_relocatable<deleter_type>::value,
+      __unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value,
       unique_ptr,
       void>;
 
