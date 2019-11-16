@@ -229,6 +229,7 @@ namespace std {
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_move_assignable.h>
 #include <__type_traits/is_trivially_move_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_void.h>
 #include <__type_traits/remove_const.h>
 #include <__type_traits/type_identity.h>
@@ -1294,7 +1295,7 @@ using __best_match_t =
 } // namespace __variant_detail
 
 template <class... _Types>
-class _LIBCPP_TEMPLATE_VIS _LIBCPP_DECLSPEC_EMPTY_BASES variant
+class _LIBCPP_TEMPLATE_VIS _LIBCPP_DECLSPEC_EMPTY_BASES _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__all<__libcpp_is_trivially_relocatable_v<_Types>...>::value) variant
     : private __sfinae_ctor_base<
           __all<is_copy_constructible_v<_Types>...>::value,
           __all<is_move_constructible_v<_Types>...>::value>,
