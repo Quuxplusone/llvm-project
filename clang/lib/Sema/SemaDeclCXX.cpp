@@ -6293,6 +6293,36 @@ static bool canPassInRegisters(Sema &S, CXXRecordDecl *D,
   return HasNonDeletedCopyOrMove;
 }
 
+static bool lookupTrivialDestructor(Sema &S, CXXRecordDecl *R,
+                                    bool AlwaysUseLookup) {
+  if (AlwaysUseLookup || R->hasUserDeclaredDestructor() ||
+      R->needsOverloadResolutionForDestructor() ||
+      (R->needsImplicitDestructor() && !R->hasTrivialDestructor())) {
+
+    Sema::SpecialMemberOverloadResult SMOR = S.LookupSpecialMember(
+        R, Sema::CXXDestructor, false, false, false, false, false);
+    return SMOR.getKind() == Sema::SpecialMemberOverloadResult::Success;
+  }
+
+  return R->hasTrivialDestructor();
+}
+
+static bool lookupTrivialMoveConstructor(Sema &S, CXXRecordDecl *R,
+                                         bool AlwaysUseLookup) {
+  if (AlwaysUseLookup || R->hasUserDeclaredMoveConstructor() ||
+      R->needsOverloadResolutionForMoveConstructor() ||
+      (R->needsImplicitMoveConstructor() && !R->hasTrivialMoveConstructor()) ||
+      !R->hasMoveConstructor()) {
+
+    Sema::SpecialMemberOverloadResult SMOR = S.LookupSpecialMember(
+        R, Sema::CXXMoveConstructor, false, false, false, false, false);
+
+    return SMOR.getKind() == Sema::SpecialMemberOverloadResult::Success;
+  }
+
+  return R->hasTrivialMoveConstructor();
+}
+
 /// Perform semantic checks on a class definition that has been
 /// completing, introducing implicitly-declared members, checking for
 /// abstract types, etc.
@@ -6606,10 +6636,22 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       }
     }
 
-    // Check that the destructor is non-deleted.
-    SpecialMemberOverloadResult SMOR = LookupSpecialMember(
-        Record, CXXDestructor, false, false, false, false, false);
-    if (SMOR.getKind() != SpecialMemberOverloadResult::Success) {
+    // Determine whether a Record is TriviallyRelocatable. The helper functions
+    // can use two methods:
+    // - Call Sema::LookupSpecialMember this call always works but it adds
+    //   special member function declarations to the CXXRecordDecl record. This
+    //   is increases the size of the AST for simple classes, which is
+    //   unwanted. For example the type_traits helper classes.
+    // - Look at the DefinitionData's HasTrivialSpecialMembers field. This
+    //   value isn't always reliable. Therefore we need to test whether we can
+    //   use this value.
+    // If AlwaysUseLookup represents the cases where we always need to use the
+    // call to Sema::LookupSpecialMember. The helper functions themselves have
+    // additional tests for their specific call.
+    bool AlwaysUseLookup = Record->isPolymorphic() ||
+                           Record->hasAttr<TriviallyRelocatableAttr>() ||
+                           Record->hasAttr<MaybeTriviallyRelocatableAttr>();
+    if (!lookupTrivialDestructor(*this, Record, AlwaysUseLookup)) {
       Record->setIsNotNaturallyTriviallyRelocatable();
       if (Record->hasAttr<TriviallyRelocatableAttr>()) {
         Record->dropAttr<TriviallyRelocatableAttr>();
@@ -6620,29 +6662,21 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
               << Context.getRecordType(Record) << true;
         }
       }
-      if (Record->hasAttr<MaybeTriviallyRelocatableAttr>()) {
+      if (Record->hasAttr<MaybeTriviallyRelocatableAttr>())
         Record->dropAttr<MaybeTriviallyRelocatableAttr>();
-      }
-    } else {
-      // Check that the constructor used for move-construction is non-deleted.
-      SMOR = LookupSpecialMember(Record, CXXMoveConstructor, false, false,
-                                 false, false, false);
-      if (SMOR.getKind() != SpecialMemberOverloadResult::Success) {
-        Record->setIsNotNaturallyTriviallyRelocatable();
-        if (Record->hasAttr<TriviallyRelocatableAttr>()) {
-          Record->dropAttr<TriviallyRelocatableAttr>();
-          if (!isTemplateInstantiation(
-                  Record->getTemplateSpecializationKind())) {
-            Diag(Record->getLocation(),
-                 diag::err_trivially_relocatable_class_is_not_relocatable)
-                << Record->getCanonicalDecl()->getTagKind()
-                << Context.getRecordType(Record) << false;
-          }
-        }
-        if (Record->hasAttr<MaybeTriviallyRelocatableAttr>()) {
-          Record->dropAttr<MaybeTriviallyRelocatableAttr>();
+    } else if (!lookupTrivialMoveConstructor(*this, Record, AlwaysUseLookup)) {
+      Record->setIsNotNaturallyTriviallyRelocatable();
+      if (Record->hasAttr<TriviallyRelocatableAttr>()) {
+        Record->dropAttr<TriviallyRelocatableAttr>();
+        if (!isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
+          Diag(Record->getLocation(),
+               diag::err_trivially_relocatable_class_is_not_relocatable)
+              << Record->getCanonicalDecl()->getTagKind()
+              << Context.getRecordType(Record) << false;
         }
       }
+      if (Record->hasAttr<MaybeTriviallyRelocatableAttr>())
+        Record->dropAttr<MaybeTriviallyRelocatableAttr>();
     }
   }
 }
