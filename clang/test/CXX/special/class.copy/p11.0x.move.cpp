@@ -72,10 +72,12 @@ struct Deleted {
   // FIXME: This diagnostic is slightly wrong: the constructor we select to move
   // 'IA' is deleted, but we select the copy constructor (we ignore the move
   // constructor, because it was defaulted and deleted).
-  IsAmbiguous IA; // expected-note{{deleted because field 'IA' has a deleted move constructor}}
+  IsAmbiguous IA;
   Deleted(Deleted&&);
 };
-Deleted::Deleted(Deleted&&) = default; // expected-error{{would delete}}
+// expected-error@+2{{call to implicitly-deleted copy constructor of 'IsAmbiguous'}}
+// expected-note@+1{{in defaulted move constructor for 'Deleted' first required here}}
+Deleted::Deleted(Deleted&&) = default;
 
 // It's implied (but not stated) that this should also happen if overload
 // resolution fails.
@@ -106,10 +108,12 @@ struct AmbiguousMoveBase : Ambiguity { // expected-note{{deleted because base cl
 };
 AmbiguousMoveBase::AmbiguousMoveBase(AmbiguousMoveBase&&) = default; // expected-error{{would delete}}
 
-struct DeletedMoveBase : AmbiguousMoveBase { // expected-note{{deleted because base class 'AmbiguousMoveBase' has a deleted move constructor}}
+struct DeletedMoveBase : AmbiguousMoveBase {
   DeletedMoveBase(DeletedMoveBase&&);
 };
-DeletedMoveBase::DeletedMoveBase(DeletedMoveBase&&) = default; // expected-error{{would delete}}
+// expected-error@+2{{call to implicitly-deleted copy constructor of 'AmbiguousMoveBase'}}
+// expected-note@+1{{in defaulted move constructor for 'DeletedMoveBase' first required here}}
+DeletedMoveBase::DeletedMoveBase(DeletedMoveBase&&) = default;
 
 struct InaccessibleMoveBase : NoAccess { // expected-note{{deleted because base class 'NoAccess' has an inaccessible move constructor}}
   InaccessibleMoveBase(InaccessibleMoveBase&&);

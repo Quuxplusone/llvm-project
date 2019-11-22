@@ -2501,7 +2501,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   },
@@ -2532,7 +2531,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   }
@@ -2702,7 +2700,119 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
-// CHECK-NEXT:   }
+// CHECK-NEXT:   },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 585,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 585,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 585,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base1",
+// CHECK-NEXT:           "mangledName": "_ZN5Base1C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Base1 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 585,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 585,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 585,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Base1 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 585,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 585,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 585,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base1",
+// CHECK-NEXT:           "mangledName": "_ZN5Base1C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Base1 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 585,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 585,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 585,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Base1 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
 
@@ -2742,7 +2852,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   },
@@ -2773,7 +2882,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   }
@@ -2943,6 +3051,118 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 602,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 602,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 602,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base2",
+// CHECK-NEXT:           "mangledName": "_ZN5Base2C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Base2 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 602,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 602,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 602,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Base2 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 602,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 602,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 602,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base2",
+// CHECK-NEXT:           "mangledName": "_ZN5Base2C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Base2 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 602,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 602,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 602,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Base2 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
@@ -2983,7 +3203,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   },
@@ -3014,7 +3233,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "simple": true,
 // CHECK-NEXT:    "trivial": true
 // CHECK-NEXT:   }
@@ -3184,6 +3402,118 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 619,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 619,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 619,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base3",
+// CHECK-NEXT:           "mangledName": "_ZN5Base3C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Base3 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 619,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 619,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 619,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Base3 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 619,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 5
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 619,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 619,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 5
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Base3",
+// CHECK-NEXT:           "mangledName": "_ZN5Base3C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Base3 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "constexpr": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 619,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 5
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 619,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 619,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 5
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Base3 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
@@ -3446,7 +3776,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   },
@@ -3467,7 +3796,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   }
@@ -3646,6 +3974,116 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 705,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 705,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 705,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived3",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived3C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Derived3 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 705,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 705,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 705,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Derived3 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 705,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 705,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 705,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived3",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived3C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Derived3 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 705,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 705,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 705,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Derived3 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
@@ -3685,7 +4123,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   },
@@ -3706,7 +4143,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   }
@@ -3899,6 +4335,116 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 743,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 743,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 743,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived4",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived4C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Derived4 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 743,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 743,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 743,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Derived4 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 743,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 743,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 743,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived4",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived4C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Derived4 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 743,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 743,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 743,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Derived4 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
@@ -3938,7 +4484,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   "copyCtor": {
 // CHECK-NEXT:    "hasConstParam": true,
 // CHECK-NEXT:    "implicitHasConstParam": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   },
@@ -3959,7 +4504,6 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:   },
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
-// CHECK-NEXT:    "needsImplicit": true,
 // CHECK-NEXT:    "nonTrivial": true,
 // CHECK-NEXT:    "simple": true
 // CHECK-NEXT:   }
@@ -4138,6 +4682,116 @@ struct Derived6 : virtual public Bases... {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "inline": true,
 // CHECK-NEXT:    "explicitlyDefaulted": "default"
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 805,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 805,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 805,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived5",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived5C1ERKS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (const Derived5 &)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 805,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 805,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 805,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "const Derived5 &"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
+// CHECK-NEXT:         },
+// CHECK-NEXT:         {
+// CHECK-NEXT:           "id": "0x{{.*}}",
+// CHECK-NEXT:           "kind": "CXXConstructorDecl",
+// CHECK-NEXT:           "loc": {
+// CHECK-NEXT:             "offset": 805,
+// CHECK-NEXT:             "col": 8,
+// CHECK-NEXT:             "tokLen": 8
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "range": {
+// CHECK-NEXT:             "begin": {
+// CHECK-NEXT:               "offset": 805,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             },
+// CHECK-NEXT:             "end": {
+// CHECK-NEXT:               "offset": 805,
+// CHECK-NEXT:               "col": 8,
+// CHECK-NEXT:               "tokLen": 8
+// CHECK-NEXT:             }
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "isImplicit": true,
+// CHECK-NEXT:           "name": "Derived5",
+// CHECK-NEXT:           "mangledName": "_ZN8Derived5C1EOS_",
+// CHECK-NEXT:           "type": {
+// CHECK-NEXT:             "qualType": "void (Derived5 &&)"
+// CHECK-NEXT:           },
+// CHECK-NEXT:           "inline": true,
+// CHECK-NEXT:           "explicitlyDefaulted": "default",
+// CHECK-NEXT:           "inner": [
+// CHECK-NEXT:             {
+// CHECK-NEXT:               "id": "0x{{.*}}",
+// CHECK-NEXT:               "kind": "ParmVarDecl",
+// CHECK-NEXT:               "loc": {
+// CHECK-NEXT:                 "offset": 805,
+// CHECK-NEXT:                 "col": 8,
+// CHECK-NEXT:                 "tokLen": 8
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "range": {
+// CHECK-NEXT:                 "begin": {
+// CHECK-NEXT:                   "offset": 805,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 },
+// CHECK-NEXT:                 "end": {
+// CHECK-NEXT:                   "offset": 805,
+// CHECK-NEXT:                   "col": 8,
+// CHECK-NEXT:                   "tokLen": 8
+// CHECK-NEXT:                 }
+// CHECK-NEXT:               },
+// CHECK-NEXT:               "type": {
+// CHECK-NEXT:                 "qualType": "Derived5 &&"
+// CHECK-NEXT:               }
+// CHECK-NEXT:             }
+// CHECK-NEXT:           ]
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ]
 // CHECK-NEXT: }
