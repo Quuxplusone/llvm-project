@@ -75,7 +75,7 @@ namespace testTypeAliasTemplateDecl {
 namespace testCXXRecordDecl {
   class TestEmpty {};
 // CHECK:      CXXRecordDecl{{.*}} class TestEmpty
-// CHECK-NEXT:   DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+// CHECK-NEXT:   DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
 // CHECK-NEXT:     DefaultConstructor exists trivial constexpr
 // CHECK-NEXT:     CopyConstructor simple trivial has_const_param
 // CHECK-NEXT:     MoveConstructor exists simple trivial
@@ -279,7 +279,7 @@ namespace testClassTemplateDecl {
 // CHECK:       ClassTemplateDecl 0x{{.+}} <{{.+}}:[[@LINE-40]]:3, line:[[@LINE-34]]:3> line:[[@LINE-40]]:30 TestClassTemplate
 // CHECK-NEXT:  |-TemplateTypeParmDecl 0x{{.+}} <col:12, col:21> col:21 typename depth 0 index 0 T
 // CHECK-NEXT:  |-CXXRecordDecl 0x{{.+}} <col:24, line:[[@LINE-36]]:3> line:[[@LINE-42]]:30 class TestClassTemplate definition
-// CHECK-NEXT:  | |-DefinitionData standard_layout has_user_declared_ctor can_const_default_init
+// CHECK-NEXT:  | |-DefinitionData standard_layout trivially_relocatable has_user_declared_ctor can_const_default_init
 // CHECK-NEXT:  | | |-DefaultConstructor exists non_trivial user_provided
 // CHECK-NEXT:  | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:  | | |-MoveConstructor
@@ -314,7 +314,7 @@ namespace testClassTemplateDecl {
 // CHECK-NEXT:  `-ClassTemplateSpecialization 0x{{.+}} 'TestClassTemplate'
 
 // CHECK:       ClassTemplateSpecializationDecl 0x{{.+}} <{{.+}}:[[@LINE-65]]:3, line:[[@LINE-63]]:3> line:[[@LINE-65]]:20 class TestClassTemplate definition
-// CHECK-NEXT:  |-DefinitionData pass_in_registers standard_layout trivially_copyable trivial literal
+// CHECK-NEXT:  |-DefinitionData pass_in_registers standard_layout trivially_copyable trivially_relocatable trivial literal
 // CHECK-NEXT:  | |-DefaultConstructor exists trivial needs_implicit
 // CHECK-NEXT:  | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:  | |-MoveConstructor exists simple trivial needs_implicit
@@ -365,7 +365,7 @@ namespace testClassTemplateDecl {
 // CHECK-NEXT:  |-TemplateTypeParmDecl 0x{{.+}} <col:12, col:21> col:21 typename depth 0 index 0 T1
 // CHECK-NEXT:  |-TemplateTypeParmDecl 0x{{.+}} <col:25, col:34> col:34 typename depth 0 index 1 T2
 // CHECK-NEXT:  `-CXXRecordDecl 0x{{.+}} <col:38, line:[[@LINE-103]]:3> line:[[@LINE-105]]:44 class TestClassTemplatePartial definition
-// CHECK-NEXT:    |-DefinitionData standard_layout trivially_copyable trivial literal
+// CHECK-NEXT:    |-DefinitionData standard_layout trivially_copyable trivially_relocatable trivial literal
 // CHECK-NEXT:    | |-DefaultConstructor exists trivial needs_implicit
 // CHECK-NEXT:    | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | |-MoveConstructor exists simple trivial needs_implicit
@@ -376,7 +376,7 @@ namespace testClassTemplateDecl {
 // CHECK-NEXT:    `-FieldDecl 0x{{.+}} <line:[[@LINE-113]]:5, col:9> col:9 i 'int'
 
 // CHECK:       ClassTemplatePartialSpecializationDecl 0x{{.+}} <{{.+}}:[[@LINE-113]]:3, line:[[@LINE-111]]:3> line:[[@LINE-113]]:31 class TestClassTemplatePartial definition
-// CHECK-NEXT:  |-DefinitionData standard_layout trivially_copyable trivial literal
+// CHECK-NEXT:  |-DefinitionData standard_layout trivially_copyable trivially_relocatable trivial literal
 // CHECK-NEXT:  | |-DefaultConstructor exists trivial needs_implicit
 // CHECK-NEXT:  | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:  | |-MoveConstructor exists simple trivial needs_implicit
@@ -399,7 +399,7 @@ namespace testClassTemplateDecl {
 // CHECK-NEXT:  | `-TemplateArgument type 'int'
 // CHECK-NEXT:  |   `-inherited from TemplateTypeParm 0x{{.+}} 'T'
 // CHECK-NEXT:  `-CXXRecordDecl 0x{{.+}} prev 0x{{.+}} <col:24, col:57> col:31 struct TestTemplateDefaultType definition
-// CHECK-NEXT:    |-DefinitionData empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+// CHECK-NEXT:    |-DefinitionData empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
 // CHECK-NEXT:    | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
 // CHECK-NEXT:    | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | |-MoveConstructor exists simple trivial needs_implicit
@@ -427,7 +427,7 @@ namespace testClassTemplateDecl {
 // CHECK-NEXT:  | `-TemplateArgument <line:275:42> template TestClassTemplate
 // CHECK-NEXT:  |   `-inherited from TemplateTemplateParm 0x{{.+}} 'TT'
 // CHECK-NEXT:  `-CXXRecordDecl 0x{{.+}} prev 0x{{.+}} <line:276:41, col:82> col:48 struct TestTemplateTemplateDefaultType definition
-// CHECK-NEXT:    |-DefinitionData empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+// CHECK-NEXT:    |-DefinitionData empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
 // CHECK-NEXT:    | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
 // CHECK-NEXT:    | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | |-MoveConstructor exists simple trivial needs_implicit
@@ -466,7 +466,7 @@ namespace testCanonicalTemplate {
   // CHECK:      ClassTemplateDecl 0x{{.+}} <{{.+}}:[[@LINE-4]]:3, line:[[@LINE-2]]:3> line:[[@LINE-4]]:31 TestClassTemplate
   // CHECK-NEXT: |-TemplateTypeParmDecl 0x{{.+}} <col:12, col:21> col:21 typename depth 0 index 0 T1
   // CHECK-NEXT: |-CXXRecordDecl 0x{{.+}} <col:25, line:[[@LINE-4]]:3> line:[[@LINE-6]]:31 class TestClassTemplate definition
-  // CHECK-NEXT: | |-DefinitionData empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+  // CHECK-NEXT: | |-DefinitionData empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
   // CHECK-NEXT: | | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
   // CHECK-NEXT: | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
   // CHECK-NEXT: | | |-MoveConstructor exists simple trivial needs_implicit
@@ -479,7 +479,7 @@ namespace testCanonicalTemplate {
   // CHECK-NEXT: |     |-TemplateTypeParmDecl 0x{{.+}} <col:14, col:23> col:23 typename depth 1 index 0 T2
   // CHECK-NEXT: |     `-CXXRecordDecl 0x{{.+}} parent 0x{{.+}} <col:34, col:40> col:40 class TestClassTemplate
   // CHECK-NEXT: `-ClassTemplateSpecializationDecl 0x{{.+}} <line:[[@LINE-19]]:3, line:[[@LINE-17]]:3> line:[[@LINE-19]]:31 class TestClassTemplate definition
-  // CHECK-NEXT:   |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+  // CHECK-NEXT:   |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
   // CHECK-NEXT:   | |-DefaultConstructor exists trivial constexpr defaulted_is_constexpr
   // CHECK-NEXT:   | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
   // CHECK-NEXT:   | |-MoveConstructor exists simple trivial
@@ -510,7 +510,7 @@ namespace testCanonicalTemplate {
   // CHECK-NEXT: |-TemplateTypeParmDecl 0x{{.+}} <col:12, col:21> col:21 typename depth 0 index 0 T1
   // CHECK-NEXT: |-CXXRecordDecl 0x{{.+}} <col:25, col:31> col:31 class TestClassTemplate2
   // CHECK-NEXT: `-ClassTemplateSpecializationDecl 0x{{.+}} <line:[[@LINE-6]]:3, line:[[@LINE-5]]:3> line:[[@LINE-6]]:31 class TestClassTemplate2 definition
-  // CHECK-NEXT:   |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+  // CHECK-NEXT:   |-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
   // CHECK-NEXT:   | |-DefaultConstructor exists trivial constexpr defaulted_is_constexpr
   // CHECK-NEXT:   | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
   // CHECK-NEXT:   | |-MoveConstructor exists simple trivial
@@ -534,7 +534,7 @@ namespace testCanonicalTemplate {
   // CHECK:      ClassTemplateDecl 0x{{.+}} prev 0x{{.+}} <{{.+}}:[[@LINE-28]]:3, line:[[@LINE-27]]:3> line:[[@LINE-28]]:31 TestClassTemplate2
   // CHECK-NEXT: |-TemplateTypeParmDecl 0x{{.+}} <col:12, col:21> col:21 typename depth 0 index 0 T1
   // CHECK-NEXT: |-CXXRecordDecl 0x{{.+}} prev 0x{{.+}} <col:25, line:[[@LINE-29]]:3> line:[[@LINE-30]]:31 class TestClassTemplate2 definition
-  // CHECK-NEXT: | |-DefinitionData empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+  // CHECK-NEXT: | |-DefinitionData empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
   // CHECK-NEXT: | | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
   // CHECK-NEXT: | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
   // CHECK-NEXT: | | |-MoveConstructor exists simple trivial needs_implicit

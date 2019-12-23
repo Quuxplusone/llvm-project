@@ -1381,6 +1381,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:       "isStandardLayout": true,
 // CHECK-NEXT:       "isTrivial": true,
 // CHECK-NEXT:       "isTriviallyCopyable": true,
+// CHECK-NEXT:       "isTriviallyRelocatable": true,
 // CHECK-NEXT:       "moveAssign": {
 // CHECK-NEXT:        "exists": true,
 // CHECK-NEXT:        "needsImplicit": true,
@@ -1491,6 +1492,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:     "isStandardLayout": true,
 // CHECK-NEXT:     "isTrivial": true,
 // CHECK-NEXT:     "isTriviallyCopyable": true,
+// CHECK-NEXT:     "isTriviallyRelocatable": true,
 // CHECK-NEXT:     "moveAssign": {
 // CHECK-NEXT:      "exists": true,
 // CHECK-NEXT:      "needsImplicit": true,
@@ -1673,6 +1675,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:       "isStandardLayout": true,
 // CHECK-NEXT:       "isTrivial": true,
 // CHECK-NEXT:       "isTriviallyCopyable": true,
+// CHECK-NEXT:       "isTriviallyRelocatable": true,
 // CHECK-NEXT:       "moveAssign": {
 // CHECK-NEXT:        "exists": true,
 // CHECK-NEXT:        "needsImplicit": true,
@@ -1777,6 +1780,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:     "isStandardLayout": true,
 // CHECK-NEXT:     "isTrivial": true,
 // CHECK-NEXT:     "isTriviallyCopyable": true,
+// CHECK-NEXT:     "isTriviallyRelocatable": true,
 // CHECK-NEXT:     "moveAssign": {
 // CHECK-NEXT:      "exists": true,
 // CHECK-NEXT:      "needsImplicit": true,
@@ -1969,6 +1973,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:       "isStandardLayout": true,
 // CHECK-NEXT:       "isTrivial": true,
 // CHECK-NEXT:       "isTriviallyCopyable": true,
+// CHECK-NEXT:       "isTriviallyRelocatable": true,
 // CHECK-NEXT:       "moveAssign": {
 // CHECK-NEXT:        "exists": true,
 // CHECK-NEXT:        "needsImplicit": true,
@@ -2123,6 +2128,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:       "isStandardLayout": true,
 // CHECK-NEXT:       "isTrivial": true,
 // CHECK-NEXT:       "isTriviallyCopyable": true,
+// CHECK-NEXT:       "isTriviallyRelocatable": true,
 // CHECK-NEXT:       "moveAssign": {
 // CHECK-NEXT:        "exists": true,
 // CHECK-NEXT:        "needsImplicit": true,
@@ -2277,6 +2283,7 @@ void V<Ty>::f() {}
 // CHECK-NEXT:       "isStandardLayout": true,
 // CHECK-NEXT:       "isTrivial": true,
 // CHECK-NEXT:       "isTriviallyCopyable": true,
+// CHECK-NEXT:       "isTriviallyRelocatable": true,
 // CHECK-NEXT:       "moveAssign": {
 // CHECK-NEXT:        "exists": true,
 // CHECK-NEXT:        "needsImplicit": true,
