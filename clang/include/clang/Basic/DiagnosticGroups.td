@@ -234,6 +234,8 @@ def FormatZeroLength : DiagGroup<"format-zero-length">;
 
 def InvalidIOSDeploymentTarget : DiagGroup<"invalid-ios-deployment-target">;
 
+def LifetimeExtension : DiagGroup<"lifetime-extension">;
+
 def CXX17CompatMangling : DiagGroup<"c++17-compat-mangling">;
 def : DiagGroup<"c++1z-compat-mangling", [CXX17CompatMangling]>;
 // Name of this warning in GCC.

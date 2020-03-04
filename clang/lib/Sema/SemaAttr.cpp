@@ -97,6 +97,9 @@ static void addGslOwnerPointerAttributeIfNotExisting(ASTContext &Context,
 
 void Sema::inferGslPointerAttribute(NamedDecl *ND,
                                     CXXRecordDecl *UnderlyingRecord) {
+  return;
+  // don't do any of this
+
   if (!UnderlyingRecord)
     return;
 

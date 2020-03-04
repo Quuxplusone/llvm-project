@@ -10613,4 +10613,8 @@ def warn_sycl_kernel_return_type : Warning<
   "function template with 'sycl_kernel' attribute must have a 'void' return type">,
   InGroup<IgnoredAttributes>;
 
+def warn_lifetime_extension: Warning<
+  "binding temporary of type %0 to a reference relies on lifetime extension">,
+  InGroup<LifetimeExtension>;
+
 } // end of sema component.

@@ -7356,6 +7356,13 @@ void Sema::checkInitializerLifetime(const InitializedEntity &Entity,
 
     auto *MTE = dyn_cast<MaterializeTemporaryExpr>(L);
 
+    if (LK == LK_Extended && MTE != nullptr) {
+      VarDecl *VD = dyn_cast<VarDecl>(ExtendingEntity->getDecl());
+      if (!(VD && VD->getNameAsString().substr(0,7) == "__range")) {
+        this->Diag(MTE->getSourceRange().getBegin(), diag::warn_lifetime_extension) << L->getType() << MTE->getSourceRange();
+      }
+    }
+
     bool IsGslPtrInitWithGslTempOwner = false;
     bool IsLocalGslOwner = false;
     if (pathOnlyInitializesGslPointer(Path)) {
