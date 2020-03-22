@@ -6,6 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+def FunctionalCast : DiagGroup<"functional-cast">;
+
 def ImplicitFunctionDeclare : DiagGroup<"implicit-function-declaration">;
 def ImplicitInt : DiagGroup<"implicit-int">;
 

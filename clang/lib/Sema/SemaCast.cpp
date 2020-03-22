@@ -2482,6 +2482,17 @@ void CastOperation::CheckCXXCStyleCast(bool FunctionalStyle,
       return;
     }
 
+  if (FunctionalStyle) {
+    unsigned msg = diag::err_bad_cxx_cast_generic;
+    auto FakeSrcExpr = SrcExpr;
+    TryCastResult tcr = TryStaticCast(Self, FakeSrcExpr, DestType, Sema::CCK_FunctionalCast,
+                                      OpRange, msg, Kind, BasePath, /*ListInitialization=*/false);
+    if (FakeSrcExpr.isInvalid() || !isValidCast(tcr)) {
+      Self.Diag(OpRange.getBegin(), diag::warn_functional_cast_not_static_cast) << OpRange;
+    }
+  }
+
+
   // C++ [expr.cast]p5: The conversions performed by
   //   - a const_cast,
   //   - a static_cast,
