@@ -51,7 +51,9 @@ void test() {
     int x24 = bool(3.14);   // OK
     int x25 = int(ci);      // OK
     int x26 = IntRef(ci);   // ERR, const_cast
+                         // expected-warning@-1{{functional-style cast is not equivalent to static_cast}}
     int x27 = FloatRef(ci); // ERR, const_cast followed by reinterpret_cast
                          // expected-warning@-1{{functional-style cast is not equivalent to static_cast}}
     A x28 = ARef(cb);       // ERR, const_cast followed by cast to base
+                         // expected-warning@-1{{functional-style cast is not equivalent to static_cast}}
 }

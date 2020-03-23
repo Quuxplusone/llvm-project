@@ -2485,7 +2485,7 @@ void CastOperation::CheckCXXCStyleCast(bool FunctionalStyle,
   if (FunctionalStyle) {
     unsigned msg = diag::err_bad_cxx_cast_generic;
     auto FakeSrcExpr = SrcExpr;
-    TryCastResult tcr = TryStaticCast(Self, FakeSrcExpr, DestType, Sema::CCK_FunctionalCast,
+    TryCastResult tcr = TryStaticCast(Self, FakeSrcExpr, DestType, Sema::CCK_OtherCast,
                                       OpRange, msg, Kind, BasePath, /*ListInitialization=*/false);
     if (FakeSrcExpr.isInvalid() || !isValidCast(tcr)) {
       Self.Diag(OpRange.getBegin(), diag::warn_functional_cast_not_static_cast) << OpRange;
