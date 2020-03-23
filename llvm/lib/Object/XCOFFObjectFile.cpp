@@ -24,7 +24,7 @@ enum { FUNCTION_SYM = 0x20, SYM_TYPE_MASK = 0x07, RELOC_OVERFLOW = 65535 };
 template <typename T>
 static Expected<const T *> getObject(MemoryBufferRef M, const void *Ptr,
                                      const uint64_t Size = sizeof(T)) {
-  uintptr_t Addr = uintptr_t(Ptr);
+  uintptr_t Addr = reinterpret_cast<uintptr_t>(Ptr);
   if (std::error_code EC = Binary::checkOffset(M, Addr, Size))
     return errorCodeToError(EC);
   return reinterpret_cast<const T *>(Addr);
@@ -276,7 +276,7 @@ XCOFFObjectFile::getSectionContents(DataRefImpl Sec) const {
 
   const uint8_t * ContentStart = base() + OffsetToRaw;
   uint64_t SectionSize = getSectionSize(Sec);
-  if (checkOffset(Data, uintptr_t(ContentStart), SectionSize))
+  if (checkOffset(Data, reinterpret_cast<uintptr_t>(ContentStart), SectionSize))
     return make_error<BinaryError>();
 
   return makeArrayRef(ContentStart,SectionSize);

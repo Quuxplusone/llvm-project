@@ -57,7 +57,7 @@ template <typename T>
 static std::error_code getObject(const T *&Obj, MemoryBufferRef M,
                                  const void *Ptr,
                                  const uint64_t Size = sizeof(T)) {
-  uintptr_t Addr = uintptr_t(Ptr);
+  uintptr_t Addr = reinterpret_cast<uintptr_t>(Ptr);
   if (std::error_code EC = Binary::checkOffset(M, Addr, Size))
     return EC;
   Obj = reinterpret_cast<const T *>(Addr);
@@ -329,8 +329,8 @@ bool COFFObjectFile::isSectionBSS(DataRefImpl Ref) const {
 }
 
 unsigned COFFObjectFile::getSectionID(SectionRef Sec) const {
-  uintptr_t Offset =
-      uintptr_t(Sec.getRawDataRefImpl().p) - uintptr_t(SectionTable);
+  uintptr_t Offset = reinterpret_cast<uintptr_t>(Sec.getRawDataRefImpl().p) -
+                     reinterpret_cast<uintptr_t>(SectionTable);
   assert((Offset % sizeof(coff_section)) == 0);
   return (Offset / sizeof(coff_section)) + 1;
 }
@@ -371,7 +371,7 @@ getFirstReloc(const coff_section *Sec, MemoryBufferRef M, const uint8_t *Base) {
     // relocations.
     begin++;
   }
-  if (Binary::checkOffset(M, uintptr_t(begin),
+  if (Binary::checkOffset(M, reinterpret_cast<uintptr_t>(begin),
                           sizeof(coff_relocation) * NumRelocs))
     return nullptr;
   return begin;
@@ -461,7 +461,8 @@ std::error_code COFFObjectFile::getRvaPtr(uint32_t Addr, uintptr_t &Res) const {
     uint32_t SectionEnd = Section->VirtualAddress + Section->VirtualSize;
     if (SectionStart <= Addr && Addr < SectionEnd) {
       uint32_t Offset = Addr - SectionStart;
-      Res = uintptr_t(base()) + Section->PointerToRawData + Offset;
+      Res = reinterpret_cast<uintptr_t>(base()) + Section->PointerToRawData +
+            Offset;
       return std::error_code();
     }
   }
@@ -479,8 +480,8 @@ COFFObjectFile::getRvaAndSizeAsBytes(uint32_t RVA, uint32_t Size,
     uint32_t OffsetIntoSection = RVA - SectionStart;
     if (SectionStart <= RVA && OffsetIntoSection < Section->VirtualSize &&
         Size <= Section->VirtualSize - OffsetIntoSection) {
-      uintptr_t Begin =
-          uintptr_t(base()) + Section->PointerToRawData + OffsetIntoSection;
+      uintptr_t Begin = reinterpret_cast<uintptr_t>(base()) +
+                        Section->PointerToRawData + OffsetIntoSection;
       Contents =
           ArrayRef<uint8_t>(reinterpret_cast<const uint8_t *>(Begin), Size);
       return std::error_code();
@@ -1105,7 +1106,8 @@ Error COFFObjectFile::getSectionContents(const coff_section *Sec,
   // The only thing that we need to verify is that the contents is contained
   // within the file bounds. We don't need to make sure it doesn't cover other
   // data, as there's nothing that says that is not allowed.
-  uintptr_t ConStart = uintptr_t(base()) + Sec->PointerToRawData;
+  uintptr_t ConStart =
+      reinterpret_cast<uintptr_t>(base()) + Sec->PointerToRawData;
   uint32_t SectionSize = getSectionSize(Sec);
   if (checkOffset(Data, ConStart, SectionSize))
     return make_error<BinaryError>();

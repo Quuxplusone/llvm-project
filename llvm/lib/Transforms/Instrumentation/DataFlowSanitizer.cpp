@@ -619,14 +619,15 @@ bool DataFlowSanitizer::doInitialization(Module &M) {
     ArgTLS = nullptr;
     GetArgTLSTy = FunctionType::get(PointerType::getUnqual(ArgTLSTy), false);
     GetArgTLS = ConstantExpr::getIntToPtr(
-        ConstantInt::get(IntptrTy, uintptr_t(GetArgTLSPtr)),
+        ConstantInt::get(IntptrTy, reinterpret_cast<uintptr_t>(GetArgTLSPtr)),
         PointerType::getUnqual(GetArgTLSTy));
   }
   if (GetRetvalTLSPtr) {
     RetvalTLS = nullptr;
     GetRetvalTLSTy = FunctionType::get(PointerType::getUnqual(ShadowTy), false);
     GetRetvalTLS = ConstantExpr::getIntToPtr(
-        ConstantInt::get(IntptrTy, uintptr_t(GetRetvalTLSPtr)),
+        ConstantInt::get(IntptrTy,
+                         reinterpret_cast<uintptr_t>(GetRetvalTLSPtr)),
         PointerType::getUnqual(GetRetvalTLSTy));
   }
 

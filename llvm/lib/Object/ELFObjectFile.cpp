@@ -71,7 +71,8 @@ ObjectFile::createELFObjectFile(MemoryBufferRef Obj) {
   std::pair<unsigned char, unsigned char> Ident =
       getElfArchType(Obj.getBuffer());
   std::size_t MaxAlignment =
-      1ULL << countTrailingZeros(uintptr_t(Obj.getBufferStart()));
+      1ULL << countTrailingZeros(
+          reinterpret_cast<uintptr_t>(Obj.getBufferStart()));
 
   if (MaxAlignment < 2)
     return createError("Insufficient alignment");
