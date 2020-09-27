@@ -1981,6 +1981,7 @@ void TextNodeDumper::VisitCXXRecordDecl(const CXXRecordDecl *D) {
     FLAG(isAggregate, aggregate);
     FLAG(isStandardLayout, standard_layout);
     FLAG(isTriviallyCopyable, trivially_copyable);
+    FLAG(isTriviallyRelocatable, trivially_relocatable);
     FLAG(isPOD, pod);
     FLAG(isTrivial, trivial);
     FLAG(isPolymorphic, polymorphic);
