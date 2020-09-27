@@ -35,6 +35,7 @@ template struct A<1>;
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTrivial": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 // CHECK-NEXT:          "moveCtor": {}
 
@@ -55,6 +56,7 @@ template struct A<2>;
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTrivial": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 // CHECK-NEXT:          "moveCtor": {}
 
@@ -113,6 +115,7 @@ template struct A<5>;
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTrivial": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 // CHECK-NEXT:          "moveCtor": {}
 
