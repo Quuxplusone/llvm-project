@@ -47,7 +47,7 @@ int test() {
 // CHECK:      |-ClassTemplateDecl [[ADDR_0:0x[a-z0-9]*]] <{{.*}}, line:7:1> line:5:30 S
 // CHECK-NEXT: | |-TemplateTypeParmDecl [[ADDR_1:0x[a-z0-9]*]] <col:11, col:20> col:20 referenced typename depth 0 index 0 T
 // CHECK-NEXT: | |-CXXRecordDecl [[ADDR_2:0x[a-z0-9]*]] <col:23, line:7:1> line:5:30 struct S definition
-// CHECK-NEXT: | | |-DefinitionData empty standard_layout trivially_copyable has_user_declared_ctor can_const_default_init
+// CHECK-NEXT: | | |-DefinitionData empty standard_layout trivially_copyable trivially_relocatable has_user_declared_ctor can_const_default_init
 // CHECK-NEXT: | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT: | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT: | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -60,7 +60,7 @@ int test() {
 // CHECK-NEXT: | |   |-ParmVarDecl [[ADDR_6:0x[a-z0-9]*]] <col:10, col:12> col:13 'T *'
 // CHECK-NEXT: | |   `-CompoundStmt [[ADDR_7:0x[a-z0-9]*]] <col:15, col:16>
 // CHECK-NEXT: | |-ClassTemplateSpecializationDecl [[ADDR_8:0x[a-z0-9]*]] <line:5:1, line:7:1> line:5:30 struct S definition
-// CHECK-NEXT: | | |-DefinitionData pass_in_registers empty standard_layout trivially_copyable has_user_declared_ctor can_const_default_init
+// CHECK-NEXT: | | |-DefinitionData pass_in_registers empty standard_layout trivially_copyable trivially_relocatable has_user_declared_ctor can_const_default_init
 // CHECK-NEXT: | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT: | | | |-CopyConstructor simple trivial has_const_param implicit_has_const_param
 // CHECK-NEXT: | | | |-MoveConstructor exists simple trivial
