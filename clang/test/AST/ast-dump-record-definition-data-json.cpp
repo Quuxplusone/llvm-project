@@ -188,6 +188,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {},
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
@@ -386,6 +387,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {},
 // CHECK-NEXT:   "moveCtor": {
 // CHECK-NEXT:    "exists": true,
@@ -774,6 +776,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {},
 // CHECK-NEXT:   "moveCtor": {}
 // CHECK-NEXT:  },
@@ -1065,6 +1068,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -1164,6 +1168,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -1289,6 +1294,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -1412,6 +1418,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -1565,6 +1572,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -1687,6 +1695,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "hasConstexprNonCopyMoveConstructor": true,
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isPolymorphic": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "nonTrivial": true,
@@ -2071,6 +2080,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -2323,6 +2333,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -2445,6 +2456,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -2573,6 +2585,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -2702,6 +2715,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isEmpty": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -2843,6 +2857,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "hasConstexprNonCopyMoveConstructor": true,
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isPolymorphic": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "nonTrivial": true,
@@ -3227,6 +3242,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -3350,6 +3366,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isAbstract": true,
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isPolymorphic": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "nonTrivial": true,
@@ -3726,6 +3743,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "hasConstexprNonCopyMoveConstructor": true,
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isPolymorphic": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "nonTrivial": true,
@@ -4107,6 +4125,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {},
 // CHECK-NEXT:   "moveCtor": {}
 // CHECK-NEXT:  },
@@ -4471,6 +4490,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isEmpty": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -4621,6 +4641,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -4723,6 +4744,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -4869,6 +4891,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isEmpty": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -5142,6 +5165,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -5268,6 +5292,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -5365,6 +5390,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:     "isStandardLayout": true,
 // CHECK-NEXT:     "isTrivial": true,
 // CHECK-NEXT:     "isTriviallyCopyable": true,
+// CHECK-NEXT:     "isTriviallyRelocatable": true,
 // CHECK-NEXT:     "moveAssign": {
 // CHECK-NEXT:      "exists": true,
 // CHECK-NEXT:      "needsImplicit": true,
@@ -5522,6 +5548,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -5622,6 +5649,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isLiteral": true,
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
@@ -5770,6 +5798,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:   "isStandardLayout": true,
 // CHECK-NEXT:   "isTrivial": true,
 // CHECK-NEXT:   "isTriviallyCopyable": true,
+// CHECK-NEXT:   "isTriviallyRelocatable": true,
 // CHECK-NEXT:   "moveAssign": {
 // CHECK-NEXT:    "exists": true,
 // CHECK-NEXT:    "needsImplicit": true,
