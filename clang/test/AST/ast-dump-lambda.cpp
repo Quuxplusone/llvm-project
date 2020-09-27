@@ -43,7 +43,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:  `-CompoundStmt {{.*}} <col:46, line:37:1>
 // CHECK-NEXT:    |-DeclStmt {{.*}} <line:16:3, line:21:4>
 // CHECK-NEXT:    | `-CXXRecordDecl {{.*}} <line:16:3, line:21:3> line:16:10{{( imported)?}}{{( <undeserialized declarations>)?}} struct V definition
-// CHECK-NEXT:    |   |-DefinitionData empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
+// CHECK-NEXT:    |   |-DefinitionData empty aggregate standard_layout trivially_copyable trivially_relocatable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
 // CHECK-NEXT:    |   | |-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
 // CHECK-NEXT:    |   | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    |   | |-MoveConstructor exists simple trivial needs_implicit
@@ -89,7 +89,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-VarDecl {{.*}} <col:3, col:10> col:10{{( imported)?}} referenced c 'int'
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:23:3, col:9> '(lambda at {{.*}}ast-dump-lambda.cpp:23:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -103,7 +103,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:8, col:9>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:24:3, col:19> '(lambda at {{.*}}ast-dump-lambda.cpp:24:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -134,7 +134,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:10, col:11>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:26:3, col:8> '(lambda at {{.*}}ast-dump-lambda.cpp:26:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -146,7 +146,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:7, col:8>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:27:3, col:19> '(lambda at {{.*}}ast-dump-lambda.cpp:27:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -162,7 +162,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    |     `-DeclRefExpr {{.*}} <col:16> 'const int' lvalue Var {{.*}} 'b' 'int'
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:28:3, col:8> '(lambda at {{.*}}ast-dump-lambda.cpp:28:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -174,7 +174,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:7, col:8>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:29:3, col:19> '(lambda at {{.*}}ast-dump-lambda.cpp:29:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -190,7 +190,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    |     `-DeclRefExpr {{.*}} <col:16> 'int' lvalue Var {{.*}} 'c' 'int'
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:30:3, col:27> '(lambda at {{.*}}ast-dump-lambda.cpp:30:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -236,7 +236,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:18, col:19>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:32:3, col:19> '(lambda at {{.*}}ast-dump-lambda.cpp:32:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -250,7 +250,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:18, col:19>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:33:3, col:17> '(lambda at {{.*}}ast-dump-lambda.cpp:33:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -264,7 +264,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:16, col:17>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:34:3, col:18> '(lambda at {{.*}}ast-dump-lambda.cpp:34:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -278,7 +278,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    | `-CompoundStmt {{.*}} <col:17, col:18>
 // CHECK-NEXT:    |-LambdaExpr {{.*}} <line:35:3, col:27> '(lambda at {{.*}}ast-dump-lambda.cpp:35:3)'
 // CHECK-NEXT:    | |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:    | | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:    | | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:    | | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:    | | | |-MoveConstructor exists simple trivial needs_implicit
@@ -296,7 +296,7 @@ template <typename... Ts> void test(Ts... a) {
 // CHECK-NEXT:    |     `-IntegerLiteral {{.*}} <col:24> 'int' 0
 // CHECK-NEXT:    `-LambdaExpr {{.*}} <line:36:3, col:23> '(lambda at {{.*}}ast-dump-lambda.cpp:36:3)'
 // CHECK-NEXT:      |-CXXRecordDecl {{.*}} <col:3> col:3{{( imported)?}} implicit{{( <undeserialized declarations>)?}} class definition
-// CHECK-NEXT:      | |-DefinitionData lambda empty standard_layout trivially_copyable literal can_const_default_init
+// CHECK-NEXT:      | |-DefinitionData lambda empty standard_layout trivially_copyable trivially_relocatable literal can_const_default_init
 // CHECK-NEXT:      | | |-DefaultConstructor defaulted_is_constexpr
 // CHECK-NEXT:      | | |-CopyConstructor simple trivial has_const_param needs_implicit implicit_has_const_param
 // CHECK-NEXT:      | | |-MoveConstructor exists simple trivial needs_implicit

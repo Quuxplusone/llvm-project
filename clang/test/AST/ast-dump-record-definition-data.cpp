@@ -77,6 +77,17 @@ struct IsNotTriviallyCopyable {
   IsNotTriviallyCopyable(const IsNotTriviallyCopyable&) {}
 };
 
+struct IsTriviallyRelocatable {
+  // CHECK: CXXRecordDecl 0x{{[^ ]*}} <line:[[@LINE-1]]:1, line:[[@LINE+2]]:1> line:[[@LINE-1]]:8 struct IsTriviallyRelocatable definition
+  // CHECK-NEXT: DefinitionData {{.*}}trivially_relocatable{{.*}}
+};
+
+struct IsNotTriviallyRelocatable {
+  // CHECK: CXXRecordDecl 0x{{[^ ]*}} <line:[[@LINE-1]]:1, line:[[@LINE+3]]:1> line:[[@LINE-1]]:8 struct IsNotTriviallyRelocatable definition
+  // CHECK-NOT: DefinitionData {{.*}}trivially_relocatable{{.*}}
+  IsNotTriviallyRelocatable(const IsNotTriviallyRelocatable&) {}
+};
+
 struct IsPOD {
   // CHECK: CXXRecordDecl 0x{{[^ ]*}} <line:[[@LINE-1]]:1, line:[[@LINE+3]]:1> line:[[@LINE-1]]:8 struct IsPOD definition
   // CHECK-NEXT: DefinitionData {{.*}}pod{{.*}}
