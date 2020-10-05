@@ -534,6 +534,7 @@ erase_if(multimap<Key, T, Compare, Allocator>& c, Predicate pred);  // C++20
 #include <__config>
 #include <__functional/is_transparent.h>
 #include <__iterator/iterator_traits.h>
+#include <__memory_resource/polymorphic_allocator.h>
 #include <__node_handle>
 #include <__tree>
 #include <__utility/forward.h>
@@ -2335,5 +2336,18 @@ inline _LIBCPP_INLINE_VISIBILITY
 #endif
 
 _LIBCPP_END_NAMESPACE_STD
+
+#if _LIBCPP_STD_VER > 14
+_LIBCPP_BEGIN_NAMESPACE_STD
+namespace pmr
+{
+    template <class _KeyT, class _ValueT, class _CompareT = _VSTD::less<_KeyT>>
+    using map = _VSTD::map<_KeyT, _ValueT, _CompareT, polymorphic_allocator<_VSTD::pair<const _KeyT, _ValueT>>>;
+
+    template <class _KeyT, class _ValueT, class _CompareT = _VSTD::less<_KeyT>>
+    using multimap = _VSTD::multimap<_KeyT, _ValueT, _CompareT, polymorphic_allocator<_VSTD::pair<const _KeyT, _ValueT>>>;
+}
+_LIBCPP_END_NAMESPACE_STD
+#endif
 
 #endif // _LIBCPP_MAP

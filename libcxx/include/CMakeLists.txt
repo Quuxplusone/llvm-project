@@ -310,6 +310,12 @@ set(files
   __memory/unique_ptr.h
   __memory/uses_allocator.h
   __memory/voidify.h
+  __memory_resource/memory_resource.h
+  __memory_resource/monotonic_buffer_resource.h
+  __memory_resource/polymorphic_allocator.h
+  __memory_resource/pool_options.h
+  __memory_resource/synchronized_pool_resource.h
+  __memory_resource/unsynchronized_pool_resource.h
   __mutex_base
   __node_handle
   __numeric/accumulate.h
@@ -536,6 +542,7 @@ set(files
   map
   math.h
   memory
+  memory_resource
   module.modulemap
   mutex
   new
