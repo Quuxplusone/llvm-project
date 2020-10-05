@@ -425,109 +425,115 @@ int main(int, char**) { return 0; }
 #endif
 
 // RUN: %{build} -DTEST_71
-#if defined(TEST_71) && !defined(_LIBCPP_HAS_NO_THREADS)
-#   include <mutex>
+#if defined(TEST_71)
+#   include <memory_resource>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_72
-#if defined(TEST_72)
-#   include <new>
+#if defined(TEST_72) && !defined(_LIBCPP_HAS_NO_THREADS)
+#   include <mutex>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_73
 #if defined(TEST_73)
-#   include <numbers>
+#   include <new>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_74
 #if defined(TEST_74)
-#   include <numeric>
+#   include <numbers>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_75
 #if defined(TEST_75)
-#   include <optional>
+#   include <numeric>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_76
-#if defined(TEST_76) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
-#   include <ostream>
+#if defined(TEST_76)
+#   include <optional>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_77
-#if defined(TEST_77)
-#   include <queue>
+#if defined(TEST_77) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
+#   include <ostream>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_78
 #if defined(TEST_78)
-#   include <random>
+#   include <queue>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_79
 #if defined(TEST_79)
-#   include <ranges>
+#   include <random>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_80
 #if defined(TEST_80)
-#   include <ratio>
+#   include <ranges>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_81
-#if defined(TEST_81) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
-#   include <regex>
+#if defined(TEST_81)
+#   include <ratio>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_82
-#if defined(TEST_82)
-#   include <scoped_allocator>
+#if defined(TEST_82) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
+#   include <regex>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_83
-#if defined(TEST_83) && !defined(_LIBCPP_HAS_NO_THREADS)
-#   include <semaphore>
+#if defined(TEST_83)
+#   include <scoped_allocator>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
 // RUN: %{build} -DTEST_84
-#if defined(TEST_84)
+#if defined(TEST_84) && !defined(_LIBCPP_HAS_NO_THREADS)
+#   include <semaphore>
+    using HandlerType = decltype(std::__libcpp_assertion_handler);
+#endif
+
+// RUN: %{build} -DTEST_85
+#if defined(TEST_85)
 #   include <set>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
-// RUN: %{build} -DTEST_86
-#if defined(TEST_86) && !defined(_LIBCPP_HAS_NO_THREADS)
+// RUN: %{build} -DTEST_87
+#if defined(TEST_87) && !defined(_LIBCPP_HAS_NO_THREADS)
 #   include <shared_mutex>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
-// RUN: %{build} -DTEST_87
-#if defined(TEST_87)
+// RUN: %{build} -DTEST_88
+#if defined(TEST_88)
 #   include <span>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
-// RUN: %{build} -DTEST_88
-#if defined(TEST_88) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
+// RUN: %{build} -DTEST_89
+#if defined(TEST_89) && !defined(_LIBCPP_HAS_NO_LOCALIZATION)
 #   include <sstream>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif
 
-// RUN: %{build} -DTEST_89
-#if defined(TEST_89)
+// RUN: %{build} -DTEST_90
+#if defined(TEST_90)
 #   include <stack>
     using HandlerType = decltype(std::__libcpp_assertion_handler);
 #endif

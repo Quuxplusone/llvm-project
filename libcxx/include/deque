@@ -173,6 +173,7 @@ template <class T, class Allocator, class Predicate>
 #include <__config>
 #include <__format/enable_insertable.h>
 #include <__iterator/iterator_traits.h>
+#include <__memory_resource/polymorphic_allocator.h>
 #include <__split_buffer>
 #include <__utility/forward.h>
 #include <__utility/move.h>
@@ -3049,6 +3050,16 @@ inline constexpr bool __format::__enable_insertable<std::deque<wchar_t>> = true;
 #endif // _LIBCPP_STD_VER > 17
 
 _LIBCPP_END_NAMESPACE_STD
+
+#if _LIBCPP_STD_VER > 14
+_LIBCPP_BEGIN_NAMESPACE_STD
+namespace pmr
+{
+    template <class _ValueT>
+    using deque = _VSTD::deque<_ValueT, polymorphic_allocator<_ValueT>>;
+}
+_LIBCPP_END_NAMESPACE_STD
+#endif
 
 _LIBCPP_POP_MACROS
 
