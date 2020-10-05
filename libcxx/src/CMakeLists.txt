@@ -24,6 +24,7 @@ set(LIBCXX_SOURCES
   iostream.cpp
   locale.cpp
   memory.cpp
+  memory_resource.cpp
   mutex.cpp
   mutex_destructor.cpp
   new.cpp
