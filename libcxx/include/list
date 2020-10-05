@@ -195,6 +195,7 @@ template <class T, class Allocator, class Predicate>
 #include <__iterator/prev.h>
 #include <__iterator/reverse_iterator.h>
 #include <__memory/swap_allocator.h>
+#include <__memory_resource/polymorphic_allocator.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
 #include <__utility/swap.h>
@@ -2361,6 +2362,16 @@ inline constexpr bool __format::__enable_insertable<std::list<wchar_t>> = true;
 #endif // _LIBCPP_STD_VER > 17
 
 _LIBCPP_END_NAMESPACE_STD
+
+#if _LIBCPP_STD_VER > 14
+_LIBCPP_BEGIN_NAMESPACE_STD
+namespace pmr
+{
+    template <class _ValueT>
+    using list = _VSTD::list<_ValueT, polymorphic_allocator<_ValueT>>;
+}
+_LIBCPP_END_NAMESPACE_STD
+#endif
 
 _LIBCPP_POP_MACROS
 
