@@ -210,6 +210,11 @@ public:
         return disable_checking || n != delete_called;
     }
 
+    bool checkDeleteCalledGreaterThan(int n) const
+    {
+        return disable_checking || delete_called > n;
+    }
+
     bool checkAlignedNewCalledEq(int n) const
     {
         return disable_checking || n == aligned_new_called;
@@ -243,6 +248,11 @@ public:
     bool checkLastNewSizeNotEq(std::size_t n) const
     {
         return disable_checking || n != last_new_size;
+    }
+
+    bool checkLastNewSizeGe(std::size_t n) const
+    {
+        return disable_checking || last_new_size >= n;
     }
 
     bool checkLastNewAlignEq(std::size_t n) const

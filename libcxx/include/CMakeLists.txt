@@ -15,6 +15,7 @@ set(files
   __memory/base.h
   __memory/pointer_traits.h
   __memory/utilities.h
+  __memory_resource_base
   __mutex_base
   __node_handle
   __nullptr
@@ -119,6 +120,7 @@ set(files
   map
   math.h
   memory
+  memory_resource
   module.modulemap
   mutex
   new
