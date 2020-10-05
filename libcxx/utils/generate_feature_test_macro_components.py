@@ -452,7 +452,6 @@ feature_test_macros = [ add_version_header(x) for x in [
     "name": "__cpp_lib_memory_resource",
     "values": { "c++17": 201603 },
     "headers": ["memory_resource"],
-    "unimplemented": True,
   }, {
     "name": "__cpp_lib_node_extract",
     "values": { "c++17": 201606 },
