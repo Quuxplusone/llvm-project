@@ -26,13 +26,13 @@ namespace ex = std::pmr;
 struct assert_on_compare : public ex::memory_resource
 {
 protected:
-    virtual void * do_allocate(size_t, size_t)
+    void * do_allocate(size_t, size_t) override
     { assert(false); }
 
-    virtual void do_deallocate(void *, size_t, size_t)
+    void do_deallocate(void *, size_t, size_t) override
     { assert(false); }
 
-    virtual bool do_is_equal(ex::memory_resource const &) const noexcept
+    bool do_is_equal(ex::memory_resource const &) const noexcept override
     { assert(false); }
 };
 

@@ -25,14 +25,14 @@ struct repointable_resource : public std::pmr::memory_resource
 
     explicit repointable_resource(std::pmr::memory_resource *res) : which(res) {}
 
-protected:
-    virtual void *do_allocate(size_t size, size_t align)
+private:
+    void *do_allocate(size_t size, size_t align) override
     { return which->allocate(size, align); }
 
-    virtual void do_deallocate(void *p, size_t size, size_t align)
+    void do_deallocate(void *p, size_t size, size_t align) override
     { return which->deallocate(p, size, align); }
 
-    virtual bool do_is_equal(std::pmr::memory_resource const &rhs) const noexcept
+    bool do_is_equal(std::pmr::memory_resource const &rhs) const noexcept override
     { return which->is_equal(rhs); }
 };
 
