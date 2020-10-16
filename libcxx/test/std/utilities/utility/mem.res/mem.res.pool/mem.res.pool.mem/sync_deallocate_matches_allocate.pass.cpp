@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 // UNSUPPORTED: no-exceptions
-// UNSUPPORTED: c++98, c++03
+// UNSUPPORTED: c++98, c++03, c++11, c++14
 
 // <memory_resource>
 

@@ -9,7 +9,7 @@
 
 // <memory_resource>
 
-// UNSUPPORTED: c++98, c++03
+// UNSUPPORTED: c++98, c++03, c++11, c++14
 
 //------------------------------------------------------------------------------
 // TESTING void * memory_resource::allocate(size_t, size_t = max_align)

@@ -11,8 +11,6 @@
 #ifndef _LIBCPP___MEMORY_RESOURCE_BASE
 #define _LIBCPP___MEMORY_RESOURCE_BASE
 
-#ifndef _LIBCPP_CXX03_LANG
-
 /**
     memory_resource synopsis
 
@@ -65,6 +63,8 @@ namespace pmr {
 
 _LIBCPP_PUSH_MACROS
 #include <__undef_macros>
+
+#if _LIBCPP_STD_VER > 14
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -308,8 +308,8 @@ bool operator!=(polymorphic_allocator<_Tp> const & __lhs,
 
 _LIBCPP_END_NAMESPACE_STD
 
-_LIBCPP_POP_MACROS
+#endif /* _LIBCPP_STD_VER > 14 */
 
-#endif /* _LIBCPP_CXX03_LANG */
+_LIBCPP_POP_MACROS
 
 #endif /* _LIBCPP___MEMORY_RESOURCE_BASE */

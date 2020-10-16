@@ -9,21 +9,23 @@
 
 // UNSUPPORTED: c++98, c++03, c++11, c++14
 
-// <memory_resource>
+// <unordered_set>
 
-// template <class T> class polymorphic_allocator
+// namespace std::pmr {
+//
+// typedef ... unordered_set
+//
+// } // namespace std::pmr
 
-// polymorphic_allocator operator=(polymorphic_allocator const &) = delete
-
-#include <memory_resource>
-#include <type_traits>
-#include <cassert>
+#include <unordered_set>
 
 int main(int, char**)
 {
-    typedef std::pmr::polymorphic_allocator<void> T;
-    static_assert(!std::is_copy_assignable<T>::value, "");
-    static_assert(!std::is_move_assignable<T>::value, "");
+    {
+        // Check that std::pmr::unordered_set is usable without <memory_resource>.
+        std::pmr::unordered_set<int> s;
+        std::pmr::unordered_multiset<int> ms;
+    }
 
-    return 0;
+  return 0;
 }

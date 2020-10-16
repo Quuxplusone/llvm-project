@@ -11,8 +11,6 @@
 #ifndef _LIBCPP_MEMORY_RESOURCE
 #define _LIBCPP_MEMORY_RESOURCE
 
-#ifndef _LIBCPP_CXX03_LANG
-
 /**
     memory_resource synopsis
 
@@ -58,6 +56,8 @@ namespace pmr {
 
 _LIBCPP_PUSH_MACROS
 #include <__undef_macros>
+
+#if _LIBCPP_STD_VER > 14
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -352,8 +352,8 @@ private:
 
 _LIBCPP_END_NAMESPACE_STD
 
-_LIBCPP_POP_MACROS
+#endif /* _LIBCPP_STD_VER > 14 */
 
-#endif /* _LIBCPP_CXX03_LANG */
+_LIBCPP_POP_MACROS
 
 #endif /* _LIBCPP_MEMORY_RESOURCE */
