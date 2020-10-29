@@ -41,6 +41,7 @@ array algorithm
 array compare
 array concepts
 array cstddef
+array cstdint
 array cstdlib
 array initializer_list
 array iterator
@@ -169,6 +170,7 @@ complex stdexcept
 complex type_traits
 complex version
 concepts cstddef
+concepts cstdint
 concepts type_traits
 concepts version
 condition_variable atomic
@@ -230,6 +232,7 @@ exception version
 execution cstddef
 execution version
 expected cstddef
+expected cstdint
 expected initializer_list
 expected new
 expected version
@@ -263,6 +266,7 @@ experimental/memory_resource tuple
 experimental/memory_resource type_traits
 experimental/memory_resource variant
 experimental/propagate_const cstddef
+experimental/propagate_const cstdint
 experimental/propagate_const type_traits
 experimental/regex experimental/memory_resource
 experimental/regex experimental/string
@@ -438,6 +442,7 @@ iostream streambuf
 iostream version
 istream concepts
 istream cstddef
+istream cstdint
 istream iosfwd
 istream ostream
 istream type_traits
@@ -445,6 +450,7 @@ istream version
 iterator compare
 iterator concepts
 iterator cstddef
+iterator cstdint
 iterator cstdlib
 iterator exception
 iterator initializer_list
@@ -515,6 +521,7 @@ locale version
 map compare
 map concepts
 map cstddef
+map cstdint
 map cstdlib
 map functional
 map initializer_list
@@ -664,6 +671,7 @@ print version
 queue compare
 queue concepts
 queue cstddef
+queue cstdint
 queue cstdlib
 queue deque
 queue functional
@@ -690,6 +698,7 @@ random vector
 random version
 ranges compare
 ranges cstddef
+ranges cstdint
 ranges cstdlib
 ranges initializer_list
 ranges iosfwd
@@ -757,6 +766,7 @@ semaphore version
 set compare
 set concepts
 set cstddef
+set cstdint
 set cstdlib
 set functional
 set initializer_list
@@ -790,6 +800,7 @@ span limits
 span type_traits
 span version
 sstream cstddef
+sstream cstdint
 sstream istream
 sstream ostream
 sstream string
@@ -798,6 +809,7 @@ sstream version
 stack compare
 stack concepts
 stack cstddef
+stack cstdint
 stack deque
 stack functional
 stack initializer_list
@@ -897,6 +909,7 @@ thread type_traits
 thread version
 tuple compare
 tuple cstddef
+tuple cstdint
 tuple exception
 tuple iosfwd
 tuple new
@@ -965,6 +978,7 @@ valarray algorithm
 valarray cmath
 valarray concepts
 valarray cstddef
+valarray cstdint
 valarray cstdlib
 valarray cstring
 valarray functional
