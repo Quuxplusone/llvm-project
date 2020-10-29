@@ -24,6 +24,7 @@
 #include <__type_traits/conditional.h>
 #include <__type_traits/dependent_type.h>
 #include <__type_traits/integral_constant.h>
+#include <__type_traits/has_virtual_destructor.h>
 #include <__type_traits/is_array.h>
 #include <__type_traits/is_assignable.h>
 #include <__type_traits/is_constructible.h>
@@ -32,6 +33,7 @@
 #include <__type_traits/is_pointer.h>
 #include <__type_traits/is_reference.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_similar.h>
 #include <__type_traits/is_swappable.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_void.h>
@@ -51,6 +53,12 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+template <class _Tp, class _Up, bool _Enable>
+struct _HasVirtualDestructor : has_virtual_destructor<_Tp> { };
+
+template <class _Tp, class _Up>
+struct _HasVirtualDestructor<_Tp, _Up, true> : true_type { };
+
 template <class _Tp>
 struct _LIBCPP_TEMPLATE_VIS default_delete {
   static_assert(!is_function<_Tp>::value, "default_delete cannot be instantiated for function types");
@@ -59,7 +67,7 @@ struct _LIBCPP_TEMPLATE_VIS default_delete {
 #else
   _LIBCPP_HIDE_FROM_ABI default_delete() {}
 #endif
-  template <class _Up, __enable_if_t<is_convertible<_Up*, _Tp*>::value, int> = 0>
+  template <class _Up, __enable_if_t<is_convertible<_Up*, _Tp*>::value && _HasVirtualDestructor<_Tp, _Up, is_similar<_Tp, _Up>::value>::value, int> = 0>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 default_delete(const default_delete<_Up>&) _NOEXCEPT {}
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 void operator()(_Tp* __ptr) const _NOEXCEPT {

@@ -470,6 +470,7 @@ namespace std
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_scalar.h>
 #include <__type_traits/is_signed.h>
+#include <__type_traits/is_similar.h>
 #include <__type_traits/is_standard_layout.h>
 #include <__type_traits/is_trivial.h>
 #include <__type_traits/is_trivially_assignable.h>
