@@ -30,6 +30,12 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+template <class _Tp, class _Up, bool _Enable>
+struct _HasVirtualDestructor : has_virtual_destructor<_Tp> { };
+
+template <class _Tp, class _Up>
+struct _HasVirtualDestructor<_Tp, _Up, true> : true_type { };
+
 template <class _Tp>
 struct _LIBCPP_TEMPLATE_VIS default_delete {
     static_assert(!is_function<_Tp>::value,
@@ -42,8 +48,10 @@ struct _LIBCPP_TEMPLATE_VIS default_delete {
   template <class _Up>
   _LIBCPP_INLINE_VISIBILITY
   default_delete(const default_delete<_Up>&,
-                 typename enable_if<is_convertible<_Up*, _Tp*>::value>::type* =
-                     0) _NOEXCEPT {}
+      typename enable_if<is_convertible<_Up*, _Tp*>::value>::type* = 0,
+      typename enable_if<_HasVirtualDestructor<_Tp, _Up,
+                        is_similar<_Tp, _Up>::value>::value>::type* = 0)
+          _NOEXCEPT {}
 
   _LIBCPP_INLINE_VISIBILITY void operator()(_Tp* __ptr) const _NOEXCEPT {
     static_assert(sizeof(_Tp) >= 0, "cannot delete an incomplete type");
