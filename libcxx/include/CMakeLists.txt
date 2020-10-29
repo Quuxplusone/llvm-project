@@ -810,6 +810,7 @@ set(files
   __type_traits/is_scoped_enum.h
   __type_traits/is_signed.h
   __type_traits/is_signed_integer.h
+  __type_traits/is_similar.h
   __type_traits/is_specialization.h
   __type_traits/is_standard_layout.h
   __type_traits/is_swappable.h
