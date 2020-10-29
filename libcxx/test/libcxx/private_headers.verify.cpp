@@ -677,6 +677,7 @@ END-SCRIPT
 #include <__type_traits/is_scoped_enum.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_scoped_enum.h'}}
 #include <__type_traits/is_signed.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_signed.h'}}
 #include <__type_traits/is_signed_integer.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_signed_integer.h'}}
+#include <__type_traits/is_similar.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_similar.h'}}
 #include <__type_traits/is_specialization.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_specialization.h'}}
 #include <__type_traits/is_standard_layout.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_standard_layout.h'}}
 #include <__type_traits/is_swappable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_swappable.h'}}
