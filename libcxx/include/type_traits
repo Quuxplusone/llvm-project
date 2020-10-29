@@ -1426,6 +1426,39 @@ template<class _Tp> struct type_identity { typedef _Tp type; };
 template<class _Tp> using type_identity_t = typename type_identity<_Tp>::type;
 #endif
 
+// is_similar
+
+template <class _Tp, class _Up>
+struct is_similar : conditional<
+        is_const<_Tp>::value || is_volatile<_Tp>::value ||
+            is_const<_Up>::value || is_volatile<_Up>::value,
+        is_similar<typename remove_cv<_Tp>::type, typename remove_cv<_Up>::type>,
+        is_same<_Tp, _Up>
+    >::type {};
+
+template <class _Tp, class _Up>
+struct is_similar<_Tp*, _Up*>: is_similar<_Tp, _Up> {};
+
+template <class _Tp, class _Up, class _Cp>
+struct is_similar<_Tp _Cp::*, _Up _Cp::*>: is_similar<_Tp, _Up> {};
+
+template <class _Tp, class _Up>
+struct is_similar<_Tp[], _Up[]>: is_similar<_Tp, _Up> {};
+
+template <class _Tp, class _Up, size_t _Np>
+struct is_similar<_Tp[], _Up[_Np]>: is_similar<_Tp, _Up> {};
+
+template <class _Tp, class _Up, size_t _Np>
+struct is_similar<_Tp[_Np], _Up[]>: is_similar<_Tp, _Up> {};
+
+template <class _Tp, class _Up, size_t _Np>
+struct is_similar<_Tp[_Np], _Up[_Np]>: is_similar<_Tp, _Up> {};
+
+#if _LIBCPP_STD_VER > 14 && !defined(_LIBCPP_HAS_NO_VARIABLE_TEMPLATES)
+template <class _Tp, class _Up>
+_LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool is_similar_v = is_similar<_Tp, _Up>::value;
+#endif
+
 // is_signed
 
 // In clang 9 and earlier, this builtin did not work for floating points or enums
