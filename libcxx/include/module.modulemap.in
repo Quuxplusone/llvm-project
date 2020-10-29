@@ -1979,6 +1979,7 @@ module std_private_type_traits_is_scalar                                 [system
 module std_private_type_traits_is_scoped_enum                            [system] { header "__type_traits/is_scoped_enum.h" }
 module std_private_type_traits_is_signed                                 [system] { header "__type_traits/is_signed.h" }
 module std_private_type_traits_is_signed_integer                         [system] { header "__type_traits/is_signed_integer.h" }
+module std_private_type_traits_is_similar                                [system] { header "__type_traits/is_similar.h" }
 module std_private_type_traits_is_specialization                         [system] { header "__type_traits/is_specialization.h" }
 module std_private_type_traits_is_standard_layout                        [system] { header "__type_traits/is_standard_layout.h" }
 module std_private_type_traits_is_swappable                              [system] {
