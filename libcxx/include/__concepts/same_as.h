@@ -11,6 +11,7 @@
 
 #include <__config>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_similar.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -27,6 +28,14 @@ concept __same_as_impl = _IsSame<_Tp, _Up>::value;
 
 template<class _Tp, class _Up>
 concept same_as = __same_as_impl<_Tp, _Up> && __same_as_impl<_Up, _Tp>;
+
+// [concept.similar]
+
+template<class _Tp, class _Up>
+concept __similar_to_impl = _VSTD::is_similar<_Tp, _Up>::value;
+
+template<class _Tp, class _Up>
+concept similar_to = (__similar_to_impl<_Tp, _Up> && __similar_to_impl<_Up, _Tp>) || same_as<_Tp, _Up>;
 
 #endif // _LIBCPP_STD_VER >= 20
 
