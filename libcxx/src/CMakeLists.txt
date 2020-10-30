@@ -20,6 +20,7 @@ set(LIBCXX_SOURCES
   include/config_elast.h
   include/refstring.h
   memory.cpp
+  memory_resource.cpp
   mutex.cpp
   mutex_destructor.cpp
   new.cpp
