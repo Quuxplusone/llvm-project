@@ -4056,8 +4056,8 @@ __sort(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __c
                         ++__i;
                     }
                     // [__first, __i) == *__first and *__first < [__i, __last)
-                    // The first part is sorted, sort the secod part
-                    // _VSTD::__sort<_Compare>(__i, __last, __comp);
+                    // The first part is sorted, sort the second part
+                    // as if by __sort<_Compare>(__i, __last, __comp)
                     __first = __i;
                     goto __restart;
                 }
@@ -4127,13 +4127,13 @@ __sort(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __c
         if (__i - __first < __last - __i)
         {
             _VSTD::__sort<_Compare>(__first, __i, __comp);
-            // _VSTD::__sort<_Compare>(__i+1, __last, __comp);
+            // as if by __sort<_Compare>(__i+1, __last, __comp)
             __first = ++__i;
         }
         else
         {
             _VSTD::__sort<_Compare>(__i+1, __last, __comp);
-            // _VSTD::__sort<_Compare>(__first, __i, __comp);
+            // as if by __sort<_Compare>(__first, __i, __comp)
             __last = __i;
         }
     }
@@ -4568,7 +4568,7 @@ __inplace_merge(_BidirectionalIterator __first, _BidirectionalIterator __middle,
         if (__len11 + __len21 < __len12 + __len22)
         {
             __inplace_merge<_Compare>(__first, __m1, __middle, __comp, __len11, __len21, __buff, __buff_size);
-//          __inplace_merge<_Compare>(__middle, __m2, __last, __comp, __len12, __len22, __buff, __buff_size);
+            // as if by __inplace_merge<_Compare>(__middle, __m2, __last, __comp, __len12, __len22, __buff, __buff_size)
             __first = __middle;
             __middle = __m2;
             __len1 = __len12;
@@ -4577,7 +4577,7 @@ __inplace_merge(_BidirectionalIterator __first, _BidirectionalIterator __middle,
         else
         {
             __inplace_merge<_Compare>(__middle, __m2, __last, __comp, __len12, __len22, __buff, __buff_size);
-//          __inplace_merge<_Compare>(__first, __m1, __middle, __comp, __len11, __len21, __buff, __buff_size);
+            // as if by __inplace_merge<_Compare>(__first, __m1, __middle, __comp, __len11, __len21, __buff, __buff_size)
             __last = __middle;
             __middle = __m1;
             __len1 = __len11;
@@ -4776,11 +4776,6 @@ __stable_sort(_RandomAccessIterator __first, _RandomAccessIterator __last, _Comp
         __stable_sort_move<_Compare>(__m, __last, __comp, __len - __l2, __buff + __l2);
         __d.__set(__len, (value_type*)nullptr);
         __merge_move_assign<_Compare>(__buff, __buff + __l2, __buff + __l2, __buff + __len, __first, __comp);
-//         __merge<_Compare>(move_iterator<value_type*>(__buff),
-//                           move_iterator<value_type*>(__buff + __l2),
-//                           move_iterator<_RandomAccessIterator>(__buff + __l2),
-//                           move_iterator<_RandomAccessIterator>(__buff + __len),
-//                           __first, __comp);
         return;
     }
     __stable_sort<_Compare>(__first, __m, __comp, __l2, __buff, __buff_size);
@@ -5210,7 +5205,7 @@ __nth_element(_RandomAccessIterator __first, _RandomAccessIterator __nth, _Rando
                 if (__i == --__j)
                 {
                     // *__first == *__m, *__m <= all other elements
-                    // Parition instead into [__first, __i) == *__first and *__first < [__i, __last)
+                    // Partition instead into [__first, __i) == *__first and *__first < [__i, __last)
                     ++__i;  // __first + 1
                     __j = __last;
                     if (!__comp(*__first, *--__j))  // we need a guard if *__first == *(__last-1)
@@ -5248,8 +5243,8 @@ __nth_element(_RandomAccessIterator __first, _RandomAccessIterator __nth, _Rando
                     // The first part is sorted,
                     if (__nth < __i)
                         return;
-                    // __nth_element the secod part
-                    // __nth_element<_Compare>(__i, __nth, __last, __comp);
+                    // __nth_element the second part
+                    // as if by __nth_element<_Compare>(__i, __nth, __last, __comp)
                     __first = __i;
                     goto __restart;
                 }
@@ -5331,12 +5326,12 @@ not_sorted:
         // __nth_element on range containing __nth
         if (__nth < __i)
         {
-            // __nth_element<_Compare>(__first, __nth, __i, __comp);
+            // as if by __nth_element<_Compare>(__first, __nth, __i, __comp)
             __last = __i;
         }
         else
         {
-            // __nth_element<_Compare>(__i+1, __nth, __last, __comp);
+            // as if by __nth_element<_Compare>(__i+1, __nth, __last, __comp)
             __first = ++__i;
         }
     }
