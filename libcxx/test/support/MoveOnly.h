@@ -33,6 +33,7 @@ public:
 
     constexpr bool operator==(const MoveOnly& x) const {return data_ == x.data_;}
     constexpr bool operator< (const MoveOnly& x) const {return data_ <  x.data_;}
+    constexpr bool operator> (const MoveOnly& x) const {return data_ >  x.data_;}
     TEST_CONSTEXPR_CXX14 MoveOnly operator+(const MoveOnly& x) const
         { return MoveOnly{data_ + x.data_}; }
     TEST_CONSTEXPR_CXX14 MoveOnly operator*(const MoveOnly& x) const

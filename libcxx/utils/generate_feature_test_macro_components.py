@@ -363,10 +363,9 @@ feature_test_macros = sorted([ add_version_header(x) for x in [
     "headers": ["concepts"],
     "unimplemented": True,
   }, {
-    "name": "__cpp_lib_constexpr_swap_algorithms",
+    "name": "__cpp_lib_constexpr_algorithms",
     "values": { "c++2a": int(201806) },
     "headers": ["algorithm"],
-    "unimplemented": True,
   }, {
     "name": "__cpp_lib_constexpr_misc",
     "values": { "c++2a": int(201811) },

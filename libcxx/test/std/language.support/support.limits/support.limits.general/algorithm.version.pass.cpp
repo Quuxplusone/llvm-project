@@ -15,7 +15,7 @@
 
 /*  Constant                                 Value
     __cpp_lib_clamp                          201603L [C++17]
-    __cpp_lib_constexpr_swap_algorithms      201806L [C++2a]
+    __cpp_lib_constexpr_algorithms           201806L [C++2a]
     __cpp_lib_parallel_algorithm             201603L [C++17]
     __cpp_lib_ranges                         201811L [C++2a]
     __cpp_lib_robust_nonmodifying_seq_ops    201304L [C++14]
@@ -31,8 +31,8 @@
 #   error "__cpp_lib_clamp should not be defined before c++17"
 # endif
 
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_parallel_algorithm
@@ -57,8 +57,8 @@
 #   error "__cpp_lib_clamp should not be defined before c++17"
 # endif
 
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_parallel_algorithm
@@ -89,8 +89,8 @@
 #   error "__cpp_lib_clamp should have the value 201603L in c++17"
 # endif
 
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
 # endif
 
 # if !defined(_LIBCPP_VERSION)
@@ -133,17 +133,11 @@
 #   error "__cpp_lib_clamp should have the value 201603L in c++2a"
 # endif
 
-# if !defined(_LIBCPP_VERSION)
-#   ifndef __cpp_lib_constexpr_swap_algorithms
-#     error "__cpp_lib_constexpr_swap_algorithms should be defined in c++2a"
-#   endif
-#   if __cpp_lib_constexpr_swap_algorithms != 201806L
-#     error "__cpp_lib_constexpr_swap_algorithms should have the value 201806L in c++2a"
-#   endif
-# else // _LIBCPP_VERSION
-#   ifdef __cpp_lib_constexpr_swap_algorithms
-#     error "__cpp_lib_constexpr_swap_algorithms should not be defined because it is unimplemented in libc++!"
-#   endif
+# ifndef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should be defined in c++2a"
+# endif
+# if __cpp_lib_constexpr_algorithms != 201806L
+#   error "__cpp_lib_constexpr_algorithms should have the value 201806L in c++2a"
 # endif
 
 # if !defined(_LIBCPP_VERSION)

@@ -40,10 +40,10 @@
     __cpp_lib_clamp                                201603L [C++17]
     __cpp_lib_complex_udls                         201309L [C++14]
     __cpp_lib_concepts                             201806L [C++2a]
+    __cpp_lib_constexpr_algorithms                 201806L [C++2a]
     __cpp_lib_constexpr_dynamic_alloc              201907L [C++2a]
     __cpp_lib_constexpr_misc                       201811L [C++2a]
     __cpp_lib_constexpr_numeric                    201911L [C++2a]
-    __cpp_lib_constexpr_swap_algorithms            201806L [C++2a]
     __cpp_lib_constexpr_utility                    201811L [C++2a]
     __cpp_lib_destroying_delete                    201806L [C++2a]
     __cpp_lib_enable_shared_from_this              201603L [C++17]
@@ -220,6 +220,10 @@
 #   error "__cpp_lib_concepts should not be defined before c++2a"
 # endif
 
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
+# endif
+
 # ifdef __cpp_lib_constexpr_dynamic_alloc
 #   error "__cpp_lib_constexpr_dynamic_alloc should not be defined before c++2a"
 # endif
@@ -230,10 +234,6 @@
 
 # ifdef __cpp_lib_constexpr_numeric
 #   error "__cpp_lib_constexpr_numeric should not be defined before c++2a"
-# endif
-
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_constexpr_utility
@@ -616,6 +616,10 @@
 #   error "__cpp_lib_concepts should not be defined before c++2a"
 # endif
 
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
+# endif
+
 # ifdef __cpp_lib_constexpr_dynamic_alloc
 #   error "__cpp_lib_constexpr_dynamic_alloc should not be defined before c++2a"
 # endif
@@ -626,10 +630,6 @@
 
 # ifdef __cpp_lib_constexpr_numeric
 #   error "__cpp_lib_constexpr_numeric should not be defined before c++2a"
-# endif
-
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_constexpr_utility
@@ -1126,6 +1126,10 @@
 #   error "__cpp_lib_concepts should not be defined before c++2a"
 # endif
 
+# ifdef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should not be defined before c++2a"
+# endif
+
 # ifdef __cpp_lib_constexpr_dynamic_alloc
 #   error "__cpp_lib_constexpr_dynamic_alloc should not be defined before c++2a"
 # endif
@@ -1136,10 +1140,6 @@
 
 # ifdef __cpp_lib_constexpr_numeric
 #   error "__cpp_lib_constexpr_numeric should not be defined before c++2a"
-# endif
-
-# ifdef __cpp_lib_constexpr_swap_algorithms
-#   error "__cpp_lib_constexpr_swap_algorithms should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_constexpr_utility
@@ -1891,6 +1891,13 @@
 #   endif
 # endif
 
+# ifndef __cpp_lib_constexpr_algorithms
+#   error "__cpp_lib_constexpr_algorithms should be defined in c++2a"
+# endif
+# if __cpp_lib_constexpr_algorithms != 201806L
+#   error "__cpp_lib_constexpr_algorithms should have the value 201806L in c++2a"
+# endif
+
 # ifndef __cpp_lib_constexpr_dynamic_alloc
 #   error "__cpp_lib_constexpr_dynamic_alloc should be defined in c++2a"
 # endif
@@ -1916,19 +1923,6 @@
 # endif
 # if __cpp_lib_constexpr_numeric != 201911L
 #   error "__cpp_lib_constexpr_numeric should have the value 201911L in c++2a"
-# endif
-
-# if !defined(_LIBCPP_VERSION)
-#   ifndef __cpp_lib_constexpr_swap_algorithms
-#     error "__cpp_lib_constexpr_swap_algorithms should be defined in c++2a"
-#   endif
-#   if __cpp_lib_constexpr_swap_algorithms != 201806L
-#     error "__cpp_lib_constexpr_swap_algorithms should have the value 201806L in c++2a"
-#   endif
-# else // _LIBCPP_VERSION
-#   ifdef __cpp_lib_constexpr_swap_algorithms
-#     error "__cpp_lib_constexpr_swap_algorithms should not be defined because it is unimplemented in libc++!"
-#   endif
 # endif
 
 # ifndef __cpp_lib_constexpr_utility
