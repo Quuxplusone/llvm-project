@@ -1393,30 +1393,6 @@ template <class _B1, class _B2> _B2 _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_
 template <class _Ip, class _Op> _Op _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17 move(_Ip, _Ip, _Op);
 template <class _B1, class _B2> _B2 _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17 move_backward(_B1, _B1, _B2);
 
-#if _LIBCPP_DEBUG_LEVEL < 2
-
-template <class _Tp>
-_LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    _Tp*
->::type
-__unwrap_iter(__wrap_iter<_Tp*>);
-
-#else
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    __wrap_iter<_Tp*>
->::type
-__unwrap_iter(__wrap_iter<_Tp*> __i);
-
-#endif
-
 template <class _Iter>
 class __wrap_iter
 {
@@ -1603,26 +1579,6 @@ private:
     template <class _B1, class _B2> friend _LIBCPP_CONSTEXPR_AFTER_CXX17 _B2 copy_backward(_B1, _B1, _B2);
     template <class _Ip, class _Op> friend _LIBCPP_CONSTEXPR_AFTER_CXX17 _Op move(_Ip, _Ip, _Op);
     template <class _B1, class _B2> friend _LIBCPP_CONSTEXPR_AFTER_CXX17 _B2 move_backward(_B1, _B1, _B2);
-
-#if _LIBCPP_DEBUG_LEVEL < 2
-    template <class _Tp>
-    _LIBCPP_CONSTEXPR friend
-    typename enable_if
-    <
-        is_trivially_copy_assignable<_Tp>::value,
-        _Tp*
-    >::type
-    __unwrap_iter(__wrap_iter<_Tp*>);
-#else
-  template <class _Tp>
-  inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR friend
-  typename enable_if
-  <
-      is_trivially_copy_assignable<_Tp>::value,
-      __wrap_iter<_Tp*>
-  >::type
-  __unwrap_iter(__wrap_iter<_Tp*> __i);
-#endif
 };
 
 template <class _Iter1, class _Iter2>

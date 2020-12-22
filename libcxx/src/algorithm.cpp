@@ -25,6 +25,7 @@ template void __sort<__less<unsigned long long>&, unsigned long long*>(unsigned 
 template void __sort<__less<float>&, float*>(float*, float*, __less<float>&);
 template void __sort<__less<double>&, double*>(double*, double*, __less<double>&);
 template void __sort<__less<long double>&, long double*>(long double*, long double*, __less<long double>&);
+template void __sort<__less<void*>&, void**>(void**, void**, __less<void*>&);
 
 template bool __insertion_sort_incomplete<__less<char>&, char*>(char*, char*, __less<char>&);
 template bool __insertion_sort_incomplete<__less<wchar_t>&, wchar_t*>(wchar_t*, wchar_t*, __less<wchar_t>&);
@@ -41,7 +42,6 @@ template bool __insertion_sort_incomplete<__less<unsigned long long>&, unsigned 
 template bool __insertion_sort_incomplete<__less<float>&, float*>(float*, float*, __less<float>&);
 template bool __insertion_sort_incomplete<__less<double>&, double*>(double*, double*, __less<double>&);
 template bool __insertion_sort_incomplete<__less<long double>&, long double*>(long double*, long double*, __less<long double>&);
-
-template unsigned __sort5<__less<long double>&, long double*>(long double*, long double*, long double*, long double*, long double*, __less<long double>&);
+template bool __insertion_sort_incomplete<__less<void*>&, void**>(void**, void**, __less<void*>&);
 
 _LIBCPP_END_NAMESPACE_STD

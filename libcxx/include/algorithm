@@ -1629,68 +1629,25 @@ search_n(_ForwardIterator __first, _ForwardIterator __last, _Size __count, const
                            __value_, __equal_to<__v, _Tp>());
 }
 
-// copy
+// __simplify_iterator
+
 template <class _Iter>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
 _Iter
-__unwrap_iter(_Iter __i)
+__simplify_iterator(_Iter __i)
 {
     return __i;
 }
 
-template <class _Tp>
+template <class _Iter>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    _Tp*
->::type
-__unwrap_iter(move_iterator<_Tp*> __i)
+_Iter
+__simplify_iterator(__wrap_iter<_Iter> __i)
 {
-    return __i.base();
+    return _VSTD::__simplify_iterator(__i.base());
 }
 
-#if _LIBCPP_DEBUG_LEVEL < 2
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    _Tp*
->::type
-__unwrap_iter(__wrap_iter<_Tp*> __i)
-{
-    return __i.base();
-}
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    const _Tp*
->::type
-__unwrap_iter(__wrap_iter<const _Tp*> __i)
-{
-    return __i.base();
-}
-
-#else
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
-typename enable_if
-<
-    is_trivially_copy_assignable<_Tp>::value,
-    __wrap_iter<_Tp*>
->::type
-__unwrap_iter(__wrap_iter<_Tp*> __i)
-{
-    return __i;
-}
-
-#endif  // _LIBCPP_DEBUG_LEVEL < 2
+// copy
 
 template <class _InputIterator, class _OutputIterator>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17
@@ -1732,11 +1689,11 @@ _OutputIterator
 copy(_InputIterator __first, _InputIterator __last, _OutputIterator __result)
 {
     if (__libcpp_is_constant_evaluated()) {
-        return _VSTD::__copy_constexpr(
-            _VSTD::__unwrap_iter(__first), _VSTD::__unwrap_iter(__last), _VSTD::__unwrap_iter(__result));
+        return _VSTD::__copy_constexpr(__first, __last, __result);
     } else {
-        return _VSTD::__copy(
-            _VSTD::__unwrap_iter(__first), _VSTD::__unwrap_iter(__last), _VSTD::__unwrap_iter(__result));
+        return _VSTD::__copy(_VSTD::__simplify_iterator(__first),
+                             _VSTD::__simplify_iterator(__last),
+                             _VSTD::__simplify_iterator(__result));
     }
 }
 
@@ -1786,13 +1743,11 @@ copy_backward(_BidirectionalIterator1 __first, _BidirectionalIterator1 __last,
               _BidirectionalIterator2 __result)
 {
     if (__libcpp_is_constant_evaluated()) {
-        return _VSTD::__copy_backward_constexpr(_VSTD::__unwrap_iter(__first),
-                                                _VSTD::__unwrap_iter(__last),
-                                                _VSTD::__unwrap_iter(__result));
+        return _VSTD::__copy_backward_constexpr(__first, __last, __result);
     } else {
-        return _VSTD::__copy_backward(_VSTD::__unwrap_iter(__first),
-                                      _VSTD::__unwrap_iter(__last),
-                                      _VSTD::__unwrap_iter(__result));
+        return _VSTD::__copy_backward(_VSTD::__simplify_iterator(__first),
+                                      _VSTD::__simplify_iterator(__last),
+                                      _VSTD::__simplify_iterator(__result));
     }
 }
 
@@ -1859,8 +1814,6 @@ copy_n(_InputIterator __first, _Size __orig_n, _OutputIterator __result)
 
 // move
 
-// __move_constexpr exists so that __move doesn't call itself when delegating to the constexpr
-// version of __move.
 template <class _InputIterator, class _OutputIterator>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
 _OutputIterator
@@ -1889,8 +1842,6 @@ typename enable_if
 >::type
 __move(_Tp* __first, _Tp* __last, _Up* __result)
 {
-    if (__libcpp_is_constant_evaluated())
-        return _VSTD::__move_constexpr(__first, __last, __result);
     const size_t __n = static_cast<size_t>(__last - __first);
     if (__n > 0)
         _VSTD::memmove(__result, __first, __n * sizeof(_Up));
@@ -1902,7 +1853,13 @@ inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17
 _OutputIterator
 move(_InputIterator __first, _InputIterator __last, _OutputIterator __result)
 {
-    return _VSTD::__move(_VSTD::__unwrap_iter(__first), _VSTD::__unwrap_iter(__last), _VSTD::__unwrap_iter(__result));
+    if (__libcpp_is_constant_evaluated()) {
+        return _VSTD::__move_constexpr(__first, __last, __result);
+    } else {
+        return _VSTD::__move(_VSTD::__simplify_iterator(__first),
+                             _VSTD::__simplify_iterator(__last),
+                             _VSTD::__simplify_iterator(__result));
+    }
 }
 
 // move_backward
@@ -1937,8 +1894,6 @@ typename enable_if
 >::type
 __move_backward(_Tp* __first, _Tp* __last, _Up* __result)
 {
-    if (__libcpp_is_constant_evaluated())
-        return _VSTD::__move_backward_constexpr(__first, __last, __result);
     const size_t __n = static_cast<size_t>(__last - __first);
     if (__n > 0)
     {
@@ -1954,7 +1909,13 @@ _BidirectionalIterator2
 move_backward(_BidirectionalIterator1 __first, _BidirectionalIterator1 __last,
               _BidirectionalIterator2 __result)
 {
-    return _VSTD::__move_backward(_VSTD::__unwrap_iter(__first), _VSTD::__unwrap_iter(__last), _VSTD::__unwrap_iter(__result));
+    if (__libcpp_is_constant_evaluated()) {
+        return _VSTD::__move_backward_constexpr(__first, __last, __result);
+    } else {
+        return _VSTD::__move_backward(_VSTD::__simplify_iterator(__first),
+                                      _VSTD::__simplify_iterator(__last),
+                                      _VSTD::__simplify_iterator(__result));
+    }
 }
 
 // iter_swap
@@ -4141,11 +4102,7 @@ __sort(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __c
 template <class _Compare, class _Tp>
 inline _LIBCPP_INLINE_VISIBILITY
 void
-__sort(_Tp** __first, _Tp** __last, __less<_Tp*>&)
-{
-    __less<uintptr_t> __comp;
-    _VSTD::__sort<__less<uintptr_t>&, uintptr_t*>((uintptr_t*)__first, (uintptr_t*)__last, __comp);
-}
+__sort(_Tp** __first, _Tp** __last, __less<_Tp*>&);
 
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<char>&, char*>(char*, char*, __less<char>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<wchar_t>&, wchar_t*>(wchar_t*, wchar_t*, __less<wchar_t>&))
@@ -4162,6 +4119,7 @@ _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<unsigned long long>&
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<float>&, float*>(float*, float*, __less<float>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<double>&, double*>(double*, double*, __less<double>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<long double>&, long double*>(long double*, long double*, __less<long double>&))
+_LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS void __sort<__less<void*>&, void**>(void**, void**, __less<void*>&))
 
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<char>&, char*>(char*, char*, __less<char>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<wchar_t>&, wchar_t*>(wchar_t*, wchar_t*, __less<wchar_t>&))
@@ -4178,8 +4136,17 @@ _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<float>&, float*>(float*, float*, __less<float>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<double>&, double*>(double*, double*, __less<double>&))
 _LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<long double>&, long double*>(long double*, long double*, __less<long double>&))
+_LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS bool __insertion_sort_incomplete<__less<void*>&, void**>(void**, void**, __less<void*>&))
 
-_LIBCPP_EXTERN_TEMPLATE(_LIBCPP_FUNC_VIS unsigned __sort5<__less<long double>&, long double*>(long double*, long double*, long double*, long double*, long double*, __less<long double>&))
+template <class _Compare, class _Tp>
+inline _LIBCPP_INLINE_VISIBILITY
+void
+__sort(_Tp** __first, _Tp** __last, __less<_Tp*>&)
+{
+    __less<void*> __comp;
+    // Note that we want to call __sort<__less<void*>&, void**> and NOT __sort<__less<void*>&, void>!
+    _VSTD::__sort<__less<void*>&, void**>((void**)__first, (void**)__last, __comp);
+}
 
 // lower_bound
 
@@ -5353,33 +5320,18 @@ nth_element(_RandomAccessIterator __first, _RandomAccessIterator __nth, _RandomA
 
 // sort
 
-template <class _Compare, class _RandomAccessIterator>
-_LIBCPP_CONSTEXPR_AFTER_CXX17 void
-__sort_constexpr(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __comp)
-{
-    if (__libcpp_is_constant_evaluated()) {
-        _VSTD::__partial_sort<_Compare>(__first, __last, __last, __comp);
-    } else {
-        _VSTD::__sort<_Compare>(__first, __last, __comp);
-    }
-}
-
 template <class _RandomAccessIterator, class _Compare>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17
 void
 sort(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __comp)
 {
     typedef typename __comp_ref_type<_Compare>::type _Comp_ref;
-    _VSTD::__sort_constexpr<_Comp_ref>(__first, __last, _Comp_ref(__comp));
-}
-
-template <class _Tp, class _Compare>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX17
-void
-sort(__wrap_iter<_Tp*> __first, __wrap_iter<_Tp*> __last, _Compare __comp)
-{
-    typedef typename __comp_ref_type<_Compare>::type _Comp_ref;
-    _VSTD::__sort_constexpr<_Comp_ref>(__first.base(), __last.base(), _Comp_ref(__comp));
+    if (__libcpp_is_constant_evaluated()) {
+        _VSTD::__partial_sort<_Comp_ref>(__first, __last, __last, _Comp_ref(__comp));
+    } else {
+        _VSTD::__sort<_Comp_ref>(_VSTD::__simplify_iterator(__first),
+                                 _VSTD::__simplify_iterator(__last), _Comp_ref(__comp));
+    }
 }
 
 template <class _RandomAccessIterator>
