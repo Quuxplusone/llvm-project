@@ -236,15 +236,15 @@ public:
 
 #ifndef _LIBCPP_HAS_NO_DEDUCTION_GUIDES
 template<class _Container,
-         class = typename enable_if<!__is_allocator<_Container>::value, nullptr_t>::type
+         class = typename enable_if<!__is_allocator<_Container>::value>::type
 >
 stack(_Container)
     -> stack<typename _Container::value_type, _Container>;
 
 template<class _Container,
          class _Alloc,
-         class = typename enable_if<!__is_allocator<_Container>::value, nullptr_t>::type,
-         class = typename enable_if< __is_allocator<_Alloc>::value, nullptr_t>::type
+         class = typename enable_if<!__is_allocator<_Container>::value>::type,
+         class = typename enable_if<uses_allocator<_Container, _Alloc>::value>::type
          >
 stack(_Container, _Alloc)
     -> stack<typename _Container::value_type, _Container>;
