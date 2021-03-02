@@ -115,27 +115,39 @@ public:
     priority_queue() : priority_queue(Compare()) {} // C++20
     explicit priority_queue(const Compare& x) : priority_queue(x, Container()) {}
     priority_queue(const Compare& x, const Container&);
-    explicit priority_queue(const Compare& x = Compare(), Container&&= Container()); // before C++20
+    explicit priority_queue(const Compare& x = Compare(), Container&& = Container()); // before C++20
     priority_queue(const Compare& x, Container&&); // C++20
     template <class InputIterator>
         priority_queue(InputIterator first, InputIterator last,
                        const Compare& comp = Compare());
     template <class InputIterator>
         priority_queue(InputIterator first, InputIterator last,
-                       const Compare& comp, const container_type& c);
+                       const Compare& comp, const Container& c);
     template <class InputIterator>
         priority_queue(InputIterator first, InputIterator last,
-                       const Compare& comp, container_type&& c);
+                       const Compare& comp, Container&& c);
     template <class Alloc>
         explicit priority_queue(const Alloc& a);
     template <class Alloc>
         priority_queue(const Compare& comp, const Alloc& a);
     template <class Alloc>
-        priority_queue(const Compare& comp, const container_type& c,
+        priority_queue(const Compare& comp, const Container& c,
                        const Alloc& a);
     template <class Alloc>
-        priority_queue(const Compare& comp, container_type&& c,
+        priority_queue(const Compare& comp, Container&& c,
                        const Alloc& a);
+    template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Alloc& a); // LWG 3506
+    template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Compare& comp, const Alloc& a); // LWG 3506
+    template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Compare& comp, const Container& c, const Alloc& a); // LWG 3506
+    template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Compare& comp, Container&& c, const Alloc& a); // LWG 3506
     template <class Alloc>
         priority_queue(const priority_queue& q, const Alloc& a);
     template <class Alloc>
@@ -160,14 +172,29 @@ priority_queue(Compare, Container)
     -> priority_queue<typename Container::value_type, Container, Compare>; // C++17
 
 template<class InputIterator,
-         class Compare = less<typename iterator_traits<InputIterator>::value_type>,
-         class Container = vector<typename iterator_traits<InputIterator>::value_type>>
+         class Compare = less<typename iter-value-type<InputIterator>>,
+         class Container = vector<typename iter-value-type<InputIterator>>>
 priority_queue(InputIterator, InputIterator, Compare = Compare(), Container = Container())
-    -> priority_queue<typename iterator_traits<InputIterator>::value_type, Container, Compare>; // C++17
+    -> priority_queue<typename iter-value-type<InputIterator>, Container, Compare>; // C++17
 
 template<class Compare, class Container, class Allocator>
 priority_queue(Compare, Container, Allocator)
     -> priority_queue<typename Container::value_type, Container, Compare>; // C++17
+
+template<class InputIterator, class Allocator>
+priority_queue(InputIterator, InputIterator, Allocator)
+    -> priority_queue<iter-value-type<InputIterator>,
+                      vector<iter-value-type<InputIterator>, Allocator>,
+                      less<iter-value-type<InputIterator>>>; // LWG 3506
+
+template<class InputIterator, class Compare, class Allocator>
+priority_queue(InputIterator, InputIterator, Compare, Allocator)
+    -> priority_queue<iter-value-type<InputIterator>,
+                      vector<iter-value-type<InputIterator>, Allocator>, Compare>; // LWG 3506
+
+template<class InputIterator, class Compare, class Container, class Allocator>
+priority_queue(InputIterator, InputIterator, Compare, Container, Allocator)
+    -> priority_queue<typename Container::value_type, Container, Compare>; // LWG 3506
 
 template <class T, class Container, class Compare>
   void swap(priority_queue<T, Container, Compare>& x,
@@ -518,6 +545,31 @@ public:
                                                          _Alloc>::value>::type* = 0);
 #endif  // _LIBCPP_CXX03_LANG
 
+    template <class _InputIter, class _Alloc, class = _EnableIf<__is_cpp17_input_iterator<_InputIter>::value> >
+        _LIBCPP_INLINE_VISIBILITY
+        priority_queue(_InputIter __f, _InputIter __l, const _Alloc& __a,
+                       _EnableIf<uses_allocator<container_type, _Alloc>::value>* = 0);
+
+    template <class _InputIter, class _Alloc, class = _EnableIf<__is_cpp17_input_iterator<_InputIter>::value> >
+        _LIBCPP_INLINE_VISIBILITY
+        priority_queue(_InputIter __f, _InputIter __l,
+                       const value_compare& __comp, const _Alloc& __a,
+                       _EnableIf<uses_allocator<container_type, _Alloc>::value>* = 0);
+
+    template <class _InputIter, class _Alloc, class = _EnableIf<__is_cpp17_input_iterator<_InputIter>::value> >
+        _LIBCPP_INLINE_VISIBILITY
+        priority_queue(_InputIter __f, _InputIter __l,
+                       const value_compare& __comp, const container_type& __c, const _Alloc& __a,
+                       _EnableIf<uses_allocator<container_type, _Alloc>::value>* = 0);
+
+#ifndef _LIBCPP_CXX03_LANG
+    template <class _InputIter, class _Alloc, class = _EnableIf<__is_cpp17_input_iterator<_InputIter>::value> >
+        _LIBCPP_INLINE_VISIBILITY
+        priority_queue(_InputIter __f, _InputIter __l,
+                       const value_compare& __comp, container_type&& __c, const _Alloc& __a,
+                       _EnableIf<uses_allocator<container_type, _Alloc>::value>* = 0);
+#endif  // _LIBCPP_CXX03_LANG
+
     _LIBCPP_NODISCARD_AFTER_CXX17 _LIBCPP_INLINE_VISIBILITY
     bool            empty() const {return c.empty();}
     _LIBCPP_INLINE_VISIBILITY
@@ -546,30 +598,57 @@ public:
 #ifndef _LIBCPP_HAS_NO_DEDUCTION_GUIDES
 template <class _Compare,
           class _Container,
-          class = typename enable_if<!__is_allocator<_Compare>::value>::type,
-          class = typename enable_if<!__is_allocator<_Container>::value>::type
+          class = _EnableIf<!__is_allocator<_Compare>::value>,
+          class = _EnableIf<!__is_allocator<_Container>::value>
 >
 priority_queue(_Compare, _Container)
     -> priority_queue<typename _Container::value_type, _Container, _Compare>;
 
 template<class _InputIterator,
-         class _Compare   = less<typename iterator_traits<_InputIterator>::value_type>,
-         class _Container = vector<typename iterator_traits<_InputIterator>::value_type>,
-         class = typename enable_if< __is_cpp17_input_iterator<_InputIterator>::value>::type,
-         class = typename enable_if<!__is_allocator<_Compare>::value>::type,
-         class = typename enable_if<!__is_allocator<_Container>::value>::type
+         class _Compare = less<__iter_value_type<_InputIterator>>,
+         class _Container = vector<__iter_value_type<_InputIterator>>,
+         class = _EnableIf< __is_cpp17_input_iterator<_InputIterator>::value>,
+         class = _EnableIf<!__is_allocator<_Compare>::value>,
+         class = _EnableIf<!__is_allocator<_Container>::value>
 >
 priority_queue(_InputIterator, _InputIterator, _Compare = _Compare(), _Container = _Container())
-    -> priority_queue<typename iterator_traits<_InputIterator>::value_type, _Container, _Compare>;
+    -> priority_queue<__iter_value_type<_InputIterator>, _Container, _Compare>;
 
 template<class _Compare,
          class _Container,
          class _Alloc,
-         class = typename enable_if<!__is_allocator<_Compare>::value>::type,
-         class = typename enable_if<!__is_allocator<_Container>::value>::type,
-         class = typename enable_if<uses_allocator<_Container, _Alloc>::value>::type
+         class = _EnableIf<!__is_allocator<_Compare>::value>,
+         class = _EnableIf<!__is_allocator<_Container>::value>,
+         class = _EnableIf<uses_allocator<_Container, _Alloc>::value>
 >
 priority_queue(_Compare, _Container, _Alloc)
+    -> priority_queue<typename _Container::value_type, _Container, _Compare>;
+
+template<class _InputIterator, class _Allocator,
+         class = _EnableIf<__is_cpp17_input_iterator<_InputIterator>::value>,
+         class = _EnableIf<__is_allocator<_Allocator>::value>
+>
+priority_queue(_InputIterator, _InputIterator, _Allocator)
+    -> priority_queue<__iter_value_type<_InputIterator>,
+                      vector<__iter_value_type<_InputIterator>, _Allocator>,
+                      less<__iter_value_type<_InputIterator>>>;
+
+template<class _InputIterator, class _Compare, class _Allocator,
+         class = _EnableIf<__is_cpp17_input_iterator<_InputIterator>::value>,
+         class = _EnableIf<!__is_allocator<_Compare>::value>,
+         class = _EnableIf<__is_allocator<_Allocator>::value>
+>
+priority_queue(_InputIterator, _InputIterator, _Compare, _Allocator)
+    -> priority_queue<__iter_value_type<_InputIterator>,
+                      vector<__iter_value_type<_InputIterator>, _Allocator>, _Compare>;
+
+template<class _InputIterator, class _Compare, class _Container, class _Alloc,
+         class = _EnableIf<__is_cpp17_input_iterator<_InputIterator>::value>,
+         class = _EnableIf<!__is_allocator<_Compare>::value>,
+         class = _EnableIf<!__is_allocator<_Container>::value>,
+         class = _EnableIf<uses_allocator<_Container, _Alloc>::value>
+>
+priority_queue(_InputIterator, _InputIterator, _Compare, _Container, _Alloc)
     -> priority_queue<typename _Container::value_type, _Container, _Compare>;
 #endif
 
@@ -684,7 +763,6 @@ priority_queue<_Tp, _Container, _Compare>::priority_queue(const priority_queue& 
     : c(__q.c, __a),
       comp(__q.comp)
 {
-    _VSTD::make_heap(c.begin(), c.end(), comp);
 }
 
 #ifndef _LIBCPP_CXX03_LANG
@@ -713,9 +791,63 @@ priority_queue<_Tp, _Container, _Compare>::priority_queue(priority_queue&& __q,
     : c(_VSTD::move(__q.c), __a),
       comp(_VSTD::move(__q.comp))
 {
+}
+
+#endif  // _LIBCPP_CXX03_LANG
+
+template <class _Tp, class _Container, class _Compare>
+template <class _InputIter, class _Alloc, class>
+inline
+priority_queue<_Tp, _Container, _Compare>::priority_queue(
+        _InputIter __f, _InputIter __l, const _Alloc& __a,
+        _EnableIf<uses_allocator<container_type, _Alloc>::value>*)
+    : c(__f, __l, __a),
+      comp()
+{
     _VSTD::make_heap(c.begin(), c.end(), comp);
 }
 
+template <class _Tp, class _Container, class _Compare>
+template <class _InputIter, class _Alloc, class>
+inline
+priority_queue<_Tp, _Container, _Compare>::priority_queue(
+        _InputIter __f, _InputIter __l,
+        const value_compare& __comp, const _Alloc& __a,
+        _EnableIf<uses_allocator<container_type, _Alloc>::value>*)
+    : c(__f, __l, __a),
+      comp(__comp)
+{
+    _VSTD::make_heap(c.begin(), c.end(), comp);
+}
+
+template <class _Tp, class _Container, class _Compare>
+template <class _InputIter, class _Alloc, class>
+inline
+priority_queue<_Tp, _Container, _Compare>::priority_queue(
+        _InputIter __f, _InputIter __l,
+        const value_compare& __comp, const container_type& __c, const _Alloc& __a,
+        _EnableIf<uses_allocator<container_type, _Alloc>::value>*)
+    : c(__c, __a),
+      comp(__comp)
+{
+    c.insert(c.end(), __f, __l);
+    _VSTD::make_heap(c.begin(), c.end(), comp);
+}
+
+#ifndef _LIBCPP_CXX03_LANG
+template <class _Tp, class _Container, class _Compare>
+template <class _InputIter, class _Alloc, class>
+inline
+priority_queue<_Tp, _Container, _Compare>::priority_queue(
+        _InputIter __f, _InputIter __l, const value_compare& __comp,
+        container_type&& __c, const _Alloc& __a,
+        _EnableIf<uses_allocator<container_type, _Alloc>::value>*)
+    : c(_VSTD::move(__c), __a),
+      comp(__comp)
+{
+    c.insert(c.end(), __f, __l);
+    _VSTD::make_heap(c.begin(), c.end(), comp);
+}
 #endif  // _LIBCPP_CXX03_LANG
 
 template <class _Tp, class _Container, class _Compare>

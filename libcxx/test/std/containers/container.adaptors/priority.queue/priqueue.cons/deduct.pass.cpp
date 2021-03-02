@@ -173,7 +173,72 @@ int main(int, char**)
         std::priority_queue pri(std::move(source), ConvertibleToAlloc(2));
         static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
         }
+
+        {
+        Cont cont;
+        std::priority_queue pri(Comp(), cont, Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        std::priority_queue pri(Comp(), cont, ConvertibleToAlloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        std::priority_queue pri(Comp(), std::move(cont), Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        std::priority_queue pri(Comp(), std::move(cont), ConvertibleToAlloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, std::vector<T, Alloc>>>);
+        }
+
+        {
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Comp(), Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, std::vector<T, Alloc>, Comp>>);
+        }
+
+        {
+        Cont cont;
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Comp(), cont, Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Comp(), cont, ConvertibleToAlloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Comp(), std::move(cont), Alloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
+
+        {
+        Cont cont;
+        T a[2] = {};
+        std::priority_queue pri(a, a+2, Comp(), std::move(cont), ConvertibleToAlloc(2));
+        static_assert(std::is_same_v<decltype(pri), std::priority_queue<T, Cont, Comp>>);
+        }
     }
 
     return 0;
 }
+
