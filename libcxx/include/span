@@ -68,6 +68,7 @@ public:
         constexpr span(const array<value_type, N>& arr) noexcept;
     template<class R>
       constexpr explicit(Extent != dynamic_extent) span(R&& r);
+    constexpr explicit(Extent != dynamic_extent) span(initializer_list<value_type> il) noexcept; // P2447
     constexpr span(const span& other) noexcept = default;
     template <class OtherElementType, size_t OtherExtent>
         constexpr explicit(Extent != dynamic_extent) span(const span<OtherElementType, OtherExtent>& s) noexcept;
@@ -146,6 +147,7 @@ template<class R>
 #include <__utility/forward.h>
 #include <array>   // for array
 #include <cstddef> // for byte
+#include <initializer_list>
 #include <version>
 
 // standard-mandated includes
@@ -262,6 +264,9 @@ public:
 
   template <__span_array_convertible<element_type> _OtherElementType>
   _LIBCPP_HIDE_FROM_ABI constexpr span(const span<_OtherElementType, _Extent>& __other) : __data_{__other.data()} {}
+
+  constexpr explicit span(initializer_list<value_type> __il) requires is_const_v<element_type>
+      : __data_(__il.begin()) { _LIBCPP_ASSERT(_Extent == __il.size(), "size mismatch in span's constructor (initializer list)"); }
 
   template <__span_array_convertible<element_type> _OtherElementType>
   _LIBCPP_HIDE_FROM_ABI constexpr explicit span(const span<_OtherElementType, dynamic_extent>& __other) noexcept
@@ -419,6 +424,9 @@ public:
   template <__span_array_convertible<element_type> _OtherElementType, size_t _OtherExtent>
   _LIBCPP_HIDE_FROM_ABI constexpr span(const span<_OtherElementType, _OtherExtent>& __other) noexcept
       : __data_{__other.data()}, __size_{__other.size()} {}
+
+  constexpr span(initializer_list<value_type> __il) requires is_const_v<element_type>
+      : __data_(__il.begin()), __size_(__il.size()) {}
 
   template <size_t _Count>
   _LIBCPP_HIDE_FROM_ABI constexpr span<element_type, _Count> first() const noexcept {
