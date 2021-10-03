@@ -29,6 +29,6 @@ void f() {
 
   std::span<int> sp = {0, 0}; // expected-error {{no matching constructor for initialization of 'std::span<int>'}}
   std::span<int, 2> sp2 = {0, 0}; // expected-error {{no matching constructor for initialization of 'std::span<int, 2>'}}
-  std::span<const int> csp = {0, 0}; // expected-error {{no matching constructor for initialization of 'std::span<const int>'}}
-  std::span<const int, 2> csp2 = {0, 0}; // expected-error {{no matching constructor for initialization of 'std::span<const int, 2>'}}
+  std::span<const int> csp = {0, 0}; // OK, constructs from initializer-list
+  std::span<const int, 2> csp2 = {0, 0}; // expected-error {{chosen constructor is explicit in copy-initialization}}
 }
