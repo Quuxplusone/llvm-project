@@ -68,6 +68,7 @@ public:
         constexpr span(const array<value_type, N>& arr) noexcept;
     template<class R>
       constexpr explicit(Extent != dynamic_extent) span(R&& r);
+    constexpr explicit(Extent != dynamic_extent) span(initializer_list<value_type> il) noexcept; // P2447
     constexpr span(const span& other) noexcept = default;
     template <class OtherElementType, size_t OtherExtent>
         constexpr explicit(Extent != dynamic_extent) span(const span<OtherElementType, OtherExtent>& s) noexcept;
@@ -139,6 +140,7 @@ template<class R>
 #include <__ranges/size.h>
 #include <array>        // for array
 #include <cstddef>      // for byte
+#include <initializer_list>
 #include <iterator>     // for iterators
 #include <limits>
 #include <type_traits>  // for remove_cv, etc
@@ -282,6 +284,10 @@ public:
       _LIBCPP_ASSERT(ranges::size(__r) == _Extent, "size mismatch in span's constructor (range)");
     }
 #endif
+
+    constexpr explicit span(initializer_list<value_type> __il) requires is_const_v<element_type> : __data(__il.begin()) {
+      _LIBCPP_ASSERT(__il.size() == _Extent, "size mismatch in span's constructor (initializer list)");
+    }
 
     template <class _OtherElementType>
     _LIBCPP_INLINE_VISIBILITY
@@ -473,6 +479,9 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     constexpr span(_Range&& __r) : __data(ranges::data(__r)), __size{ranges::size(__r)} {}
 #endif
+
+    constexpr span(initializer_list<value_type> __il) requires is_const_v<element_type>
+        : __data(__il.begin()), __size(__il.size()) {}
 
     template <class _OtherElementType, size_t _OtherExtent>
     _LIBCPP_INLINE_VISIBILITY
