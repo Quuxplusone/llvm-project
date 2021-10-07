@@ -24,14 +24,11 @@
 
 #include <ranges>
 
-#include <concepts>
-
-#include "test_iterators.h"
-#include "test_range.h"
-
-
-
-static_assert(std::same_as<std::ranges::range_difference_t<test_range<cpp20_input_iterator> >, std::iter_difference_t<int*> >);
-static_assert(std::same_as<std::ranges::range_value_t<test_range<cpp20_input_iterator> >, std::iter_value_t<int*> >);
-static_assert(std::same_as<std::ranges::range_reference_t<test_range<cpp20_input_iterator> >, std::iter_reference_t<int*> >);
-static_assert(std::same_as<std::ranges::range_rvalue_reference_t<test_range<cpp20_input_iterator> >, std::iter_rvalue_reference_t<int*> >);
+struct Range {
+    int *begin();
+    int *end();
+};
+static_assert(std::same_as<std::ranges::range_difference_t<Range>, std::ptrdiff_t>);
+static_assert(std::same_as<std::ranges::range_value_t<Range>, int>);
+static_assert(std::same_as<std::ranges::range_reference_t<Range>, int&>);
+static_assert(std::same_as<std::ranges::range_rvalue_reference_t<Range>, int&&>);

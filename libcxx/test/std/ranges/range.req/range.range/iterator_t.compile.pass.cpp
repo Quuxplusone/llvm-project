@@ -10,23 +10,47 @@
 // UNSUPPORTED: libcpp-no-concepts
 // UNSUPPORTED: libcpp-has-no-incomplete-ranges
 
-// template<class T>
-// using iterator_t = decltype(ranges::begin(declval<T&>()));
+// template<range _Rp>
+// using iterator_t = decltype(ranges::begin(declval<_Rp&>()));
 
 #include <ranges>
 
-#include <concepts>
+#include "test_iterators.h"
 
-#include "test_range.h"
+template<class T>
+concept HasIteratorT = requires {
+    typename std::ranges::iterator_t<T>;
+};
 
+static_assert(std::same_as<std::ranges::iterator_t<int[]>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<int(&)[]>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<int[10]>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<int(&)[10]>, int*>);
 
+struct Range {
+    char *begin() &;
+    sentinel_wrapper<char*> end() &;
+    short *begin() &&;
+    sentinel_wrapper<short*> end() &&;
+    int *begin() const&;
+    sentinel_wrapper<int*> end() const&;
+    long *begin() const&&;
+    sentinel_wrapper<long*> end() const&&;
+};
+static_assert(std::same_as<std::ranges::iterator_t<Range>, char*>);
+static_assert(std::same_as<std::ranges::iterator_t<Range&>, char*>);
+static_assert(std::same_as<std::ranges::iterator_t<Range&&>, char*>);
+static_assert(std::same_as<std::ranges::iterator_t<const Range>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<const Range&>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<const Range&&>, int*>);
 
-static_assert(std::same_as<std::ranges::iterator_t<test_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
-static_assert(std::same_as<std::ranges::iterator_t<test_range<cpp17_input_iterator> const>, cpp17_input_iterator<int const*> >);
-
-static_assert(std::same_as<std::ranges::iterator_t<test_non_const_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
-
-static_assert(std::same_as<std::ranges::iterator_t<test_common_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
-static_assert(std::same_as<std::ranges::iterator_t<test_common_range<cpp17_input_iterator> const>, cpp17_input_iterator<int const*> >);
-
-static_assert(std::same_as<std::ranges::iterator_t<test_non_const_common_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
+struct NonConstRange {
+    int *begin();
+    int *end();
+};
+static_assert(std::same_as<std::ranges::iterator_t<NonConstRange>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<NonConstRange&>, int*>);
+static_assert(std::same_as<std::ranges::iterator_t<NonConstRange&&>, int*>);
+static_assert(!HasIteratorT<const NonConstRange>);
+static_assert(!HasIteratorT<const NonConstRange&>);
+static_assert(!HasIteratorT<const NonConstRange&&>);
