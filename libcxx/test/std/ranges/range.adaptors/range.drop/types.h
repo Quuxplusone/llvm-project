@@ -76,12 +76,9 @@ template<>
 inline constexpr bool std::ranges::enable_borrowed_range<BorrowableView> = true;
 
 struct InputView : std::ranges::view_base {
-  constexpr cpp20_input_iterator<int*> begin() const { return cpp20_input_iterator<int*>(globalBuff); }
-  constexpr int* end() const { return globalBuff + 8; }
+  constexpr auto begin() const { return cpp20_input_iterator<int*>(globalBuff); }
+  constexpr auto end() const { return sentinel_wrapper<cpp20_input_iterator<int*>>(cpp20_input_iterator<int*>(globalBuff + 8)); }
 };
-// TODO: remove these bogus operators
-constexpr bool operator==(const cpp20_input_iterator<int*> &lhs, int* rhs) { return lhs.base() == rhs; }
-constexpr bool operator==(int* lhs, const cpp20_input_iterator<int*> &rhs) { return rhs.base() == lhs; }
 
 struct Range {
   int *begin() const;

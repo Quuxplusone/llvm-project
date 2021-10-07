@@ -27,7 +27,7 @@ constexpr bool test() {
 
   // !simple-view<V>
   std::ranges::drop_view dropView2(InputView(), 4);
-  assert(dropView2.end() == globalBuff + 8);
+  assert(base(base(dropView2.end())) == globalBuff + 8);
 
   // range<const V>
   const std::ranges::drop_view dropView3(MoveOnlyView(), 0);
@@ -35,7 +35,7 @@ constexpr bool test() {
 
   // !simple-view<V>
   const std::ranges::drop_view dropView4(InputView(), 2);
-  assert(dropView4.end() == globalBuff + 8);
+  assert(base(base(dropView4.end())) == globalBuff + 8);
 
   // range<const V>
   std::ranges::drop_view dropView5(MoveOnlyView(), 10);
