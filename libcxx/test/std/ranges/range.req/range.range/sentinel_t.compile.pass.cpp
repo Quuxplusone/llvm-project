@@ -14,17 +14,24 @@
 // using sentinel_t = decltype(ranges::end(declval<_Rp&>()));
 
 #include <ranges>
-
 #include <concepts>
 
-#include "test_iterators.h"
-#include "test_range.h"
+struct Range {
+    char *begin() &;
+    char *end() &;
+    short *begin() &&;
+    short *end() &&;
+    int *begin() const&;
+    int *end() const&;
+    long *begin() const&&;
+    long *end() const&&;
+};
 
-
-
-static_assert(std::same_as<std::ranges::sentinel_t<test_range<cpp20_input_iterator> >, sentinel>);
-static_assert(std::same_as<std::ranges::sentinel_t<test_range<cpp20_input_iterator> const>, sentinel>);
-static_assert(std::same_as<std::ranges::sentinel_t<test_non_const_range<cpp20_input_iterator> >, sentinel>);
-static_assert(std::same_as<std::ranges::sentinel_t<test_common_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
-static_assert(std::same_as<std::ranges::sentinel_t<test_common_range<cpp17_input_iterator> const>, cpp17_input_iterator<int const*> >);
-static_assert(std::same_as<std::ranges::sentinel_t<test_non_const_common_range<cpp17_input_iterator> >, cpp17_input_iterator<int*> >);
+static_assert(std::same_as<std::ranges::sentinel_t<Range>, char*>);
+static_assert(std::same_as<std::ranges::sentinel_t<Range&>, char*>);
+static_assert(std::same_as<std::ranges::sentinel_t<Range&&>, char*>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range>, int*>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range&>, int*>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range&&>, int*>);
+static_assert(std::same_as<std::ranges::sentinel_t<int[10]>, int*>);
+static_assert(std::same_as<std::ranges::sentinel_t<int(&)[10]>, int*>);
