@@ -95,23 +95,19 @@ constexpr bool operator==(int* lhs, const cpp20_input_iterator<int*> &rhs) { ret
 struct SizedSentinelView : std::ranges::view_base {
   int count_;
   constexpr explicit SizedSentinelView(int count = 8) : count_(count) {}
-  constexpr auto begin() const { return RandomAccessIter(globalBuff); }
-  constexpr int *end() const { return globalBuff + count_; }
+  constexpr int *begin() const { return globalBuff; }
+  constexpr auto end() const { return sized_sentinel<int*>(globalBuff + count_); }
 };
-// TODO: remove these bogus operators
-constexpr auto operator- (const RandomAccessIter &lhs, int* rhs) { return lhs.base() - rhs; }
-constexpr auto operator- (int* lhs, const RandomAccessIter &rhs) { return lhs - rhs.base(); }
-constexpr bool operator==(const RandomAccessIter &lhs, int* rhs) { return lhs.base() == rhs; }
-constexpr bool operator==(int* lhs, const RandomAccessIter &rhs) { return rhs.base() == lhs; }
 
-struct SizedSentinelNotConstView : std::ranges::view_base {
-  ForwardIter begin() const;
-  int *end() const;
+struct NonConstSizedView : std::ranges::view_base {
+  forward_iterator<int*> begin() const;
+  forward_iterator<int*> end() const;
   size_t size();
 };
-// TODO: remove these bogus operators
-bool operator==(const ForwardIter &lhs, int* rhs);
-bool operator==(int* lhs, const ForwardIter &rhs);
+static_assert( std::ranges::view<NonConstSizedView>);
+static_assert( std::ranges::sized_range<NonConstSizedView>);
+static_assert( std::ranges::range<const NonConstSizedView>);
+static_assert(!std::ranges::sized_range<const NonConstSizedView>);
 
 struct Range {
   int *begin() const;

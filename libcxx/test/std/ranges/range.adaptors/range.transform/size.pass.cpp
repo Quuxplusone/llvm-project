@@ -34,8 +34,8 @@ constexpr bool test() {
 
   static_assert(!SizeInvocable<std::ranges::transform_view<ForwardView, PlusOne>>);
 
-  static_assert(SizeInvocable<std::ranges::transform_view<SizedSentinelNotConstView, PlusOne>>);
-  static_assert(!SizeInvocable<const std::ranges::transform_view<SizedSentinelNotConstView, PlusOne>>);
+  static_assert(SizeInvocable<std::ranges::transform_view<NonConstSizedView, PlusOne>>);
+  static_assert(!SizeInvocable<const std::ranges::transform_view<NonConstSizedView, PlusOne>>);
 
   return true;
 }
