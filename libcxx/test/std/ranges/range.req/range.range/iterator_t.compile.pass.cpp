@@ -29,13 +29,13 @@ static_assert(std::same_as<std::ranges::iterator_t<int(&)[10]>, int*>);
 
 struct Range {
     char *begin() &;
-    sentinel_wrapper<char*> end() &;
+    sentinel<char*> end() &;
     short *begin() &&;
-    sentinel_wrapper<short*> end() &&;
+    sentinel<short*> end() &&;
     int *begin() const&;
-    sentinel_wrapper<int*> end() const&;
+    sentinel<int*> end() const&;
     long *begin() const&&;
-    sentinel_wrapper<long*> end() const&&;
+    sentinel<long*> end() const&&;
 };
 static_assert(std::same_as<std::ranges::iterator_t<Range>, char*>);
 static_assert(std::same_as<std::ranges::iterator_t<Range&>, char*>);

@@ -94,7 +94,7 @@ constexpr void check_sentinel(It it, It last, int const* expected) {
   auto n = (last.base() - it.base());
 
   {
-    auto sent = sentinel_wrapper(last);
+    auto sent = sentinel(last);
     It result = std::ranges::next(std::move(it), sent);
     assert(&*result == expected);
   }
@@ -102,7 +102,7 @@ constexpr void check_sentinel(It it, It last, int const* expected) {
   // Count operations
   {
     auto strided_it = stride_counting_iterator(it);
-    auto sent = sentinel_wrapper(stride_counting_iterator(last));
+    auto sent = sentinel(stride_counting_iterator(last));
     stride_counting_iterator result = std::ranges::next(std::move(strided_it), sent);
     assert(&*result == expected);
     assert(result.stride_count() == n); // must have used ++ until it hit the sentinel

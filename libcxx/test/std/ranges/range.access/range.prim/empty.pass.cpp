@@ -92,7 +92,7 @@ constexpr bool testUsingRangesSize() {
 
 struct BeginEndNotSizedSentinel {
   constexpr int *begin() const { return nullptr; }
-  constexpr auto end() const { return sentinel_wrapper<int*>(nullptr); }
+  constexpr auto end() const { return sentinel<int*>(nullptr); }
 };
 static_assert( std::ranges::forward_range<BeginEndNotSizedSentinel>);
 static_assert(!std::ranges::sized_range<BeginEndNotSizedSentinel>);
@@ -100,7 +100,7 @@ static_assert(!std::ranges::sized_range<BeginEndNotSizedSentinel>);
 // size is disabled here, so we have to compare begin and end.
 struct DisabledSizeRangeWithBeginEnd {
   constexpr int *begin() const { return {}; }
-  constexpr sentinel_wrapper<int*> end() const { return {}; }
+  constexpr sentinel<int*> end() const { return {}; }
   size_t size() const;
 };
 template<>

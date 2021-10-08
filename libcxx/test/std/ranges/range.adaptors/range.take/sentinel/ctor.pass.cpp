@@ -54,11 +54,11 @@ constexpr bool test() {
     // Test the constructor from "base-sentinel" to "sentinel".
     using TakeView = std::ranges::take_view<MoveOnlyView>;
     using Sentinel = std::ranges::sentinel_t<TakeView>;
-    sentinel_wrapper<int*> sw1 = MoveOnlyView(buffer).end();
-    static_assert( std::is_constructible_v<Sentinel, sentinel_wrapper<int*>>);
-    static_assert(!std::is_convertible_v<sentinel_wrapper<int*>, Sentinel>);
+    sentinel<int*> sw1 = MoveOnlyView(buffer).end();
+    static_assert( std::is_constructible_v<Sentinel, sentinel<int*>>);
+    static_assert(!std::is_convertible_v<sentinel<int*>, Sentinel>);
     auto s = Sentinel(sw1);
-    std::same_as<sentinel_wrapper<int*>> auto sw2 = s.base();
+    std::same_as<sentinel<int*>> auto sw2 = s.base();
     assert(base(sw2) == base(sw1));
   }
 

@@ -23,22 +23,22 @@
 struct View : std::ranges::view_base {
   friend int* begin(View&) { return nullptr; }
   friend int* begin(View const&) { return nullptr; }
-  friend sentinel_wrapper<int*> end(View&) { return sentinel_wrapper<int*>(nullptr); }
-  friend sentinel_wrapper<int*> end(View const&) { return sentinel_wrapper<int*>(nullptr); }
+  friend sentinel<int*> end(View&) { return sentinel<int*>(nullptr); }
+  friend sentinel<int*> end(View const&) { return sentinel<int*>(nullptr); }
 };
 
 struct Range {
   friend int* begin(Range&) { return nullptr; }
   friend int* begin(Range const&) { return nullptr; }
-  friend sentinel_wrapper<int*> end(Range&) { return sentinel_wrapper<int*>(nullptr); }
-  friend sentinel_wrapper<int*> end(Range const&) { return sentinel_wrapper<int*>(nullptr); }
+  friend sentinel<int*> end(Range&) { return sentinel<int*>(nullptr); }
+  friend sentinel<int*> end(Range const&) { return sentinel<int*>(nullptr); }
 };
 
 struct BorrowedRange {
   friend int* begin(BorrowedRange&) { return nullptr; }
   friend int* begin(BorrowedRange const&) { return nullptr; }
-  friend sentinel_wrapper<int*> end(BorrowedRange&) { return sentinel_wrapper<int*>(nullptr); }
-  friend sentinel_wrapper<int*> end(BorrowedRange const&) { return sentinel_wrapper<int*>(nullptr); }
+  friend sentinel<int*> end(BorrowedRange&) { return sentinel<int*>(nullptr); }
+  friend sentinel<int*> end(BorrowedRange const&) { return sentinel<int*>(nullptr); }
 };
 
 template<>
@@ -63,7 +63,7 @@ int main(int, char**) {
     (void)x;
   }
   {
-    using Subrange = std::ranges::subrange<int *, sentinel_wrapper<int *>, std::ranges::subrange_kind::unsized>;
+    using Subrange = std::ranges::subrange<int *, sentinel<int *>, std::ranges::subrange_kind::unsized>;
     std::same_as<std::ranges::reverse_view<Subrange>> auto x = std::ranges::reverse_view(std::move(br));
     (void)x;
   }

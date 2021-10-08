@@ -20,4 +20,4 @@ namespace ranges = std::ranges;
 
 static_assert(ranges::borrowed_range<ranges::subrange<int*>>);
 static_assert(ranges::borrowed_range<ranges::subrange<int*, int const*>>);
-static_assert(ranges::borrowed_range<ranges::subrange<int*, sentinel_wrapper<int*>, ranges::subrange_kind::unsized>>);
+static_assert(ranges::borrowed_range<ranges::subrange<int*, sentinel<int*>, ranges::subrange_kind::unsized>>);

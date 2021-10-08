@@ -86,7 +86,7 @@ struct InputView : std::ranges::view_base {
   int *ptr_;
   constexpr explicit InputView(int* ptr = globalBuff) : ptr_(ptr) {}
   constexpr auto begin() const { return cpp20_input_iterator<int*>(ptr_); }
-  constexpr auto end() const { return sentinel_wrapper<cpp20_input_iterator<int*>>(cpp20_input_iterator<int*>(ptr_ + 8)); }
+  constexpr auto end() const { return sentinel<cpp20_input_iterator<int*>>(cpp20_input_iterator<int*>(ptr_ + 8)); }
 };
 static_assert( std::ranges::view<InputView>);
 static_assert(!std::ranges::sized_range<InputView>);

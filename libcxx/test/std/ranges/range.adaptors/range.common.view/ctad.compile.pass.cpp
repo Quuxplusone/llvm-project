@@ -20,17 +20,17 @@
 
 struct View : std::ranges::view_base {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 
 struct Range {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 
 struct BorrowedRange {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 template<>
 inline constexpr bool std::ranges::enable_borrowed_range<BorrowedRange> = true;
@@ -55,6 +55,6 @@ void testCTAD() {
     static_assert(std::same_as<
         decltype(std::ranges::common_view(std::move(br))),
         std::ranges::common_view<std::ranges::subrange<
-          int *, sentinel_wrapper<int *>, std::ranges::subrange_kind::unsized>>
+          int *, sentinel<int *>, std::ranges::subrange_kind::unsized>>
     >);
 }

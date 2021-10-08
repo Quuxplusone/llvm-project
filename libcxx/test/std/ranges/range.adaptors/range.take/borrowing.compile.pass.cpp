@@ -21,15 +21,15 @@
 struct View : std::ranges::view_base {
   friend int* begin(View&);
   friend int* begin(View const&);
-  friend sentinel_wrapper<int*> end(View&);
-  friend sentinel_wrapper<int*> end(View const&);
+  friend sentinel<int*> end(View&);
+  friend sentinel<int*> end(View const&);
 };
 
 struct BorrowableView : std::ranges::view_base {
   friend int* begin(BorrowableView&);
   friend int* begin(BorrowableView const&);
-  friend sentinel_wrapper<int*> end(BorrowableView&);
-  friend sentinel_wrapper<int*> end(BorrowableView const&);
+  friend sentinel<int*> end(BorrowableView&);
+  friend sentinel<int*> end(BorrowableView const&);
 };
 
 template<>

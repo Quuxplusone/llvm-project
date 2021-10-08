@@ -20,12 +20,12 @@
 
 struct View : std::ranges::view_base {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 
 struct BorrowableView : std::ranges::view_base {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 template<>
 inline constexpr bool std::ranges::enable_borrowed_range<BorrowableView> = true;

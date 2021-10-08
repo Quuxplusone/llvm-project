@@ -22,24 +22,24 @@ struct View : std::ranges::view_base {
   // All friends here are defined to prevent GCC warnings.
   friend T* begin(View&) { return nullptr; }
   friend T* begin(View const&) { return nullptr; }
-  friend sentinel_wrapper<T*> end(View&) { return sentinel_wrapper<T*>(nullptr); }
-  friend sentinel_wrapper<T*> end(View const&) { return sentinel_wrapper<T*>(nullptr); }
+  friend sentinel<T*> end(View&) { return sentinel<T*>(nullptr); }
+  friend sentinel<T*> end(View const&) { return sentinel<T*>(nullptr); }
 };
 
 template<class T>
 struct Range {
   friend T* begin(Range&) { return nullptr; }
   friend T* begin(Range const&) { return nullptr; }
-  friend sentinel_wrapper<T*> end(Range&) { return sentinel_wrapper<T*>(nullptr); }
-  friend sentinel_wrapper<T*> end(Range const&) { return sentinel_wrapper<T*>(nullptr); }
+  friend sentinel<T*> end(Range&) { return sentinel<T*>(nullptr); }
+  friend sentinel<T*> end(Range const&) { return sentinel<T*>(nullptr); }
 };
 
 template<class T>
 struct BorrowedRange {
   friend T* begin(BorrowedRange&) { return nullptr; }
   friend T* begin(BorrowedRange const&) { return nullptr; }
-  friend sentinel_wrapper<T*> end(BorrowedRange&) { return sentinel_wrapper<T*>(nullptr); }
-  friend sentinel_wrapper<T*> end(BorrowedRange const&) { return sentinel_wrapper<T*>(nullptr); }
+  friend sentinel<T*> end(BorrowedRange&) { return sentinel<T*>(nullptr); }
+  friend sentinel<T*> end(BorrowedRange const&) { return sentinel<T*>(nullptr); }
 };
 
 template<>
@@ -66,7 +66,7 @@ void testCTAD() {
     static_assert(std::same_as<
         decltype(std::ranges::join_view(std::move(br))),
         std::ranges::join_view<std::ranges::subrange<BorrowedRange<int> *,
-                               sentinel_wrapper<BorrowedRange<int> *>,
+                               sentinel<BorrowedRange<int> *>,
                                std::ranges::subrange_kind::unsized>>
     >);
 }

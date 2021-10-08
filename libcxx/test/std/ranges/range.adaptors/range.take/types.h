@@ -15,7 +15,7 @@ struct MoveOnlyView : std::ranges::view_base {
   MoveOnlyView& operator=(MoveOnlyView&&) = default;
 
   constexpr int* begin() const {return ptr_;}
-  constexpr sentinel_wrapper<int*> end() const {return sentinel_wrapper<int*>{ptr_ + 8};}
+  constexpr sentinel<int*> end() const {return sentinel<int*>{ptr_ + 8};}
 };
 static_assert( std::ranges::view<MoveOnlyView>);
 static_assert( std::ranges::contiguous_range<MoveOnlyView>);
@@ -26,7 +26,7 @@ struct CopyableView : std::ranges::view_base {
   constexpr explicit CopyableView(int* ptr) : ptr_(ptr) {}
 
   constexpr int* begin() const {return ptr_;}
-  constexpr sentinel_wrapper<int*> end() const {return sentinel_wrapper<int*>{ptr_ + 8};}
+  constexpr sentinel<int*> end() const {return sentinel<int*>{ptr_ + 8};}
 };
 static_assert(std::ranges::view<CopyableView>);
 static_assert(std::ranges::contiguous_range<CopyableView>);

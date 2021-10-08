@@ -29,20 +29,20 @@ static_assert(std::same_as<std::ranges::sentinel_t<int(&)[10]>, int*>);
 
 struct Range {
     char *begin() &;
-    sentinel_wrapper<char*> end() &;
+    sentinel<char*> end() &;
     short *begin() &&;
-    sentinel_wrapper<short*> end() &&;
+    sentinel<short*> end() &&;
     int *begin() const&;
-    sentinel_wrapper<int*> end() const&;
+    sentinel<int*> end() const&;
     long *begin() const&&;
-    sentinel_wrapper<long*> end() const&&;
+    sentinel<long*> end() const&&;
 };
-static_assert(std::same_as<std::ranges::sentinel_t<Range>, sentinel_wrapper<char*>>);
-static_assert(std::same_as<std::ranges::sentinel_t<Range&>, sentinel_wrapper<char*>>);
-static_assert(std::same_as<std::ranges::sentinel_t<Range&&>, sentinel_wrapper<char*>>);
-static_assert(std::same_as<std::ranges::sentinel_t<const Range>, sentinel_wrapper<int*>>);
-static_assert(std::same_as<std::ranges::sentinel_t<const Range&>, sentinel_wrapper<int*>>);
-static_assert(std::same_as<std::ranges::sentinel_t<const Range&&>, sentinel_wrapper<int*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<Range>, sentinel<char*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<Range&>, sentinel<char*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<Range&&>, sentinel<char*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range>, sentinel<int*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range&>, sentinel<int*>>);
+static_assert(std::same_as<std::ranges::sentinel_t<const Range&&>, sentinel<int*>>);
 
 struct NonConstRange {
     int *begin();

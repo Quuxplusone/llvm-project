@@ -83,7 +83,7 @@ template <std::input_or_output_iterator It>
 constexpr void check_forward(std::ptrdiff_t n, expected_t expected, range_t& range) {
   using Difference = std::iter_difference_t<It>;
   auto current = stride_counting_iterator(It(range.begin()));
-  Difference const result = std::ranges::advance(current, n, sentinel_wrapper(It(range.end())));
+  Difference const result = std::ranges::advance(current, n, sentinel(It(range.end())));
   assert(current.base().base() == expected.coordinate);
   assert(result == expected.result);
   assert(current.stride_count() == n - result);

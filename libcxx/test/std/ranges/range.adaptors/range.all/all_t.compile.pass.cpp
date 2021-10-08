@@ -37,5 +37,5 @@ ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange&>, std::ranges::ref_view<Borr
 ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange const&>, std::ranges::ref_view<BorrowableRange const>);
 
 // Otherwise, returns subrange<iterator_t<T>, sentinel_t<R>>
-ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange>, std::ranges::subrange<forward_iterator<int*>, sentinel_wrapper<forward_iterator<int*>>>);
-ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange const>, std::ranges::subrange<forward_iterator<const int*>, sentinel_wrapper<forward_iterator<const int*>>>);
+ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange>, std::ranges::subrange<forward_iterator<int*>, sentinel<forward_iterator<int*>>>);
+ASSERT_SAME_TYPE(std::views::all_t<BorrowableRange const>, std::ranges::subrange<forward_iterator<const int*>, sentinel<forward_iterator<const int*>>>);

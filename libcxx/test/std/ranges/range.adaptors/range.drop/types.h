@@ -77,7 +77,7 @@ inline constexpr bool std::ranges::enable_borrowed_range<BorrowableView> = true;
 
 struct InputView : std::ranges::view_base {
   constexpr auto begin() const { return cpp20_input_iterator<int*>(globalBuff); }
-  constexpr auto end() const { return sentinel_wrapper<cpp20_input_iterator<int*>>(cpp20_input_iterator<int*>(globalBuff + 8)); }
+  constexpr auto end() const { return sentinel<cpp20_input_iterator<int*>>(cpp20_input_iterator<int*>(globalBuff + 8)); }
 };
 
 struct Range {

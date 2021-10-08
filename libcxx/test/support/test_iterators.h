@@ -865,12 +865,12 @@ concept sentinel_for_base = requires(U const& u) {
 };
 
 template <class It>
-class sentinel_wrapper {
+class sentinel {
 public:
-    sentinel_wrapper() = default;
-    constexpr explicit sentinel_wrapper(const It& it) : base_(base(it)) {}
+    sentinel() = default;
+    constexpr explicit sentinel(const It& it) : base_(base(it)) {}
     constexpr bool operator==(const It& other) const { return base_ == base(other); }
-    friend constexpr auto base(const sentinel_wrapper& s) { return It(s.base_); }
+    friend constexpr auto base(const sentinel& s) { return It(s.base_); }
 private:
     decltype(base(std::declval<It>())) base_;
 };

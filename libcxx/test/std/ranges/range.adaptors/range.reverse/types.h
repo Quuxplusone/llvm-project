@@ -31,8 +31,8 @@ static_assert( std::copyable<BidirRange>);
 enum CopyCategory { MoveOnly, Copyable };
 template<CopyCategory CC>
 struct BidirSentRange : std::ranges::view_base {
-  using sent_t = sentinel_wrapper<bidirectional_iterator<int*>>;
-  using sent_const_t = sentinel_wrapper<bidirectional_iterator<const int*>>;
+  using sent_t = sentinel<bidirectional_iterator<int*>>;
+  using sent_const_t = sentinel<bidirectional_iterator<const int*>>;
 
   int* begin_;
   int* end_;

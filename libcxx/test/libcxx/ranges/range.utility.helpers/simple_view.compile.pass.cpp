@@ -36,7 +36,7 @@ struct NoConstView : std::ranges::view_base {
 
 struct DifferentSentinel : std::ranges::view_base {
   int *begin() const;
-  sentinel_wrapper<int*> end() const;
+  sentinel<int*> end() const;
 };
 
 static_assert( std::ranges::__simple_view<SimpleView>);

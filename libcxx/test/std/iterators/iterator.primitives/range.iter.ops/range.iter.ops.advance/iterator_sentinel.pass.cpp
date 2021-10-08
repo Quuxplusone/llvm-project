@@ -74,7 +74,7 @@ constexpr void check_sentinel_case(std::ptrdiff_t const n) {
   auto range = range_t{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
   auto first = stride_counting_iterator(It(range.begin()));
   auto const last = It(range.begin() + n);
-  std::ranges::advance(first, sentinel_wrapper(last));
+  std::ranges::advance(first, sentinel(last));
   assert(first.base() == last);
   assert(first.stride_count() == n);
 }

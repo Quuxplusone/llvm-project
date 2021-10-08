@@ -24,7 +24,7 @@
 
 struct MutableView : std::ranges::view_base {
   int* begin();
-  sentinel_wrapper<int*> end();
+  sentinel<int*> end();
 };
 
 template<class View>
@@ -76,7 +76,7 @@ int main(int, char**) {
   {
     MoveOnlyView view{buf, buf + 8};
     std::ranges::common_view<MoveOnlyView> common(std::move(view));
-    using CommonIter = std::common_iterator<int*, sentinel_wrapper<int*>>;
+    using CommonIter = std::common_iterator<int*, sentinel<int*>>;
     std::same_as<CommonIter> auto begin = common.begin();
     assert(begin == std::ranges::begin(view));
   }
@@ -84,7 +84,7 @@ int main(int, char**) {
   {
     CopyableView view{buf, buf + 8};
     std::ranges::common_view<CopyableView> const common(view);
-    using CommonIter = std::common_iterator<int*, sentinel_wrapper<int*>>;
+    using CommonIter = std::common_iterator<int*, sentinel<int*>>;
     std::same_as<CommonIter> auto begin = common.begin();
     assert(begin == std::ranges::begin(view));
   }

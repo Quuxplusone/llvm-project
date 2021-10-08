@@ -57,13 +57,13 @@ struct CountedView : std::ranges::view_base {
 
   auto begin() { return CountedIter(begin_); }
   auto begin() const { return CountedIter(begin_); }
-  auto end() { return sentinel_wrapper<CountedIter>(CountedIter(end_)); }
-  auto end() const { return sentinel_wrapper<CountedIter>(CountedIter(end_)); }
+  auto end() { return sentinel<CountedIter>(CountedIter(end_)); }
+  auto end() const { return sentinel<CountedIter>(CountedIter(end_)); }
 };
 
 struct RASentRange : std::ranges::view_base {
-  using sent_t = sentinel_wrapper<random_access_iterator<int*>>;
-  using sent_const_t = sentinel_wrapper<random_access_iterator<const int*>>;
+  using sent_t = sentinel<random_access_iterator<int*>>;
+  using sent_const_t = sentinel<random_access_iterator<const int*>>;
 
   int* begin_;
   int* end_;

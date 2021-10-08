@@ -18,7 +18,7 @@ struct DefaultConstructibleView : std::ranges::view_base {
   int* end_ = nullptr;
   explicit DefaultConstructibleView() = default;
   constexpr int *begin() const { return begin_; }
-  constexpr auto end() const { return sentinel_wrapper<int*>(end_); }
+  constexpr auto end() const { return sentinel<int*>(end_); }
 };
 static_assert(std::ranges::view<DefaultConstructibleView>);
 static_assert(std::default_initializable<DefaultConstructibleView>);
@@ -30,7 +30,7 @@ struct MoveOnlyView : std::ranges::view_base {
   constexpr MoveOnlyView(MoveOnlyView&&) = default;
   constexpr MoveOnlyView& operator=(MoveOnlyView&&) = default;
   constexpr int *begin() const { return begin_; }
-  constexpr auto end() const { return sentinel_wrapper<int*>(end_); }
+  constexpr auto end() const { return sentinel<int*>(end_); }
 };
 static_assert( std::ranges::view<MoveOnlyView>);
 static_assert( std::ranges::contiguous_range<MoveOnlyView>);
@@ -41,7 +41,7 @@ struct CopyableView : std::ranges::view_base {
   int* end_;
   constexpr explicit CopyableView(int* b, int* e) : begin_(b), end_(e) { }
   constexpr int *begin() const { return begin_; }
-  constexpr auto end() const { return sentinel_wrapper<int*>(end_); }
+  constexpr auto end() const { return sentinel<int*>(end_); }
 };
 static_assert(std::ranges::view<CopyableView>);
 static_assert(std::copyable<CopyableView>);
@@ -85,7 +85,7 @@ struct NonCommonView : std::ranges::view_base {
   int* end_;
   constexpr explicit NonCommonView(int* b, int* e) : begin_(b), end_(e) { }
   constexpr int *begin() const { return begin_; }
-  constexpr auto end() const { return sentinel_wrapper<int*>(end_); }
+  constexpr auto end() const { return sentinel<int*>(end_); }
 };
 static_assert( std::ranges::view<NonCommonView>);
 static_assert(!std::ranges::common_range<NonCommonView>);

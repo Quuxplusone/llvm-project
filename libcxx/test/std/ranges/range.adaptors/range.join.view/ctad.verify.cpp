@@ -23,8 +23,8 @@ template<class T>
 struct Range {
   friend T* begin(Range&) { return nullptr; }
   friend T* begin(Range const&) { return nullptr; }
-  friend sentinel_wrapper<T*> end(Range&) { return sentinel_wrapper<T*>(nullptr); }
-  friend sentinel_wrapper<T*> end(Range const&) { return sentinel_wrapper<T*>(nullptr); }
+  friend sentinel<T*> end(Range&) { return sentinel<T*>(nullptr); }
+  friend sentinel<T*> end(Range const&) { return sentinel<T*>(nullptr); }
 };
 
 void testExplicitCTAD() {
