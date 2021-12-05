@@ -36,6 +36,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 namespace ranges::views {
 
 namespace __counted {
+
   template<class _From, class _To>
   concept __explicitly_convertible = requires {
     _To(_From{});
@@ -79,7 +80,8 @@ namespace __counted {
       return ranges::subrange(counted_iterator(_VSTD::forward<_Iter>(__it), __c), default_sentinel);
     }
   };
-}
+
+} // namespace __counted
 
 inline namespace __cpo {
   inline constexpr auto counted = __counted::__fn{};

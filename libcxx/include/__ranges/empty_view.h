@@ -32,6 +32,10 @@ namespace ranges {
     _LIBCPP_HIDE_FROM_ABI static constexpr size_t size() noexcept { return 0; }
     _LIBCPP_HIDE_FROM_ABI static constexpr bool empty() noexcept { return true; }
   };
+
+  template<class> struct __is_empty_view : false_type {};
+  template<class _Tp> struct __is_empty_view<empty_view<_Tp>> : true_type {};
+
 } // namespace ranges
 
 #endif // !defined(_LIBCPP_HAS_NO_RANGES)
