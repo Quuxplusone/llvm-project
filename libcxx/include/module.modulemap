@@ -762,6 +762,7 @@ module std [system] {
       module counted                { private header "__ranges/counted.h"               }
       module dangling               { private header "__ranges/dangling.h"              }
       module data                   { private header "__ranges/data.h"                  }
+      module drop                   { private header "__ranges/drop.h"                  }
       module drop_view              { private header "__ranges/drop_view.h"             }
       module empty                  { private header "__ranges/empty.h"                 }
       module empty_view             { private header "__ranges/empty_view.h"            }
