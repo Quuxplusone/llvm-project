@@ -720,6 +720,7 @@ template <class BidirectionalIterator, class Compare>
 #include <__algorithm/pop_heap.h>
 #include <__algorithm/prev_permutation.h>
 #include <__algorithm/push_heap.h>
+#include <__algorithm/ranges_equal.h>
 #include <__algorithm/remove.h>
 #include <__algorithm/remove_copy.h>
 #include <__algorithm/remove_copy_if.h>

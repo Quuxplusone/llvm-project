@@ -59,6 +59,7 @@ set(files
   __algorithm/pop_heap.h
   __algorithm/prev_permutation.h
   __algorithm/push_heap.h
+  __algorithm/ranges_equal.h
   __algorithm/remove_copy_if.h
   __algorithm/remove_copy.h
   __algorithm/remove_if.h
