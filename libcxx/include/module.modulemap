@@ -598,6 +598,7 @@ module std [system] {
         export __function_like
       }
       module projected             { private header "__iterator/projected.h" }
+      module ranges_distance       { private header "__iterator/ranges_distance.h" }
       module readable_traits       { private header "__iterator/readable_traits.h" }
       module reverse_access        { private header "__iterator/reverse_access.h" }
       module reverse_iterator      { private header "__iterator/reverse_iterator.h" }

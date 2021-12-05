@@ -610,6 +610,7 @@ template <class E> constexpr const E* data(initializer_list<E> il) noexcept;    
 #include <__iterator/ostream_iterator.h>
 #include <__iterator/prev.h>
 #include <__iterator/projected.h>
+#include <__iterator/ranges_distance.h>
 #include <__iterator/readable_traits.h>
 #include <__iterator/reverse_access.h>
 #include <__iterator/reverse_iterator.h>
