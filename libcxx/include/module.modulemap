@@ -564,6 +564,7 @@ module std [system] {
         private header "__iterator/advance.h"
         export __function_like
       }
+      module algorithm_concepts    { private header "__iterator/algorithm_concepts.h" }
       module back_insert_iterator  { private header "__iterator/back_insert_iterator.h" }
       module common_iterator       { private header "__iterator/common_iterator.h" }
       module concepts              { private header "__iterator/concepts.h" }
@@ -575,6 +576,7 @@ module std [system] {
       module erase_if_container    { private header "__iterator/erase_if_container.h" }
       module front_insert_iterator { private header "__iterator/front_insert_iterator.h" }
       module incrementable_traits  { private header "__iterator/incrementable_traits.h" }
+      module indirectly_copyable   { private header "__iterator/indirectly_copyable.h" }
       module indirectly_movable    { private header "__iterator/indirectly_movable.h" }
       module indirectly_swappable  { private header "__iterator/indirectly_swappable.h" }
       module insert_iterator       { private header "__iterator/insert_iterator.h" }

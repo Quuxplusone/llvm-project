@@ -188,6 +188,7 @@ set(files
   __hash_table
   __iterator/access.h
   __iterator/advance.h
+  __iterator/algorithm_concepts.h
   __iterator/back_insert_iterator.h
   __iterator/common_iterator.h
   __iterator/concepts.h
@@ -199,6 +200,7 @@ set(files
   __iterator/erase_if_container.h
   __iterator/front_insert_iterator.h
   __iterator/incrementable_traits.h
+  __iterator/indirectly_copyable.h
   __iterator/indirectly_movable.h
   __iterator/indirectly_swappable.h
   __iterator/insert_iterator.h

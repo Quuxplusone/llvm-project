@@ -582,6 +582,7 @@ template <class E> constexpr const E* data(initializer_list<E> il) noexcept;    
 #include <__functional_base>
 #include <__iterator/access.h>
 #include <__iterator/advance.h>
+#include <__iterator/algorithm_concepts.h>
 #include <__iterator/back_insert_iterator.h>
 #include <__iterator/common_iterator.h>
 #include <__iterator/concepts.h>
@@ -593,6 +594,7 @@ template <class E> constexpr const E* data(initializer_list<E> il) noexcept;    
 #include <__iterator/erase_if_container.h>
 #include <__iterator/front_insert_iterator.h>
 #include <__iterator/incrementable_traits.h>
+#include <__iterator/indirectly_copyable.h>
 #include <__iterator/indirectly_movable.h>
 #include <__iterator/indirectly_swappable.h>
 #include <__iterator/insert_iterator.h>
