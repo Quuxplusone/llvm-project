@@ -14,6 +14,7 @@
 #include <__debug>
 #include <__iterator/concepts.h>
 #include <__iterator/incrementable_traits.h>
+#include <__iterator/indirectly_swappable.h>
 #include <__iterator/iter_move.h>
 #include <__iterator/iter_swap.h>
 #include <__iterator/iterator_traits.h>

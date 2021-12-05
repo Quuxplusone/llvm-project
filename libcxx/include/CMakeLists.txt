@@ -199,6 +199,8 @@ set(files
   __iterator/erase_if_container.h
   __iterator/front_insert_iterator.h
   __iterator/incrementable_traits.h
+  __iterator/indirectly_movable.h
+  __iterator/indirectly_swappable.h
   __iterator/insert_iterator.h
   __iterator/istream_iterator.h
   __iterator/istreambuf_iterator.h

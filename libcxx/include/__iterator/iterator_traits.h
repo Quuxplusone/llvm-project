@@ -10,10 +10,16 @@
 #ifndef _LIBCPP___ITERATOR_ITERATOR_TRAITS_H
 #define _LIBCPP___ITERATOR_ITERATOR_TRAITS_H
 
+#include <__concepts/arithmetic.h>
+#include <__concepts/constructible.h>
+#include <__concepts/convertible_to.h>
+#include <__concepts/copyable.h>
+#include <__concepts/equality_comparable.h>
+#include <__concepts/same_as.h>
+#include <__concepts/totally_ordered.h>
 #include <__config>
 #include <__iterator/incrementable_traits.h>
 #include <__iterator/readable_traits.h>
-#include <concepts>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)

@@ -10,14 +10,15 @@
 #define _LIBCPP___ITERATOR_ITER_SWAP_H
 
 #include <__config>
+#include <__concepts/swappable.h>
 #include <__iterator/concepts.h>
+#include <__iterator/indirectly_movable.h>
 #include <__iterator/iter_move.h>
 #include <__iterator/iterator_traits.h>
 #include <__iterator/readable_traits.h>
 #include <__ranges/access.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
-#include <concepts>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -86,16 +87,6 @@ inline namespace __cpo {
 } // namespace __cpo
 
 } // namespace ranges
-
-template<class _I1, class _I2 = _I1>
-concept indirectly_swappable =
-  indirectly_readable<_I1> && indirectly_readable<_I2> &&
-  requires(const _I1 __i1, const _I2 __i2) {
-    ranges::iter_swap(__i1, __i1);
-    ranges::iter_swap(__i2, __i2);
-    ranges::iter_swap(__i1, __i2);
-    ranges::iter_swap(__i2, __i1);
-  };
 
 #endif // !defined(_LIBCPP_HAS_NO_RANGES)
 

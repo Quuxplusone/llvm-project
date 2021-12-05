@@ -11,6 +11,7 @@
 
 #include <__config>
 #include <__iterator/concepts.h>
+#include <__iterator/indirectly_swappable.h>
 #include <__iterator/iterator_traits.h>
 #include <__ranges/access.h>
 #include <__ranges/all.h>

@@ -243,22 +243,6 @@ template<class _Fp, class... _Its>
   requires (indirectly_readable<_Its> && ...) && invocable<_Fp, iter_reference_t<_Its>...>
 using indirect_result_t = invoke_result_t<_Fp, iter_reference_t<_Its>...>;
 
-template<class _In, class _Out>
-concept indirectly_movable =
-  indirectly_readable<_In> &&
-  indirectly_writable<_Out, iter_rvalue_reference_t<_In>>;
-
-template<class _In, class _Out>
-concept indirectly_movable_storable =
-  indirectly_movable<_In, _Out> &&
-  indirectly_writable<_Out, iter_value_t<_In>> &&
-  movable<iter_value_t<_In>> &&
-  constructible_from<iter_value_t<_In>, iter_rvalue_reference_t<_In>> &&
-  assignable_from<iter_value_t<_In>&, iter_rvalue_reference_t<_In>>;
-
-// Note: indirectly_swappable is located in iter_swap.h to prevent a dependency cycle
-// (both iter_swap and indirectly_swappable require indirectly_readable).
-
 // clang-format on
 
 #endif // !defined(_LIBCPP_HAS_NO_RANGES)
