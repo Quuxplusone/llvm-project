@@ -36,7 +36,8 @@
 void f() {
     long double ld = 3.14;
     (void)std::strong_order(ld, ld);
-        // expected-error@*:* {{std::strong_order is unimplemented for this floating-point type}}
-        // expected-note@*:* {{in instantiation of function template specialization}}
-        // expected-note@*:* {{in instantiation of function template specialization}}
+        // expected-error@-1 {{no matching function for call}}
+        // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
+        // expected-note@*:* {{because 'long double &' does not satisfy '__strong_order_for_long_double_is_not_yet_implemented'}}
+        // expected-note@*:* {{because '!is_same_v<decay_t<long double &>, long double>' evaluated to false}}
 }
