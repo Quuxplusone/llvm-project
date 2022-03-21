@@ -16,75 +16,37 @@
 
 void nonclasstype() {
   std::ranges::begin(42);
-  // expected-error@-1 {{call to deleted function call operator}}
-  // expected-note@*:* {{candidate function [with auto:1 = int] has been explicitly deleted}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
+  // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'int' does not satisfy '__member_begin'}}
-  // expected-note@*:* {{because 'int' does not satisfy '__can_borrow'}}
-  // expected-note@*:* {{because 'is_lvalue_reference_v<int>' evaluated to false}}
-  // expected-note@*:* {{and 'enable_borrowed_range<remove_cvref_t<int> >' evaluated to false}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'int' does not satisfy '__unqualified_begin'}}
-  // expected-note@*:* {{because 'int' does not satisfy '__can_borrow'}}
-  // expected-note@*:* {{because 'is_lvalue_reference_v<int>' evaluated to false}}
-  // expected-note@*:* {{and 'enable_borrowed_range<remove_cvref_t<int> >' evaluated to false}}
-  // expected-error@-15 {{attempt to use a deleted function}}
-  // expected-note@*:* {{'operator()<int>' has been explicitly marked deleted here}}
+  // expected-note@*:* {{because 'remove_cvref_t<int>' (aka 'int') does not satisfy '__class_or_enum'}}
+  // expected-note@*:* {{because '_Bool(is_class_v<int> || is_union_v<int> || is_enum_v<int>)' evaluated to false}}
+  // expected-note@*:* {{and 'is_array_v<remove_reference_t<int> >' evaluated to false}}
 }
 
 void classtype() {
   struct S {} s;
   std::ranges::begin(s);
-  // expected-error@-1 {{call to deleted function call operator}}
-  // expected-note@*:* {{candidate function [with auto:1 = S &] has been explicitly deleted}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
+  // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__member_begin'}}
-  // expected-note@*:* {{because 'static_cast<typename decay<decltype((__t.begin()))>::type>(__t.begin())' would be invalid}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__unqualified_begin'}}
-  // expected-note@*:* {{because 'static_cast<typename decay<decltype((begin(__t)))>::type>(begin(__t))' would be invalid}}
-  // expected-error@-11 {{attempt to use a deleted function}}
-  // expected-note@*:* {{'operator()<S &>' has been explicitly marked deleted here}}
+  // expected-note@*:* {{because '__t.begin()' would be invalid}}
+  // expected-note@*:* {{and 'begin(__t)' would be invalid}}
+  // expected-note@*:* {{and 'is_array_v<remove_reference_t<S &> >' evaluated to false}}
 }
 
 void baditerator() {
   struct S { int begin(); } s;
   std::ranges::begin(s);
-  // expected-error@-1 {{call to deleted function call operator}}
-  // expected-note@*:* {{candidate function [with auto:1 = S &] has been explicitly deleted}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
+  // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__member_begin'}}
-  // expected-note@*:* {{because 'typename decay<decltype((__t.begin()))>::type' (aka 'int') does not satisfy 'input_or_output_iterator'}}
+  // expected-note@*:* {{because '::std::__decay_t<decltype((__t.begin()))>' (aka 'int') does not satisfy 'input_or_output_iterator'}}
   // expected-note@*:* {{because '*__i' would be invalid}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__unqualified_begin'}}
-  // expected-note@*:* {{because 'static_cast<typename decay<decltype((begin(__t)))>::type>(begin(__t))' would be invalid}}
-  // expected-error@-12 {{attempt to use a deleted function}}
-  // expected-note@*:* {{'operator()<S &>' has been explicitly marked deleted here}}
+  // expected-note@*:* {{and 'begin(__t)' would be invalid}}
+  // expected-note@*:* {{and 'is_array_v<remove_reference_t<S &> >' evaluated to false}}
 }
 
 void rvalue() {
   std::ranges::begin(std::string());
-  // expected-error@-1 {{call to deleted function call operator}}
-  // expected-note@*:* {{candidate function [with auto:1 = std::string] has been explicitly deleted}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
-  // expected-note@*:* {{candidate template ignored: could not match}}
+  // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'std::string' does not satisfy '__member_begin'}}
-  // expected-note@*:* {{because 'std::string' does not satisfy '__can_borrow'}}
-  // expected-note@*:* {{because 'is_lvalue_reference_v<std::string>' evaluated to false}}
-  // expected-note@*:* {{and 'enable_borrowed_range<remove_cvref_t<string> >' evaluated to false}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'std::string' does not satisfy '__unqualified_begin'}}
-  // expected-note@*:* {{because 'std::string' does not satisfy '__can_borrow'}}
-  // expected-note@*:* {{because 'is_lvalue_reference_v<std::string>' evaluated to false}}
-  // expected-note@*:* {{and 'enable_borrowed_range<remove_cvref_t<string> >' evaluated to false}}
-  // expected-error@-15 {{attempt to use a deleted function}}
-  // expected-note@*:* {{'operator()<std::string>' has been explicitly marked deleted here}}
+  // expected-note@*:* {{because '__go(std::forward<_Tp>(__t), __priority_tag<3>())' would be invalid}}
 }

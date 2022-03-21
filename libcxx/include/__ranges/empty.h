@@ -15,6 +15,11 @@
 #include <__iterator/concepts.h>
 #include <__ranges/access.h>
 #include <__ranges/size.h>
+#include <__type_traits/enable_if.h>
+#include <__type_traits/remove_reference.h>
+#include <__utility/declval.h>
+#include <__utility/forward.h>
+#include <__utility/priority_tag.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -28,35 +33,48 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 namespace ranges {
 namespace __empty {
-template <class _Tp>
-concept __member_empty = requires(_Tp&& __t) { bool(__t.empty()); };
-
-template <class _Tp>
-concept __can_invoke_size = !__member_empty<_Tp> && requires(_Tp&& __t) { ranges::size(__t); };
-
-template <class _Tp>
-concept __can_compare_begin_end = !__member_empty<_Tp> && !__can_invoke_size<_Tp> && requires(_Tp&& __t) {
-  bool(ranges::begin(__t) == ranges::end(__t));
-  { ranges::begin(__t) } -> forward_iterator;
-};
-
 struct __fn {
-  template <__member_empty _Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr bool operator()(_Tp&& __t) const noexcept(noexcept(bool(__t.empty()))) {
-    return bool(__t.empty());
-  }
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<2>)
+    noexcept(noexcept(bool(__t.empty())))
+    -> decltype(      bool(__t.empty()))
+    { return          bool(__t.empty()); }
 
-  template <__can_invoke_size _Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr bool operator()(_Tp&& __t) const noexcept(noexcept(ranges::size(__t))) {
-    return ranges::size(__t) == 0;
-  }
+  template <class _Tp>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<1>)
+    noexcept(noexcept(ranges::size(__t) == 0))
+    -> decltype(      ranges::size(__t) == 0)
+    { return          ranges::size(__t) == 0; }
 
-  template <__can_compare_begin_end _Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr bool operator()(_Tp&& __t) const
-      noexcept(noexcept(bool(ranges::begin(__t) == ranges::end(__t)))) {
-    return ranges::begin(__t) == ranges::end(__t);
-  }
-};
+  template <class _Tp, class _It = decltype(ranges::begin(declval<_Tp&>()))>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<0>)
+    noexcept(noexcept(bool(ranges::begin(__t) == ranges::end(__t))))
+    -> decltype(      bool(ranges::begin(__t) == ranges::end(__t)))
+    requires forward_iterator<_It>
+    { return          bool(ranges::begin(__t) == ranges::end(__t)); }
+
+  template <class _Tp>
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr
+  decltype(auto) operator()(_Tp&& __t) const
+    noexcept(noexcept(__go(std::forward<_Tp>(__t), __priority_tag<2>())))
+    requires (
+      requires {
+        requires __class_or_enum<remove_reference_t<_Tp>>;
+        __t.empty();
+      } ||
+      requires {
+        ranges::size(__t) == 0;
+      } ||
+      requires {
+        ranges::begin(__t) == ranges::end(__t);
+        { ranges::begin(__t) } -> forward_iterator;
+      }
+    ) && requires {   __go(std::forward<_Tp>(__t), __priority_tag<2>()); }
+    { return          __go(std::forward<_Tp>(__t), __priority_tag<2>()); }
+  };
 } // namespace __empty
 
 inline namespace __cpo {
