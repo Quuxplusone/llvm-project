@@ -56,10 +56,25 @@ namespace __partial_order {
             { return          partial_ordering(_VSTD::weak_order(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u))); }
 
         template<class _Tp, class _Up>
-        _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t, _Up&& __u) const
-            noexcept(noexcept(__go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>())))
-            -> decltype(      __go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>()))
-            { return          __go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>()); }
+        _LIBCPP_HIDE_FROM_ABI constexpr
+        decltype(auto) operator()(_Tp&& __t, _Up&& __u) const
+            noexcept(noexcept(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>())))
+            requires is_same_v<decay_t<_Tp>, decay_t<_Up>> && (
+                requires {
+                    std::forward<_Tp>(__t) <=> std::forward<_Up>(__u);
+                    partial_ordering(std::forward<_Tp>(__t) <=> std::forward<_Up>(__u));
+                } ||
+                requires {
+                    partial_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+                    partial_ordering(partial_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+                } ||
+                requires {
+                    std::weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+                    partial_ordering(std::weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+                }
+            ) &&
+            requires {        __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
+            { return          __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
     };
 } // namespace __partial_order
 
