@@ -9,13 +9,15 @@
 #ifndef _LIBCPP___RANGES_SIZE_H
 #define _LIBCPP___RANGES_SIZE_H
 
+#include <__concepts/arithmetic.h>
 #include <__concepts/class_or_enum.h>
 #include <__config>
 #include <__iterator/concepts.h>
 #include <__iterator/iterator_traits.h>
 #include <__ranges/access.h>
 #include <__utility/auto_cast.h>
-#include <concepts>
+#include <__utility/forward.h>
+#include <__utility/priority_tag.h>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -38,64 +40,64 @@ namespace __size {
   void size(auto&) = delete;
   void size(const auto&) = delete;
 
-  template <class _Tp>
-  concept __size_enabled = !disable_sized_range<remove_cvref_t<_Tp>>;
-
-  template <class _Tp>
-  concept __member_size =
-    __size_enabled<_Tp> &&
-    __workaround_52970<_Tp> &&
-    requires(_Tp&& __t) {
-      { _LIBCPP_AUTO_CAST(__t.size()) } -> __integer_like;
-    };
-
-  template <class _Tp>
-  concept __unqualified_size =
-    __size_enabled<_Tp> &&
-    !__member_size<_Tp> &&
-    __class_or_enum<remove_cvref_t<_Tp>> &&
-    requires(_Tp&& __t) {
-      { _LIBCPP_AUTO_CAST(size(__t)) } -> __integer_like;
-    };
-
-  template <class _Tp>
-  concept __difference =
-    !__member_size<_Tp> &&
-    !__unqualified_size<_Tp> &&
-    __class_or_enum<remove_cvref_t<_Tp>> &&
-    requires(_Tp&& __t) {
-      { ranges::begin(__t) } -> forward_iterator;
-      { ranges::end(__t) } -> sized_sentinel_for<decltype(ranges::begin(declval<_Tp>()))>;
-    };
-
   struct __fn {
-    template <class _Tp, size_t _Sz>
-    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr size_t operator()(_Tp (&&)[_Sz]) const noexcept {
-      return _Sz;
-    }
+    template <class _Tp>
+      requires is_unbounded_array_v<remove_reference_t<_Tp>>
+    _LIBCPP_HIDE_FROM_ABI
+    static constexpr void __go(_Tp&&, __priority_tag<4>) = delete;
 
-    template <class _Tp, size_t _Sz>
-    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr size_t operator()(_Tp (&)[_Sz]) const noexcept {
-      return _Sz;
-    }
+    template <class _Tp>
+      requires is_bounded_array_v<remove_reference_t<_Tp>>
+    _LIBCPP_HIDE_FROM_ABI
+    static constexpr auto __go(_Tp&&, __priority_tag<3>)
+      noexcept(noexcept(_LIBCPP_AUTO_CAST(extent_v<remove_reference_t<_Tp>>)))
+      -> decltype(      _LIBCPP_AUTO_CAST(extent_v<remove_reference_t<_Tp>>))
+      { return          _LIBCPP_AUTO_CAST(extent_v<remove_reference_t<_Tp>>); }
 
-    template <__member_size _Tp>
-    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr __integer_like auto operator()(_Tp&& __t) const
-        noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.size()))) {
-      return _LIBCPP_AUTO_CAST(__t.size());
-    }
+    template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+      requires (!disable_sized_range<remove_cvref_t<_Tp>>)
+    _LIBCPP_HIDE_FROM_ABI
+    static constexpr auto __go(_Tp&& __t, __priority_tag<2>)
+      noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.size())))
+      -> decltype(      _LIBCPP_AUTO_CAST(__t.size()))
+      requires __integer_like<decltype(_LIBCPP_AUTO_CAST(__t.size()))>
+      { return          _LIBCPP_AUTO_CAST(__t.size()); }
 
-    template <__unqualified_size _Tp>
-    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr __integer_like auto operator()(_Tp&& __t) const
-        noexcept(noexcept(_LIBCPP_AUTO_CAST(size(__t)))) {
-      return _LIBCPP_AUTO_CAST(size(__t));
-    }
+    template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+      requires (!disable_sized_range<remove_cvref_t<_Tp>>)
+    _LIBCPP_HIDE_FROM_ABI
+    static constexpr auto __go(_Tp&& __t, __priority_tag<1>)
+      noexcept(noexcept(_LIBCPP_AUTO_CAST(size(__t))))
+      -> decltype(      _LIBCPP_AUTO_CAST(size(__t)))
+      requires __integer_like<decltype(_LIBCPP_AUTO_CAST(size(__t)))>
+      { return          _LIBCPP_AUTO_CAST(size(__t)); }
 
-    template<__difference _Tp>
-    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr __integer_like auto operator()(_Tp&& __t) const
-        noexcept(noexcept(ranges::end(__t) - ranges::begin(__t))) {
-      return std::__to_unsigned_like(ranges::end(__t) - ranges::begin(__t));
-    }
+    template <class _Tp, class _It = decltype(ranges::begin(declval<_Tp&>()))>
+    _LIBCPP_HIDE_FROM_ABI
+    static constexpr auto __go(_Tp&& __t, __priority_tag<0>)
+      noexcept(noexcept(std::__to_unsigned_like(ranges::end(__t) - ranges::begin(__t))))
+      -> decltype(      std::__to_unsigned_like(ranges::end(__t) - ranges::begin(__t)))
+      requires forward_iterator<_It> && sized_sentinel_for<decltype(ranges::end(__t)), _It>
+      { return          std::__to_unsigned_like(ranges::end(__t) - ranges::begin(__t)); }
+
+    template <class _Tp>
+    [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr
+    decltype(auto) operator()(_Tp&& __t) const
+      noexcept(noexcept(__go(std::forward<_Tp>(__t), __priority_tag<4>())))
+      requires (
+        is_bounded_array_v<remove_reference_t<_Tp>> ||
+        requires {
+          requires __class_or_enum<remove_reference_t<_Tp>>;
+          requires (
+              requires { __t.size(); } ||
+              requires { size(__t); }
+          );
+        } ||
+        requires {
+          ranges::end(__t) - ranges::begin(__t);
+        }
+      ) && requires {   __go(std::forward<_Tp>(__t), __priority_tag<4>()); }
+      { return          __go(std::forward<_Tp>(__t), __priority_tag<4>()); }
   };
 } // namespace __size
 
