@@ -34,10 +34,12 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 // [cmp.alg]
 namespace __strong_order {
+    template <class _Tp>
+    concept __strong_order_for_long_double_is_not_yet_implemented = !is_same_v<decay_t<_Tp>, long double>;
+
     struct __fn {
     // NOLINTBEGIN(libcpp-robust-against-adl) strong_order should use ADL, but only here
         template<class _Tp, class _Up>
-            requires is_same_v<decay_t<_Tp>, decay_t<_Up>>
         _LIBCPP_HIDE_FROM_ABI static constexpr auto
         __go(_Tp&& __t, _Up&& __u, __priority_tag<2>)
             noexcept(noexcept(strong_ordering(strong_order(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u)))))
@@ -46,7 +48,7 @@ namespace __strong_order {
     // NOLINTEND(libcpp-robust-against-adl)
 
         template<class _Tp, class _Up, class _Dp = decay_t<_Tp>>
-            requires is_same_v<_Dp, decay_t<_Up>> && is_floating_point_v<_Dp>
+            requires is_floating_point_v<_Dp>
         _LIBCPP_HIDE_FROM_ABI static constexpr strong_ordering
         __go(_Tp&& __t, _Up&& __u, __priority_tag<1>) noexcept
         {
@@ -111,7 +113,6 @@ namespace __strong_order {
         }
 
         template<class _Tp, class _Up>
-            requires is_same_v<decay_t<_Tp>, decay_t<_Up>>
         _LIBCPP_HIDE_FROM_ABI static constexpr auto
         __go(_Tp&& __t, _Up&& __u, __priority_tag<0>)
             noexcept(noexcept(strong_ordering(compare_three_way()(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u)))))
@@ -119,10 +120,24 @@ namespace __strong_order {
             { return          strong_ordering(compare_three_way()(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u))); }
 
         template<class _Tp, class _Up>
-        _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t, _Up&& __u) const
-            noexcept(noexcept(__go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>())))
-            -> decltype(      __go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>()))
-            { return          __go(_VSTD::forward<_Tp>(__t), _VSTD::forward<_Up>(__u), __priority_tag<2>()); }
+        _LIBCPP_HIDE_FROM_ABI constexpr
+        decltype(auto) operator()(_Tp&& __t, _Up&& __u) const
+            noexcept(noexcept(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>())))
+            requires is_same_v<decay_t<_Tp>, decay_t<_Up>> && (
+                requires {
+                    std::forward<_Tp>(__t) <=> std::forward<_Up>(__u);
+                    requires (
+                        requires { strong_ordering(std::forward<_Tp>(__t) <=> std::forward<_Up>(__u)); } ||
+                        is_floating_point_v<decay_t<_Tp>>
+                    );
+                } ||
+                requires {
+                    strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+                    strong_ordering(strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+                }
+            ) && __strong_order_for_long_double_is_not_yet_implemented<_Tp> &&
+            requires {        __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
+            { return          __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
     };
 } // namespace __strong_order
 
