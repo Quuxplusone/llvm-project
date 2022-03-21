@@ -17,16 +17,10 @@ void f() {
   std::ranges::empty(42);
   // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'int' does not satisfy '__member_empty'}}
-  // expected-note@*:* {{because 'int' does not satisfy '__workaround_52970'}}
-  // expected-note@*:* {{because 'is_class_v<__remove_cvref_t<int> >' evaluated to false}}
-  // expected-note@*:* {{and 'is_union_v<__remove_cvref_t<int> >' evaluated to false}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'int' does not satisfy '__can_invoke_size'}}
-  // expected-note@*:* {{because 'ranges::size(__t)' would be invalid}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'int' does not satisfy '__can_compare_begin_end'}}
-  // expected-note@*:* {{because 'bool(ranges::begin(__t) == ranges::end(__t))' would be invalid}}
+  // expected-note@*:* {{because 'remove_reference_t<int>' (aka 'int') does not satisfy '__class_or_enum'}}
+  // expected-note@*:* {{because '_Bool(is_class_v<int> || is_union_v<int> || is_enum_v<int>)' evaluated to false}}
+  // expected-note@*:* {{and 'ranges::size(__t) == 0' would be invalid}}
+  // expected-note@*:* {{and 'ranges::begin(__t) == ranges::end(__t)' would be invalid}}
 }
 
 void g() {
@@ -34,12 +28,7 @@ void g() {
   std::ranges::empty(s);
   // expected-error@-1 {{no matching function for call}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__member_empty'}}
-  // expected-note@*:* {{because 'bool(__t.empty())' would be invalid}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__can_invoke_size'}}
-  // expected-note@*:* {{because 'ranges::size(__t)' would be invalid}}
-  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
-  // expected-note@*:* {{because 'S &' does not satisfy '__can_compare_begin_end'}}
-  // expected-note@*:* {{because 'bool(ranges::begin(__t) == ranges::end(__t))' would be invalid}}
+  // expected-note@*:* {{because '__t.empty()' would be invalid}}
+  // expected-note@*:* {{and 'ranges::size(__t) == 0' would be invalid}}
+  // expected-note@*:* {{and 'ranges::begin(__t) == ranges::end(__t)' would be invalid}}
 }

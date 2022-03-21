@@ -16,11 +16,18 @@
 #include <__iterator/readable_traits.h>
 #include <__ranges/enable_borrowed_range.h>
 #include <__type_traits/decay.h>
+#include <__type_traits/enable_if.h>
+#include <__type_traits/extent.h>
+#include <__type_traits/is_array.h>
+#include <__type_traits/is_bounded_array.h>
 #include <__type_traits/is_reference.h>
+#include <__type_traits/is_unbounded_array.h>
 #include <__type_traits/remove_cvref.h>
 #include <__type_traits/remove_reference.h>
 #include <__utility/auto_cast.h>
 #include <__utility/declval.h>
+#include <__utility/forward.h>
+#include <__utility/priority_tag.h>
 #include <cstddef>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -40,50 +47,59 @@ concept __can_borrow = is_lvalue_reference_v<_Tp> || enable_borrowed_range<remov
 
 namespace ranges {
 namespace __begin {
-template <class _Tp>
-concept __member_begin = __can_borrow<_Tp> && requires(_Tp&& __t) {
-  { _LIBCPP_AUTO_CAST(__t.begin()) } -> input_or_output_iterator;
-};
-
 void begin() = delete;
-
-template <class _Tp>
-concept __unqualified_begin =
-    !__member_begin<_Tp> && __can_borrow<_Tp> && __class_or_enum<remove_cvref_t<_Tp>> && requires(_Tp&& __t) {
-      { _LIBCPP_AUTO_CAST(begin(__t)) } -> input_or_output_iterator;
-    };
 
 struct __fn {
   template <class _Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp (&__t)[]) const noexcept
-    requires(sizeof(_Tp) >= 0) // Disallow incomplete element types.
-  {
-    return __t + 0;
-  }
+    requires is_rvalue_reference_v<_Tp&&> && (!enable_borrowed_range<remove_cvref_t<_Tp>>)
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr void __go(_Tp&&, __priority_tag<3>) = delete;
 
-  template <class _Tp, size_t _Np>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp (&__t)[_Np]) const noexcept
-    requires(sizeof(_Tp) >= 0) // Disallow incomplete element types.
-  {
-    return __t + 0;
-  }
+  template <class _Tp, enable_if_t<is_array_v<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<2>)
+    noexcept(noexcept(__t + 0))
+    -> decltype(      __t + 0)
+    { return          __t + 0; }
+
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<1>)
+    noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.begin())))
+    -> decltype(      _LIBCPP_AUTO_CAST(__t.begin()))
+    requires input_or_output_iterator<decltype(_LIBCPP_AUTO_CAST(__t.begin()))>
+    { return          _LIBCPP_AUTO_CAST(__t.begin()); }
+
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<0>)
+    noexcept(noexcept(_LIBCPP_AUTO_CAST(begin(__t))))
+    -> decltype(      _LIBCPP_AUTO_CAST(begin(__t)))
+    requires input_or_output_iterator<decltype(_LIBCPP_AUTO_CAST(begin(__t)))>
+    { return          _LIBCPP_AUTO_CAST(begin(__t)); }
 
   template <class _Tp>
-    requires __member_begin<_Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const
-      noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.begin()))) {
-    return _LIBCPP_AUTO_CAST(__t.begin());
-  }
-
-  template <class _Tp>
-    requires __unqualified_begin<_Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const
-      noexcept(noexcept(_LIBCPP_AUTO_CAST(begin(__t)))) {
-    return _LIBCPP_AUTO_CAST(begin(__t));
-  }
-
-  void operator()(auto&&) const = delete;
-};
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr
+  decltype(auto) operator()(_Tp&& __t) const
+    noexcept(noexcept(__go(std::forward<_Tp>(__t), __priority_tag<3>())))
+    requires (
+      requires {
+        requires __class_or_enum<remove_cvref_t<_Tp>>;
+        requires (
+          requires {
+            __t.begin();
+            { _LIBCPP_AUTO_CAST(__t.begin()) } -> input_or_output_iterator;
+          } ||
+          requires {
+            begin(__t);
+            { _LIBCPP_AUTO_CAST(begin(__t)) } -> input_or_output_iterator;
+          }
+        );
+      } ||
+      is_array_v<remove_reference_t<_Tp>>
+    ) && requires {   __go(std::forward<_Tp>(__t), __priority_tag<3>()); }
+    { return          __go(std::forward<_Tp>(__t), __priority_tag<3>()); }
+  };
 } // namespace __begin
 
 inline namespace __cpo {
@@ -102,45 +118,64 @@ using iterator_t = decltype(ranges::begin(std::declval<_Tp&>()));
 
 namespace ranges {
 namespace __end {
-template <class _Tp>
-concept __member_end = __can_borrow<_Tp> && requires(_Tp&& __t) {
-  typename iterator_t<_Tp>;
-  { _LIBCPP_AUTO_CAST(__t.end()) } -> sentinel_for<iterator_t<_Tp>>;
-};
-
 void end() = delete;
 
-template <class _Tp>
-concept __unqualified_end =
-    !__member_end<_Tp> && __can_borrow<_Tp> && __class_or_enum<remove_cvref_t<_Tp>> && requires(_Tp&& __t) {
-      typename iterator_t<_Tp>;
-      { _LIBCPP_AUTO_CAST(end(__t)) } -> sentinel_for<iterator_t<_Tp>>;
-    };
-
 struct __fn {
-  template <class _Tp, size_t _Np>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp (&__t)[_Np]) const noexcept
-    requires(sizeof(_Tp) >= 0) // Disallow incomplete element types.
-  {
-    return __t + _Np;
-  }
+  template <class _Tp>
+    requires is_rvalue_reference_v<_Tp&&> && (!enable_borrowed_range<remove_cvref_t<_Tp>>)
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr void __go(_Tp&&, __priority_tag<4>) = delete;
 
   template <class _Tp>
-    requires __member_end<_Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const
-      noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.end()))) {
-    return _LIBCPP_AUTO_CAST(__t.end());
-  }
+    requires is_unbounded_array_v<remove_reference_t<_Tp>>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr void __go(_Tp&&, __priority_tag<3>) = delete;
+
+  template <class _Tp, enable_if_t<is_bounded_array_v<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<2>)
+    noexcept(noexcept(__t + extent_v<remove_reference_t<_Tp>>))
+    -> decltype(      __t + extent_v<remove_reference_t<_Tp>>)
+    { return          __t + extent_v<remove_reference_t<_Tp>>; }
+
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<1>)
+    noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.end())))
+    -> decltype(      _LIBCPP_AUTO_CAST(__t.end()))
+    requires sentinel_for<decltype(_LIBCPP_AUTO_CAST(__t.end())), iterator_t<remove_reference_t<_Tp>>>
+    { return          _LIBCPP_AUTO_CAST(__t.end()); }
+
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<0>)
+    noexcept(noexcept(_LIBCPP_AUTO_CAST(end(__t))))
+    -> decltype(      _LIBCPP_AUTO_CAST(end(__t)))
+    requires sentinel_for<decltype(_LIBCPP_AUTO_CAST(end(__t))), iterator_t<remove_reference_t<_Tp>>>
+    { return          _LIBCPP_AUTO_CAST(end(__t)); }
 
   template <class _Tp>
-    requires __unqualified_end<_Tp>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const
-      noexcept(noexcept(_LIBCPP_AUTO_CAST(end(__t)))) {
-    return _LIBCPP_AUTO_CAST(end(__t));
-  }
-
-  void operator()(auto&&) const = delete;
-};
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr
+  decltype(auto) operator()(_Tp&& __t) const
+    noexcept(noexcept(__go(std::forward<_Tp>(__t), __priority_tag<4>())))
+    requires (
+      requires {
+        requires __class_or_enum<remove_cvref_t<_Tp>>;
+        requires (
+          requires {
+            __t.end();
+            { _LIBCPP_AUTO_CAST(__t.end()) } -> sentinel_for<iterator_t<remove_reference_t<_Tp>>>;
+          } ||
+          requires {
+            end(__t);
+            { _LIBCPP_AUTO_CAST(end(__t)) } -> sentinel_for<iterator_t<remove_reference_t<_Tp>>>;
+          }
+        );
+      } ||
+      is_bounded_array_v<remove_reference_t<_Tp>>
+    ) && requires {   __go(std::forward<_Tp>(__t), __priority_tag<4>()); }
+    { return          __go(std::forward<_Tp>(__t), __priority_tag<4>()); }
+  };
 } // namespace __end
 
 inline namespace __cpo {
