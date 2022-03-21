@@ -33,9 +33,10 @@
 
 #include <compare>
 
-#include "test_macros.h"
-
 void f() {
     long double ld = 3.14;
-    (void)std::strong_order(ld, ld);  // expected-error@*:* {{std::strong_order is unimplemented for this floating-point type}}
+    (void)std::strong_order(ld, ld);
+        // expected-error@*:* {{std::strong_order is unimplemented for this floating-point type}}
+        // expected-note@*:* {{in instantiation of function template specialization}}
+        // expected-note@*:* {{in instantiation of function template specialization}}
 }
