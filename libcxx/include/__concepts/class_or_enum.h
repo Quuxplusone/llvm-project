@@ -26,7 +26,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 // Whether a type is a class type or enumeration type according to the Core wording.
 
 template <class _Tp>
-concept __class_or_enum = is_class_v<_Tp> || is_union_v<_Tp> || is_enum_v<_Tp>;
+concept __class_or_enum = bool(is_class_v<_Tp> || is_union_v<_Tp> || is_enum_v<_Tp>);
 
 #endif // _LIBCPP_STD_VER >= 20
 
