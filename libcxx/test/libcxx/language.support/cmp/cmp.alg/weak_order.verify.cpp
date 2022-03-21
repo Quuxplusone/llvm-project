@@ -16,14 +16,18 @@
 void different_types() {
   std::weak_order(42, 42L);
   // expected-error@-1 {{no matching function for call}}
-  // expected-note@*:* {{candidate template ignored: substitution failure}}
+  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
+  // expected-note@*:* {{because 'is_same_v<decay_t<int>, decay_t<long> >' evaluated to false}}
 }
 
 void no_threeway_operator() {
   struct S {} s;
   std::weak_order(s, s);
   // expected-error@-1 {{no matching function for call}}
-  // expected-note@*:* {{candidate template ignored: substitution failure}}
+  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
+  // expected-note@*:* {{because 'std::forward<_Tp>(__t) <=> std::forward<_Up>(__u)' would be invalid}}
+  // expected-note@*:* {{and 'weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u))' would be invalid}}
+  // expected-note@*:* {{and 'std::strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u))' would be invalid}}
 }
 
 void too_weak() {
@@ -32,5 +36,9 @@ void too_weak() {
   } s;
   std::weak_order(s, s);
   // expected-error@-1 {{no matching function for call}}
-  // expected-note@*:* {{candidate template ignored: substitution failure}}
+  // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
+  // expected-note@*:* {{because 'weak_ordering(std::forward<_Tp>(__t) <=> std::forward<_Up>(__u))' would be invalid}}
+  // expected-note@*:* {{and 'is_floating_point_v<decay_t<S &> >' evaluated to false}}
+  // expected-note@*:* {{and 'weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u))' would be invalid}}
+  // expected-note@*:* {{and 'std::strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u))' would be invalid}}
 }
