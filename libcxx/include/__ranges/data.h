@@ -16,13 +16,18 @@
 #include <__iterator/iterator_traits.h>
 #include <__memory/pointer_traits.h>
 #include <__ranges/access.h>
+#include <__ranges/enable_borrowed_range.h>
 #include <__type_traits/decay.h>
+#include <__type_traits/enable_if.h>
 #include <__type_traits/is_object.h>
 #include <__type_traits/is_pointer.h>
 #include <__type_traits/is_reference.h>
+#include <__type_traits/remove_cvref.h>
 #include <__type_traits/remove_pointer.h>
 #include <__type_traits/remove_reference.h>
 #include <__utility/auto_cast.h>
+#include <__utility/forward.h>
+#include <__utility/priority_tag.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -36,31 +41,43 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 namespace ranges {
 namespace __data {
-template <class _Tp>
-concept __ptr_to_object = is_pointer_v<_Tp> && is_object_v<remove_pointer_t<_Tp>>;
-
-template <class _Tp>
-concept __member_data = __can_borrow<_Tp> && requires(_Tp&& __t) {
-  { _LIBCPP_AUTO_CAST(__t.data()) } -> __ptr_to_object;
-};
-
-template <class _Tp>
-concept __ranges_begin_invocable = !__member_data<_Tp> && __can_borrow<_Tp> && requires(_Tp&& __t) {
-  { ranges::begin(__t) } -> contiguous_iterator;
-};
-
 struct __fn {
-  template <__member_data _Tp>
-  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const noexcept(noexcept(__t.data())) {
-    return __t.data();
-  }
+  template <class _Tp>
+    requires is_rvalue_reference_v<_Tp&&> && (!enable_borrowed_range<remove_cvref_t<_Tp>>)
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr void __go(_Tp&&, __priority_tag<2>) = delete;
 
-  template <__ranges_begin_invocable _Tp>
-  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t) const
-      noexcept(noexcept(std::to_address(ranges::begin(__t)))) {
-    return std::to_address(ranges::begin(__t));
-  }
-};
+  template <class _Tp, enable_if_t<__class_or_enum<remove_reference_t<_Tp>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<1>)
+    noexcept(noexcept(_LIBCPP_AUTO_CAST(__t.data())))
+    -> decltype(      _LIBCPP_AUTO_CAST(__t.data()))
+    requires is_pointer_v<decltype(_LIBCPP_AUTO_CAST(__t.data()))> &&
+             is_object_v<remove_pointer_t<decltype(_LIBCPP_AUTO_CAST(__t.data()))>>
+    { return          _LIBCPP_AUTO_CAST(__t.data()); }
+
+  template <class _Tp, enable_if_t<contiguous_iterator<iterator_t<_Tp&>>>* = nullptr>
+  _LIBCPP_HIDE_FROM_ABI
+  static constexpr auto __go(_Tp&& __t, __priority_tag<0>)
+    noexcept(noexcept(std::to_address(ranges::begin(__t))))
+    -> decltype(      std::to_address(ranges::begin(__t)))
+    { return          std::to_address(ranges::begin(__t)); }
+
+  template <class _Tp>
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr
+  decltype(auto) operator()(_Tp&& __t) const
+    noexcept(noexcept(__go(std::forward<_Tp>(__t), __priority_tag<2>())))
+    requires (
+      requires {
+        requires __class_or_enum<remove_reference_t<_Tp>>;
+        __t.data();
+      } ||
+      requires {
+        { ranges::begin(__t) } -> contiguous_iterator;
+      }
+    ) && requires {   __go(std::forward<_Tp>(__t), __priority_tag<2>()); }
+    { return          __go(std::forward<_Tp>(__t), __priority_tag<2>()); }
+  };
 } // namespace __data
 
 inline namespace __cpo {

@@ -88,10 +88,27 @@ struct __fn {
   template <class _Tp, class _Up>
   _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t, _Up&& __u) const
       noexcept(noexcept(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<3>())))
-          -> decltype(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<3>())) {
-    return __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<3>());
-  }
-};
+
+    requires is_same_v<decay_t<_Tp>, decay_t<_Up>> && (
+      requires {
+        std::forward<_Tp>(__t) <=> std::forward<_Up>(__u);
+        requires (
+          requires { weak_ordering(std::forward<_Tp>(__t) <=> std::forward<_Up>(__u)); } ||
+          is_floating_point_v<decay_t<_Tp>>
+        );
+      } ||
+      requires {
+        weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+        weak_ordering(weak_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+      } ||
+      requires {
+        std::strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+        weak_ordering(std::strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+      }
+    ) &&
+    requires {        __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<3>()); }
+    { return          __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<3>()); }
+  };
 } // namespace __weak_order
 
 inline namespace __cpo {
