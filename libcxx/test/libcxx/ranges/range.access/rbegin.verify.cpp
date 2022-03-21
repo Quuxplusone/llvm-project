@@ -69,7 +69,7 @@ void baditerator() {
   // expected-note@*:* {{because 'static_cast<typename decay<decltype((rbegin(__t)))>::type>(rbegin(__t))' would be invalid}}
   // expected-note@*:* {{candidate template ignored: constraints not satisfied}}
   // expected-note@*:* {{because 'std::forward_list<int> &' does not satisfy '__can_reverse'}}
-  // expected-note@*:* {{because 'typename decay<decltype((__t.begin()))>::type' (aka 'std::__forward_list_iterator<std::__forward_list_node<int, void *> *>') does not satisfy 'bidirectional_iterator'}}
+  // expected-note@*:* {{because 'decltype(static_cast<typename decay<decltype((__t.begin()))>::type>(__t.begin()))' (aka 'std::__forward_list_iterator<std::__forward_list_node<int, void *> *>') does not satisfy 'bidirectional_iterator'}}
   // expected-note@*:* {{because 'derived_from<_ITER_CONCEPT<__forward_list_iterator<__forward_list_node<int, void *> *> >, bidirectional_iterator_tag>' evaluated to false}}
   // expected-note@*:* {{because 'is_base_of_v<std::bidirectional_iterator_tag, std::forward_iterator_tag>' evaluated to false}}
   // expected-error@-14 {{attempt to use a deleted function}}
