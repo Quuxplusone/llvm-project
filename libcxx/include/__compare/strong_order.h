@@ -39,7 +39,11 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 namespace __strong_order {
 void strong_order() = delete;
 
+template <class _Tp>
+concept __strong_order_for_long_double_is_not_yet_implemented = !is_same_v<decay_t<_Tp>, long double>;
+
 struct __fn {
+
   // NOLINTBEGIN(libcpp-robust-against-adl) strong_order should use ADL, but only here
   template <class _Tp, class _Up>
     requires is_same_v<decay_t<_Tp>, decay_t<_Up>>
@@ -124,10 +128,22 @@ struct __fn {
   template <class _Tp, class _Up>
   _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __t, _Up&& __u) const
       noexcept(noexcept(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>())))
-          -> decltype(__go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>())) {
-    return __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>());
-  }
-};
+    requires is_same_v<decay_t<_Tp>, decay_t<_Up>> && (
+      requires {
+        std::forward<_Tp>(__t) <=> std::forward<_Up>(__u);
+        requires (
+          requires { strong_ordering(std::forward<_Tp>(__t) <=> std::forward<_Up>(__u)); } ||
+          is_floating_point_v<decay_t<_Tp>>
+        );
+      } ||
+      requires {
+        strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u));
+        strong_ordering(strong_order(std::forward<_Tp>(__t), std::forward<_Up>(__u)));
+      }
+    ) && __strong_order_for_long_double_is_not_yet_implemented<_Tp> &&
+    requires { __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
+    { return   __go(std::forward<_Tp>(__t), std::forward<_Up>(__u), __priority_tag<2>()); }
+  };
 } // namespace __strong_order
 
 inline namespace __cpo {
