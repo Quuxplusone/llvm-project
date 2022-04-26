@@ -133,15 +133,22 @@ public:
     reference operator*() const {_Iter __tmp = current; return *--__tmp;}
 
 #if _LIBCPP_STD_VER > 17
-    _LIBCPP_INLINE_VISIBILITY
-    constexpr pointer operator->() const
-      requires is_pointer_v<_Iter> || requires(const _Iter i) { i.operator->(); }
+    _LIBCPP_INLINE_VISIBILITY constexpr
+    pointer operator->() const
+      requires is_pointer_v<_Iter> || requires (const _Iter i) { i.operator->(); }
     {
       if constexpr (is_pointer_v<_Iter>) {
         return std::prev(current);
       } else {
         return std::prev(current).operator->();
       }
+    }
+
+    _LIBCPP_INLINE_VISIBILITY constexpr
+    pointer operator->()
+      requires requires (_Iter i) { i.operator->(); } && (!is_pointer_v<_Iter>) && (!requires (const _Iter i) { i.operator->(); })
+    {
+      return std::prev(current).operator->();
     }
 #else
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
