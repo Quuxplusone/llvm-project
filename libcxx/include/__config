@@ -24,6 +24,10 @@
 
 #ifdef __cplusplus
 
+#ifndef _LIBCPP_UNORDERED_MULTISET_QUICK_INSERT
+# define _LIBCPP_UNORDERED_MULTISET_QUICK_INSERT 1
+#endif
+
 #  define _LIBCPP_VERSION 15000
 
 #  if __STDC_HOSTED__ == 0

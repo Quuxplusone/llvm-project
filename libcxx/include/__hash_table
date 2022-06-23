@@ -1874,6 +1874,10 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::__node_insert_multi_prepare(
     }
     size_t __chash = __constrain_hash(__cp_hash, __bc);
     __next_pointer __pn = __bucket_list_[__chash];
+#if _LIBCPP_UNORDERED_MULTISET_QUICK_INSERT
+    (void)__cp_val;
+    return __pn;
+#else
     if (__pn != nullptr)
     {
         for (bool __found = false; __pn->__next_ != nullptr &&
@@ -1896,6 +1900,7 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::__node_insert_multi_prepare(
         }
     }
     return __pn;
+#endif
 }
 
 // Insert the node __cp into the container after __pn (which is the last node in
@@ -2434,6 +2439,25 @@ typename __hash_table<_Tp, _Hash, _Equal, _Alloc>::size_type
 __hash_table<_Tp, _Hash, _Equal, _Alloc>::__erase_multi(const _Key& __k)
 {
     size_type __r = 0;
+#if _LIBCPP_UNORDERED_MULTISET_QUICK_INSERT
+    size_t __hash = hash_function()(__k);
+    size_type __bc = bucket_count();
+    if (__bc != 0)
+    {
+        size_t __chash = __constrain_hash(__hash, __bc);
+        __next_pointer __nd = __bucket_list_[__chash];
+        if (__nd != nullptr) {
+            for (__nd = __nd->__next_; __nd != nullptr && (__nd->__hash() == __hash || __constrain_hash(__nd->__hash(), __bc) == __chash); ) {
+                if ((__nd->__hash() == __hash) && key_eq()(__nd->__upcast()->__value_, __k)) {
+                    __nd = erase(const_iterator(__nd, this)).__node_;
+                    __r += 1;
+                } else {
+                    __nd = __nd->__next_;
+                }
+            }
+        }
+    }
+#else
     iterator __i = find(__k);
     if (__i != end())
     {
@@ -2444,6 +2468,7 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::__erase_multi(const _Key& __k)
             ++__r;
         } while (__i != __e && key_eq()(*__i, __k));
     }
+#endif
     return __r;
 }
 
@@ -2513,6 +2538,26 @@ typename __hash_table<_Tp, _Hash, _Equal, _Alloc>::size_type
 __hash_table<_Tp, _Hash, _Equal, _Alloc>::__count_multi(const _Key& __k) const
 {
     size_type __r = 0;
+#if _LIBCPP_UNORDERED_MULTISET_QUICK_INSERT
+    size_type __bc = bucket_count();
+    if (__bc != 0)
+    {
+        size_t __hash = hash_function()(__k);
+        size_t __chash = __constrain_hash(__hash, __bc);
+        __next_pointer __nd = __bucket_list_[__chash];
+        if (__nd != nullptr) {
+            for (__nd = __nd->__next_; __nd != nullptr &&
+                (__nd->__hash() == __hash
+                  || __constrain_hash(__nd->__hash(), __bc) == __chash);
+                                                           __nd = __nd->__next_)
+            {
+                if ((__nd->__hash() == __hash)
+                    && key_eq()(__nd->__upcast()->__value_, __k))
+                    __r += 1;
+            }
+        }
+    }
+#else
     const_iterator __i = find(__k);
     if (__i != end())
     {
@@ -2523,6 +2568,7 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::__count_multi(const _Key& __k) const
             ++__r;
         } while (__i != __e && key_eq()(*__i, __k));
     }
+#endif
     return __r;
 }
 
