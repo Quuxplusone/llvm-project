@@ -21,21 +21,18 @@ void test() {
     std::move_only_function<T> f{std::in_place_type<TriviallyDestructible>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_TriviallyDestructible);
   }
   {
     int counter = 0;
     std::move_only_function<T> f{std::in_place_type<TriviallyDestructibleSqueezeFit>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_TriviallyDestructible);
   }
   {
     int counter = 0;
     std::move_only_function<T> f{std::in_place_type<TriviallyDestructibleTooLarge>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_Heap);
   }
 #ifdef TEST_COMPILER_CLANG
   {
@@ -43,21 +40,18 @@ void test() {
     std::move_only_function<T> f{std::in_place_type<TriviallyRelocatable>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_TriviallyRelocatable);
   }
   {
     int counter = 0;
     std::move_only_function<T> f{std::in_place_type<TriviallyRelocatableSqueezeFit>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_TriviallyRelocatable);
   }
   {
     int counter = 0;
     std::move_only_function<T> f{std::in_place_type<TriviallyRelocatableTooLarge>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_Heap);
   }
 #endif
   {
@@ -65,7 +59,6 @@ void test() {
     std::move_only_function<T> f{std::in_place_type<NonTrivial>, {1}, MoveCounter{&counter}};
     assert(f);
     assert(counter == 1);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_Heap);
   }
 }
 

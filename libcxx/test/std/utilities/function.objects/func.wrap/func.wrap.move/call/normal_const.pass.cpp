@@ -80,13 +80,11 @@ void test() {
   {
     std::move_only_function<void(S) const> f = &S::func;
     assert(f);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_TriviallyDestructible);
   }
   {
     decltype(&S::func) ptr                   = nullptr;
     std::move_only_function<void(S) const> f = ptr;
     assert(!f);
-    LIBCPP_ASSERT(f.__get_status() == std::__move_only_function_storage::_Status::_NotEngaged);
   }
   {
     CallType type;
