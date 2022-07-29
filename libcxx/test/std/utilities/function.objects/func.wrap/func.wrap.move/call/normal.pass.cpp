@@ -95,6 +95,14 @@ void test() {
     std::move(f)();
     assert(type == CallType::LValue);
   }
+  {
+    // Test that an int-returning function can be cast to void().
+    bool called_it = false;
+    auto lam = [&]() -> int { called_it = true; return 42; };
+    std::move_only_function<void()> f = lam;
+    f();
+    assert(called_it == true);
+  }
 }
 
 int main(int, char**) {

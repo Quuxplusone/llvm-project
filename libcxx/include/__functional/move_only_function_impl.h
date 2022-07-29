@@ -134,8 +134,8 @@ class _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI move_only_function<_ReturnT(
       __storage_.__call_ = reinterpret_cast<void(*)()>(
         +[](void *__data, _ArgTypes&&... __argts) -> _ReturnT {
           _StoredFunc *__p = reinterpret_cast<_StoredFunc*>(__data);
-          return std::invoke(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
-                             std::forward<_ArgTypes>(__argts)...);
+          return std::invoke_r<_ReturnT>(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
+                                         std::forward<_ArgTypes>(__argts)...);
         }
       );
       __storage_.__destroy_ = +[](void *__data) {
@@ -148,8 +148,8 @@ class _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI move_only_function<_ReturnT(
       __storage_.__call_ = reinterpret_cast<void(*)()>(
         +[](void *__data, _ArgTypes&&... __argts) -> _ReturnT {
           _StoredFunc *__p = *reinterpret_cast<_StoredFunc**>(__data);
-          return std::invoke(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
-                             std::forward<_ArgTypes>(__argts)...);
+          return std::invoke_r<_ReturnT>(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
+                                         std::forward<_ArgTypes>(__argts)...);
         }
       );
       __storage_.__destroy_ = +[](void *__data) {
