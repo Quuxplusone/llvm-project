@@ -64,11 +64,11 @@ static_assert(sizeof(__move_only_function_storage) == __move_only_function_stora
 template <class...>
 class move_only_function;
 
-template <class...>
+template <class>
 struct __is_move_only_function : false_type {};
 
-template <class _ReturnT, class... _ArgTypes>
-struct __is_move_only_function<move_only_function<_ReturnT(_ArgTypes...)>> : true_type {};
+template <class... _Ts>
+struct __is_move_only_function<move_only_function<_Ts...>> : true_type {};
 
 _LIBCPP_END_NAMESPACE_STD
 
