@@ -379,6 +379,8 @@ END-SCRIPT
 #include <__functional/is_transparent.h> // expected-error@*:* {{use of private header from outside its module: '__functional/is_transparent.h'}}
 #include <__functional/mem_fn.h> // expected-error@*:* {{use of private header from outside its module: '__functional/mem_fn.h'}}
 #include <__functional/mem_fun_ref.h> // expected-error@*:* {{use of private header from outside its module: '__functional/mem_fun_ref.h'}}
+#include <__functional/move_only_function.h> // expected-error@*:* {{use of private header from outside its module: '__functional/move_only_function.h'}}
+#include <__functional/move_only_function_impl.h> // expected-error@*:* {{use of private header from outside its module: '__functional/move_only_function_impl.h'}}
 #include <__functional/not_fn.h> // expected-error@*:* {{use of private header from outside its module: '__functional/not_fn.h'}}
 #include <__functional/operations.h> // expected-error@*:* {{use of private header from outside its module: '__functional/operations.h'}}
 #include <__functional/perfect_forward.h> // expected-error@*:* {{use of private header from outside its module: '__functional/perfect_forward.h'}}
