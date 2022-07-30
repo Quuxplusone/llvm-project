@@ -4415,17 +4415,11 @@
 #   error "__cpp_lib_memory_resource should have the value 201603L in c++2b"
 # endif
 
-# if !defined(_LIBCPP_VERSION)
-#   ifndef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should be defined in c++2b"
-#   endif
-#   if __cpp_lib_move_only_function != 202110L
-#     error "__cpp_lib_move_only_function should have the value 202110L in c++2b"
-#   endif
-# else // _LIBCPP_VERSION
-#   ifdef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should not be defined because it is unimplemented in libc++!"
-#   endif
+# ifndef __cpp_lib_move_only_function
+#   error "__cpp_lib_move_only_function should be defined in c++2b"
+# endif
+# if __cpp_lib_move_only_function != 202110L
+#   error "__cpp_lib_move_only_function should have the value 202110L in c++2b"
 # endif
 
 # ifndef __cpp_lib_node_extract
