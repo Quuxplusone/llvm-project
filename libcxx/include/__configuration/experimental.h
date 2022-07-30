@@ -15,7 +15,7 @@
 #  pragma GCC system_header
 #endif
 
-#if __has_feature(experimental_library)
+#if 1 || __has_feature(experimental_library)
 #  ifndef _LIBCPP_ENABLE_EXPERIMENTAL
 #    define _LIBCPP_ENABLE_EXPERIMENTAL
 #  endif
