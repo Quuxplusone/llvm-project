@@ -867,7 +867,6 @@ feature_test_macros = [
             "name": "__cpp_lib_move_only_function",
             "values": {"c++23": 202110},
             "headers": ["functional"],
-            "unimplemented": True,
         },
         {
             "name": "__cpp_lib_node_extract",

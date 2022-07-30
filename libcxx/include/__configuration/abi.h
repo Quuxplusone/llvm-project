@@ -57,6 +57,8 @@
 #  define _LIBCPP_ABI_ENABLE_UNIQUE_PTR_TRIVIAL_ABI
 // Enable clang::trivial_abi on std::shared_ptr and std::weak_ptr
 #  define _LIBCPP_ABI_ENABLE_SHARED_PTR_TRIVIAL_ABI
+// Enable clang::trivial_abi for std::move_only_function
+#  define _LIBCPP_ABI_MOVE_ONLY_FUNCTION_TRIVIAL_ABI
 // std::random_device holds some state when it uses an implementation that gets
 // entropy from a file (see _LIBCPP_USING_DEV_RANDOM). When switching from this
 // implementation to another one on a platform that has already shipped
