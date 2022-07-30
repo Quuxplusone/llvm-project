@@ -541,6 +541,22 @@ invoke(_Fn&& __f, _Args&&... __args)
 
 #endif // _LIBCPP_STD_VER > 14
 
+#if _LIBCPP_STD_VER > 20
+
+template <class _Rp, class _Fn, class ..._Args>
+constexpr _Rp invoke_r(_Fn&& __f, _Args&&... __args)
+    noexcept(is_nothrow_invocable_r_v<_Rp, _Fn, _Args...>)
+    requires is_invocable_r_v<_Rp, _Fn, _Args...>
+{
+    if constexpr (is_void_v<_Rp>) {
+        std::__invoke(std::forward<_Fn>(__f), std::forward<_Args>(__args)...);
+    } else {
+        return std::__invoke(std::forward<_Fn>(__f), std::forward<_Args>(__args)...);
+    }
+}
+
+#endif // _LIBCPP_STD_VER > 20
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___FUNCTIONAL_INVOKE_H
