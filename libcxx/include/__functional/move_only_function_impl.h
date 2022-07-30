@@ -40,7 +40,7 @@ struct __move_only_function_storage {
   static constexpr size_t _Align = alignof(void(*)());
 
   void (*__call_)() = nullptr; // must be cast to _ReturnT(*)(void*, _ArgTypes&&...) before it is used
-  void (*__destroy_)(void*) = nullptr;
+  void (*__destroy_)(void*) noexcept = nullptr;
   alignas(_Align) unsigned char __data_[_Size];
 
   _LIBCPP_HIDE_FROM_ABI void __reset() {
@@ -142,13 +142,13 @@ class _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI move_only_function<_ReturnT(
 
     if constexpr (__fits_in_buffer) {
       __storage_.__call_ = reinterpret_cast<void(*)()>(
-        +[](void *__data, _ArgTypes&&... __argts) -> _ReturnT {
+        +[](void *__data, _ArgTypes&&... __argts) noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT) -> _ReturnT {
           _StoredFunc *__p = reinterpret_cast<_StoredFunc*>(__data);
           return std::invoke_r<_ReturnT>(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
                                          std::forward<_ArgTypes>(__argts)...);
         }
       );
-      __storage_.__destroy_ = +[](void *__data) {
+      __storage_.__destroy_ = +[](void *__data) noexcept {
         _StoredFunc *__p = reinterpret_cast<_StoredFunc*>(__data);
         __p->~_StoredFunc();
       };
@@ -156,13 +156,13 @@ class _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI move_only_function<_ReturnT(
     } else {
       using _StoredFuncPtr = _StoredFunc*;
       __storage_.__call_ = reinterpret_cast<void(*)()>(
-        +[](void *__data, _ArgTypes&&... __argts) -> _ReturnT {
+        +[](void *__data, _ArgTypes&&... __argts) noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT) -> _ReturnT {
           _StoredFunc *__p = *reinterpret_cast<_StoredFunc**>(__data);
           return std::invoke_r<_ReturnT>(static_cast<_StoredFunc _LIBCPP_MOVE_ONLY_FUNCTION_INV_QUALS>(*__p),
                                          std::forward<_ArgTypes>(__argts)...);
         }
       );
-      __storage_.__destroy_ = +[](void *__data) {
+      __storage_.__destroy_ = +[](void *__data) noexcept {
         _StoredFunc *__p = *reinterpret_cast<_StoredFunc**>(__data);
         __p->~_StoredFunc();
         ::operator delete(static_cast<void *>(__p));
@@ -255,7 +255,7 @@ public:
       noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT) {
     _LIBCPP_ASSERT(__storage_.__call_ != nullptr, "Tried to call a disengaged move_only_function");
 
-    using _CallType = _ReturnT(*)(void*, _ArgTypes&&...);
+    using _CallType = _ReturnT(*)(void*, _ArgTypes&&...) noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT);
     _CallType __pcall = reinterpret_cast<_CallType>(__storage_.__call_);
     return __pcall((void*)__storage_.__data_, std::forward<_ArgTypes>(__argts)...);
   }
