@@ -412,6 +412,8 @@
   { include: [ "<__functional/is_transparent.h>", "private", "<functional>", "public" ] },
   { include: [ "<__functional/mem_fn.h>", "private", "<functional>", "public" ] },
   { include: [ "<__functional/mem_fun_ref.h>", "private", "<functional>", "public" ] },
+  { include: [ "<__functional/move_only_function.h>", "private", "<functional>", "public" ] },
+  { include: [ "<__functional/move_only_function_impl.h>", "private", "<functional>", "public" ] },
   { include: [ "<__functional/not_fn.h>", "private", "<functional>", "public" ] },
   { include: [ "<__functional/operations.h>", "private", "<functional>", "public" ] },
   { include: [ "<__functional/perfect_forward.h>", "private", "<functional>", "public" ] },
