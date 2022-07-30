@@ -43,6 +43,10 @@
 #    define _LIBCPP_CXX03_LANG
 #  endif
 
+#  ifndef _LIBCPP_ENABLE_EXPERIMENTAL
+#    define _LIBCPP_ENABLE_EXPERIMENTAL
+#  endif
+
 #  if __has_feature(experimental_library)
 #    ifndef _LIBCPP_ENABLE_EXPERIMENTAL
 #      define _LIBCPP_ENABLE_EXPERIMENTAL
