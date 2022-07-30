@@ -376,17 +376,11 @@
 #   error "__cpp_lib_invoke_r should have the value 202106L in c++23"
 # endif
 
-# if !defined(_LIBCPP_VERSION)
-#   ifndef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should be defined in c++23"
-#   endif
-#   if __cpp_lib_move_only_function != 202110L
-#     error "__cpp_lib_move_only_function should have the value 202110L in c++23"
-#   endif
-# else // _LIBCPP_VERSION
-#   ifdef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should not be defined because it is unimplemented in libc++!"
-#   endif
+# ifndef __cpp_lib_move_only_function
+#   error "__cpp_lib_move_only_function should be defined in c++23"
+# endif
+# if __cpp_lib_move_only_function != 202110L
+#   error "__cpp_lib_move_only_function should have the value 202110L in c++23"
 # endif
 
 # ifndef __cpp_lib_not_fn
@@ -500,17 +494,11 @@
 #   error "__cpp_lib_invoke_r should have the value 202106L in c++26"
 # endif
 
-# if !defined(_LIBCPP_VERSION)
-#   ifndef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should be defined in c++26"
-#   endif
-#   if __cpp_lib_move_only_function != 202110L
-#     error "__cpp_lib_move_only_function should have the value 202110L in c++26"
-#   endif
-# else // _LIBCPP_VERSION
-#   ifdef __cpp_lib_move_only_function
-#     error "__cpp_lib_move_only_function should not be defined because it is unimplemented in libc++!"
-#   endif
+# ifndef __cpp_lib_move_only_function
+#   error "__cpp_lib_move_only_function should be defined in c++26"
+# endif
+# if __cpp_lib_move_only_function != 202110L
+#   error "__cpp_lib_move_only_function should have the value 202110L in c++26"
 # endif
 
 # ifndef __cpp_lib_not_fn
