@@ -70,6 +70,16 @@ struct __is_move_only_function : false_type {};
 template <class... _Ts>
 struct __is_move_only_function<move_only_function<_Ts...>> : true_type {};
 
+template <class, class>
+struct __is_noexceptless_move_only_function : false_type {};
+
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) noexcept, _Rp(_Ap...)> : true_type {};
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) & noexcept, _Rp(_Ap...) &> : true_type {};
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) && noexcept, _Rp(_Ap...) &&> : true_type {};
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const noexcept, _Rp(_Ap...) const> : true_type {};
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const & noexcept, _Rp(_Ap...) const &> : true_type {};
+template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const && noexcept, _Rp(_Ap...) const &&> : true_type {};
+
 _LIBCPP_END_NAMESPACE_STD
 
 // This header is only partially guarded on purpose. This header is an implementation detail of move_only_function.h
@@ -186,7 +196,11 @@ public:
         __construct<_StoredFunc>(std::forward<_Func>(__func));
       }
     } else if constexpr (__is_move_only_function<_StoredFunc>::value) {
-      if (!__func) {
+      if constexpr (__is_noexceptless_move_only_function<_StoredFunc, move_only_function>::value) {
+        std::swap(__storage_.__call_, __func.__storage_.__call_);
+        std::swap(__storage_.__destroy_, __func.__storage_.__destroy_);
+        std::swap(__storage_.__data_, __func.__storage_.__data_);
+      } else if (!__func) {
         // we're already disengaged
       } else {
         // TODO: unwrap the move_only_function and store its unwrapped target instead
