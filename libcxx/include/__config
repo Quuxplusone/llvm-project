@@ -214,15 +214,19 @@ _LIBCPP_HARDENING_MODE_DEBUG
 #    define _LIBCPP_ABI_VCRUNTIME
 #  endif
 
+#  ifndef _LIBCPP_ENABLE_EXPERIMENTAL
+#    define _LIBCPP_ENABLE_EXPERIMENTAL 1
+#  endif
+
 #  if __has_feature(experimental_library)
 #    ifndef _LIBCPP_ENABLE_EXPERIMENTAL
-#      define _LIBCPP_ENABLE_EXPERIMENTAL
+#      define _LIBCPP_ENABLE_EXPERIMENTAL 1
 #    endif
 #  endif
 
 // Incomplete features get their own specific disabling flags. This makes it
 // easier to grep for target specific flags once the feature is complete.
-#  if !defined(_LIBCPP_ENABLE_EXPERIMENTAL) && !defined(_LIBCPP_BUILDING_LIBRARY)
+#  if !(defined(_LIBCPP_ENABLE_EXPERIMENTAL) && _LIBCPP_ENABLE_EXPERIMENTAL) && !defined(_LIBCPP_BUILDING_LIBRARY)
 #    define _LIBCPP_HAS_NO_INCOMPLETE_PSTL
 #    define _LIBCPP_HAS_NO_EXPERIMENTAL_STOP_TOKEN
 #    define _LIBCPP_HAS_NO_EXPERIMENTAL_TZDB
