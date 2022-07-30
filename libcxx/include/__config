@@ -190,6 +190,10 @@ _LIBCPP_HARDENING_MODE_DEBUG
 #    define _LIBCPP_ABI_VCRUNTIME
 #  endif
 
+#  ifndef _LIBCPP_ENABLE_EXPERIMENTAL
+#    define _LIBCPP_ENABLE_EXPERIMENTAL
+#  endif
+
 #  if __has_feature(experimental_library)
 #    ifndef _LIBCPP_ENABLE_EXPERIMENTAL
 #      define _LIBCPP_ENABLE_EXPERIMENTAL
