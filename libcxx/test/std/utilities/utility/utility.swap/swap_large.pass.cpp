@@ -49,11 +49,11 @@ int main(int, char**)
   {
     Large a = { 1, {}, 2 };
     Large b = { 3, {}, 4 };
-    a.ptrs_[42] = std::make_unique<int>(42);
-    a.ptrs_[100] = std::make_unique<int>(100);
-    b.ptrs_[42] = std::make_unique<int>(420);
-    b.ptrs_[200] = std::make_unique<int>(1000);
-    b.ptrs_[999] = std::make_unique<int>(9990);
+    a.ptrs_[42] = std::unique_ptr<int>(new int(42));
+    a.ptrs_[100] = std::unique_ptr<int>(new int(100));
+    b.ptrs_[42] = std::unique_ptr<int>(new int(420));
+    b.ptrs_[200] = std::unique_ptr<int>(new int(1000));
+    b.ptrs_[999] = std::unique_ptr<int>(new int(9990));
     std::swap(a, b);
     assert(a.head_ == 3);
     assert(a.ptrs_[42] != nullptr && *a.ptrs_[42] == 420);
