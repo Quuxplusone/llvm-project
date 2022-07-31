@@ -345,6 +345,13 @@ _LIBCPP_PUSH_MACROS
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 template<class _Tp, class _Allocator>
+struct __vector_move_via_memcpy : integral_constant<bool,
+    is_trivially_move_constructible<_Tp>::value &&
+    __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
+    !is_volatile<_Tp>::value
+> {};
+
+template<class _Tp, class _Allocator>
 struct __vector_relocate_via_memcpy : integral_constant<bool,
     __libcpp_is_trivially_relocatable<_Tp>::value &&
     __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
@@ -926,15 +933,32 @@ _LIBCPP_CONSTEXPR_SINCE_CXX20
 void
 vector<_Tp, _Allocator>::__swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v)
 {
+    using __move_via_memcpy = integral_constant<bool,
+        __vector_move_via_memcpy<_Tp, _Allocator>::value ||
+        __vector_relocate_via_memcpy<_Tp, _Allocator>::value
+    >;
+    using __destroy_via_noop = integral_constant<bool,
+        __vector_relocate_via_memcpy<_Tp, _Allocator>::value
+    >;
+
     __annotate_delete();
-    using _RevIter = std::reverse_iterator<pointer>;
-    __v.__begin_   = std::__uninitialized_allocator_move_if_noexcept(
-                       __alloc(), _RevIter(__end_), _RevIter(__begin_), _RevIter(__v.__begin_))
-                       .base();
+    if (__move_via_memcpy() && !__libcpp_is_constant_evaluated()) {
+        size_type __n = __end_ - __begin_;
+        __v.__begin_ -= __n;
+        ::__builtin_memmove(std::__to_address(__v.__begin_), std::__to_address(__begin_), __n * sizeof(value_type));
+    } else {
+        using _RevIter = std::reverse_iterator<pointer>;
+        __v.__begin_   = std::__uninitialized_allocator_move_if_noexcept(
+                           __alloc(), _RevIter(__end_), _RevIter(__begin_), _RevIter(__v.__begin_))
+                           .base();
+    }
     std::swap(this->__begin_, __v.__begin_);
     std::swap(this->__end_, __v.__end_);
     std::swap(this->__end_cap(), __v.__end_cap());
     __v.__first_ = __v.__begin_;
+    if (__move_via_memcpy() && !__libcpp_is_constant_evaluated()) {
+        __v.__destruct_at_end(__v.__begin_, __destroy_via_noop());
+    }
     __annotate_new(size());
     std::__debug_db_invalidate_all(this);
 }
@@ -944,17 +968,37 @@ _LIBCPP_CONSTEXPR_SINCE_CXX20
 typename vector<_Tp, _Allocator>::pointer
 vector<_Tp, _Allocator>::__swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v, pointer __p)
 {
+    using __move_via_memcpy = integral_constant<bool,
+        __vector_move_via_memcpy<_Tp, _Allocator>::value ||
+        __vector_relocate_via_memcpy<_Tp, _Allocator>::value
+    >;
+    using __destroy_via_noop = integral_constant<bool,
+        __vector_relocate_via_memcpy<_Tp, _Allocator>::value
+    >;
+
     __annotate_delete();
     pointer __r = __v.__begin_;
-    using _RevIter = std::reverse_iterator<pointer>;
-    __v.__begin_   = std::__uninitialized_allocator_move_if_noexcept(
-                       __alloc(), _RevIter(__p), _RevIter(__begin_), _RevIter(__v.__begin_))
-                       .base();
-    __v.__end_ = std::__uninitialized_allocator_move_if_noexcept(__alloc(), __p, __end_, __v.__end_);
+    if (__move_via_memcpy() && !__libcpp_is_constant_evaluated()) {
+        size_type __n = __p - __begin_;
+        __v.__begin_ -= __n;
+        ::__builtin_memmove(std::__to_address(__v.__begin_), std::__to_address(__begin_), __n * sizeof(value_type));
+        size_type __n2 = __end_ - __p;
+        ::__builtin_memmove(std::__to_address(__v.__end_), std::__to_address(__p), __n2 * sizeof(value_type));
+        __v.__end_ += __n2;
+    } else {
+        using _RevIter = std::reverse_iterator<pointer>;
+        __v.__begin_   = std::__uninitialized_allocator_move_if_noexcept(
+                           __alloc(), _RevIter(__p), _RevIter(__begin_), _RevIter(__v.__begin_))
+                           .base();
+        __v.__end_ = std::__uninitialized_allocator_move_if_noexcept(__alloc(), __p, __end_, __v.__end_);
+    }
     std::swap(this->__begin_, __v.__begin_);
     std::swap(this->__end_, __v.__end_);
     std::swap(this->__end_cap(), __v.__end_cap());
     __v.__first_ = __v.__begin_;
+    if (__move_via_memcpy() && !__libcpp_is_constant_evaluated()) {
+        __v.__destruct_at_end(__v.__begin_, __destroy_via_noop());
+    }
     __annotate_new(size());
     std::__debug_db_invalidate_all(this);
     return __r;
