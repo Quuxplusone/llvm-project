@@ -17,6 +17,7 @@
 #include <__ranges/access.h>
 #include <__ranges/concepts.h>
 #include <__ranges/size.h>
+#include <__utility/forward.h>
 #include <type_traits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -60,25 +61,23 @@ namespace ranges {
 namespace __distance {
 
 struct __fn {
-  template<class _Ip, sentinel_for<_Ip> _Sp>
-    requires (!sized_sentinel_for<_Sp, _Ip>)
-  _LIBCPP_HIDE_FROM_ABI
-  constexpr iter_difference_t<_Ip> operator()(_Ip __first, _Sp __last) const {
-    iter_difference_t<_Ip> __n = 0;
-    while (__first != __last) {
-      ++__first;
-      ++__n;
-    }
-    return __n;
-  }
-
-  template<class _Ip, sized_sentinel_for<decay_t<_Ip>> _Sp>
+  template<class _Ip, sentinel_for<decay_t<_Ip>> _Sp>
+    requires sized_sentinel_for<_Sp, decay_t<_Ip>> ||
+             is_constructible_v<decay_t<_Ip>, _Ip&&>
   _LIBCPP_HIDE_FROM_ABI
   constexpr iter_difference_t<_Ip> operator()(_Ip&& __first, _Sp __last) const {
     if constexpr (sized_sentinel_for<_Sp, __remove_cvref_t<_Ip>>) {
       return __last - __first;
-    } else {
+    } else if constexpr (sized_sentinel_for<_Sp, decay_t<_Ip>>) {
       return __last - decay_t<_Ip>(__first);
+    } else {
+      auto __i = std::forward<_Ip>(__first);
+      iter_difference_t<_Ip> __n = 0;
+      while (__i != __last) {
+        ++__i;
+        ++__n;
+      }
+      return __n;
     }
   }
 
