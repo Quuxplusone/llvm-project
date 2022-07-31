@@ -14,6 +14,7 @@
 #include <__memory/unique_ptr.h>
 #include <__type_traits/is_member_function_pointer.h>
 #include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/remove_pointer.h>
 #include <__utility/forward.h>
 #include <__utility/in_place.h>
@@ -149,7 +150,7 @@ class
     static_assert(is_constructible_v<_StoredFunc, _StoredFunc&&>);
 
     constexpr bool __fits_in_buffer =
-      is_trivially_copyable_v<_StoredFunc> &&
+      __libcpp_is_trivially_relocatable<_StoredFunc>::value &&
       sizeof(_StoredFunc) <= __move_only_function_storage::_Size &&
       alignof(_StoredFunc) <= __move_only_function_storage::_Align;
 
