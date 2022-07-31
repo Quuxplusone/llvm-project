@@ -305,16 +305,19 @@ template<class T, class charT> requires is-vector-bool-reference<T> // Since C++
 #include <__memory/swap_allocator.h>
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
+#include <__memory/uninitialized_relocate.h>
 #include <__memory_resource/polymorphic_allocator.h>
 #include <__split_buffer>
 #include <__type_traits/is_allocator.h>
 #include <__type_traits/is_constructible.h>
+#include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_move_assignable.h>
 #include <__type_traits/noexcept_move_assign_container.h>
 #include <__type_traits/is_trivially_move_constructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_volatile.h>
 #include <__type_traits/type_identity.h>
+#include <__utility/declval.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
@@ -348,6 +351,14 @@ _LIBCPP_PUSH_MACROS
 
 
 _LIBCPP_BEGIN_NAMESPACE_STD
+
+template<class _Tp, class _Allocator>
+struct __vector_relocate_via_memcpy : integral_constant<bool,
+    __libcpp_is_trivially_relocatable<_Tp>::value &&
+    __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
+    __allocator_has_trivial_destroy<_Allocator, _Tp>::value &&
+    !is_volatile<_Tp>::value
+> {};
 
 template <class _Tp, class _Allocator /* = allocator<_Tp> */>
 class _LIBCPP_TEMPLATE_VIS
@@ -720,17 +731,29 @@ private:
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI pointer __swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v, pointer __p);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_range(pointer __from_s, pointer __from_e, pointer __to);
+    template<class _Up>
+        _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __relocate_upward_and_insert(pointer __from_s, pointer __from_e, _Up&& __elt);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, true_type)
         _NOEXCEPT_(is_nothrow_move_assignable<allocator_type>::value);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, false_type)
         _NOEXCEPT_(__alloc_traits::is_always_equal::value);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI
-    void __destruct_at_end(pointer __new_last) _NOEXCEPT
+    void __destruct_at_end(pointer __new_last, false_type = false_type()) _NOEXCEPT
     {
         if (!__libcpp_is_constant_evaluated())
             __invalidate_iterators_past(__new_last);
         size_type __old_size = size();
         __base_destruct_at_end(__new_last);
+        __annotate_shrink(__old_size);
+    }
+
+    _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI
+    void __destruct_at_end(pointer __new_last, true_type) _NOEXCEPT
+    {
+        if (!__libcpp_is_constant_evaluated())
+            __invalidate_iterators_past(__new_last);
+        size_type __old_size = size();
+        this->__end_ = __new_last;
         __annotate_shrink(__old_size);
     }
 
@@ -1637,7 +1660,13 @@ vector<_Tp, _Allocator>::erase(const_iterator __position)
         "vector::erase(iterator) called with a non-dereferenceable iterator");
     difference_type __ps = __position - cbegin();
     pointer __p = this->__begin_ + __ps;
-    this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
+    if (__vector_relocate_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
+        __alloc_traits::destroy(__alloc(), std::__to_address(__p));
+        std::uninitialized_relocate(__p + 1, this->__end_, __p);
+        this->__destruct_at_end(this->__end_ - 1, true_type()); // destroy_via_noop
+    } else {
+        this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
+    }
     if (!__libcpp_is_constant_evaluated())
         this->__invalidate_iterators_past(__p - 1);
     return __make_iter(__p);
@@ -1656,11 +1685,51 @@ vector<_Tp, _Allocator>::erase(const_iterator __first, const_iterator __last)
     _LIBCPP_ASSERT(__first <= __last, "vector::erase(first, last) called with invalid range");
     pointer __p = this->__begin_ + (__first - begin());
     if (__first != __last) {
-        this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
+        if (__vector_relocate_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
+            pointer __endp = __p + (__last - __first);
+            for (pointer __q = __p; __q != __endp; ++__q) {
+                __alloc_traits::destroy(__alloc(), std::__to_address(__q));
+            }
+            std::uninitialized_relocate(__endp, this->__end_, __p);
+            this->__destruct_at_end(this->__end_ - (__last - __first), true_type()); // destroy_via_noop
+        } else {
+            this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
+        }
         if (!__libcpp_is_constant_evaluated())
             this->__invalidate_iterators_past(__p - 1);
     }
     return __make_iter(__p);
+}
+
+#ifdef _LIBCPP_CXX03_LANG
+template<class _Allocator, class _Tp, class _Up>
+struct __is_nothrow_constructible_a : integral_constant<bool, false> {};
+#else
+template<class _Allocator, class _Tp, class _Up>
+struct __is_nothrow_constructible_a : integral_constant<bool,
+    noexcept(allocator_traits<_Allocator>::construct(declval<_Allocator&>(), (_Tp*)nullptr, declval<_Up>()))
+> {};
+#endif
+
+template<class _Tp, class _Up>
+struct __is_nothrow_constructible_a<allocator<_Tp>, _Tp, _Up> : is_nothrow_constructible<_Tp, _Up> {};
+
+template<class _Tp, class _Allocator>
+template<class _Up>
+_LIBCPP_CONSTEXPR_SINCE_CXX20 void
+vector<_Tp, _Allocator>::__relocate_upward_and_insert(pointer __from_s, pointer __from_e, _Up&& __elt)
+{
+    if (!__libcpp_is_constant_evaluated() && __vector_relocate_via_memcpy<_Tp, _Allocator>::value &&
+                                             __is_nothrow_constructible_a<_Allocator, _Tp, _Up&&>::value) {
+        ::__builtin_memmove(std::__to_address(__from_s + 1), std::__to_address(__from_s), (__from_e - __from_s) * sizeof(_Tp));
+        ++this->__end_;
+        __alloc_traits::construct(this->__alloc(),
+                                  std::__to_address(__from_s),
+                                  static_cast<_Up&&>(__elt));
+    } else {
+        __move_range(__from_s, __from_e, __from_s + 1);
+        *__from_s = static_cast<_Up&&>(__elt);
+    }
 }
 
 template <class _Tp, class _Allocator>
@@ -1700,11 +1769,10 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, const_reference __x)
         }
         else
         {
-            __move_range(__p, this->__end_, __p + 1);
             const_pointer __xr = pointer_traits<const_pointer>::pointer_to(__x);
             if (__p <= __xr && __xr < this->__end_)
                 ++__xr;
-            *__p = *__xr;
+            __relocate_upward_and_insert(__p, this->__end_, *__xr);
         }
     }
     else
@@ -1733,8 +1801,7 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, value_type&& __x)
         }
         else
         {
-            __move_range(__p, this->__end_, __p + 1);
-            *__p = std::move(__x);
+            __relocate_upward_and_insert(__p, this->__end_, std::move(__x));
         }
     }
     else
@@ -1765,8 +1832,7 @@ vector<_Tp, _Allocator>::emplace(const_iterator __position, _Args&&... __args)
         else
         {
             __temp_value<value_type, _Allocator> __tmp(this->__alloc(), std::forward<_Args>(__args)...);
-            __move_range(__p, this->__end_, __p + 1);
-            *__p = std::move(__tmp.get());
+            __relocate_upward_and_insert(__p, this->__end_, std::move(__tmp.get()));
         }
     }
     else
