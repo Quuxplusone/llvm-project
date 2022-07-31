@@ -618,6 +618,12 @@ struct __allocator_has_trivial_move_construct : _Not<__has_construct<_Alloc, _Ty
 template <class _Type>
 struct __allocator_has_trivial_move_construct<allocator<_Type>, _Type> : true_type {};
 
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_destroy : _Not<__has_destroy<_Alloc, _Type*> > {};
+
+template <class _Type>
+struct __allocator_has_trivial_destroy<allocator<_Type>, _Type> : true_type {};
+
 #ifndef _LIBCPP_COMPILER_GCC
 template <
     class _Alloc,
