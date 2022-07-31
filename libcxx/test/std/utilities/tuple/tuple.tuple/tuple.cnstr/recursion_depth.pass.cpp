@@ -20,6 +20,13 @@ constexpr void CreateTuple(std::index_sequence<I...>) {
   std::tuple<decltype(I)...> tuple(I...);
   assert(std::get<0>(tuple) == 0);
   assert(std::get<sizeof...(I)-1>(tuple) == sizeof...(I)-1);
+  auto t2 = tuple;             // copy constructor
+  auto t3 = std::move(tuple);  // move constructor
+  decltype(tuple) t4;          // default constructor
+  t3 = t2;                     // copy assignment
+  t4 = std::move(t2);          // move assignment
+  swap(t3, t4);                // swap
+  // equality (t3 == t4) does not work
 }
 
 constexpr bool test() {
