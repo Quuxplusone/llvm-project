@@ -71,14 +71,20 @@ template <class... _Ts>
 struct __is_move_only_function<move_only_function<_Ts...>> : true_type {};
 
 template <class, class>
-struct __is_noexceptless_move_only_function : false_type {};
+struct __is_compatible_move_only_function : false_type {};
 
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) noexcept, _Rp(_Ap...)> : true_type {};
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) & noexcept, _Rp(_Ap...) &> : true_type {};
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) && noexcept, _Rp(_Ap...) &&> : true_type {};
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const noexcept, _Rp(_Ap...) const> : true_type {};
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const & noexcept, _Rp(_Ap...) const &> : true_type {};
-template <class _Rp, class... _Ap> struct __is_noexceptless_move_only_function<_Rp(_Ap...) const && noexcept, _Rp(_Ap...) const &&> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...)>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) &>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) &&>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const &>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const &&>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) noexcept>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) & noexcept>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) && noexcept>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const noexcept>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const & noexcept>> : true_type {};
+template <class _Rp, class... _Ap> struct __is_compatible_move_only_function<_Rp(_Ap...), move_only_function<_Rp(_Ap...) const && noexcept>> : true_type {};
 
 _LIBCPP_END_NAMESPACE_STD
 
@@ -112,8 +118,12 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 #endif
 
 template <class _ReturnT, class... _ArgTypes>
-class _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI move_only_function<_ReturnT(
-    _ArgTypes...) _LIBCPP_MOVE_ONLY_FUNCTION_CV_REF noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT)> {
+class
+  _LIBCPP_MOVE_ONLY_FUNCTION_TRIVIAL_ABI
+  move_only_function<_ReturnT(_ArgTypes...) _LIBCPP_MOVE_ONLY_FUNCTION_CV_REF noexcept(_LIBCPP_MOVE_ONLY_FUNCTION_NOEXCEPT)>
+{
+  template <class...>
+  friend class move_only_function; // for access to __storage_
 
   template <class _VT>
   static constexpr bool __is_callable_from_impl() {
@@ -196,14 +206,12 @@ public:
         __construct<_StoredFunc>(std::forward<_Func>(__func));
       }
     } else if constexpr (__is_move_only_function<_StoredFunc>::value) {
-      if constexpr (__is_noexceptless_move_only_function<_StoredFunc, move_only_function>::value) {
-        std::swap(__storage_.__call_, __func.__storage_.__call_);
-        std::swap(__storage_.__destroy_, __func.__storage_.__destroy_);
-        std::swap(__storage_.__data_, __func.__storage_.__data_);
+      if constexpr (__is_compatible_move_only_function<_ReturnT(_ArgTypes...), _StoredFunc>::value) {
+        __storage_ = __func.__storage_;
+        __func.__storage_ = {};
       } else if (!__func) {
         // we're already disengaged
       } else {
-        // TODO: unwrap the move_only_function and store its unwrapped target instead
         __construct<_StoredFunc>(std::forward<_Func>(__func));
       }
     } else {

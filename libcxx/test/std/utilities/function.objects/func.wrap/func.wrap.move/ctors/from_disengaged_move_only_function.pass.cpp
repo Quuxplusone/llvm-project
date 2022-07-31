@@ -12,7 +12,6 @@
 #include <functional>
 
 #include "test_macros.h"
-#include "../common.h"
 
 int main(int, char**) {
   std::move_only_function<int() const noexcept> disengaged = nullptr;
