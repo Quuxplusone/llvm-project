@@ -344,6 +344,14 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+template<class _Tp, class _Allocator>
+struct __vector_relocate_via_memcpy : integral_constant<bool,
+    __libcpp_is_trivially_relocatable<_Tp>::value &&
+    __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
+    __allocator_has_trivial_destroy<_Allocator, _Tp>::value &&
+    !is_volatile<_Tp>::value
+> {};
+
 template <class _Tp, class _Allocator /* = allocator<_Tp> */>
 class _LIBCPP_TEMPLATE_VIS
 #ifndef _LIBCPP_ENABLE_DEBUG_MODE
@@ -715,6 +723,8 @@ private:
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI pointer __swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v, pointer __p);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_range(pointer __from_s, pointer __from_e, pointer __to);
+    template<class _Up>
+        _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __relocate_upward_and_insert(pointer __from_s, pointer __from_e, _Up&& __elt);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, true_type)
         _NOEXCEPT_(is_nothrow_move_assignable<allocator_type>::value);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, false_type)
@@ -1677,6 +1687,37 @@ vector<_Tp, _Allocator>::erase(const_iterator __first, const_iterator __last)
     return __make_iter(__p);
 }
 
+#ifdef _LIBCPP_CXX03_LANG
+template<class _Allocator, class _Tp, class _Up>
+struct __is_nothrow_constructible_a : integral_constant<bool, false> {};
+#else
+template<class _Allocator, class _Tp, class _Up>
+struct __is_nothrow_constructible_a : integral_constant<bool,
+    noexcept(allocator_traits<_Allocator>::construct(declval<_Allocator&>(), (_Tp*)nullptr, declval<_Up>()))
+> {};
+#endif
+
+template<class _Tp, class _Up>
+struct __is_nothrow_constructible_a<allocator<_Tp>, _Tp, _Up> : is_nothrow_constructible<_Tp, _Up> {};
+
+template<class _Tp, class _Allocator>
+template<class _Up>
+_LIBCPP_CONSTEXPR_SINCE_CXX20 void
+vector<_Tp, _Allocator>::__relocate_upward_and_insert(pointer __from_s, pointer __from_e, _Up&& __elt)
+{
+    if (!__libcpp_is_constant_evaluated() && __vector_relocate_via_memcpy<_Tp, _Allocator>::value &&
+                                             __is_nothrow_constructible_a<_Allocator, _Tp, _Up&&>::value) {
+        ::__builtin_memmove(std::__to_address(__from_s + 1), std::__to_address(__from_s), (__from_e - __from_s) * sizeof(_Tp));
+        ++this->__end_;
+        __alloc_traits::construct(this->__alloc(),
+                                  std::__to_address(__from_s),
+                                  static_cast<_Up&&>(__elt));
+    } else {
+        __move_range(__from_s, __from_e, __from_s + 1);
+        *__from_s = static_cast<_Up&&>(__elt);
+    }
+}
+
 template <class _Tp, class _Allocator>
 _LIBCPP_CONSTEXPR_SINCE_CXX20
 void
@@ -1714,11 +1755,10 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, const_reference __x)
         }
         else
         {
-            __move_range(__p, this->__end_, __p + 1);
             const_pointer __xr = pointer_traits<const_pointer>::pointer_to(__x);
             if (__p <= __xr && __xr < this->__end_)
                 ++__xr;
-            *__p = *__xr;
+            __relocate_upward_and_insert(__p, this->__end_, *__xr);
         }
     }
     else
@@ -1747,8 +1787,7 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, value_type&& __x)
         }
         else
         {
-            __move_range(__p, this->__end_, __p + 1);
-            *__p = std::move(__x);
+            __relocate_upward_and_insert(__p, this->__end_, std::move(__x));
         }
     }
     else
@@ -1779,8 +1818,7 @@ vector<_Tp, _Allocator>::emplace(const_iterator __position, _Args&&... __args)
         else
         {
             __temp_value<value_type, _Allocator> __tmp(this->__alloc(), std::forward<_Args>(__args)...);
-            __move_range(__p, this->__end_, __p + 1);
-            *__p = std::move(__tmp.get());
+            __relocate_upward_and_insert(__p, this->__end_, std::move(__tmp.get()));
         }
     }
     else
