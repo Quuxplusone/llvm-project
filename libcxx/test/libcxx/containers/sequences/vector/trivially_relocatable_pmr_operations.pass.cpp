@@ -45,9 +45,9 @@ void test_reallocate()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "1", "2" }));
-  assert(v[0].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
+  assert(v[0].get_allocator().resource() == (PmrIsTrivial ? &mr[0] : &mr[3]));
+  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[1] : &mr[3]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[3]));
 }
 
 void test_insert_one()
