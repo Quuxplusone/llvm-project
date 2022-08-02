@@ -101,6 +101,10 @@ export namespace std {
     using std::ranges::uninitialized_fill_n;
   } // namespace ranges
 
+  using std::uninitialized_relocate;
+  using std::uninitialized_relocate_n;
+  using std::uninitialized_relocate_backward;
+
   // [specialized.construct], construct_at
   using std::construct_at;
 
@@ -117,6 +121,10 @@ export namespace std {
     using std::ranges::destroy_at;
     using std::ranges::destroy_n;
   } // namespace ranges
+
+  // [specialized.relocate]
+  using std::relocate;
+  using std::relocate_at;
 
   // [unique.ptr], class template unique_ptr
   using std::default_delete;
