@@ -30,12 +30,21 @@ struct __libcpp_is_trivially_relocatable : integral_constant<bool, __is_triviall
 #else
 template <class _Tp, class = void>
 struct __libcpp_is_trivially_relocatable : is_trivially_copyable<_Tp> {};
-#endif
 
 template <class _Tp>
 struct __libcpp_is_trivially_relocatable<_Tp,
                                          __enable_if_t<is_same<_Tp, typename _Tp::__trivially_relocatable>::value> >
     : true_type {};
+#endif
+
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS is_trivially_relocatable
+  : __libcpp_is_trivially_relocatable<_Tp> {};
+
+#if _LIBCPP_STD_VER >= 17
+template <class _Tp>
+inline constexpr bool is_trivially_relocatable_v = is_trivially_relocatable<_Tp>::value;
+#endif
 
 _LIBCPP_END_NAMESPACE_STD
 

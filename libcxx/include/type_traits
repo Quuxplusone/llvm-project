@@ -474,6 +474,7 @@ namespace std
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_convertible.h>
 #include <__type_traits/is_nothrow_destructible.h>
+#include <__type_traits/is_nothrow_relocatable.h>
 #include <__type_traits/is_null_pointer.h>
 #include <__type_traits/is_object.h>
 #include <__type_traits/is_pod.h>
@@ -482,6 +483,7 @@ namespace std
 #include <__type_traits/is_reference.h>
 #include <__type_traits/is_reference_wrapper.h>
 #include <__type_traits/is_referenceable.h>
+#include <__type_traits/is_relocatable.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_scalar.h>
 #include <__type_traits/is_scoped_enum.h>
@@ -494,6 +496,7 @@ namespace std
 #include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_copyable.h>
 #include <__type_traits/is_trivially_destructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_unbounded_array.h>
 #include <__type_traits/is_union.h>
 #include <__type_traits/is_unsigned.h>
