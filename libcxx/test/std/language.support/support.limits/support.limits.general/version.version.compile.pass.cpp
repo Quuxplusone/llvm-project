@@ -232,6 +232,7 @@
     __cpp_lib_transformation_trait_aliases                  201304L [C++14]
     __cpp_lib_transparent_operators                         201210L [C++14]
                                                             201510L [C++17]
+    __cpp_lib_trivially_relocatable                         202401L [C++14]
     __cpp_lib_tuple_element_t                               201402L [C++14]
     __cpp_lib_tuple_like                                    202207L [C++23]
                                                             202311L [C++26]
@@ -1061,6 +1062,10 @@
 
 # ifdef __cpp_lib_transparent_operators
 #   error "__cpp_lib_transparent_operators should not be defined before c++14"
+# endif
+
+# ifdef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should not be defined before c++14"
 # endif
 
 # ifdef __cpp_lib_tuple_element_t
@@ -1985,6 +1990,13 @@
 # endif
 # if __cpp_lib_transparent_operators != 201210L
 #   error "__cpp_lib_transparent_operators should have the value 201210L in c++14"
+# endif
+
+# ifndef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should be defined in c++14"
+# endif
+# if __cpp_lib_trivially_relocatable != 202401L
+#   error "__cpp_lib_trivially_relocatable should have the value 202401L in c++14"
 # endif
 
 # ifndef __cpp_lib_tuple_element_t
@@ -3098,6 +3110,13 @@
 # endif
 # if __cpp_lib_transparent_operators != 201510L
 #   error "__cpp_lib_transparent_operators should have the value 201510L in c++17"
+# endif
+
+# ifndef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should be defined in c++17"
+# endif
+# if __cpp_lib_trivially_relocatable != 202401L
+#   error "__cpp_lib_trivially_relocatable should have the value 202401L in c++17"
 # endif
 
 # ifndef __cpp_lib_tuple_element_t
@@ -4490,6 +4509,13 @@
 # endif
 # if __cpp_lib_transparent_operators != 201510L
 #   error "__cpp_lib_transparent_operators should have the value 201510L in c++20"
+# endif
+
+# ifndef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should be defined in c++20"
+# endif
+# if __cpp_lib_trivially_relocatable != 202401L
+#   error "__cpp_lib_trivially_relocatable should have the value 202401L in c++20"
 # endif
 
 # ifndef __cpp_lib_tuple_element_t
@@ -6086,6 +6112,13 @@
 # endif
 # if __cpp_lib_transparent_operators != 201510L
 #   error "__cpp_lib_transparent_operators should have the value 201510L in c++23"
+# endif
+
+# ifndef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should be defined in c++23"
+# endif
+# if __cpp_lib_trivially_relocatable != 202401L
+#   error "__cpp_lib_trivially_relocatable should have the value 202401L in c++23"
 # endif
 
 # ifndef __cpp_lib_tuple_element_t
@@ -8012,6 +8045,13 @@
 # endif
 # if __cpp_lib_transparent_operators != 201510L
 #   error "__cpp_lib_transparent_operators should have the value 201510L in c++26"
+# endif
+
+# ifndef __cpp_lib_trivially_relocatable
+#   error "__cpp_lib_trivially_relocatable should be defined in c++26"
+# endif
+# if __cpp_lib_trivially_relocatable != 202401L
+#   error "__cpp_lib_trivially_relocatable should have the value 202401L in c++26"
 # endif
 
 # ifndef __cpp_lib_tuple_element_t
