@@ -66,14 +66,6 @@ struct NonTrivialDestructor {
 };
 static_assert(!std::__libcpp_is_trivially_relocatable<NonTrivialDestructor>::value, "");
 
-// library-internal types
-// ----------------------
-
-// __split_buffer
-static_assert(std::__libcpp_is_trivially_relocatable<std::__split_buffer<int> >::value, "");
-static_assert(std::__libcpp_is_trivially_relocatable<std::__split_buffer<NotTriviallyCopyable> >::value, "");
-static_assert(!std::__libcpp_is_trivially_relocatable<std::__split_buffer<int, test_allocator<int> > >::value, "");
-
 // standard library types
 // ----------------------
 
