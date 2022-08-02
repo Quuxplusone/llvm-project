@@ -510,6 +510,7 @@ namespace std
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_move_assignable.h>
 #include <__type_traits/is_trivially_move_constructible.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_unbounded_array.h>
 #include <__type_traits/is_union.h>
 #include <__type_traits/is_unsigned.h>
