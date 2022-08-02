@@ -239,6 +239,7 @@ __cpp_lib_to_underlying                                 202102L <utility>
 __cpp_lib_transformation_trait_aliases                  201304L <type_traits>
 __cpp_lib_transparent_operators                         201510L <functional> <memory>
                                                         201210L // C++14
+__cpp_lib_trivially_relocatable                         202401L <memory> <type_traits>
 __cpp_lib_tuple_element_t                               201402L <tuple>
 __cpp_lib_tuple_like                                    202311L <map> <tuple> <unordered_map>
                                                                 <utility>
@@ -287,6 +288,7 @@ __cpp_lib_void_t                                        201411L <type_traits>
 # define __cpp_lib_string_udls                          201304L
 # define __cpp_lib_transformation_trait_aliases         201304L
 # define __cpp_lib_transparent_operators                201210L
+# define __cpp_lib_trivially_relocatable                202401L
 # define __cpp_lib_tuple_element_t                      201402L
 # define __cpp_lib_tuples_by_type                       201304L
 #endif
