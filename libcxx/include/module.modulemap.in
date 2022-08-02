@@ -1521,6 +1521,7 @@ module std [system] {
     module is_trivially_destructible           { private header "__type_traits/is_trivially_destructible.h" }
     module is_trivially_move_assignable        { private header "__type_traits/is_trivially_move_assignable.h" }
     module is_trivially_move_constructible     { private header "__type_traits/is_trivially_move_constructible.h" }
+    module is_trivially_relocatable            { private header "__type_traits/is_trivially_relocatable.h" }
     module is_unbounded_array                  { private header "__type_traits/is_unbounded_array.h" }
     module is_union                            { private header "__type_traits/is_union.h" }
     module is_unsigned                         { private header "__type_traits/is_unsigned.h" }
