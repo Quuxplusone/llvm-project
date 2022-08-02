@@ -702,6 +702,7 @@ END-SCRIPT
 #include <__type_traits/is_trivially_destructible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_trivially_destructible.h'}}
 #include <__type_traits/is_trivially_move_assignable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_trivially_move_assignable.h'}}
 #include <__type_traits/is_trivially_move_constructible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_trivially_move_constructible.h'}}
+#include <__type_traits/is_trivially_relocatable.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_trivially_relocatable.h'}}
 #include <__type_traits/is_unbounded_array.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_unbounded_array.h'}}
 #include <__type_traits/is_union.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_union.h'}}
 #include <__type_traits/is_unsigned.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_unsigned.h'}}
