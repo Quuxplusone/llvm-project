@@ -108,6 +108,10 @@
 #    error "__cpp_lib_transformation_trait_aliases should not be defined before c++14"
 #  endif
 
+#  ifdef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should not be defined before c++14"
+#  endif
+
 #  ifdef __cpp_lib_type_identity
 #    error "__cpp_lib_type_identity should not be defined before c++20"
 #  endif
@@ -223,6 +227,13 @@
 #  endif
 #  if __cpp_lib_transformation_trait_aliases != 201304L
 #    error "__cpp_lib_transformation_trait_aliases should have the value 201304L in c++14"
+#  endif
+
+#  ifndef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should be defined in c++14"
+#  endif
+#  if __cpp_lib_trivially_relocatable != 202401L
+#    error "__cpp_lib_trivially_relocatable should have the value 202401L in c++14"
 #  endif
 
 #  ifdef __cpp_lib_type_identity
@@ -358,6 +369,13 @@
 #  endif
 #  if __cpp_lib_transformation_trait_aliases != 201304L
 #    error "__cpp_lib_transformation_trait_aliases should have the value 201304L in c++17"
+#  endif
+
+#  ifndef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should be defined in c++17"
+#  endif
+#  if __cpp_lib_trivially_relocatable != 202401L
+#    error "__cpp_lib_trivially_relocatable should have the value 202401L in c++17"
 #  endif
 
 #  ifdef __cpp_lib_type_identity
@@ -529,6 +547,13 @@
 #  endif
 #  if __cpp_lib_transformation_trait_aliases != 201304L
 #    error "__cpp_lib_transformation_trait_aliases should have the value 201304L in c++20"
+#  endif
+
+#  ifndef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should be defined in c++20"
+#  endif
+#  if __cpp_lib_trivially_relocatable != 202401L
+#    error "__cpp_lib_trivially_relocatable should have the value 202401L in c++20"
 #  endif
 
 #  ifndef __cpp_lib_type_identity
@@ -724,6 +749,13 @@
 #  endif
 #  if __cpp_lib_transformation_trait_aliases != 201304L
 #    error "__cpp_lib_transformation_trait_aliases should have the value 201304L in c++23"
+#  endif
+
+#  ifndef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should be defined in c++23"
+#  endif
+#  if __cpp_lib_trivially_relocatable != 202401L
+#    error "__cpp_lib_trivially_relocatable should have the value 202401L in c++23"
 #  endif
 
 #  ifndef __cpp_lib_type_identity
@@ -937,6 +969,13 @@
 #  endif
 #  if __cpp_lib_transformation_trait_aliases != 201304L
 #    error "__cpp_lib_transformation_trait_aliases should have the value 201304L in c++26"
+#  endif
+
+#  ifndef __cpp_lib_trivially_relocatable
+#    error "__cpp_lib_trivially_relocatable should be defined in c++26"
+#  endif
+#  if __cpp_lib_trivially_relocatable != 202401L
+#    error "__cpp_lib_trivially_relocatable should have the value 202401L in c++26"
 #  endif
 
 #  ifndef __cpp_lib_type_identity
