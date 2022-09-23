@@ -12,5 +12,6 @@ limits
 new
 optional
 stdexcept
+tuple
 type_traits
 version
