@@ -2618,7 +2618,7 @@ def note_deduction_guide_access : Note<
 def warn_cxx14_compat_class_template_argument_deduction : Warning<
   "class template argument deduction is incompatible with C++ standards "
   "before C++17%select{|; for compatibility, use explicit type name %1}0">,
-  InGroup<CXXPre17Compat>, DefaultIgnore;
+  InGroup<CTAD>, DefaultIgnore;
 def warn_ctad_maybe_unsupported : Warning<
   "%0 may not intend to support class template argument deduction">,
   InGroup<CTADMaybeUnsupported>, DefaultIgnore;
