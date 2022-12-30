@@ -1974,6 +1974,12 @@ defm elide_constructors : BoolFOption<"elide-constructors",
   NegFlag<SetFalse, [], [ClangOption, CC1Option],
           "Disable C++ copy constructor elision">,
   PosFlag<SetTrue>>;
+defm static_init_lists : BoolFOption<"static-init-lists",
+  LangOpts<"StaticInitLists">, DefaultFalse,
+  NegFlag<SetFalse, [], [ClangOption, CC1Option],
+          "Never store braced initializers in static storage">,
+  PosFlag<SetTrue, [], [ClangOption, CC1Option],
+          "Store braced initializers in static storage when possible">>;
 def fno_elide_type : Flag<["-"], "fno-elide-type">, Group<f_Group>,
     Visibility<[ClangOption, CC1Option]>,
     HelpText<"Do not elide types when printing diagnostics">,
