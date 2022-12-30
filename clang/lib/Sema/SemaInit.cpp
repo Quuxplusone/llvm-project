@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Designator.h"
@@ -20,6 +21,7 @@
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
+#include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/SemaInternal.h"
@@ -7942,7 +7944,11 @@ void Sema::checkInitializerLifetime(const InitializedEntity &Entity,
     }
 
     case LK_MemInitializer: {
-      if (isa<MaterializeTemporaryExpr>(L)) {
+      auto *DRE = dyn_cast<DeclRefExpr>(L);
+      auto *VD = DRE ? dyn_cast<VarDecl>(DRE->getDecl()) : nullptr;
+      bool IsBackingArray = isa<MaterializeTemporaryExpr>(L) ||
+          (VD && VD->getName().startswith("__il"));
+      if (IsBackingArray) {
         // Under C++ DR1696, if a mem-initializer (or a default member
         // initializer used by the absence of one) would lifetime-extend a
         // temporary, the program is ill-formed.
@@ -9041,18 +9047,50 @@ ExprResult InitializationSequence::Perform(Sema &S,
              diag::warn_cxx98_compat_initializer_list_init)
         << CurInit.get()->getSourceRange();
 
+      DeclContext *DC = S.CurContext->getEnclosingNamespaceContext();
+
+      auto BuildStaticBackingArrayVarDecl = [&](SourceLocation Loc, QualType Type, StringRef Name) {
+        IdentifierInfo *II = &S.PP.getIdentifierTable().get(Name);
+        TypeSourceInfo *TInfo = S.Context.getTrivialTypeSourceInfo(Type, Loc);
+        VarDecl *VD = VarDecl::Create(S.Context, DC, Loc, Loc, II, Type, TInfo, SC_Static);
+        VD->setImplicit();
+        return VD;
+      };
+
       // Materialize the temporary into memory.
-      MaterializeTemporaryExpr *MTE = S.CreateMaterializeTemporaryExpr(
-          CurInit.get()->getType(), CurInit.get(),
-          /*BoundToLvalueReference=*/false);
+      Expr *MTE = [&](QualType AT, Expr *Init) -> Expr* {
+        if (!S.getLangOpts().StaticInitLists) {
+          // eschew the optimization entirely
+        } else if (S.CurContext->isDependentContext()) {
+          // don't do anything until substitution time
+        } else if (!AT.isDestructedType()) {
+          // The backing array's name is static, so it needn't be unique
+          // except within this translation unit.
+          static int Count = 0;
+          VarDecl *VD = BuildStaticBackingArrayVarDecl(
+            Init->getExprLoc(), AT,
+            std::string("__il") + std::to_string(Count++)
+          );
+          S.AddInitializerToDecl(VD, Init, /*DirectInit=*/false);
+          S.FinalizeDeclaration(VD);
+          if (VD->hasConstantInitialization()) {
+            VD->setConstexpr(true); // so the initializer_list will be constexpr-iterable if need be
+            DC->addHiddenDecl(VD);
+            S.Consumer.HandleTopLevelDecl(DeclGroupRef(VD));
+            return S.BuildDeclRefExpr(VD, AT, VK_LValue, Init->getExprLoc());
+          } else {
+            VD->setInvalidDecl(); // so it won't be emitted
+          }
+        }
+        return S.CreateMaterializeTemporaryExpr(AT, Init, /*BoundToLvalueReference=*/false);
+      }(CurInit.get()->getType(), CurInit.get());
 
       // Wrap it in a construction of a std::initializer_list<T>.
       CurInit = new (S.Context) CXXStdInitializerListExpr(Step->Type, MTE);
 
       // Bind the result, in case the library has given initializer_list a
       // non-trivial destructor.
-      if (shouldBindAsTemporary(Entity))
-        CurInit = S.MaybeBindToTemporary(CurInit.get());
+      assert(!shouldBindAsTemporary(Entity));
       break;
     }
 
