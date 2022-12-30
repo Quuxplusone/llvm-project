@@ -6542,6 +6542,8 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
                      options::OPT_fno_access_control);
   Args.addOptOutFlag(CmdArgs, options::OPT_felide_constructors,
                      options::OPT_fno_elide_constructors);
+  Args.addOptInFlag(CmdArgs, options::OPT_fstatic_init_lists,
+                    options::OPT_fno_static_init_lists);
 
   ToolChain::RTTIMode RTTIMode = TC.getRTTIMode();
 
