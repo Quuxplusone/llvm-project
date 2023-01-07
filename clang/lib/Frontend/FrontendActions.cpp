@@ -658,6 +658,11 @@ namespace {
                    "Use standard C++ include directories [-nostdinc++]");
       DUMP_BOOLEAN(HSOpts.UseLibcxx,
                    "Use libc++ (rather than libstdc++) [-stdlib=]");
+      Out.indent(2) << "Binary search options:\n";
+      Out.indent(4) << "Binary dirs [ -binary-dir=]:\n";
+      for (const std::string &Entry : HSOpts.BinaryDirs) {
+        Out.indent(6) << Entry << "'\n";
+      }
       return false;
     }
 
