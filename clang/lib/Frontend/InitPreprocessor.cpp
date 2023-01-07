@@ -599,6 +599,8 @@ static void InitializeCPlusPlusFeatureTestMacros(const LangOptions &LangOpts,
   if (LangOpts.CXXExceptions)
     Builder.defineMacro("__cpp_exceptions", "199711L");
 
+  Builder.defineMacro("__cpp_pp_embed", "202401L"); // P1967R9 #embed
+
   // C++11 features.
   if (LangOpts.CPlusPlus11) {
     Builder.defineMacro("__cpp_unicode_characters", "200704L");
