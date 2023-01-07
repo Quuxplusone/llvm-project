@@ -18,6 +18,9 @@ void PPCallbacks::HasInclude(SourceLocation Loc, StringRef FileName,
                              bool IsAngled, OptionalFileEntryRef File,
                              SrcMgr::CharacteristicKind FileType) {}
 
+void PPCallbacks::HasEmbed(SourceLocation Loc, StringRef FileName,
+                           bool IsAngled, OptionalFileEntryRef File) {}
+
 // Out of line key method.
 PPChainedCallbacks::~PPChainedCallbacks() = default;
 
@@ -26,4 +29,10 @@ void PPChainedCallbacks::HasInclude(SourceLocation Loc, StringRef FileName,
                                     SrcMgr::CharacteristicKind FileType) {
   First->HasInclude(Loc, FileName, IsAngled, File, FileType);
   Second->HasInclude(Loc, FileName, IsAngled, File, FileType);
+}
+
+void PPChainedCallbacks::HasEmbed(SourceLocation Loc, StringRef FileName,
+                                  bool IsAngled, OptionalFileEntryRef File) {
+  First->HasEmbed(Loc, FileName, IsAngled, File);
+  Second->HasEmbed(Loc, FileName, IsAngled, File);
 }

@@ -171,6 +171,10 @@ public:
                           StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
+  void EmbedDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                          StringRef FileName, bool IsAngled,
+                          CharSourceRange FilenameRange, OptionalFileEntryRef File,
+                          StringRef SearchPath, StringRef RelativePath) override;
   void moduleImport(SourceLocation ImportLoc, ModuleIdPath Path,
                     const Module *Imported) override;
 

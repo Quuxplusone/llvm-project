@@ -62,6 +62,15 @@ struct ModuleDependencyPPCallbacks : public PPCallbacks {
       return;
     Collector.addFile(File->getName());
   }
+
+  void EmbedDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                          StringRef FileName, bool IsAngled,
+                          CharSourceRange FilenameRange, OptionalFileEntryRef File,
+                          StringRef SearchPath, StringRef RelativePath) override {
+    if (!File)
+      return;
+    Collector.addFile(File->getName());
+  }
 };
 
 struct ModuleDependencyMMCallbacks : public ModuleMapCallbacks {
