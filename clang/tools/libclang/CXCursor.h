@@ -28,6 +28,7 @@ class Decl;
 class Expr;
 class FieldDecl;
 class InclusionDirective;
+class EmbedDirective;
 class LabelStmt;
 class MacroDefinitionRecord;
 class MacroExpansion;
@@ -199,9 +200,17 @@ static inline MacroExpansionCursor getCursorMacroExpansion(CXCursor C) {
 CXCursor MakeInclusionDirectiveCursor(InclusionDirective *,
                                       CXTranslationUnit TU);
 
+/// Create an embed directive cursor.
+CXCursor MakeEmbedDirectiveCursor(EmbedDirective *,
+                                      CXTranslationUnit TU);
+
 /// Unpack a given inclusion directive cursor to retrieve its
 /// source range.
 const InclusionDirective *getCursorInclusionDirective(CXCursor C);
+
+/// Unpack a given embed directive cursor to retrieve its
+/// source range.
+const EmbedDirective *getCursorEmbedDirective(CXCursor C);
 
 /// Create a label reference at the given location.
 CXCursor MakeCursorLabelRef(LabelStmt *Label, SourceLocation Loc,

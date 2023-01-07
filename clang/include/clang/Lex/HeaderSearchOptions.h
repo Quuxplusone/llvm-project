@@ -111,6 +111,9 @@ public:
   /// etc.).
   std::string ResourceDir;
 
+  /// User-specified "-binary-dir" entries, for \c \#embed.
+  std::vector<std::string> BinaryDirs;
+
   /// The directory used for the module cache.
   std::string ModuleCachePath;
 
