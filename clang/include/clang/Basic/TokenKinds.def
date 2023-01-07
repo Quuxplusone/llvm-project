@@ -132,6 +132,9 @@ PPKEYWORD(sccs)
 PPKEYWORD(assert)
 PPKEYWORD(unassert)
 
+// WG21 P1967 | WG14 N2898 preprocessor embed
+PPKEYWORD(embed)
+
 // Clang extensions
 PPKEYWORD(__public_macro)
 PPKEYWORD(__private_macro)
