@@ -2055,8 +2055,9 @@ enum CXCursorKind {
   CXCursor_MacroExpansion = 502,
   CXCursor_MacroInstantiation = CXCursor_MacroExpansion,
   CXCursor_InclusionDirective = 503,
+  CXCursor_EmbedDirective = 504,
   CXCursor_FirstPreprocessing = CXCursor_PreprocessingDirective,
-  CXCursor_LastPreprocessing = CXCursor_InclusionDirective,
+  CXCursor_LastPreprocessing = CXCursor_EmbedDirective,
 
   /* Extra Declarations */
   /**

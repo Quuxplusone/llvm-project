@@ -380,6 +380,7 @@ void Preprocessor::RegisterBuiltinMacros() {
     Ident__has_c_attribute = nullptr;
 
   Ident__has_declspec = RegisterBuiltinMacro(*this, "__has_declspec_attribute");
+  Ident__has_embed      = RegisterBuiltinMacro(*this, "__has_embed");
   Ident__has_include      = RegisterBuiltinMacro(*this, "__has_include");
   Ident__has_include_next = RegisterBuiltinMacro(*this, "__has_include_next");
   Ident__has_warning      = RegisterBuiltinMacro(*this, "__has_warning");
@@ -1277,6 +1278,92 @@ bool Preprocessor::EvaluateHasIncludeNext(Token &Tok, IdentifierInfo *II) {
   return EvaluateHasIncludeCommon(Tok, II, *this, Lookup, LookupFromFile);
 }
 
+/// EvaluateHasEmbed - Process a '__has_embed("foo" params...)' expression.
+/// Returns 0 on failure, 1 if successful, or 2 if the file is empty.
+int Preprocessor::EvaluateHasEmbed(Token &Tok, IdentifierInfo *II) {
+  // Save the location of the current token.  If a '(' is later found, use
+  // that location.  If not, use the end of this location instead.
+  SourceLocation LParenLoc = Tok.getLocation();
+
+  // These expressions are only allowed within a preprocessor directive.
+  if (!isParsingIfOrElifDirective()) {
+    Diag(LParenLoc, diag::err_pp_directive_required) << II;
+    // Return a valid identifier token.
+    assert(Tok.is(tok::identifier));
+    Tok.setIdentifierInfo(II);
+    return 0;
+  }
+
+  // Get '('. If we don't have a '(', try to form a header-name token.
+  do {
+    if (LexHeaderName(Tok))
+      return 0;
+  } while (Tok.getKind() == tok::comment);
+
+  // Ensure we have a '('.
+  if (Tok.isNot(tok::l_paren)) {
+    // No '(', use end of last token.
+    LParenLoc = getLocForEndOfToken(LParenLoc);
+    Diag(LParenLoc, diag::err_pp_expected_after) << II << tok::l_paren;
+    // If the next token looks like a filename or the start of one,
+    // assume it is and process it as such.
+    if (Tok.isNot(tok::header_name))
+      return 0;
+  } else {
+    // Save '(' location for possible missing ')' message.
+    LParenLoc = Tok.getLocation();
+    if (LexHeaderName(Tok))
+      return 0;
+  }
+
+  if (Tok.isNot(tok::header_name)) {
+    Diag(Tok.getLocation(), diag::err_pp_expects_filename);
+    return 0;
+  }
+
+  SmallString<128> FilenameBuffer;
+  bool Invalid = false;
+  StringRef Filename = getSpelling(Tok, FilenameBuffer, &Invalid);
+  if (Invalid)
+    return 0;
+
+  SourceLocation FilenameLoc = Tok.getLocation();
+
+  bool isAngled = GetIncludeFilenameSpelling(Tok.getLocation(), Filename);
+  // If GetIncludeFilenameSpelling set the start ptr to null, there was an
+  // error.
+  if (Filename.empty())
+    return 0;
+
+  Preprocessor::LexEmbedParametersResult Params =
+      LexEmbedParameters(Tok, /*InHasEmbed=*/true, /*DiagnoseUnknown=*/false);
+  if (!Params.Successful || Params.UnrecognizedParams > 0)
+    return 0;
+
+  // Ensure we have a trailing ).
+  if (Tok.isNot(tok::r_paren)) {
+    Diag(getLocForEndOfToken(FilenameLoc), diag::err_pp_expected_after)
+        << II << tok::r_paren;
+    Diag(LParenLoc, diag::note_matching) << tok::l_paren;
+    return 0;
+  }
+
+  SmallString<256> RelativePath;
+  SmallString<256> SearchPath;
+  OptionalFileEntryRef File = LookupEmbedFile(FilenameLoc, Filename, Params.MaybeLimitParam, isAngled,
+                                              nullptr, &SearchPath, &RelativePath);
+  if (PPCallbacks *Callbacks = getPPCallbacks()) {
+    Callbacks->HasEmbed(FilenameLoc, Filename, isAngled, File);
+  }
+  if (!File) {
+    return 0;
+  } else if (Params.MaybeLimitParam.value_or(-1) == 0 || File->getSize() == 0) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
 /// Process single-argument builtin feature-like macros that return
 /// integer values.
 static void EvaluateFeatureLikeBuiltinMacro(llvm::raw_svector_ostream& OS,
@@ -1827,6 +1914,13 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
     if (Tok.isNot(tok::r_paren))
       return;
     OS << (int)Value;
+    Tok.setKind(tok::numeric_constant);
+  } else if (II == Ident__has_embed) {
+    int Value = EvaluateHasEmbed(Tok, II);
+
+    if (Tok.isNot(tok::r_paren))
+      return;
+    OS << Value;
     Tok.setKind(tok::numeric_constant);
   } else if (II == Ident__has_warning) {
     // The argument should be a parenthesized string literal.
