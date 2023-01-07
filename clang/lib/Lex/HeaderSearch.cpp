@@ -850,6 +850,119 @@ diagnoseFrameworkInclude(DiagnosticsEngine &Diags, SourceLocation IncludeLoc,
         << IncludeFilename;
 }
 
+OptionalFileEntryRef HeaderSearch::LookupEmbedFile(
+    SourceLocation FilenameLoc, StringRef Filename, std::optional<size_t> MaybeLimit,
+    bool isAngled, const SmallVectorImpl<char> *LocalPath,
+    SmallVectorImpl<char> *SearchPath,
+    SmallVectorImpl<char> *RelativePath, const FileEntry *LookupFromFile) {
+  FileManager &FM = this->FileMgr;
+  auto DidErrorHappen = [](llvm::Expected<FileEntryRef> &Attempt) -> bool {
+    if (Attempt)
+      return false;
+    llvm::handleAllErrors(Attempt.takeError(), [](llvm::ErrorInfoBase &) {
+      // simply purging the information
+    });
+    return true;
+  };
+  if (llvm::sys::path::is_absolute(Filename)) {
+    // lookup path or immediately fail
+    Expected<FileEntryRef> ImmediateLookupFile =
+        FM.getFileRef(Filename, false);
+    if (DidErrorHappen(ImmediateLookupFile))
+      return std::nullopt;
+    if (SearchPath) {
+      SearchPath->assign(Filename.begin(), Filename.end());
+      llvm::sys::path::remove_filename(*SearchPath);
+    }
+    return ImmediateLookupFile.get();
+  }
+
+  // Otherwise, it's search time!
+  SmallString<512> LookupPath;
+  // Non-angled lookup
+  if (!isAngled) {
+    bool TryLocalLookup = false;
+    if (LocalPath) {
+        // use the provided search path as the local lookup path
+        llvm::sys::path::native(*LocalPath, LookupPath);
+        TryLocalLookup = true;
+    } else if (LookupFromFile) {
+      // Use file-based lookup here
+      StringRef FullFileDir = LookupFromFile->tryGetRealPathName();
+      if (!FullFileDir.empty()) {
+        llvm::sys::path::native(FullFileDir, LookupPath);
+        llvm::sys::path::remove_filename(LookupPath);
+        TryLocalLookup = true;
+      }
+    } else {
+      // Cannot do local lookup: give up.
+      TryLocalLookup = false;
+    }
+    if (TryLocalLookup) {
+      if (!LookupPath.empty() &&
+          !llvm::sys::path::is_separator(LookupPath.back())) {
+        LookupPath.append(llvm::sys::path::get_separator());
+      }
+      LookupPath.append(Filename);
+      Expected<FileEntryRef> FileLookup = FM.getFileRef(LookupPath, false);
+      if (!DidErrorHappen(FileLookup)) {
+        if (SearchPath) {
+          *SearchPath = LookupPath;
+          llvm::sys::path::remove_filename(*SearchPath);
+        }
+        return FileLookup.get();
+      }
+    }
+  }
+
+  if (!isAngled) {
+    // do working directory lookup
+    LookupPath.clear();
+    auto MaybeWorkingDirEntry = FM.getDirectory(".");
+    if (MaybeWorkingDirEntry) {
+      const DirectoryEntry *WorkingDirEntry = *MaybeWorkingDirEntry;
+      StringRef WorkingDir = WorkingDirEntry->getName();
+      if (!WorkingDir.empty()) {
+        llvm::sys::path::native(WorkingDir, LookupPath);
+        if (!LookupPath.empty() &&
+            !llvm::sys::path::is_separator(LookupPath.back())) {
+          LookupPath.append(llvm::sys::path::get_separator());
+        }
+        LookupPath.append(llvm::sys::path::get_separator());
+        LookupPath.append(Filename);
+        Expected<FileEntryRef> FileLookup = FM.getFileRef(LookupPath, false);
+        if (!DidErrorHappen(FileLookup)) {
+          if (SearchPath) {
+            *SearchPath = LookupPath;
+            llvm::sys::path::remove_filename(*SearchPath);
+          }
+          return FileLookup.get();
+        }
+      }
+    }
+  }
+
+  for (const std::string &Entry : HSOpts->BinaryDirs) {
+    LookupPath.clear();
+    llvm::sys::path::native(Entry, LookupPath);
+    if (!LookupPath.empty() &&
+        !llvm::sys::path::is_separator(LookupPath.back())) {
+      LookupPath.append(llvm::sys::path::get_separator());
+    }
+    LookupPath.append(Filename.begin(), Filename.end());
+    llvm::sys::path::native(LookupPath);
+    Expected<FileEntryRef> FileLookup = FM.getFileRef(LookupPath, false);
+    if (!DidErrorHappen(FileLookup)) {
+      if (SearchPath) {
+        *SearchPath = LookupPath;
+        llvm::sys::path::remove_filename(*SearchPath);
+      }
+      return FileLookup.get();
+    }
+  }
+  return std::nullopt;
+}
+
 /// LookupFile - Given a "foo" or \<foo> reference, look up the indicated file,
 /// return null on failure.  isAngled indicates whether the file reference is
 /// for system \#include's or not (i.e. using <> instead of ""). Includers, if

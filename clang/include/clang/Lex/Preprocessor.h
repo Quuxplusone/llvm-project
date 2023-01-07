@@ -165,6 +165,7 @@ class Preprocessor {
   IdentifierInfo *Ident__has_builtin;              // __has_builtin
   IdentifierInfo *Ident__has_constexpr_builtin;    // __has_constexpr_builtin
   IdentifierInfo *Ident__has_attribute;            // __has_attribute
+  IdentifierInfo *Ident__has_embed;                // __has_embed
   IdentifierInfo *Ident__has_include;              // __has_include
   IdentifierInfo *Ident__has_include_next;         // __has_include_next
   IdentifierInfo *Ident__has_warning;              // __has_warning
@@ -1584,6 +1585,23 @@ public:
   /// Lex a token, forming a header-name token if possible.
   bool LexHeaderName(Token &Result, bool AllowMacroExpansion = true);
 
+  /// Lex '(' balanced-token-seq_opt ')' as used by \c \#embed.
+  /// Return true if there was a diagnosed error.
+  bool LexParenthesizedBalancedTokenSequence(Token &Tok, SmallVector<Token, 2> &TokenSequence);
+
+  struct LexEmbedParametersResult {
+    bool Successful;
+    std::optional<size_t> MaybeLimitParam;
+    std::optional<SmallVector<Token, 2>> MaybeEmptyParam;
+    std::optional<SmallVector<Token, 2>> MaybePrefixParam;
+    std::optional<SmallVector<Token, 2>> MaybeSuffixParam;
+    int UnrecognizedParams;
+  };
+
+  LexEmbedParametersResult LexEmbedParameters(Token &Current,
+                                              bool InHasEmbed,
+                                              bool DiagnoseUnknown);
+
   bool LexAfterModuleImport(Token &Result);
   void CollectPpImportSuffix(SmallVectorImpl<Token> &Toks);
 
@@ -2252,6 +2270,20 @@ public:
              bool *IsFrameworkFound, bool SkipCache = false,
              bool OpenFile = true, bool CacheFailures = true);
 
+  OptionalFileEntryRef
+  LookupEmbedFile(SourceLocation FilenameLoc, StringRef Filename,
+                  std::optional<size_t> MaybeLimit, bool isAngled,
+                  const SmallVectorImpl<char> *LocalPath,
+                  SmallVectorImpl<char> *SearchPath,
+                  SmallVectorImpl<char> *RelativePath) {
+    const FileEntry *LookupFromFile = nullptr;
+    if (PreprocessorLexer *TheLexer = getCurrentFileLexer())
+      LookupFromFile = TheLexer->getFileEntry();
+    return HeaderInfo.LookupEmbedFile(FilenameLoc, Filename,
+        MaybeLimit, isAngled, LocalPath, SearchPath, RelativePath,
+        LookupFromFile);
+  }
+
   /// Return true if we're in the top-level file, not in a \#include.
   bool isInPrimaryFile() const;
 
@@ -2356,6 +2388,9 @@ private:
   /// Information about the result for evaluating an expression for a
   /// preprocessor directive.
   struct DirectiveEvalResult {
+    /// The integral value of the expression.
+    std::optional<llvm::APSInt> Value;
+
     /// Whether the expression was evaluated as true or not.
     bool Conditional;
 
@@ -2368,9 +2403,18 @@ private:
 
   /// Evaluate an integer constant expression that may occur after a
   /// \#if or \#elif directive and return a \p DirectiveEvalResult object.
+  /// This includes discarding the rest of the line if a parse error happens.
   ///
   /// If the expression is equivalent to "!defined(X)" return X in IfNDefMacro.
   DirectiveEvalResult EvaluateDirectiveExpression(IdentifierInfo *&IfNDefMacro);
+
+  /// Evaluate an integer constant expression that may occur after a
+  /// \#if or \#elif directive and return a \p DirectiveEvalResult object.
+  ///
+  /// If the expression is equivalent to "!defined(X)" return X in IfNDefMacro.
+  DirectiveEvalResult EvaluateDirectiveExpressionWithTok(IdentifierInfo *&IfNDefMacro,
+                                                         Token &Tok,
+                                                         bool Parenthesized);
 
   /// Process a '__has_include("path")' expression.
   ///
@@ -2381,6 +2425,11 @@ private:
   ///
   /// Returns true if successful.
   bool EvaluateHasIncludeNext(Token &Tok, IdentifierInfo *II);
+
+  /// Process a '__has_embed("path" args...)' expression.
+  ///
+  /// Returns 0 on failure, 1 on success, 2 on empty-file.
+  int EvaluateHasEmbed(Token &Tok, IdentifierInfo *II);
 
   /// Get the directory and file from which to start \#include_next lookup.
   std::pair<ConstSearchDirIterator, const FileEntry *>
@@ -2532,6 +2581,7 @@ private:
   void HandleIncludeMacrosDirective(SourceLocation HashLoc, Token &Tok);
   void HandleImportDirective(SourceLocation HashLoc, Token &Tok);
   void HandleMicrosoftImportDirective(Token &Tok);
+  void HandleEmbedDirective(SourceLocation HashLoc, Token &Tok);
 
 public:
   /// Check that the given module is available, producing a diagnostic if not.
