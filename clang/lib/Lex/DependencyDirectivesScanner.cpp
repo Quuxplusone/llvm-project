@@ -887,6 +887,7 @@ bool Scanner::lexPPLine(const char *&First, const char *const End) {
                   .Case("elifndef", pp_elifndef)
                   .Case("else", pp_else)
                   .Case("endif", pp_endif)
+                  .Case("embed", pp_embed)
                   .Default(pp_none);
   if (Kind == pp_none) {
     skipDirective(Id, First, End);
@@ -901,6 +902,7 @@ bool Scanner::lexPPLine(const char *&First, const char *const End) {
   case pp___include_macros:
   case pp_include_next:
   case pp_import:
+  case pp_embed:
     lexIncludeFilename(First, End);
     break;
   default:
