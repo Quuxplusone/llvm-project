@@ -1413,7 +1413,8 @@ private:
       break;
     case tok::identifier:
       if (Tok->isOneOf(Keywords.kw___has_include,
-                       Keywords.kw___has_include_next)) {
+                       Keywords.kw___has_include_next,
+                       Keywords.kw___has_embed)) {
         parseHasInclude();
       }
       if (Style.isCSharp() && Tok->is(Keywords.kw_where) && Tok->Next &&
@@ -1549,6 +1550,7 @@ private:
     case tok::pp_include:
     case tok::pp_include_next:
     case tok::pp_import:
+    case tok::pp_embed:
       next();
       parseIncludeDirective();
       Type = LT_ImportStatement;
@@ -1575,7 +1577,8 @@ private:
       if (Tok->is(tok::l_paren)) {
         parseParens();
       } else if (Tok->isOneOf(Keywords.kw___has_include,
-                              Keywords.kw___has_include_next)) {
+                              Keywords.kw___has_include_next,
+                              Keywords.kw___has_embed)) {
         parseHasInclude();
       }
     }
