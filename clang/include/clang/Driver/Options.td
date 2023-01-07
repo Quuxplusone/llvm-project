@@ -822,6 +822,10 @@ in the order they are given before the standard system directories
 are searched. If the same directory is in the SYSTEM include search
 paths, for example if also specified with -isystem, the -I option
 will be ignored}]>;
+def binary_dir : Separate<["-"], "binary-dir">, Group<I_Group>,
+    Visibility<[ClangOption, CC1Option, CC1AsOption, FlangOption, FC1Option]>,
+    MetaVarName<"<dir>">,
+    HelpText<"Add directory to the end of the list of binary search paths (for #embed)">;
 def L : JoinedOrSeparate<["-"], "L">, Flags<[RenderJoined]>, Group<Link_Group>,
     Visibility<[ClangOption, FlangOption]>,
     MetaVarName<"<dir>">, HelpText<"Add directory to library search path">;
