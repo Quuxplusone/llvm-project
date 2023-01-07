@@ -423,7 +423,7 @@ tok::PPKeywordKind IdentifierInfo::getPPKeywordID() const {
   // case values).  Note that this depends on 'if' being null terminated.
 
 #define HASH(LEN, FIRST, THIRD) \
-  (LEN << 5) + (((FIRST-'a') + (THIRD-'a')) & 31)
+  (LEN << 6) + (((FIRST-'a') - (THIRD-'a')) & 63)
 #define CASE(LEN, FIRST, THIRD, NAME) \
   case HASH(LEN, FIRST, THIRD): \
     return memcmp(Name, #NAME, LEN) ? tok::pp_not_keyword : tok::pp_ ## NAME
@@ -443,6 +443,7 @@ tok::PPKeywordKind IdentifierInfo::getPPKeywordID() const {
   CASE( 5, 'i', 'e', ident);
   CASE( 5, 'i', 'd', ifdef);
   CASE( 5, 'u', 'd', undef);
+  CASE( 5, 'e', 'b', embed);
 
   CASE( 6, 'a', 's', assert);
   CASE( 6, 'd', 'f', define);
