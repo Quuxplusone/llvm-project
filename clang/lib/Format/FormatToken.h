@@ -1068,6 +1068,7 @@ struct AdditionalKeywords {
     kw___except = &IdentTable.get("__except");
     kw___has_include = &IdentTable.get("__has_include");
     kw___has_include_next = &IdentTable.get("__has_include_next");
+    kw___has_embed = &IdentTable.get("__has_embed");
 
     kw_mark = &IdentTable.get("mark");
     kw_region = &IdentTable.get("region");
@@ -1401,6 +1402,7 @@ struct AdditionalKeywords {
   IdentifierInfo *kw___except;
   IdentifierInfo *kw___has_include;
   IdentifierInfo *kw___has_include_next;
+  IdentifierInfo *kw___has_embed;
 
   // JavaScript keywords.
   IdentifierInfo *kw_as;

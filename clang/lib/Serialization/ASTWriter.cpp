@@ -1095,6 +1095,7 @@ void ASTWriter::WriteBlockInfoBlock() {
   RECORD(PPD_MACRO_EXPANSION);
   RECORD(PPD_MACRO_DEFINITION);
   RECORD(PPD_INCLUSION_DIRECTIVE);
+  RECORD(PPD_EMBED_DIRECTIVE);
 
   // Decls and Types block.
   BLOCK(EXTENSION_BLOCK);
@@ -1612,6 +1613,9 @@ void ASTWriter::WriteControlBlock(Preprocessor &PP, ASTContext &Context,
 
   AddString(HSOpts.Sysroot, Record);
   AddString(HSOpts.ResourceDir, Record);
+  Record.push_back(HSOpts.BinaryDirs.size());
+  for (const std::string& Entry : HSOpts.BinaryDirs)
+    AddString(Entry, Record);
   AddString(HSOpts.ModuleCachePath, Record);
   AddString(HSOpts.ModuleUserBuildPath, Record);
   Record.push_back(HSOpts.DisableModuleHash);
@@ -2730,17 +2734,28 @@ void ASTWriter::WritePreprocessorDetail(PreprocessingRecord &PPRec,
   unsigned NumPreprocessingRecords = 0;
   using namespace llvm;
 
-  // Set up the abbreviation for
+  // Set up the abbreviation for includes
   unsigned InclusionAbbrev = 0;
   {
     auto Abbrev = std::make_shared<BitCodeAbbrev>();
     Abbrev->Add(BitCodeAbbrevOp(PPD_INCLUSION_DIRECTIVE));
     Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 32)); // filename length
-    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 1)); // in quotes
-    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 2)); // kind
-    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 1)); // imported module
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 1));  // in quotes
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 2));  // kind
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 1));  // imported module
     Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));
     InclusionAbbrev = Stream.EmitAbbrev(std::move(Abbrev));
+  }
+
+  // Set up the abbreviation for embeds
+  unsigned EmbedAbbrev = 0;
+  {
+    auto Abbrev = std::make_shared<BitCodeAbbrev>();
+    Abbrev->Add(BitCodeAbbrevOp(PPD_EMBED_DIRECTIVE));
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 32)); // filename length
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 1));  // in quotes
+    Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));
+    EmbedAbbrev = Stream.EmitAbbrev(std::move(Abbrev));
   }
 
   unsigned FirstPreprocessorEntityID
@@ -2793,6 +2808,20 @@ void ASTWriter::WritePreprocessorDetail(PreprocessingRecord &PPRec,
       if (ID->getFile())
         Buffer += ID->getFile()->getName();
       Stream.EmitRecordWithBlob(InclusionAbbrev, Record, Buffer);
+      continue;
+    }
+
+    if (auto *ID = dyn_cast<EmbedDirective>(*E)) {
+      Record.push_back(PPD_EMBED_DIRECTIVE);
+      Record.push_back(ID->getFileName().size());
+      Record.push_back(ID->wasInQuotes());
+      SmallString<64> Buffer;
+      Buffer += ID->getFileName();
+      // Check that the FileEntry is not null because it was not resolved and
+      // we create a PCH even with compiler errors.
+      if (ID->getFile())
+        Buffer += ID->getFile()->getName();
+      Stream.EmitRecordWithBlob(EmbedAbbrev, Record, Buffer);
       continue;
     }
 

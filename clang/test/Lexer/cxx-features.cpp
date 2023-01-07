@@ -77,6 +77,10 @@
 #error "wrong value for __cpp_explicit_this_parameter"
 #endif
 
+#if check(pp_embed, 202401, 202401, 202401, 202401, 202401, 202401, 202401)
+#error "wrong value for __cpp_pp_embed"
+#endif
+
 // --- C++20 features ---
 
 #if check(aggregate_paren_init, 0, 0, 0, 0, 201902, 201902, 201902)

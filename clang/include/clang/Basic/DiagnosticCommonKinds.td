@@ -182,6 +182,12 @@ def err_opencl_unknown_type_specifier : Error<
   "%0 does not support the '%1' "
   "%select{type qualifier|storage class specifier}2">;
 
+def warn_pp_unknown_parameter_ignored : Warning<
+  "unknown %select{preprocessor|#embed}0 parameter '%1' ignored">,
+  InGroup<UnknownDirectiveParameters>;
+def err_pp_unsupported_directive : Error<
+  "unsupported directive: %0">;
+
 def warn_unknown_attribute_ignored : Warning<
   "unknown attribute %0 ignored">, InGroup<UnknownAttributes>;
 def warn_attribute_ignored : Warning<"%0 attribute ignored">,
