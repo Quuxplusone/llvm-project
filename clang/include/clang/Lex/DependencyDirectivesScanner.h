@@ -78,6 +78,7 @@ enum DirectiveKind : uint8_t {
   pp_elifndef,
   pp_else,
   pp_endif,
+  pp_embed,
   decl_at_import,
   cxx_module_decl,
   cxx_import_decl,
