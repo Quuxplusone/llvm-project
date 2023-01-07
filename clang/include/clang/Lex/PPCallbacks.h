@@ -142,6 +142,12 @@ public:
                                   const Module *Imported,
                                   SrcMgr::CharacteristicKind FileType) {}
 
+  virtual void EmbedDirective(SourceLocation HashLoc,
+                              const Token &EmbedTok, StringRef FileName,
+                              bool IsAngled, CharSourceRange FilenameRange,
+                              OptionalFileEntryRef File, StringRef SearchPath,
+                              StringRef RelativePath) {}
+
   /// Callback invoked whenever a submodule was entered.
   ///
   /// \param M The submodule we have entered.
@@ -336,6 +342,10 @@ public:
                           OptionalFileEntryRef File,
                           SrcMgr::CharacteristicKind FileType);
 
+  /// Hook called when a '__has_embed' directive is read.
+  virtual void HasEmbed(SourceLocation Loc, StringRef FileName, bool IsAngled,
+                        OptionalFileEntryRef File);
+
   /// Hook called when a source range is skipped.
   /// \param Range The SourceRange that was skipped. The range begins at the
   /// \#if/\#else directive and ends after the \#endif/\#else directive.
@@ -483,6 +493,16 @@ public:
                                Imported, FileType);
   }
 
+  void EmbedDirective(SourceLocation HashLoc, const Token &EmbedTok,
+                      StringRef FileName, bool IsAngled,
+                      CharSourceRange FilenameRange, OptionalFileEntryRef File,
+                      StringRef SearchPath, StringRef RelativePath) override {
+    First->EmbedDirective(HashLoc, EmbedTok, FileName, IsAngled,
+                          FilenameRange, File, SearchPath, RelativePath);
+    Second->EmbedDirective(HashLoc, EmbedTok, FileName, IsAngled,
+                           FilenameRange, File, SearchPath, RelativePath);
+  }
+
   void EnteredSubmodule(Module *M, SourceLocation ImportLoc,
                         bool ForPragma) override {
     First->EnteredSubmodule(M, ImportLoc, ForPragma);
@@ -564,6 +584,9 @@ public:
   void HasInclude(SourceLocation Loc, StringRef FileName, bool IsAngled,
                   OptionalFileEntryRef File,
                   SrcMgr::CharacteristicKind FileType) override;
+
+  void HasEmbed(SourceLocation Loc, StringRef FileName, bool IsAngled,
+                OptionalFileEntryRef File) override;
 
   void PragmaOpenCLExtension(SourceLocation NameLoc, const IdentifierInfo *Name,
                              SourceLocation StateLoc, unsigned State) override {
