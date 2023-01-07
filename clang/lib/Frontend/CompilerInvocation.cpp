@@ -3035,6 +3035,9 @@ static void GenerateHeaderSearchArgs(HeaderSearchOptions &Opts,
 
   for (const std::string &F : Opts.VFSOverlayFiles)
     GenerateArg(Consumer, OPT_ivfsoverlay, F);
+
+  for (const std::string &E : Opts.BinaryDirs)
+    GenerateArg(Consumer, OPT_binary_dir, E);
 }
 
 static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
@@ -3048,6 +3051,11 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
   PARSE_OPTION_WITH_MARSHALLING(Args, Diags, __VA_ARGS__)
 #include "clang/Driver/Options.inc"
 #undef HEADER_SEARCH_OPTION_WITH_MARSHALLING
+
+  for (const auto *A : Args.filtered(OPT_binary_dir)) {
+    std::string Path = A->getValue();
+    Opts.BinaryDirs.push_back(Path);
+  }
 
   if (const Arg *A = Args.getLastArg(OPT_stdlib_EQ))
     Opts.UseLibcxx = (strcmp(A->getValue(), "libc++") == 0);
@@ -4393,8 +4401,8 @@ bool CompilerInvocation::CreateFromArgsImpl(
   InputKind DashX = Res.getFrontendOpts().DashX;
   ParseTargetArgs(Res.getTargetOpts(), Args, Diags);
   llvm::Triple T(Res.getTargetOpts().Triple);
-  ParseHeaderSearchArgs(Res.getHeaderSearchOpts(), Args, Diags,
-                        Res.getFileSystemOpts().WorkingDir);
+  ParseHeaderSearchArgs(Res.getHeaderSearchOpts(),
+                        Args, Diags, Res.getFileSystemOpts().WorkingDir);
 
   ParseLangArgs(LangOpts, Args, DashX, T, Res.getPreprocessorOpts().Includes,
                 Diags);
