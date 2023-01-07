@@ -294,6 +294,11 @@ public:
                                 RequiresNullTerminator);
   }
 
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
+  getBufferForFileWithLimit(FileEntryRef Entry, size_t Limit,
+                            bool isVolatile = false,
+                            bool RequiresNullTerminator = true);
+
 private:
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
   getBufferForFileImpl(StringRef Filename, int64_t FileSize, bool isVolatile,

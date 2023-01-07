@@ -790,6 +790,11 @@ def NSobjectAttribute : DiagGroup<"NSObject-attribute">;
 def NSConsumedMismatch : DiagGroup<"nsconsumed-mismatch">;
 def NSReturnsMismatch : DiagGroup<"nsreturns-mismatch">;
 
+def UnknownDirectiveParameters : DiagGroup<"unknown-directive-parameters">;
+def IgnoredDirectiveParameters : DiagGroup<"ignored-directive-parameters">;
+def DirectiveParameters : DiagGroup<"directive-parameters",
+    [UnknownDirectiveParameters, IgnoredDirectiveParameters]>;
+
 def IndependentClassAttribute : DiagGroup<"IndependentClass-attribute">;
 def UnknownAttributes : DiagGroup<"unknown-attributes">;
 def IgnoredAttributes : DiagGroup<"ignored-attributes">;

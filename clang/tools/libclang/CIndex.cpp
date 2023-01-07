@@ -6023,6 +6023,8 @@ CXString clang_getCursorKindSpelling(enum CXCursorKind Kind) {
     return cxstring::createRef("macro expansion");
   case CXCursor_InclusionDirective:
     return cxstring::createRef("inclusion directive");
+  case CXCursor_EmbedDirective:
+    return cxstring::createRef("embed directive");
   case CXCursor_Namespace:
     return cxstring::createRef("Namespace");
   case CXCursor_LinkageSpec:

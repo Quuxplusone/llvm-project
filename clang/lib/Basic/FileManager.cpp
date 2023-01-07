@@ -539,6 +539,35 @@ FileManager::getBufferForFile(FileEntryRef FE, bool isVolatile,
 }
 
 llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
+FileManager::getBufferForFileWithLimit(FileEntryRef FE, size_t Limit,
+                                       bool isVolatile,
+                                       bool RequiresNullTerminator) {
+  const FileEntry *Entry = &FE.getFileEntry();
+  // If the content is living on the file entry, return a reference to it.
+  if (Entry->Content)
+    return llvm::MemoryBuffer::getMemBuffer(Entry->Content->getMemBufferRef());
+
+  uint64_t FileSize = uint64_t(Entry->getSize()) > Limit ? Limit : uint64_t(-1);
+  // If there's a high enough chance that the file have changed since we
+  // got its size, force a stat before opening it.
+  if (isVolatile || Entry->isNamedPipe())
+    FileSize = Limit;
+
+  StringRef Filename = FE.getName();
+  // If the file is already open, use the open file descriptor.
+  if (Entry->File) {
+    auto Result = Entry->File->getBuffer(Filename, FileSize,
+                                         RequiresNullTerminator, isVolatile);
+    Entry->closeFile();
+    return Result;
+  }
+
+  // Otherwise, open the file.
+  return getBufferForFileImpl(Filename, FileSize, isVolatile,
+                              RequiresNullTerminator);
+}
+
+llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
 FileManager::getBufferForFileImpl(StringRef Filename, int64_t FileSize,
                                   bool isVolatile,
                                   bool RequiresNullTerminator) const {
