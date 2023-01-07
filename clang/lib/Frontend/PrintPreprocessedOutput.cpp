@@ -155,6 +155,10 @@ public:
                           OptionalFileEntryRef File, StringRef SearchPath,
                           StringRef RelativePath, const Module *Imported,
                           SrcMgr::CharacteristicKind FileType) override;
+  void EmbedDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                          StringRef FileName, bool IsAngled,
+                          CharSourceRange FilenameRange, OptionalFileEntryRef File,
+                          StringRef SearchPath, StringRef RelativePath) override;
   void Ident(SourceLocation Loc, StringRef str) override;
   void PragmaMessage(SourceLocation Loc, StringRef Namespace,
                      PragmaMessageKind Kind, StringRef Str) override;
@@ -446,6 +450,22 @@ void PrintPPOutputPPCallbacks::InclusionDirective(
       break;
     }
   }
+}
+
+void PrintPPOutputPPCallbacks::EmbedDirective(
+    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
+    StringRef SearchPath, StringRef RelativePath) {
+  // In -dI mode, dump #embed directives prior to dumping their content or
+  // interpretation.
+  if (DumpIncludeDirectives) {
+    MoveToLine(HashLoc, /*RequireStartOfLine=*/true);
+    *OS << "#embed "
+        << (IsAngled ? '<' : '"') << FileName << (IsAngled ? '>' : '"')
+        << " /* clang -E -dI */";
+    setEmittedDirectiveOnThisLine();
+  }
+  // FIXME: dump integers here
 }
 
 /// Handle entering the scope of a module during a module compilation.

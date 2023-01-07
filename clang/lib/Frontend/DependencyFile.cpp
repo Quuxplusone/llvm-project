@@ -76,6 +76,17 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
     // Files that actually exist are handled by FileChanged.
   }
 
+  void EmbedDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                          StringRef FileName, bool IsAngled,
+                          CharSourceRange FilenameRange, OptionalFileEntryRef File,
+                          StringRef SearchPath, StringRef RelativePath) override {
+    DepCollector.maybeAddDependency(
+        File == nullptr ? FileName : File->getName(), /*FromModule*/ false,
+                                      /*IsSystem*/ false,
+                                      /*IsModuleFile*/ false,
+                                      /*IsMissing*/ File == nullptr);
+  }
+
   void HasInclude(SourceLocation Loc, StringRef SpelledFilename, bool IsAngled,
                   OptionalFileEntryRef File,
                   SrcMgr::CharacteristicKind FileType) override {
@@ -85,6 +96,19 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
         llvm::sys::path::remove_leading_dotslash(File->getName());
     DepCollector.maybeAddDependency(Filename, /*FromModule=*/false,
                                     /*IsSystem=*/isSystem(FileType),
+                                    /*IsModuleFile=*/false,
+                                    /*IsMissing=*/false);
+  }
+
+  void HasEmbed(SourceLocation Loc, StringRef SpelledFilename, bool IsAngled,
+                OptionalFileEntryRef File) override {
+    if (!File)
+      return;
+    StringRef Filename =
+        llvm::sys::path::remove_leading_dotslash(File->getName());
+    DepCollector.maybeAddDependency(Filename,
+                                    /*FromModule=*/false,
+                                    /*IsSystem=*/false,
                                     /*IsModuleFile=*/false,
                                     /*IsMissing=*/false);
   }
