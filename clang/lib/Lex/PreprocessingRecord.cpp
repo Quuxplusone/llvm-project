@@ -52,6 +52,17 @@ InclusionDirective::InclusionDirective(PreprocessingRecord &PPRec,
   this->FileName = StringRef(Memory, FileName.size());
 }
 
+EmbedDirective::EmbedDirective(PreprocessingRecord &PPRec, StringRef FileName,
+                               bool InQuotes, OptionalFileEntryRef File,
+                               SourceRange Range)
+    : PreprocessingDirective(EmbedDirectiveKind, Range), InQuotes(InQuotes),
+      File(File) {
+  char *Memory = (char *)PPRec.Allocate(FileName.size() + 1, alignof(char));
+  memcpy(Memory, FileName.data(), FileName.size());
+  Memory[FileName.size()] = 0;
+  this->FileName = StringRef(Memory, FileName.size());
+}
+
 PreprocessingRecord::PreprocessingRecord(SourceManager &SM) : SourceMgr(SM) {}
 
 /// Returns a pair of [Begin, End) iterators of preprocessed entities
@@ -510,6 +521,25 @@ void PreprocessingRecord::InclusionDirective(
       *this, Kind, FileName, !IsAngled, ModuleImported, File,
       SourceRange(HashLoc, EndLoc));
   addPreprocessedEntity(ID);
+}
+
+void PreprocessingRecord::EmbedDirective(
+    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
+    StringRef SearchPath, StringRef RelativePath) {
+  SourceLocation EndLoc;
+  if (!IsAngled) {
+    EndLoc = FilenameRange.getBegin();
+  } else {
+    EndLoc = FilenameRange.getEnd();
+    if (FilenameRange.isCharRange())
+      EndLoc = EndLoc.getLocWithOffset(-1); // the InclusionDirective expects
+                                            // a token range.
+  }
+  clang::EmbedDirective *ED = new (*this) clang::EmbedDirective(
+      *this, FileName, !IsAngled, File,
+      SourceRange(HashLoc, EndLoc));
+  addPreprocessedEntity(ED);
 }
 
 size_t PreprocessingRecord::getTotalMemory() const {
