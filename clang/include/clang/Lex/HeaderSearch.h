@@ -503,6 +503,14 @@ public:
       bool BuildSystemModule = false, bool OpenFile = true,
       bool CacheFailures = true);
 
+  OptionalFileEntryRef
+  LookupEmbedFile(SourceLocation FilenameLoc, StringRef Filename,
+                  std::optional<size_t> MaybeLimit, bool isAngled,
+                  const SmallVectorImpl<char> *LocalPath,
+                  SmallVectorImpl<char> *SearchPath,
+                  SmallVectorImpl<char> *RelativePath,
+                  const FileEntry *LookupFromFile);
+
   /// Look up a subframework for the specified \#include file.
   ///
   /// For example, if \#include'ing <HIToolbox/HIToolbox.h> from
