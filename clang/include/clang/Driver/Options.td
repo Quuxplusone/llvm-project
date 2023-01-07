@@ -740,6 +740,10 @@ paths, for example if also specified with -isystem, the -I option
 will be ignored}]>;
 def L : JoinedOrSeparate<["-"], "L">, Flags<[RenderJoined]>, Group<Link_Group>,
     MetaVarName<"<dir>">, HelpText<"Add directory to library search path">;
+def binary_dir : Separate<["-"], "binary-dir">,
+    Flags<[CoreOption,CC1Option,CC1AsOption]>,
+    Group<I_Group>,
+    MetaVarName<"<dir>">, HelpText<"Add directory to binary search path (for #embed)">;
 def MD : Flag<["-"], "MD">, Group<M_Group>,
     HelpText<"Write a depfile containing user and system headers">;
 def MMD : Flag<["-"], "MMD">, Group<M_Group>,

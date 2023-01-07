@@ -5925,6 +5925,9 @@ bool ASTReader::ParseHeaderSearchOptions(const RecordData &Record,
   HSOpts.Sysroot = ReadString(Record, Idx);
 
   HSOpts.ResourceDir = ReadString(Record, Idx);
+  HSOpts.BinaryDirs.clear();
+  for (unsigned N = Record[Idx++]; N != 0; --N)
+    HSOpts.BinaryDirs.push_back(ReadString(Record, Idx));
   HSOpts.ModuleCachePath = ReadString(Record, Idx);
   HSOpts.ModuleUserBuildPath = ReadString(Record, Idx);
   HSOpts.DisableModuleHash = Record[Idx++];
@@ -6149,6 +6152,19 @@ PreprocessedEntity *ASTReader::ReadPreprocessedEntity(unsigned Index) {
                                        Record[1], Record[3],
                                        File,
                                        Range);
+    return ID;
+  }
+
+  case PPD_EMBED_DIRECTIVE: {
+    const char *FullFileNameStart = Blob.data() + Record[0];
+    StringRef FullFileName(FullFileNameStart, Blob.size() - Record[0]);
+    OptionalFileEntryRef File;
+    if (!FullFileName.empty())
+      File = PP.getFileManager().getOptionalFileRef(FullFileName);
+
+    EmbedDirective *ID = new (PPRec)
+        EmbedDirective(PPRec, StringRef(Blob.data(), Record[0]),
+                           Record[1], File, Range);
     return ID;
   }
   }

@@ -435,6 +435,10 @@ unsigned Lexer::getSpelling(const Token &Tok, const char *&Buffer,
 
   // If this token contains nothing interesting, return it directly.
   if (!Tok.needsCleaning()) {
+    if (Tok.is(tok::comma)) {
+      Buffer = ",";
+      return 1;
+    }
     Buffer = TokStart;
     return Tok.getLength();
   }
@@ -4483,6 +4487,7 @@ bool Lexer::LexDependencyDirectiveTokenWhileSkipping(Token &Result) {
     case pp_pragma_pop_macro:
     case pp_pragma_include_alias:
     case pp_include_next:
+    case pp_embed:
     case decl_at_import:
     case cxx_module_decl:
     case cxx_import_decl:
