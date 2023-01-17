@@ -878,6 +878,8 @@ set(files
   __utility/private_constructor_tag.h
   __utility/rel_ops.h
   __utility/small_buffer.h
+  __utility/sorted_equivalent.h
+  __utility/sorted_unique.h
   __utility/swap.h
   __utility/to_underlying.h
   __utility/unreachable.h
