@@ -2111,6 +2111,8 @@ module std_private_utility_priority_tag            [system] { header "__utility/
 module std_private_utility_private_constructor_tag [system] { header "__utility/private_constructor_tag.h" }
 module std_private_utility_rel_ops                 [system] { header "__utility/rel_ops.h" }
 module std_private_utility_small_buffer            [system] { header "__utility/small_buffer.h" }
+module std_private_utility_sorted_equivalent       [system] { header "__utility/sorted_equivalent.h" }
+module std_private_utility_sorted_unique           [system] { header "__utility/sorted_unique.h" }
 module std_private_utility_swap                    [system] {
   header "__utility/swap.h"
   export std_private_type_traits_is_swappable
