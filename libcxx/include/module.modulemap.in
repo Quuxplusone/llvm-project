@@ -1595,6 +1595,8 @@ module std [system] {
       module piecewise_construct { private header "__utility/piecewise_construct.h" }
       module priority_tag        { private header "__utility/priority_tag.h" }
       module rel_ops             { private header "__utility/rel_ops.h" }
+      module sorted_equivalent   { private header "__utility/sorted_equivalent.h" }
+      module sorted_unique       { private header "__utility/sorted_unique.h" }
       module swap                { private header "__utility/swap.h" }
       module to_underlying       { private header "__utility/to_underlying.h" }
       module unreachable         { private header "__utility/unreachable.h" }
