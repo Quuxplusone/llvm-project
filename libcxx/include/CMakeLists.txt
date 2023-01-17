@@ -365,6 +365,7 @@ set(files
   __filesystem/recursive_directory_iterator.h
   __filesystem/space_info.h
   __filesystem/u8path.h
+  __flat_set/flat_set.h
   __format/buffer.h
   __format/concepts.h
   __format/container_adaptor.h
@@ -922,6 +923,8 @@ set(files
   __utility/rel_ops.h
   __utility/scope_guard.h
   __utility/small_buffer.h
+  __utility/sorted_equivalent.h
+  __utility/sorted_unique.h
   __utility/swap.h
   __utility/to_underlying.h
   __utility/unreachable.h
@@ -1004,6 +1007,7 @@ set(files
   ext/hash_set
   fenv.h
   filesystem
+  flat_set
   float.h
   format
   forward_list
