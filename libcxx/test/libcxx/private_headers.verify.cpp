@@ -742,6 +742,8 @@ END-SCRIPT
 #include <__utility/piecewise_construct.h> // expected-error@*:* {{use of private header from outside its module: '__utility/piecewise_construct.h'}}
 #include <__utility/priority_tag.h> // expected-error@*:* {{use of private header from outside its module: '__utility/priority_tag.h'}}
 #include <__utility/rel_ops.h> // expected-error@*:* {{use of private header from outside its module: '__utility/rel_ops.h'}}
+#include <__utility/sorted_equivalent.h> // expected-error@*:* {{use of private header from outside its module: '__utility/sorted_equivalent.h'}}
+#include <__utility/sorted_unique.h> // expected-error@*:* {{use of private header from outside its module: '__utility/sorted_unique.h'}}
 #include <__utility/swap.h> // expected-error@*:* {{use of private header from outside its module: '__utility/swap.h'}}
 #include <__utility/to_underlying.h> // expected-error@*:* {{use of private header from outside its module: '__utility/to_underlying.h'}}
 #include <__utility/unreachable.h> // expected-error@*:* {{use of private header from outside its module: '__utility/unreachable.h'}}
