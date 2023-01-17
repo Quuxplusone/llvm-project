@@ -868,6 +868,8 @@
   { include: [ "<__utility/priority_tag.h>", "private", "<utility>", "public" ] },
   { include: [ "<__utility/rel_ops.h>", "private", "<utility>", "public" ] },
   { include: [ "<__utility/small_buffer.h>", "private", "<utility>", "public" ] },
+  { include: [ "<__utility/sorted_equivalent.h>", "private", "<utility>", "public" ] },
+  { include: [ "<__utility/sorted_unique.h>", "private", "<utility>", "public" ] },
   { include: [ "<__utility/swap.h>", "private", "<utility>", "public" ] },
   { include: [ "<__utility/to_underlying.h>", "private", "<utility>", "public" ] },
   { include: [ "<__utility/unreachable.h>", "private", "<utility>", "public" ] },
