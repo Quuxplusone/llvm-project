@@ -1284,6 +1284,15 @@ module std [system] {
     export *
   }
 
+  module flat_set {
+    module flat_set              { header "__flat_set/flat_set.h" }
+    module sorted_equivalent     { header "__flat_set/sorted_equivalent.h" }
+    module sorted_unique         { header "__flat_set/sorted_unique.h" }
+
+    header "flat_set"
+    export *
+  }
+
   module fstream {
     module fwd { header "__fwd/fstream.h" }
 
