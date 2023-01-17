@@ -909,6 +909,8 @@ set(files
   __utility/rel_ops.h
   __utility/scope_guard.h
   __utility/small_buffer.h
+  __utility/sorted_equivalent.h
+  __utility/sorted_unique.h
   __utility/swap.h
   __utility/to_underlying.h
   __utility/unreachable.h
