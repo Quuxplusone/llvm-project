@@ -886,6 +886,15 @@ module std [system] {
       module u8path                       { private header "__filesystem/u8path.h" }
     }
   }
+  module flat_set {
+    header "flat_set"
+    export initializer_list
+    export *
+
+    module __flat_set {
+      module flat_set                     { private header "__flat_set/flat_set.h" }
+    }
+  }
   module format {
     header "format"
     export *
