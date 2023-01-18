@@ -42,6 +42,7 @@ array algorithm
 array compare
 array concepts
 array cstddef
+array cstdint
 array cstdlib
 array initializer_list
 array iterator
@@ -201,6 +202,17 @@ expected cstddef
 expected initializer_list
 expected new
 expected version
+flat_set climits
+flat_set compare
+flat_set cstddef
+flat_set cstdint
+flat_set cstring
+flat_set initializer_list
+flat_set limits
+flat_set new
+flat_set tuple
+flat_set vector
+flat_set version
 format array
 format cmath
 format cstddef
