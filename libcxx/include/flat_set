@@ -1,0 +1,759 @@
+// -*- C++ -*-
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef _LIBCPP_FLAT_SET
+#define _LIBCPP_FLAT_SET
+
+/*
+
+    flat_set synopsis
+
+#include <compare>
+#include <initializer_list>
+
+namespace std {
+  // [flat.set], class template flat_set
+  template<class Key, class Compare = less<Key>, class KeyContainer = vector<Key>>
+    class flat_set;
+
+  struct sorted_unique_t { explicit sorted_unique_t() = default; };
+  inline constexpr sorted_unique_t sorted_unique{};
+
+  template<class Key, class Compare, class KeyContainer, class Allocator>
+    struct uses_allocator<flat_set<Key, Compare, KeyContainer>, Allocator>;
+
+  // [flat.set.erasure], erasure for flat_set
+  template<class Key, class Compare, class KeyContainer, class Predicate>
+    typename flat_set<Key, Compare, KeyContainer>::size_type
+      erase_if(flat_set<Key, Compare, KeyContainer>& c, Predicate pred);
+
+  // [flat.multiset], class template flat_multiset
+  template<class Key, class Compare = less<Key>, class KeyContainer = vector<Key>>
+    class flat_multiset;
+
+  struct sorted_equivalent_t { explicit sorted_equivalent_t() = default; };
+  inline constexpr sorted_equivalent_t sorted_equivalent{};
+
+  template<class Key, class Compare, class KeyContainer, class Allocator>
+    struct uses_allocator<flat_multiset<Key, Compare, KeyContainer>, Allocator>;
+
+  // [flat.multiset.erasure], erasure for flat_multiset
+  template<class Key, class Compare, class KeyContainer, class Predicate>
+    typename flat_multiset<Key, Compare, KeyContainer>::size_type
+      erase_if(flat_multiset<Key, Compare, KeyContainer>& c, Predicate pred);
+}
+
+*/
+
+#include <__algorithm/inplace_merge.h>
+#include <__algorithm/is_sorted_until.h>
+#include <__algorithm/lexicographical_compare_three_way.h>
+#include <__algorithm/partition_point.h>
+#include <__algorithm/remove_if.h>
+#include <__algorithm/sort.h>
+#include <__assert> // all public C++ headers provide the assertion handler
+#include <__compare/synth_three_way.h>
+#include <__config>
+#include <__functional/is_transparent.h>
+#include <__functional/operations.h>
+#include <__functional/reference_wrapper.h>
+#include <__iterator/iterator_traits.h>
+#include <__iterator/reverse_iterator.h>
+#include <__memory/allocator.h>
+#include <__memory/uses_allocator.h>
+#include <__memory/uses_allocator_construction.h>
+#include <__ranges/concepts.h>
+#include <__ranges/container_compatible_range.h>
+#include <__ranges/from_range.h>
+#include <__type_traits/is_allocator.h>
+#include <__type_traits/is_constructible.h>
+#include <__type_traits/is_nothrow_default_constructible.h>
+#include <__type_traits/is_same.h>
+#include <__utility/exception_guard.h>
+#include <__utility/forward.h>
+#include <__utility/move.h>
+#include <__utility/pair.h>
+#include <__utility/sorted_equivalent.h>
+#include <__utility/sorted_unique.h>
+#include <vector>
+#include <version>
+
+// standard-mandated includes
+
+// [flat.set.syn]
+#include <compare>
+#include <initializer_list>
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#  pragma GCC system_header
+#endif
+
+#if _LIBCPP_STD_VER >= 23
+
+_LIBCPP_BEGIN_NAMESPACE_STD
+
+template <class _FwdIt, class _Compare>
+_LIBCPP_HIDE_FROM_ABI _FwdIt
+__flatset_unique(_FwdIt __first, _FwdIt __last, reference_wrapper<const _Compare> __comp) {
+  if (__first == __last)
+    return __first;
+  _FwdIt __dest = __first;
+  for (++__first; __first != __last; ++__first) {
+    if (bool(__comp(*__dest, *__first))) {
+      ++__dest;
+      if (__dest != __first) {
+        *__dest = std::move(*__first);
+      }
+    }
+  }
+  ++__dest;
+  return __dest;
+}
+
+template <class _Key, class _Compare = less<_Key>,
+          class _KeyContainer = vector<_Key>>
+class flat_set {
+  static_assert(is_same_v<_Key, typename _KeyContainer::value_type>);
+  static_assert(__is_cpp17_random_access_iterator<typename _KeyContainer::iterator>::value);
+  static_assert(__is_cpp17_random_access_iterator<typename _KeyContainer::const_iterator>::value);
+
+public:
+  using key_type = _Key;
+  using value_type = _Key;
+  using key_compare = _Compare;
+  using value_compare = _Compare;
+  using reference = _Key&;
+  using const_reference = const _Key&;
+  using size_type = typename _KeyContainer::size_type;
+  using difference_type = typename _KeyContainer::difference_type;
+  using iterator = typename _KeyContainer::const_iterator;
+  using const_iterator = typename _KeyContainer::const_iterator;
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+  using container_type = _KeyContainer;
+
+  // [flat.set.cons]
+
+  flat_set()
+    noexcept(is_nothrow_default_constructible_v<container_type> && is_nothrow_default_constructible_v<key_compare>)
+    = default;
+
+  explicit flat_set(container_type __cont)
+    : __c_(std::move(__cont)) {
+    __construct_invariant();
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(const container_type& __cont, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a, __cont)) {
+    __construct_invariant();
+  }
+
+  flat_set(sorted_unique_t, container_type __cont)
+    : __c_(std::move(__cont)) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(sorted_unique_t, const container_type& __cont, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a, __cont)) {}
+
+  flat_set(const flat_set& __fs) = default;
+
+  flat_set(flat_set&& __fs)
+    noexcept(is_nothrow_constructible_v<_Compare, _Compare&> && is_nothrow_move_constructible_v<_KeyContainer>)
+    : __compare_(__fs.__compare_), __c_(std::move(__fs.__c_)) {
+    __fs.__c_.clear();
+  }
+
+  explicit flat_set(const key_compare& __comp)
+    : __compare_(__comp) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a)) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  explicit flat_set(const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a)) {}
+
+  template <class _InIt>
+    requires __is_cpp17_input_iterator<_InIt>::value
+  flat_set(_InIt __first, _InIt __last, const key_compare& __comp = key_compare())
+    : __compare_(__comp) {
+    insert(__first, __last);
+  }
+
+  template <class _InIt, class _Alloc>
+    requires __is_cpp17_input_iterator<_InIt>::value && uses_allocator_v<container_type, _Alloc>
+  flat_set(_InIt __first, _InIt __last, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a)) {
+    insert(__first, __last);
+  }
+
+  template <class _InIt, class _Alloc>
+    requires __is_cpp17_input_iterator<_InIt>::value && uses_allocator_v<container_type, _Alloc>
+  flat_set(_InIt __first, _InIt __last, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a)) {
+    insert(__first, __last);
+  }
+
+  template <__container_compatible_range<value_type> _Rp>
+  flat_set(from_range_t __fr, _Rp&& __r)
+    : flat_set(__fr, std::forward<_Rp>(__r), key_compare()) {}
+
+  template <__container_compatible_range<value_type> _Rp, class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(from_range_t __fr, _Rp&& __r, const _Alloc& __a)
+    : flat_set(__fr, std::forward<_Rp>(__r), key_compare(), __a) {}
+
+  template <__container_compatible_range<value_type> _Rp>
+  flat_set(from_range_t, _Rp&& __r, const key_compare& __comp)
+    : flat_set(__comp) {
+    insert_range(std::forward<_Rp>(__r));
+  }
+
+  template <__container_compatible_range<value_type> _Rp, class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(from_range_t, _Rp&& __r, const key_compare& __comp, const _Alloc& __a)
+    : flat_set(__comp, __a) {
+    insert_range(std::forward<_Rp>(__r));
+  }
+
+  template <class _InIt>
+  flat_set(sorted_unique_t, _InIt __first, _InIt __last, const key_compare& __comp = key_compare())
+    : __compare_(__comp), __c_(__first, __last) {}
+
+  template <class _InIt, class _Alloc>
+    requires __is_cpp17_input_iterator<_InIt>::value && uses_allocator_v<container_type, _Alloc>
+  flat_set(sorted_unique_t, _InIt __first, _InIt __last, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a, __first, __last)) {}
+
+  template <class _InIt, class _Alloc>
+    requires __is_cpp17_input_iterator<_InIt>::value && uses_allocator_v<container_type, _Alloc>
+  flat_set(sorted_unique_t, _InIt __first, _InIt __last, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a, __first, __last)) {}
+
+  flat_set(initializer_list<value_type> __il, const key_compare& __comp = key_compare())
+    : flat_set(__il.begin(), __il.end(), __comp) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(initializer_list<value_type> __il, const key_compare& __comp, const _Alloc& __a)
+    : flat_set(__il.begin(), __il.end(), __comp, __a) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(initializer_list<value_type> __il, const _Alloc& __a)
+    : flat_set(__il.begin(), __il.end(), __a) {}
+
+  flat_set(sorted_unique_t __s, initializer_list<value_type> __il,
+         const key_compare& __comp = key_compare())
+    : flat_set(__s, __il.begin(), __il.end(), __comp) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(sorted_unique_t __s, initializer_list<value_type> __il,
+           const key_compare& __comp, const _Alloc& __a)
+    : flat_set(__s, __il.begin(), __il.end(), __comp, __a) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  flat_set(sorted_unique_t __s, initializer_list<value_type> __il, const _Alloc& __a)
+    : flat_set(__s, __il.begin(), __il.end(), __a) { }
+
+  flat_set& operator=(initializer_list<value_type> __il) {
+    clear();
+    insert(__il.begin(), __il.end());
+    return *this;
+  }
+
+  flat_set& operator=(const flat_set& __fs) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    __compare_ = __fs.__compare_;
+    __c_ = __fs.__c_;
+    __guard.__complete();
+    return *this;
+  }
+
+  flat_set& operator=(flat_set&& __fs)
+    noexcept(is_nothrow_assignable_v<_Compare&, _Compare&> && is_nothrow_assignable_v<_KeyContainer, _KeyContainer&&>)
+  {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    __compare_ = __fs.__compare_;
+    __c_ = std::move(__fs.__c_);
+    __guard.__complete();
+    return *this;
+  }
+
+  // iterators
+
+  iterator begin() noexcept { return __c_.begin(); }
+  const_iterator begin() const noexcept { return __c_.begin(); }
+  iterator end() noexcept { return __c_.end(); }
+  const_iterator end() const noexcept { return __c_.end(); }
+
+  reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
+  const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(end()); }
+  reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
+  const_reverse_iterator rend() const noexcept { return const_reverse_iterator(begin()); }
+
+  const_iterator cbegin() const noexcept { return begin(); }
+  const_iterator cend() const noexcept { return end(); }
+  const_reverse_iterator crbegin() const noexcept { return rbegin(); }
+  const_reverse_iterator crend() const noexcept { return rend(); }
+
+  // capacity
+
+  [[nodiscard]] bool empty() const noexcept { return __c_.empty(); }
+  size_type size() const noexcept { return __c_.size(); }
+  size_type max_size() const noexcept { return __c_.max_size(); }
+
+  // [flat.set.modifiers]
+
+  template <class... _Args>
+  pair<iterator, bool> emplace(_Args&&... __args) {
+    auto __key = key_type(std::forward<_Args>(__args)...);
+    auto __it = lower_bound(__key);
+    if (__it == end() || __compare_(__key, *__it)) {
+      auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+      __it = __c_.emplace(__it, std::move(__key));
+      __guard.__complete();
+      return {__it, true};
+    } else {
+      return {__it, false};
+    }
+  }
+
+  template <class... _Args>
+  iterator emplace_hint(const_iterator, _Args&&... __args) {
+    return emplace(std::forward<_Args>(__args)...).first;
+  }
+
+  pair<iterator, bool> insert(const value_type& __x) { return emplace(__x); }
+  pair<iterator, bool> insert(value_type&& __x) { return emplace(std::move(__x)); }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value &&
+             is_constructible_v<value_type, _K2>
+  pair<iterator, bool> insert(_K2&& __x) {
+    auto __it = lower_bound(__x);
+    if (__it == end() || __compare_(__x, *__it)) {
+      auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+      __it = __c_.emplace(__it, std::forward<_K2>(__x));
+      __guard.__complete();
+      return {__it, true};
+    } else {
+      return {__it, false};
+    }
+  }
+
+  iterator insert(const_iterator, const value_type& __x) { return emplace(__x).first; }
+  iterator insert(const_iterator, value_type&& __x) { return emplace(std::move(__x)).first; }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value &&
+             is_constructible_v<value_type, _K2>
+  iterator insert(const_iterator, _K2&& __x) {
+    return insert(std::forward<_K2>(__x)).first;
+  }
+
+  template <class _InIt>
+    requires __is_cpp17_input_iterator<_InIt>::value
+  void insert(_InIt __first, _InIt __last) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __it = __c_.insert(__c_.end(), __first, __last);
+    auto __end = __c_.end();
+    if (__it != __end) {
+      std::sort(__it, __end, __comp_ref());
+      auto __begin = __c_.begin();
+      std::inplace_merge(__begin, __it, __end, __comp_ref());
+      __c_.erase(std::__flatset_unique(__begin, __end, __comp_ref()), __end);
+    }
+    __guard.__complete();
+  }
+
+  template <class _InIt>
+    requires __is_cpp17_input_iterator<_InIt>::value
+  void insert(sorted_unique_t, _InIt __first, _InIt __last) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __it = __c_.insert(__c_.end(), __first, __last);
+    auto __end = __c_.end();
+    if (__it != __end) {
+      auto __begin = __c_.begin();
+      std::inplace_merge(__begin, __it, __end, __comp_ref());
+      __c_.erase(std::__flatset_unique(__begin, __end, __comp_ref()), __end);
+    }
+    __guard.__complete();
+  }
+
+  template <__container_compatible_range<value_type> _Rp>
+  void insert_range(_Rp&& __r) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    size_type __n = 0;
+    for (const auto& __e : __r) {
+      __c_.insert(__c_.end(), __e);
+      ++__n;
+    }
+    if (__n != 0) {
+      auto __end = __c_.end();
+      auto __it = __end - __n;
+      std::sort(__it, __end, __comp_ref());
+      auto __begin = __c_.begin();
+      std::inplace_merge(__begin, __it, __end, __comp_ref());
+      __c_.erase(std::__flatset_unique(__begin, __end, __comp_ref()), __end);
+    }
+    __guard.__complete();
+  }
+
+  void insert(std::initializer_list<value_type> __il) { insert(__il.begin(), __il.end()); }
+  void insert(sorted_unique_t __s, std::initializer_list<value_type> __il) { insert(__s, __il.begin(), __il.end()); }
+
+  container_type extract() && {
+    auto __guard = std::__make_exception_guard([&] { clear(); });
+    container_type __res = std::move(__c_);
+    // deliberately do not call __guard.__complete(), so that the clear always happens
+    return __res;
+  }
+
+  void replace(container_type&& __cont) {
+    auto __guard = std::__make_exception_guard([&] { clear(); });
+    __c_ = std::move(__cont);
+    __guard.__complete();
+  }
+
+  iterator erase(const_iterator __pos) {
+    // Notice that our iterator and const_iterator are the same type
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __it = __c_.erase(__pos);
+    __guard.__complete();
+    return __it;
+  }
+
+  size_type erase(const key_type& __x) {
+    auto __it = find(__x);
+    if (__it != end()) {
+      erase(__it);
+      return 1;
+    }
+    return 0;
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value &&
+             (!is_convertible_v<_K2&&, iterator>)
+  size_type erase(_K2&& __x) {
+    // Notice that our iterator and const_iterator are the same type
+    auto [__first, __last] = equal_range(__x);
+    auto __n = __last - __first;
+    if (__n) {
+      erase(__first, __last);
+    }
+    return __n;
+  }
+
+  iterator erase(const_iterator __first, const_iterator __last) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __it = __c_.erase(__first, __last);
+    __guard.__complete();
+    return __it;
+  }
+
+  void swap(flat_set& __y) noexcept {
+    using std::swap;
+    swap(__compare_, __y.__compare_);
+    swap(__c_, __y.__c_);
+  }
+
+  void clear() noexcept {
+    __c_.clear();
+  }
+
+  // observers
+
+  key_compare key_comp() const { return __compare_; }
+  value_compare value_comp() const { return __compare_; }
+
+  // set operations
+
+  iterator find(const key_type& __x) {
+    auto __it = lower_bound(__x);
+    if (__it == end() || __compare_(__x, *__it)) {
+      return end();
+    }
+    return __it;
+  }
+
+  const_iterator find(const key_type& __x) const {
+    auto __it = lower_bound(__x);
+    if (__it == end() || __compare_(__x, *__it)) {
+      return end();
+    }
+    return __it;
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  iterator find(const _K2& __x) {
+    auto __it = lower_bound(__x);
+    if (__it == end() || __compare_(__x, *__it)) {
+      return end();
+    }
+    return __it;
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  const_iterator find(const _K2& __x) const {
+    auto __it = lower_bound(__x);
+    if (__it == end() || __compare_(__x, *__it)) {
+      return end();
+    }
+    return __it;
+  }
+
+  size_type count(const key_type& __x) const {
+    return contains(__x) ? 1 : 0;
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  size_type count(const _K2& __x) const {
+    auto [__first, __last] = equal_range(__x);
+    return __last - __first;
+  }
+
+  bool contains(const key_type& __x) const {
+    return find(__x) != end();
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  bool contains(const _K2& __x) const {
+    return find(__x) != end();
+  }
+
+  iterator lower_bound(const key_type& __x) {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+  }
+
+  const_iterator lower_bound(const key_type& __x) const {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  iterator lower_bound(const _K2& __x) {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  const_iterator lower_bound(const _K2& __x) const {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+  }
+
+  iterator upper_bound(const key_type& __x) {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+  }
+
+  const_iterator upper_bound(const key_type& __x) const {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  iterator upper_bound(const _K2& __x) {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  const_iterator upper_bound(const _K2& __x) const {
+    return std::partition_point(begin(), end(), [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+  }
+
+  pair<iterator, iterator> equal_range(const key_type& __x) {
+    auto __end = end();
+    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+    auto __last = std::partition_point(__first, __end, [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+    return {__first, __last};
+  }
+
+  pair<const_iterator, const_iterator> equal_range(const key_type& __x) const {
+    auto __end = end();
+    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+    auto __last = std::partition_point(__first, __end, [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+    return {__first, __last};
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  pair<iterator, iterator> equal_range(const _K2& __x) {
+    auto __end = end();
+    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+    auto __last = std::partition_point(__first, __end, [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+    return {__first, __last};
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value
+  pair<const_iterator, const_iterator> equal_range(const _K2& __x) const {
+    auto __end = end();
+    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
+      return bool(__compare_(__e, __x));
+    });
+    auto __last = std::partition_point(__first, __end, [&](const value_type& __e) {
+      return !bool(__compare_(__x, __e));
+    });
+    return {__first, __last};
+  }
+
+  friend bool operator==(const flat_set& __x, const flat_set& __y) {
+    return __x.__c_ == __y.__c_;
+  }
+
+  friend auto operator<=>(const flat_set& __x, const flat_set& __y) {
+    if constexpr (requires { __x <=> __y; }) {
+      return __x <=> __y;
+    } else {
+      return std::lexicographical_compare_three_way(__x.begin(), __x.end(), __y.begin(), __y.end(), __synth_three_way);
+    }
+  }
+
+  friend void swap(flat_set& __x, flat_set& __y) noexcept { __x.swap(__y); }
+
+  template <class _Predicate>
+  size_type __erase_if(reference_wrapper<const _Predicate> __pred) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __end = __c_.end();
+    auto __it = std::remove_if(__c_.begin(), __end, __pred);
+    auto __n = __end - __it;
+    __c_.erase(__it, __end);
+    __guard.__complete();
+    return __n;
+  }
+
+private:
+  void __construct_invariant() {
+     // This function must not be called except from the constructors,
+     // where if the comparator or move-assignment throws an exception
+     // we will have no flat_set object and thus no invariant to restore.
+     auto __begin = __c_.begin();
+     auto __end = __c_.end();
+     std::sort(__begin, __end, __comp_ref());
+     __c_.erase(std::__flatset_unique(__begin, __end, __comp_ref()), __end);
+  }
+
+  void __restore_invariant() {
+    // There is already an exception in flight, so we cannot do anything
+    // that would risk a second exception. In particular, the comparator
+    // might throw, or value_type's operator= might throw.
+    // All we can safely do, in general, is clear the container.
+    __c_.clear();
+  }
+
+  reference_wrapper<const _Compare> __comp_ref() const {
+    return reference_wrapper<const _Compare>(__compare_);
+  }
+
+  _LIBCPP_NO_UNIQUE_ADDRESS key_compare __compare_ = key_compare();
+  container_type __c_ = container_type();
+};
+
+template<class _InputIterator,
+         class _Compare = less<__iter_value_type<_InputIterator>>,
+         class = enable_if_t<__is_cpp17_input_iterator<_InputIterator>::value>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(_InputIterator, _InputIterator, _Compare = _Compare())
+  -> flat_set<__iter_value_type<_InputIterator>, _Compare>;
+
+template<class _InputIterator,
+         class _Compare = less<__iter_value_type<_InputIterator>>,
+         class = enable_if_t<__is_cpp17_input_iterator<_InputIterator>::value>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(sorted_unique_t, _InputIterator, _InputIterator, _Compare = _Compare())
+  -> flat_set<__iter_value_type<_InputIterator>, _Compare>;
+
+template<ranges::input_range _Rp,
+         class _Compare = less<ranges::range_value_t<_Rp>>,
+         class _Allocator = allocator<ranges::range_value_t<_Rp>>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(from_range_t, _Rp&&, _Compare = _Compare(), _Allocator = _Allocator())
+  -> flat_set<ranges::range_value_t<_Rp>, _Compare>;
+
+template<ranges::input_range _Rp,
+         class _Allocator,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(from_range_t, _Rp&&, _Allocator)
+  -> flat_set<ranges::range_value_t<_Rp>, less<ranges::range_value_t<_Rp>>>;
+
+template<class _Key,
+         class _Compare = less<_Key>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(initializer_list<_Key>, _Compare = _Compare())
+  -> flat_set<_Key, _Compare>;
+
+template<class _Key,
+         class _Compare = less<_Key>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(sorted_unique_t, initializer_list<_Key>, _Compare = _Compare())
+  -> flat_set<_Key, _Compare>;
+
+template <class _Key, class _Compare, class _KeyContainer, class _Alloc>
+struct uses_allocator<flat_set<_Key, _Compare, _KeyContainer>, _Alloc>
+  : bool_constant<uses_allocator_v<_KeyContainer, _Alloc>> { };
+
+// [flat.set.erasure]
+
+template <class _Key, class _Compare, class _KeyContainer, class _Predicate>
+auto erase_if(flat_set<_Key, _Compare, _KeyContainer>& __c, _Predicate __pred)
+    -> typename flat_set<_Key, _Compare, _KeyContainer>::size_type
+{
+    return __c.__erase_if(reference_wrapper<const _Predicate>(__pred));
+}
+
+_LIBCPP_END_NAMESPACE_STD
+
+#endif // _LIBCPP_STD_VER >= 23
+
+#endif // _LIBCPP_FLAT_SET
+
+
