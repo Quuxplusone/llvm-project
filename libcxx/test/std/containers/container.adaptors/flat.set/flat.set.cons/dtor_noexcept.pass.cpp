@@ -1,0 +1,51 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+
+// <flat_set>
+
+// ~flat_set();
+
+#include <cassert>
+#include <deque>
+#include <flat_set>
+#include <functional>
+
+#include "test_macros.h"
+#include "MoveOnly.h"
+#include "test_allocator.h"
+
+struct ThrowingDtorComp {
+  bool operator()(const auto&, const auto&) const;
+  ~ThrowingDtorComp() noexcept(false);
+};
+
+int main(int, char**)
+{
+  {
+    using C = std::flat_set<MoveOnly>;
+    static_assert(std::is_nothrow_destructible_v<C>);
+  }
+  {
+    using C = std::flat_set<MoveOnly, std::less<MoveOnly>, std::vector<MoveOnly, test_allocator<MoveOnly>>>;
+    static_assert(std::is_nothrow_destructible_v<C>);
+  }
+  {
+    using C = std::flat_set<MoveOnly, std::greater<MoveOnly>, std::deque<MoveOnly, other_allocator<MoveOnly>>>;
+    static_assert(std::is_nothrow_destructible_v<C>);
+  }
+#if defined(_LIBCPP_VERSION)
+  {
+    using C = std::flat_set<MoveOnly, ThrowingDtorComp>;
+    static_assert(!std::is_nothrow_destructible_v<C>);
+  }
+#endif // _LIBCPP_VERSION
+
+  return 0;
+}
