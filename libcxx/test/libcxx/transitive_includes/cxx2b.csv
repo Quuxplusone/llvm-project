@@ -260,6 +260,7 @@ flat_set compare
 flat_set cstddef
 flat_set cstdint
 flat_set cstdlib
+flat_set cstring
 flat_set initializer_list
 flat_set limits
 flat_set new
