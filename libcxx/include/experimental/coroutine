@@ -56,6 +56,7 @@ template <class P> struct hash<coroutine_handle<P>>;
 #if !defined(_LIBCPP_REMOVE_TRANSITIVE_INCLUDES) && _LIBCPP_STD_VER <= 20
 #  include <atomic>
 #  include <climits>
+#  include <cstring>
 #  include <cmath>
 #  include <compare>
 #  include <concepts>

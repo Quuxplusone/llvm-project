@@ -438,22 +438,22 @@ basic_filebuf<_CharT, _Traits>::swap(basic_filebuf& __rhs)
             // *this uses the small buffer, but __rhs doesn't.
             __extbuf_ = __rhs.__extbuf_;
             __rhs.__extbuf_ = __rhs.__extbuf_min_;
-            std::memmove(__rhs.__extbuf_min_, __extbuf_min_, sizeof(__extbuf_min_));
+            ::__builtin_memmove(__rhs.__extbuf_min_, __extbuf_min_, sizeof(__extbuf_min_));
         }
         else if (__extbuf_ != __extbuf_min_ && __rhs.__extbuf_ == __rhs.__extbuf_min_)
         {
             // *this doesn't use the small buffer, but __rhs does.
             __rhs.__extbuf_ = __extbuf_;
             __extbuf_ = __extbuf_min_;
-            std::memmove(__extbuf_min_, __rhs.__extbuf_min_, sizeof(__extbuf_min_));
+            ::__builtin_memmove(__extbuf_min_, __rhs.__extbuf_min_, sizeof(__extbuf_min_));
         }
         else
         {
             // Both *this and __rhs use the small buffer.
             char __tmp[sizeof(__extbuf_min_)];
-            std::memmove(__tmp, __extbuf_min_, sizeof(__extbuf_min_));
-            std::memmove(__extbuf_min_, __rhs.__extbuf_min_, sizeof(__extbuf_min_));
-            std::memmove(__rhs.__extbuf_min_, __tmp, sizeof(__extbuf_min_));
+            ::__builtin_memcpy(__tmp, __extbuf_min_, sizeof(__extbuf_min_));
+            ::__builtin_memmove(__extbuf_min_, __rhs.__extbuf_min_, sizeof(__extbuf_min_));
+            ::__builtin_memcpy(__rhs.__extbuf_min_, __tmp, sizeof(__extbuf_min_));
         }
         __extbufnext_ = __extbuf_ + __rn;
         __extbufend_ = __extbuf_ + __re;
@@ -738,7 +738,7 @@ basic_filebuf<_CharT, _Traits>::underflow()
     int_type __c = traits_type::eof();
     if (this->gptr() == this->egptr())
     {
-        _VSTD::memmove(this->eback(), this->egptr() - __unget_sz, __unget_sz * sizeof(char_type));
+        ::__builtin_memmove(this->eback(), this->egptr() - __unget_sz, __unget_sz * sizeof(char_type));
         if (__always_noconv_)
         {
             size_t __nmemb = static_cast<size_t>(this->egptr() - this->eback() - __unget_sz);
@@ -756,7 +756,7 @@ basic_filebuf<_CharT, _Traits>::underflow()
             if (__extbufend_ != __extbufnext_) {
                 _LIBCPP_ASSERT(__extbufnext_ != nullptr, "underflow moving from nullptr");
                 _LIBCPP_ASSERT(__extbuf_ != nullptr, "underflow moving into nullptr");
-                _VSTD::memmove(__extbuf_, __extbufnext_, __extbufend_ - __extbufnext_);
+                ::__builtin_memmove(__extbuf_, __extbufnext_, __extbufend_ - __extbufnext_);
             }
             __extbufnext_ = __extbuf_ + (__extbufend_ - __extbufnext_);
             __extbufend_ = __extbuf_ + (__extbuf_ == __extbuf_min_ ? sizeof(__extbuf_min_) : __ebs_);

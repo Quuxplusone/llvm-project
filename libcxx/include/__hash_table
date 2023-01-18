@@ -30,7 +30,6 @@
 #include <__utility/pair.h>
 #include <__utility/swap.h>
 #include <cmath>
-#include <cstring>
 #include <initializer_list>
 #include <type_traits>
 
@@ -1528,7 +1527,7 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::__deallocate_node(__next_pointer __np)
             {
                 (*__p)->__c_ = nullptr;
                 if (--__c->end_ != __p)
-                    _VSTD::memmove(__p, __p+1, (__c->end_ - __p)*sizeof(__i_node*));
+                    ::__builtin_memmove(__p, __p+1, (__c->end_ - __p)*sizeof(__i_node*));
             }
         }
         __get_db()->unlock();
@@ -2503,7 +2502,7 @@ __hash_table<_Tp, _Hash, _Equal, _Alloc>::remove(const_iterator __p) _NOEXCEPT
         {
             (*__dp)->__c_ = nullptr;
             if (--__c->end_ != __dp)
-                _VSTD::memmove(__dp, __dp+1, (__c->end_ - __dp)*sizeof(__i_node*));
+                ::__builtin_memmove(__dp, __dp+1, (__c->end_ - __dp)*sizeof(__i_node*));
         }
     }
     __get_db()->unlock();

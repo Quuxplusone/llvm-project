@@ -314,7 +314,6 @@ template<class T, class charT> requires is-vector-bool-reference<T> // Since C++
 #include <__utility/swap.h>
 #include <climits>
 #include <cstdlib>
-#include <cstring>
 #include <iosfwd> // for forward declaration of vector
 #include <limits>
 #include <stdexcept>
@@ -2032,7 +2031,7 @@ vector<_Tp, _Allocator>::__invalidate_iterators_past(pointer __new_last) {
     if (__i->base() > __new_last) {
       (*__p)->__c_ = nullptr;
       if (--__c->end_ != __p)
-        std::memmove(__p, __p+1, (__c->end_ - __p)*sizeof(__i_node*));
+        ::__builtin_memmove(__p, __p+1, (__c->end_ - __p)*sizeof(__i_node*));
     }
   }
   __get_db()->unlock();

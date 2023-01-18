@@ -25,7 +25,6 @@
 #include <__utility/swap.h>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <limits>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -40,7 +39,7 @@ _Size
 __loadword(const void* __p)
 {
     _Size __r;
-    _VSTD::memcpy(&__r, __p, sizeof(__r));
+    ::__builtin_memcpy(&__r, __p, sizeof(__r));
     return __r;
 }
 

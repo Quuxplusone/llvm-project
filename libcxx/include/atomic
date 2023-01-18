@@ -1247,9 +1247,9 @@ bool __cxx_atomic_compare_exchange_strong(__cxx_atomic_lock_impl<_Tp>* __a,
   __a->__lock();
   bool __ret = (_VSTD::memcmp(&__a->__a_value, __expected, sizeof(_Tp)) == 0);
   if(__ret)
-    _VSTD::memcpy(&__a->__a_value, &__value, sizeof(_Tp));
+    ::__builtin_memcpy(&__a->__a_value, &__value, sizeof(_Tp));
   else
-    _VSTD::memcpy(__expected, &__a->__a_value, sizeof(_Tp));
+    ::__builtin_memcpy(__expected, &__a->__a_value, sizeof(_Tp));
   __a->__unlock();
   return __ret;
 }
@@ -1276,9 +1276,9 @@ bool __cxx_atomic_compare_exchange_weak(__cxx_atomic_lock_impl<_Tp>* __a,
   __a->__lock();
   bool __ret = (_VSTD::memcmp(&__a->__a_value, __expected, sizeof(_Tp)) == 0);
   if(__ret)
-    _VSTD::memcpy(&__a->__a_value, &__value, sizeof(_Tp));
+    ::__builtin_memcpy(&__a->__a_value, &__value, sizeof(_Tp));
   else
-    _VSTD::memcpy(__expected, &__a->__a_value, sizeof(_Tp));
+    ::__builtin_memcpy(__expected, &__a->__a_value, sizeof(_Tp));
   __a->__unlock();
   return __ret;
 }
