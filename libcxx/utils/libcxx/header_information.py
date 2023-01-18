@@ -140,7 +140,6 @@ mandatory_inclusions = {
 headers_not_available = [
     "debugging",
     "flat_map",
-    "flat_set",
     "generator",
     "hazard_pointer",
     "inplace_vector",
