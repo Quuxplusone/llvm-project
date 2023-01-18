@@ -100,6 +100,7 @@ END-SCRIPT
 #if !defined(_LIBCPP_HAS_NO_FILESYSTEM_LIBRARY)
 #   include <filesystem>
 #endif
+#include <flat_set>
 #include <float.h>
 #include <format>
 #include <forward_list>
