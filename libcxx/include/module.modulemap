@@ -1232,6 +1232,15 @@ module std [system] {
     export *
   }
 
+  module flat_set {
+    module flat_set              { header "__flat_set/flat_set.h" }
+    module sorted_equivalent     { header "__utility/sorted_equivalent.h" }
+    module sorted_unique         { header "__utility/sorted_unique.h" }
+
+    header "flat_set"
+    export *
+  }
+
   module format {
     module buffer                             { header "__format/buffer.h" }
     module concepts                           { header "__format/concepts.h" }
@@ -1281,15 +1290,6 @@ module std [system] {
 
   module forward_list {
     header "forward_list"
-    export *
-  }
-
-  module flat_set {
-    module flat_set              { header "__flat_set/flat_set.h" }
-    module sorted_equivalent     { header "__flat_set/sorted_equivalent.h" }
-    module sorted_unique         { header "__flat_set/sorted_unique.h" }
-
-    header "flat_set"
     export *
   }
 
