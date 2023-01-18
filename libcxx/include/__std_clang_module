@@ -94,6 +94,7 @@
 #include <experimental/utility>
 #include <fenv.h>
 #include <filesystem>
+#include <flat_set>
 #include <float.h>
 #include <format>
 #include <forward_list>
