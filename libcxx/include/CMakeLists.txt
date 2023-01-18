@@ -825,6 +825,7 @@ set(files
   ext/hash_set
   fenv.h
   filesystem
+  flat_set
   float.h
   format
   forward_list
