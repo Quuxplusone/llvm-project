@@ -149,6 +149,8 @@ TEST_MACROS();
 #   include <filesystem>
 TEST_MACROS();
 #endif
+#include <flat_set>
+TEST_MACROS();
 #include <float.h>
 TEST_MACROS();
 #include <format>
