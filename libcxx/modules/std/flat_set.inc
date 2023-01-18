@@ -8,8 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 export namespace std {
-#if 0
-  // [flat.set], class template flat_­set
+  // [flat.set], class template flat_set
   using std::flat_set;
 
   using std::sorted_unique;
@@ -17,13 +16,12 @@ export namespace std {
 
   using std::uses_allocator;
 
-  // [flat.set.erasure], erasure for flat_­set
+  // [flat.set.erasure], erasure for flat_set
   using std::erase_if;
 
-  // [flat.multiset], class template flat_­multiset
-  using std::flat_multiset;
+  // [flat.multiset], class template flat_multiset
+  //using std::flat_multiset;
 
   using std::sorted_equivalent;
   using std::sorted_equivalent_t;
-#endif
 } // namespace std
