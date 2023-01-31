@@ -1,0 +1,49 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// UNSUPPORTED: c++03, c++11, c++14
+
+// <hive>
+
+// hive& operator=(hive&& c)
+//     noexcept(allocator_traits<Allocator>::is_always_equal::value ||
+//              allocator_type::propagate_on_container_move_assignment::value)
+
+// This tests a conforming extension
+
+#include <hive>
+#include <cassert>
+
+#include "test_macros.h"
+#include "MoveOnly.h"
+#include "test_allocator.h"
+
+template <class T>
+struct some_alloc
+{
+  typedef T value_type;
+  some_alloc(const some_alloc&);
+  void allocate(size_t);
+};
+
+int main(int, char**)
+{
+  {
+    typedef std::hive<MoveOnly> C;
+    static_assert(std::is_nothrow_move_assignable<C>::value, "");
+  }
+  {
+    typedef std::hive<MoveOnly, test_allocator<MoveOnly>> C;
+    static_assert(!std::is_nothrow_move_assignable<C>::value, "");
+  }
+  {
+    typedef std::hive<MoveOnly, other_allocator<MoveOnly>> C;
+    static_assert(std::is_nothrow_move_assignable<C>::value, "");
+  }
+  return 0;
+}
