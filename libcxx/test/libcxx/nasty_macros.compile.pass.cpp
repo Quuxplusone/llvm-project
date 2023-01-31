@@ -235,6 +235,7 @@ END-SCRIPT
 #if !defined(_LIBCPP_HAS_NO_THREADS)
 #   include <future>
 #endif
+#include <hive>
 #include <initializer_list>
 #include <inttypes.h>
 #if !defined(_LIBCPP_HAS_NO_LOCALIZATION)
