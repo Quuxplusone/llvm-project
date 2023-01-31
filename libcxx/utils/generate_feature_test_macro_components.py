@@ -356,6 +356,10 @@ feature_test_macros = [ add_version_header(x) for x in [
     "values": { "c++17": 201606 },
     "headers": ["type_traits"],
   }, {
+    "name": "__cpp_lib_hive",
+    "values": { "c++2b": 202300 },
+    "headers": ["hive"],
+  }, {
     "name": "__cpp_lib_hypot",
     "values": { "c++17": 201603 },
     "headers": ["cmath"],
