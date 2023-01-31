@@ -84,14 +84,14 @@ struct move_iterator_view : std::ranges::view_base {
 };
 
 constexpr bool test() {
-  meta::for_each(meta::cpp20_input_iterator_list<int*>{}, []<class Iter> {
+  TestMeta::for_each(TestMeta::cpp20_input_iterator_list<int*>{}, []<class Iter> {
     if constexpr (std::sentinel_for<Iter, Iter>)
       test_range<Iter, Iter>();
     test_range<Iter, sentinel_wrapper<Iter>>();
     test_range<Iter, sized_sentinel<Iter>>();
   });
 
-  meta::for_each(meta::forward_iterator_list<const int*>{}, []<class Iter> {
+  TestMeta::for_each(TestMeta::forward_iterator_list<const int*>{}, []<class Iter> {
     test_const_range<Iter, Iter>();
     test_const_range<Iter, sentinel_wrapper<Iter>>();
     test_const_range<Iter, sized_sentinel<Iter>>();

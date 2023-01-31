@@ -13,7 +13,7 @@
 
 #include "test_macros.h"
 
-namespace meta {
+namespace TestMeta {
 template <class... Types>
 struct type_list {};
 
@@ -100,6 +100,6 @@ using integral_types = concatenate_t<character_types, signed_integer_types, unsi
 using floating_point_types = type_list<float, double, long double>;
 
 using arithmetic_types = concatenate_t<integral_types, floating_point_types>;
-} // namespace meta
+} // namespace TestMeta
 
 #endif // TEST_SUPPORT_TYPE_ALGORITHMS_H
