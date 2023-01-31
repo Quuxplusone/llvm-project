@@ -1418,7 +1418,7 @@ template <std::ranges::input_range R>
   requires std::ranges::viewable_range<R&&>
 ProxyRange(R&&) -> ProxyRange<std::views::all_t<R&&>>;
 
-namespace meta {
+namespace TestMeta {
 template <class Ptr>
 using random_access_iterator_list = type_list<Ptr, contiguous_iterator<Ptr>, random_access_iterator<Ptr>>;
 
@@ -1433,7 +1433,7 @@ template <class Ptr>
 using cpp20_input_iterator_list =
     concatenate_t<forward_iterator_list<Ptr>, type_list<cpp20_input_iterator<Ptr>, cpp17_input_iterator<Ptr>>>;
 
-} // namespace meta
+} // namespace TestMeta
 
 #endif // TEST_STD_VER > 17
 
