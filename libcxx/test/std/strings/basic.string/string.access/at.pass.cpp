@@ -76,7 +76,7 @@ struct TestCaller {
 };
 
 TEST_CONSTEXPR_CXX20 bool test() {
-  meta::for_each(meta::character_types(), TestCaller());
+  TestMeta::for_each(TestMeta::character_types(), TestCaller());
 
   return true;
 }
