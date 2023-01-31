@@ -89,6 +89,7 @@
 #include <cstddef>
 #include <deque>
 #include <functional>
+#include <hive>
 #include <list>
 #include <map>
 #include <new>
@@ -448,6 +449,11 @@ template <class T = CopyInsertable<1>>
 using deque = std::deque<T, ContainerTestAllocator<T, T> >;
 template <class T = CopyInsertable<1>>
 using list = std::list<T, ContainerTestAllocator<T, T> >;
+
+#if TEST_STD_VER >= 17
+template <class T = CopyInsertable<1>>
+using hive = std::hive<T, ContainerTestAllocator<T, T> >;
+#endif
 
 template <class Key = CopyInsertable<1>, class Value = CopyInsertable<2>,
           class ValueTp = std::pair<const Key, Value> >

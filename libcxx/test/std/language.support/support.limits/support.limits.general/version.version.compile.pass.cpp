@@ -111,6 +111,7 @@
     __cpp_lib_hardware_interference_size                    201703L [C++17]
     __cpp_lib_has_unique_object_representations             201606L [C++17]
     __cpp_lib_hazard_pointer                                202306L [C++26]
+    __cpp_lib_hive                                          202300L [C++20]
     __cpp_lib_hypot                                         201603L [C++17]
     __cpp_lib_incomplete_container_elements                 201505L [C++17]
     __cpp_lib_inplace_vector                                202406L [C++26]
@@ -620,6 +621,10 @@
 
 # ifdef __cpp_lib_hazard_pointer
 #   error "__cpp_lib_hazard_pointer should not be defined before c++26"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++20"
 # endif
 
 # ifdef __cpp_lib_hypot
@@ -1502,6 +1507,10 @@
 
 # ifdef __cpp_lib_hazard_pointer
 #   error "__cpp_lib_hazard_pointer should not be defined before c++26"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++20"
 # endif
 
 # ifdef __cpp_lib_hypot
@@ -2522,6 +2531,10 @@
 
 # ifdef __cpp_lib_hazard_pointer
 #   error "__cpp_lib_hazard_pointer should not be defined before c++26"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++20"
 # endif
 
 # ifndef __cpp_lib_hypot
@@ -3806,6 +3819,13 @@
 
 # ifdef __cpp_lib_hazard_pointer
 #   error "__cpp_lib_hazard_pointer should not be defined before c++26"
+# endif
+
+# ifndef __cpp_lib_hive
+#   error "__cpp_lib_hive should be defined in c++20"
+# endif
+# if __cpp_lib_hive != 202300L
+#   error "__cpp_lib_hive should have the value 202300L in c++20"
 # endif
 
 # ifndef __cpp_lib_hypot
@@ -5276,6 +5296,13 @@
 
 # ifdef __cpp_lib_hazard_pointer
 #   error "__cpp_lib_hazard_pointer should not be defined before c++26"
+# endif
+
+# ifndef __cpp_lib_hive
+#   error "__cpp_lib_hive should be defined in c++23"
+# endif
+# if __cpp_lib_hive != 202300L
+#   error "__cpp_lib_hive should have the value 202300L in c++23"
 # endif
 
 # ifndef __cpp_lib_hypot
@@ -7088,6 +7115,13 @@
 #   ifdef __cpp_lib_hazard_pointer
 #     error "__cpp_lib_hazard_pointer should not be defined because it is unimplemented in libc++!"
 #   endif
+# endif
+
+# ifndef __cpp_lib_hive
+#   error "__cpp_lib_hive should be defined in c++26"
+# endif
+# if __cpp_lib_hive != 202300L
+#   error "__cpp_lib_hive should have the value 202300L in c++26"
 # endif
 
 # ifndef __cpp_lib_hypot
