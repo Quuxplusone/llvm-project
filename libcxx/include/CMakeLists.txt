@@ -1055,6 +1055,7 @@ set(files
   fstream
   functional
   future
+  hive
   initializer_list
   iomanip
   ios
