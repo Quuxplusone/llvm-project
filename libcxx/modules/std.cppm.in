@@ -80,6 +80,7 @@ module;
 #if !defined(_LIBCPP_HAS_NO_THREADS)
 #  include <future>
 #endif
+#include <hive>
 #include <initializer_list>
 #if !defined(_LIBCPP_HAS_NO_LOCALIZATION)
 #  include <iomanip>
