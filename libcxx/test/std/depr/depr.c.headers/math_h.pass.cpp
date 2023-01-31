@@ -947,53 +947,53 @@ struct test_three_args {
 };
 
 struct CallTwoArgs {
-  using integral_float_double = meta::concatenate_t<meta::integral_types, meta::type_list<float, double> >;
+  using integral_float_double = TestMeta::concatenate_t<TestMeta::integral_types, TestMeta::type_list<float, double> >;
 
   template <class Arg2>
   void operator()() {
-    meta::for_each(integral_float_double(), test_two_args</*PromoteResult=*/double, /*Iterate*/void, Arg2>());
+    TestMeta::for_each(integral_float_double(), test_two_args</*PromoteResult=*/double, /*Iterate*/void, Arg2>());
   }
 };
 
 template <class T>
 struct CallThreeArgs {
-  using integral_float_double = meta::concatenate_t<meta::integral_types, meta::type_list<float, double> >;
+  using integral_float_double = TestMeta::concatenate_t<TestMeta::integral_types, TestMeta::type_list<float, double> >;
 
   template <class Arg3>
   struct Helper {
 
     template <class Arg2>
     void operator()() {
-      meta::for_each(integral_float_double(), test_three_args</*PromoteResult=*/double, /*Iterate*/void, Arg2, Arg3>());
+      TestMeta::for_each(integral_float_double(), test_three_args</*PromoteResult=*/double, /*Iterate*/void, Arg2, Arg3>());
     }
   };
 
   template <class Arg3>
   void operator()() {
-    meta::for_each(integral_float_double(), Helper<Arg3>());
+    TestMeta::for_each(integral_float_double(), Helper<Arg3>());
   }
 };
 
 int main(int, char**)
 {
-  meta::for_each(meta::integral_types(), test_single_arg</*PromoteResult=*/double>());
+  TestMeta::for_each(TestMeta::integral_types(), test_single_arg</*PromoteResult=*/double>());
   test_single_arg</*PromoteResult=*/float, /*Arg=*/float>();
   test_single_arg</*PromoteResult=*/double, /*Arg=*/double>();
   test_single_arg</*PromoteResult=*/long double, /*Arg=*/long double>();
 
-  meta::for_each(meta::integral_types(), CallTwoArgs());
+  TestMeta::for_each(TestMeta::integral_types(), CallTwoArgs());
 
-  meta::for_each(
-      meta::integral_types(), test_two_args</*PromoteResult=*/long double, /*Arg1=*/void, /*Arg2=*/long double>());
+  TestMeta::for_each(
+      TestMeta::integral_types(), test_two_args</*PromoteResult=*/long double, /*Arg1=*/void, /*Arg2=*/long double>());
 
   test_two_args</*PromoteResult=*/float, /*Args=*/float, float>();
   test_two_args</*PromoteResult=*/float, /*Args=*/double, double>();
   test_two_args</*PromoteResult=*/double, /*Args=*/float, double>();
   test_two_args</*PromoteResult=*/double, /*Args=*/double, double>();
 
-  meta::for_each(meta::integral_types(), CallThreeArgs<double>());
-  meta::for_each(
-      meta::integral_types(), test_three_args</*PromoteResult=*/long double, /*Iterate*/ void, long double, double>());
+  TestMeta::for_each(TestMeta::integral_types(), CallThreeArgs<double>());
+  TestMeta::for_each(
+      TestMeta::integral_types(), test_three_args</*PromoteResult=*/long double, /*Iterate*/ void, long double, double>());
 
   test_three_args</*PromoteResult=*/float, /*Args=*/float, float, float>();
   test_three_args</*PromoteResult=*/double, /*Args=*/double, double, double>();
