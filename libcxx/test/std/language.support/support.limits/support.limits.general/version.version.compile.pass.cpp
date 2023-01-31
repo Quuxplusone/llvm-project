@@ -416,6 +416,10 @@
 #    error "__cpp_lib_hazard_pointer should not be defined before c++26"
 #  endif
 
+#  ifdef __cpp_lib_hive
+#    error "__cpp_lib_hive should not be defined before c++20"
+#  endif
+
 #  ifdef __cpp_lib_hypot
 #    error "__cpp_lib_hypot should not be defined before c++17"
 #  endif
@@ -1332,6 +1336,10 @@
 
 #  ifdef __cpp_lib_hazard_pointer
 #    error "__cpp_lib_hazard_pointer should not be defined before c++26"
+#  endif
+
+#  ifdef __cpp_lib_hive
+#    error "__cpp_lib_hive should not be defined before c++20"
 #  endif
 
 #  ifdef __cpp_lib_hypot
@@ -2388,6 +2396,10 @@
 
 #  ifdef __cpp_lib_hazard_pointer
 #    error "__cpp_lib_hazard_pointer should not be defined before c++26"
+#  endif
+
+#  ifdef __cpp_lib_hive
+#    error "__cpp_lib_hive should not be defined before c++20"
 #  endif
 
 #  ifndef __cpp_lib_hypot
@@ -3714,6 +3726,13 @@
 
 #  ifdef __cpp_lib_hazard_pointer
 #    error "__cpp_lib_hazard_pointer should not be defined before c++26"
+#  endif
+
+#  ifndef __cpp_lib_hive
+#    error "__cpp_lib_hive should be defined in c++20"
+#  endif
+#  if __cpp_lib_hive != 202300L
+#    error "__cpp_lib_hive should have the value 202300L in c++20"
 #  endif
 
 #  ifndef __cpp_lib_hypot
@@ -5232,6 +5251,13 @@
 
 #  ifdef __cpp_lib_hazard_pointer
 #    error "__cpp_lib_hazard_pointer should not be defined before c++26"
+#  endif
+
+#  ifndef __cpp_lib_hive
+#    error "__cpp_lib_hive should be defined in c++23"
+#  endif
+#  if __cpp_lib_hive != 202300L
+#    error "__cpp_lib_hive should have the value 202300L in c++23"
 #  endif
 
 #  ifndef __cpp_lib_hypot
@@ -7092,6 +7118,13 @@
 #    ifdef __cpp_lib_hazard_pointer
 #      error "__cpp_lib_hazard_pointer should not be defined because it is unimplemented in libc++!"
 #    endif
+#  endif
+
+#  ifndef __cpp_lib_hive
+#    error "__cpp_lib_hive should be defined in c++26"
+#  endif
+#  if __cpp_lib_hive != 202300L
+#    error "__cpp_lib_hive should have the value 202300L in c++26"
 #  endif
 
 #  ifndef __cpp_lib_hypot
