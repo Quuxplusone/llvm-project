@@ -429,6 +429,17 @@ future system_error
 future thread
 future type_traits
 future version
+hive climits
+hive compare
+hive cstddef
+hive cstdint
+hive cstdlib
+hive cstring
+hive initializer_list
+hive limits
+hive new
+hive stdexcept
+hive version
 initializer_list cstddef
 iomanip istream
 iomanip version
