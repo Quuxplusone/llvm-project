@@ -167,6 +167,8 @@ TEST_MACROS();
 #   include <future>
 TEST_MACROS();
 #endif
+#include <hive>
+TEST_MACROS();
 #include <initializer_list>
 TEST_MACROS();
 #include <inttypes.h>

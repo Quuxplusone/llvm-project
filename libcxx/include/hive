@@ -1,0 +1,2346 @@
+// -*- C++ -*-
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef _LIBCPP_HIVE
+#define _LIBCPP_HIVE
+
+#include <__algorithm/fill_n.h>
+#include <__algorithm/sort.h>
+#include <__bit/bit_cast.h>
+#include <__concepts/assignable.h>
+#include <__config>
+#include <__functional/operations.h>
+#include <__iterator/concepts.h>
+#include <__iterator/distance.h>
+#include <__iterator/iterator_traits.h>
+#include <__iterator/move_iterator.h>
+#include <__iterator/reverse_iterator.h>
+#include <__memory/addressof.h>
+#include <__memory/allocator.h>
+#include <__memory/allocator_traits.h>
+#include <__memory/pointer_traits.h>
+#include <__memory/unique_ptr.h>
+#include <__ranges/concepts.h>
+#include <__ranges/container_compatible_range.h>
+#include <__ranges/from_range.h>
+#include <__ranges/access.h>
+#include <__ranges/size.h>
+#include <__type_traits/conditional.h>
+#include <__type_traits/enable_if.h>
+#include <__type_traits/is_trivial.h>
+#include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_destructible.h>
+#include <__type_traits/type_identity.h>
+#include <__utility/exception_guard.h>
+#include <__utility/exchange.h>
+#include <__utility/forward.h>
+#include <__utility/move.h>
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
+#include <version>
+
+// standard-mandated includes
+
+// [hive.syn]
+#include <compare>
+#include <initializer_list>
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#  pragma GCC system_header
+#endif
+
+#if _LIBCPP_STD_VER >= 23
+
+_LIBCPP_PUSH_MACROS
+#include <__undef_macros>
+
+_LIBCPP_BEGIN_NAMESPACE_STD
+
+// Copyright (c) 2022, Matthew Bentley (mattreecebentley@gmail.com) www.plflib.org
+// Modified by Arthur O'Dwyer, 2022. Original source:
+// https://github.com/mattreecebentley/plf_hive/blob/7b7763f/plf_hive.h
+
+// zLib license (https://www.zlib.net/zlib_license.html):
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//  claim that you wrote the original software. If you use this software
+//  in a product, an acknowledgement in the product documentation would be
+//  appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//  misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+#ifndef PLF_HIVE_P2596
+ #define PLF_HIVE_P2596 0
+#endif
+
+#ifndef PLF_HIVE_RANDOM_ACCESS_ITERATORS
+ #define PLF_HIVE_RANDOM_ACCESS_ITERATORS 0
+#endif
+
+#if PLF_HIVE_RANDOM_ACCESS_ITERATORS
+ #define PLF_HIVE_RELATIONAL_OPERATORS 1  // random access iterators require relational operators
+#endif
+
+#ifndef PLF_HIVE_RELATIONAL_OPERATORS
+ #define PLF_HIVE_RELATIONAL_OPERATORS 1
+#endif
+
+#ifndef PLF_HIVE_DEBUGGING
+ #define PLF_HIVE_DEBUGGING 0
+#endif
+
+template<class _Fp, class _Rp>
+inline void __hive_try_rollback(_Fp&& __task, _Rp&& rollback) {
+    auto __guard = std::__make_exception_guard(rollback);
+    __task();
+    __guard.__complete();
+}
+
+template<class _Fp, class _Rp>
+inline void __hive_try_finally(_Fp&& __task, _Rp&& __finally) {
+    auto __guard = std::__make_exception_guard(__finally);
+    __task();
+    // deliberately do not __guard.__complete(), so that __finally always runs
+}
+
+#if !PLF_HIVE_P2596
+struct hive_limits {
+    constexpr hive_limits(size_t mn, size_t mx) noexcept : min(mn), max(mx) {}
+    size_t min, max;
+};
+#endif
+
+template <class _Tp, class _Allocator = std::allocator<_Tp>>
+class hive {
+    template<bool _IsConst> class __hive_iterator;
+    friend class __hive_iterator<false>;
+    friend class __hive_iterator<true>;
+
+    using _SkipfieldType = unsigned short;
+    using _AllocTraits = std::allocator_traits<_Allocator>;
+
+public:
+    using value_type = _Tp;
+    using allocator_type = _Allocator;
+    using size_type = typename _AllocTraits::size_type;
+    using difference_type = typename _AllocTraits::difference_type;
+    using pointer = typename _AllocTraits::pointer;
+    using const_pointer = typename _AllocTraits::const_pointer;
+    using reference = _Tp&;
+    using const_reference = const _Tp&;
+    using iterator = __hive_iterator<false>;
+    using const_iterator = __hive_iterator<true>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+private:
+    auto __make_value_callback(size_type, const _Tp& __value) {
+        struct _Callback {
+            const _Tp& __value_;
+            void __construct_and_increment(allocator_type& __ea, _AlignedEltPtr& __p) {
+                _AllocTraits::construct(__ea, __p[0].t(), __value_);
+                ++__p;
+            }
+        };
+        return _Callback{__value};
+    }
+
+    template <class _It, class _Sent>
+    auto __make_itpair_callback(_It& __first, _Sent&) {
+        struct _Callback {
+            _It& __first_;
+            void __construct_and_increment(allocator_type& __ea, _AlignedEltPtr& __p) {
+                _AllocTraits::construct(__ea, __p[0].t(), *__first_);
+                ++__p;
+                ++__first_;
+            }
+        };
+        return _Callback{__first};
+    }
+
+    template <class _Up> using _AllocOf = typename _AllocTraits::template rebind_alloc<_Up>;
+    template <class _Up> using _PtrOf = typename std::allocator_traits<_AllocOf<_Up>>::pointer;
+
+    struct _OveralignedElt {
+        union {
+            char __dummy_;
+            struct {
+                _SkipfieldType nextlink_;
+                _SkipfieldType prevlink_;
+            };
+            _Tp t_;
+        };
+        _PtrOf<_Tp> t() { return bitcast_pointer<_PtrOf<_Tp>>(std::addressof(t_)); }
+    };
+
+    template <class _Dp, class _Sp>
+    static constexpr _Dp bitcast_pointer(_Sp __source_pointer) {
+        return std::bit_cast<_Dp>(std::to_address(__source_pointer));
+    }
+
+    struct group;
+    using _AlignedEltPtr = _PtrOf<_OveralignedElt>;
+    using _GroupPtr = _PtrOf<group>;
+    using _SkipfieldPtr = _PtrOf<_SkipfieldType>;
+
+    struct group {
+        _AlignedEltPtr last_endpoint;
+            // The address which is one-past the highest cell number that's been used so far in this group - does not change via erasure
+            // but may change via insertion/emplacement/assignment (if no previously-erased locations are available to insert to).
+            // This variable is necessary because an iterator cannot access the hive's __end_. It is probably the most-used variable
+            // in general hive usage (being heavily used in operator ++, --), so is first in struct. If all cells in the group have
+            // been inserted into at some point, it will be == reinterpret_cast<_AlignedEltPtr>(skipfield).
+        _GroupPtr next_group = nullptr;
+        _GroupPtr prev_group = nullptr;
+        _SkipfieldType free_list_head = std::numeric_limits<_SkipfieldType>::max();
+            // The index of the last erased element in the group. The last erased element will, in turn, contain
+            // the number of the index of the next erased element, and so on. If this is == maximum _SkipfieldType value
+            // then free_list is empty ie. no erasures have occurred in the group.
+        _SkipfieldType capacity;
+        _SkipfieldType size = 0;
+            // The total number of active elements in group - changes with insert and erase commands - used to check for empty group in erase function,
+            // as an indication to remove the group. Also used in combination with capacity to check if group is full.
+        _GroupPtr next_erasure_ = nullptr;
+            // The next group in the singly-linked list of groups with erasures ie. with active erased-element free lists. nullptr if no next group.
+#if PLF_HIVE_RELATIONAL_OPERATORS
+        size_type groupno_ = 0;
+            // Used for comparison (> < >= <= <=>) iterator operators (used by distance function and user).
+#endif
+
+#if PLF_HIVE_RELATIONAL_OPERATORS
+        inline size_t group_number() const { return groupno_; }
+        inline void set_group_number(size_type x) { groupno_ = x; }
+#else
+        inline size_t group_number() const { return 42; }
+        inline void set_group_number(size_type) { }
+#endif
+
+#if PLF_HIVE_DEBUGGING
+        void debug_dump() {
+            printf(
+                "  group #%zu [%zu/%zu used] (last_endpoint=%p, elts=%p, skipfield=%p, freelist=%zu, erasenext=%p)",
+                group_number(), size_t(size), size_t(capacity),
+                (void*)last_endpoint, (void*)addr_of_element(0), (void*)addr_of_skipfield(0), size_t(free_list_head), (void*)next_erasure_
+            );
+            if (next_group) {
+                printf(" next: #%zu", next_group->group_number());
+            } else {
+                printf(" next: null");
+            }
+            if (prev_group) {
+                printf(" prev: #%zu\n", prev_group->group_number());
+            } else {
+                printf(" prev: null\n");
+            }
+            printf("  skipfield[] =");
+            for (int i = 0; i < capacity; ++i) {
+                if (skipfield(i) == 0) {
+                    printf(" _");
+                } else {
+                    printf(" %d", int(skipfield(i)));
+                }
+            }
+            if (skipfield(capacity) == 0) {
+                printf(" [_]\n");
+            } else {
+                printf(" [%d]\n", int(skipfield(capacity)));
+            }
+        }
+#endif // PLF_HIVE_DEBUGGING
+
+        explicit group(_SkipfieldType cap) :
+            last_endpoint(addr_of_element(0)), capacity(cap)
+        {
+            std::fill_n(addr_of_skipfield(0), cap + 1, _SkipfieldType());
+        }
+
+        bool is_packed() const {
+            return free_list_head == std::numeric_limits<_SkipfieldType>::max();
+        }
+
+        _AlignedEltPtr addr_of_element(size_type n) { return GroupAllocHelper::elements(this) + n; }
+        _OveralignedElt& element(size_type n) { return GroupAllocHelper::elements(this)[n]; }
+        _AlignedEltPtr __end_of_elements() { return GroupAllocHelper::elements(this) + capacity; }
+
+        _SkipfieldPtr addr_of_skipfield(size_type n) { return GroupAllocHelper::skipfield(this) + n; }
+        _SkipfieldType& skipfield(size_type n) { return GroupAllocHelper::skipfield(this)[n]; }
+
+        _SkipfieldType index_of_last_endpoint() { return last_endpoint - addr_of_element(0); }
+
+        void reset(_SkipfieldType increment, _GroupPtr next, _GroupPtr prev, size_type groupno) {
+            last_endpoint = addr_of_element(increment);
+            next_group = next;
+            free_list_head = std::numeric_limits<_SkipfieldType>::max();
+            prev_group = prev;
+            size = increment;
+            next_erasure_ = nullptr;
+            set_group_number(groupno);
+            std::fill_n(addr_of_skipfield(0), capacity, _SkipfieldType());
+        }
+    };
+
+    template <bool _IsConst>
+    class __hive_iterator {
+        _GroupPtr group_ = _GroupPtr();
+        _SkipfieldType idx_ = 0;
+
+    public:
+#if PLF_HIVE_DEBUGGING
+        void debug_dump() const {
+            printf("iterator(");
+            if (group_) printf("#%zu", group_->group_number());
+            else printf("null");
+            printf(", %zu)\n", size_t(idx_));
+        }
+#endif // PLF_HIVE_DEBUGGING
+
+#if PLF_HIVE_RANDOM_ACCESS_ITERATORS
+        using iterator_category = std::random_access_iterator_tag;
+#else
+        using iterator_category = std::bidirectional_iterator_tag;
+#endif
+        using value_type = typename hive::value_type;
+        using difference_type = typename hive::difference_type;
+        using pointer = std::conditional_t<_IsConst, typename hive::const_pointer, typename hive::pointer>;
+        using reference = std::conditional_t<_IsConst, typename hive::const_reference, typename hive::reference>;
+
+        friend class hive;
+
+        explicit __hive_iterator() = default;
+        __hive_iterator(__hive_iterator&&) = default;
+        __hive_iterator(const __hive_iterator&) = default;
+        __hive_iterator& operator=(__hive_iterator&&) = default;
+        __hive_iterator& operator=(const __hive_iterator&) = default;
+
+        template<bool _IsConst_ = _IsConst, class = std::enable_if_t<_IsConst_>>
+        __hive_iterator(const __hive_iterator<false>& rhs) :
+            group_(rhs.group_),
+            idx_(rhs.idx_)
+        {}
+
+        template<bool _IsConst_ = _IsConst, class = std::enable_if_t<_IsConst_>>
+        __hive_iterator(__hive_iterator<false>&& rhs) :
+            group_(std::move(rhs.group_)),
+            idx_(std::move(rhs.idx_))
+        {}
+
+        friend void swap(__hive_iterator& a, __hive_iterator& b) noexcept {
+            using std::swap;
+            swap(a.group_, b.group_);
+            swap(a.idx_, b.idx_);
+        }
+
+        friend bool operator==(const __hive_iterator&, const __hive_iterator&) = default;
+
+#if PLF_HIVE_RELATIONAL_OPERATORS
+        friend std::strong_ordering operator<=>(const __hive_iterator& a, const __hive_iterator& b) {
+            return a.group_ == b.group_ ?
+                a.idx_ <=> b.idx_ :
+                a.group_->groupno_ <=> b.group_->groupno_;
+        }
+#endif
+
+        reference operator*() const noexcept {
+            return *group_->element(idx_).t();
+        }
+
+        pointer operator->() const noexcept {
+            return group_->element(idx_).t();
+        }
+
+        __hive_iterator& operator++() {
+            _LIBCPP_ASSERT(group_ != nullptr, "");
+            auto __inc = 1 + group_->skipfield(idx_ + 1);
+            idx_ += __inc;
+            if (idx_ == group_->index_of_last_endpoint() && group_->next_group != nullptr) {
+                group_ = group_->next_group;
+                idx_ = group_->skipfield(0);
+            }
+            return *this;
+        }
+
+        __hive_iterator& operator--() {
+            _LIBCPP_ASSERT(group_ != nullptr, "");
+            if (idx_ != 0) {
+                _SkipfieldType __dec = group_->skipfield(idx_ - 1);
+                if (__dec != idx_) {
+                   idx_ -= __dec + 1;
+                   return *this;
+                }
+            }
+            group_ = group_->prev_group;
+            idx_ = group_->capacity - 1 - group_->skipfield(group_->capacity - 1);
+            return *this;
+        }
+
+        __hive_iterator operator++(int) { auto __copy = *this; ++*this; return __copy; }
+        __hive_iterator operator--(int) { auto __copy = *this; --*this; return __copy; }
+
+    private:
+        template <bool _IsConst_ = _IsConst, class = std::enable_if_t<_IsConst_>>
+        __hive_iterator<false> __unconst() const {
+            __hive_iterator<false> __it;
+            __it.group_ = group_;
+            __it.idx_ = idx_;
+            return __it;
+        }
+
+        explicit __hive_iterator(_GroupPtr __g, size_t __idx) :
+            group_(__g), idx_(__idx) {}
+
+        void __advance_forward(difference_type n) {
+            _LIBCPP_ASSERT(n > 0, "");
+            _LIBCPP_ASSERT(group_ != nullptr, "");
+
+            if (idx_ != group_->skipfield(0)) {
+                _SkipfieldType endpoint = group_->index_of_last_endpoint();
+                while (true) {
+                    ++idx_;
+                    idx_ += group_->skipfield(idx_);
+                    --n;
+                    if (idx_ == endpoint) {
+                        break;
+                    } else if (n == 0) {
+                        return;
+                    }
+                }
+                if (group_->next_group == nullptr) {
+                    return;
+                }
+                group_ = group_->next_group;
+                if (n == 0) {
+                    idx_ = group_->skipfield(0);
+                    return;
+                }
+            }
+
+            while (static_cast<difference_type>(group_->size) <= n) {
+                if (group_->next_group == nullptr) {
+                    idx_ = group_->index_of_last_endpoint();
+                    return;
+                } else {
+                    n -= group_->size;
+                    group_ = group_->next_group;
+                    if (n == 0) {
+                        idx_ = group_->skipfield(0);
+                        return;
+                    }
+                }
+            }
+
+            if (group_->is_packed()) {
+                idx_ = n;
+            } else {
+                idx_ = group_->skipfield(0);
+                do {
+                    idx_ += 1 + group_->skipfield(idx_ + 1);
+                } while (--n != 0);
+            }
+        }
+
+        void __advance_backward(difference_type n) {
+            _LIBCPP_ASSERT(n < 0, "");
+            _LIBCPP_ASSERT(!(idx_ == group_->skipfield(0) && group_->prev_group == nullptr), "");
+
+            if (idx_ != group_->index_of_last_endpoint()) {
+                if (group_->is_packed()) {
+                    difference_type __distance_from_beginning = -static_cast<difference_type>(idx_);
+                    if (n >= __distance_from_beginning) {
+                        idx_ += n;
+                        return;
+                    } else if (group_->prev_group == nullptr) {
+                        idx_ = 0;
+                        return;
+                    } else {
+                        n -= __distance_from_beginning;
+                    }
+                } else {
+                    _SkipfieldType beginning_point = group_->skipfield(0);
+                    while (idx_ != beginning_point) {
+                        --idx_;
+                        idx_ -= group_->skipfield(idx_);
+                        if (++n == 0) {
+                            return;
+                        }
+                    }
+                    if (group_->prev_group == nullptr) {
+                        idx_ = group_->skipfield(0);
+                        return;
+                    }
+                }
+                group_ = group_->prev_group;
+            }
+
+            while (n < -static_cast<difference_type>(group_->size)) {
+                if (group_->prev_group == nullptr) {
+                    idx_ = group_->skipfield(0);
+                    return;
+                }
+                n += group_->size;
+                group_ = group_->prev_group;
+            }
+
+            if (n == -static_cast<difference_type>(group_->size)) {
+                idx_ = group_->skipfield(0);
+            } else if (group_->is_packed()) {
+                idx_ = group_->size + n;
+            } else {
+                idx_ = group_->index_of_last_endpoint();
+                do {
+                    --idx_;
+                    idx_ -= group_->skipfield(idx_);
+                } while (++n != 0);
+            }
+        }
+
+        difference_type __index_in_group() const { return idx_; }
+
+        difference_type __distance_from_start_of_group() const {
+            _LIBCPP_ASSERT(group_ != nullptr, "");
+            if (group_->is_packed() || idx_ == 0) {
+                return idx_;
+            } else {
+                difference_type __count = 0;
+                _SkipfieldType endpoint = group_->index_of_last_endpoint();
+                for (_SkipfieldType i = idx_; i != endpoint; ++__count) {
+                    ++i;
+                    i += group_->skipfield(i);
+                }
+                return group_->size - __count;
+            }
+        }
+
+        difference_type __distance_from_end_of_group() const {
+            _LIBCPP_ASSERT(group_ != nullptr, "");
+            if (group_->is_packed() || idx_ == 0) {
+                return group_->size - idx_;
+            } else {
+                difference_type __count = 0;
+                _SkipfieldType endpoint = group_->index_of_last_endpoint();
+                for (_SkipfieldType i = idx_; i != endpoint; ++__count) {
+                    ++i;
+                    i += group_->skipfield(i);
+                }
+                return __count;
+            }
+        }
+
+        difference_type __distance_forward(__hive_iterator last) const {
+            if (last.group_ != group_) {
+                difference_type __count = last.__distance_from_start_of_group();
+                for (_GroupPtr g = last.group_->prev_group; g != group_; g = g->prev_group) {
+                    __count += g->size;
+                }
+                return __count + this->__distance_from_end_of_group();
+            } else if (idx_ == last.idx_) {
+                return 0;
+            } else if (group_->is_packed()) {
+                return last.idx_ - idx_;
+            } else {
+                difference_type __count = 0;
+                while (last.idx_ != idx_) {
+                    --last.idx_;
+                    last.idx_ -= last.group_->skipfield(last.idx_);
+                    ++__count;
+                }
+                return __count;
+            }
+        }
+
+    public:
+        void __advance(difference_type n) {
+            if (n > 0) {
+                __advance_forward(n);
+            } else if (n < 0) {
+                __advance_backward(n);
+            }
+        }
+
+        __hive_iterator __next(difference_type n) const {
+            auto copy = *this;
+            copy.__advance(n);
+            return copy;
+        }
+
+        __hive_iterator __prev(difference_type n) const {
+            auto copy = *this;
+            copy.__advance(-n);
+            return copy;
+        }
+
+        difference_type __distance(__hive_iterator last) const {
+#if PLF_HIVE_RELATIONAL_OPERATORS
+            if (last < *this) {
+                return -last.__distance_forward(*this);
+            }
+#endif
+            return __distance_forward(last);
+        }
+
+#if PLF_HIVE_RANDOM_ACCESS_ITERATORS
+        friend __hive_iterator& operator+=(__hive_iterator& a, difference_type n) { a.__advance(n); return a; }
+        friend __hive_iterator& operator-=(__hive_iterator& a, difference_type n) { a.__advance(-n); return a; }
+        friend __hive_iterator operator+(const __hive_iterator& a, difference_type n) { return a.__next(n); }
+        friend __hive_iterator operator+(difference_type n, const __hive_iterator& a) { return a.__next(n); }
+        friend __hive_iterator operator-(const __hive_iterator& a, difference_type n) { return a.__prev(n); }
+        friend difference_type operator-(const __hive_iterator& a, const __hive_iterator& b) { return b.__distance(a); }
+        reference operator[](difference_type n) const { return *__next(n); }
+#endif
+    }; // class __hive_iterator
+
+public:
+    void __assert_invariants() const {
+#if PLF_HIVE_DEBUGGING
+        assert(size_ <= capacity_);
+#if !PLF_HIVE_P2596
+        assert(__min_group_capacity_ <= __max_group_capacity_);
+#endif
+        if (size_ == 0) {
+            assert(__begin_ == __end_);
+            if (capacity_ == 0) {  // TODO FIXME BUG HACK: this should be `if (true)`
+                assert(__begin_.group_ == nullptr);
+                assert(__begin_.idx_ == 0);
+                assert(__end_.group_ == nullptr);
+                assert(__end_.idx_ == 0);
+            }
+            assert(__groups_with_erasures_ == nullptr);
+            if (capacity_ == 0) {
+                assert(__unused_groups_ == nullptr);
+            } else {
+                if (__begin_.group_ == nullptr) {
+                    assert(__unused_groups_ != nullptr);  // the capacity must be somewhere
+                }
+            }
+        } else {
+            assert(__begin_.group_ != nullptr);
+            assert(__begin_.group_->prev_group == nullptr);
+            assert(__end_.group_ != nullptr);
+            assert(__end_.idx_ == __end_.group_->index_of_last_endpoint());
+            assert(__end_.group_->next_group == nullptr);
+            assert(__begin_ != __end_);
+            if (capacity_ == size_) {
+                assert(__unused_groups_ == nullptr);
+            }
+        }
+        size_type total_size = 0;
+        size_type total_cap = 0;
+        for (_GroupPtr g = __begin_.group_; g != nullptr; g = g->next_group) {
+#if !PLF_HIVE_P2596
+            assert(__min_group_capacity_ <= g->capacity);
+            assert(g->capacity <= __max_group_capacity_);
+#endif
+            // assert(g->size >= 1); // TODO FIXME BUG HACK
+            assert(g->size <= g->capacity);
+            total_size += g->size;
+            total_cap += g->capacity;
+            if (g->is_packed()) {
+                assert(g->last_endpoint == g->addr_of_element(g->size));
+            } else {
+                assert(g->size < g->capacity);
+                assert(g->last_endpoint > g->addr_of_element(g->size));
+                assert(g->skipfield(g->free_list_head) != 0);
+            }
+            if (g->last_endpoint != g->__end_of_elements()) {
+                assert(g == __end_.group_);
+                assert(g->next_group == nullptr);
+            }
+            assert(g->skipfield(g->last_endpoint - g->addr_of_element(0)) == 0);
+            if (g->size != g->capacity && g->next_group != nullptr) {
+                assert(!g->is_packed());
+            }
+#if PLF_HIVE_RELATIONAL_OPERATORS
+            if (g->next_group != nullptr) {
+                assert(g->group_number() < g->next_group->group_number());
+            }
+#endif
+            _SkipfieldType total_skipped = 0;
+            for (_SkipfieldType sb = g->free_list_head; sb != std::numeric_limits<_SkipfieldType>::max(); sb = g->element(sb).nextlink_) {
+                _SkipfieldType skipblock_length = g->skipfield(sb);
+                assert(skipblock_length != 0);
+                assert(g->skipfield(sb + skipblock_length - 1) == skipblock_length);
+                total_skipped += skipblock_length;
+                if (sb == g->free_list_head) {
+                    assert(g->element(sb).prevlink_ == std::numeric_limits<_SkipfieldType>::max());
+                }
+                if (g->element(sb).nextlink_ != std::numeric_limits<_SkipfieldType>::max()) {
+                    assert(g->element(g->element(sb).nextlink_).prevlink_ == sb);
+                }
+            }
+            if (g == __end_.group_) {
+                assert(g->capacity == g->size + total_skipped + (g->__end_of_elements() - g->last_endpoint));
+            } else {
+                assert(g->capacity == g->size + total_skipped);
+            }
+        }
+        assert(total_size == size_);
+        assert((__unused_groups_ != nullptr) == (__unused_groups_tail_ != nullptr));
+        for (_GroupPtr g = __unused_groups_; g != nullptr; g = g->next_group) {
+#if !PLF_HIVE_P2596
+            assert(__min_group_capacity_ <= g->capacity);
+            assert(g->capacity <= __max_group_capacity_);
+#endif
+            total_cap += g->capacity;
+            if (g->next_group == nullptr) {
+                assert(__unused_groups_tail_ == g);
+            }
+        }
+        assert(total_cap == capacity_);
+        if (size_ == capacity_) {
+            assert(__groups_with_erasures_ == nullptr);
+            assert(__unused_groups_ == nullptr);
+        } else {
+            size_type space_in_last_group = __end_.group_ != nullptr ? (__end_.group_->capacity - __end_.idx_) : 0;
+            assert(size_ + space_in_last_group == capacity_ || __groups_with_erasures_ != nullptr || __unused_groups_ != nullptr);
+        }
+        for (_GroupPtr g = __groups_with_erasures_; g != nullptr; g = g->next_erasure_) {
+            assert(g->size < g->capacity);
+        }
+#endif
+    }
+
+    void debug_dump() const {
+#if PLF_HIVE_DEBUGGING
+        printf(
+            "hive [%zu/%zu used] (erase=%p, unused=%p, mincap=%zu, maxcap=%zu)\n",
+            size_t(size_), size_t(capacity_),
+            __groups_with_erasures_, __unused_groups_,
+#if PLF_HIVE_P2596
+            size_t(__impl_min_block_size()), size_t(__impl_max_block_size())
+#else
+            size_t(__min_group_capacity_), size_t(__max_group_capacity_)
+#endif
+        );
+        printf("  begin="); __begin_.debug_dump();
+        size_t total = 0;
+        group *prev = nullptr;
+        for (auto *g = __begin_.group_; g != nullptr; g = g->next_group) {
+            g->debug_dump();
+            total += g->size;
+            assert(g->prev_group == prev);
+            prev = g;
+        }
+        assert(total == size_);
+        printf("  end="); __end_.debug_dump();
+        if (__end_.group_) {
+            assert(__end_.group_->next_group == nullptr);
+        }
+        printf("UNUSED GROUPS:\n");
+        for (auto *g = __unused_groups_; g != nullptr; g = g->next_group) {
+            g->debug_dump();
+            assert(g != __begin_.group_);
+            assert(g != __end_.group_);
+        }
+        printf("GROUPS WITH ERASURES:");
+        for (auto *g = __groups_with_erasures_; g != nullptr; g = g->next_erasure_) {
+            printf(" %zu", g->group_number());
+        }
+        printf("\n");
+#endif // PLF_HIVE_DEBUGGING
+    }
+
+public:
+    hive() = default;
+    explicit hive(const allocator_type& __alloc) : __allocator_(__alloc) {}
+    hive(const hive& __h) : hive(__h, _AllocTraits::select_on_container_copy_construction(__h.__allocator_)) {}
+
+#if PLF_HIVE_P2596
+    hive(const hive& __h, const type_identity_t<allocator_type>& __alloc) :
+        __allocator_(__alloc)
+    {
+        reserve(__h.size());
+        __range_assign_impl(__h.begin(), __h.end());
+    }
+#else
+    explicit hive(hive_limits __limits) :
+        __min_group_capacity_(static_cast<_SkipfieldType>(__limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(__limits.max))
+    {
+        __check_limits(__limits);
+    }
+
+    hive(hive_limits __limits, const allocator_type& __alloc) :
+        __allocator_(__alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(__limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(__limits.max))
+    {
+        __check_limits(__limits);
+    }
+
+    hive(const hive& __h, const type_identity_t<allocator_type>& __alloc) :
+        __allocator_(__alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>((__h.__min_group_capacity_ > __h.size_) ? __h.__min_group_capacity_ : ((__h.size_ > __h.__max_group_capacity_) ? __h.__max_group_capacity_ : __h.size_))),
+        __max_group_capacity_(__h.__max_group_capacity_)
+    {
+        reserve(__h.size());
+        __range_assign_impl(__h.begin(), __h.end());
+        __min_group_capacity_ = __h.__min_group_capacity_;
+    }
+#endif
+
+    hive(hive&& __h) noexcept :
+        __end_(std::move(__h.__end_)),
+        __begin_(std::move(__h.__begin_)),
+        __groups_with_erasures_(std::move(__h.__groups_with_erasures_)),
+        __unused_groups_(std::move(__h.__unused_groups_)),
+        size_(__h.size_),
+        capacity_(__h.capacity_),
+        __allocator_(__h.get_allocator())
+#if !PLF_HIVE_P2596
+        , __min_group_capacity_(__h.__min_group_capacity_)
+        , __max_group_capacity_(__h.__max_group_capacity_)
+#endif
+    {
+        __h.__blank();
+    }
+
+    hive(hive&& __h, const type_identity_t<allocator_type>& __alloc) : hive(__alloc)
+    {
+        bool __should_use_source_allocator = (
+            _AllocTraits::is_always_equal::value ||
+            __alloc == __h.get_allocator()
+        );
+        if (__should_use_source_allocator) {
+            *this = std::move(__h);
+        } else {
+#if !PLF_HIVE_P2596
+            reshape(__h.block_capacity_limits());
+#endif
+            reserve(__h.size());
+            __range_assign_impl(std::make_move_iterator(__h.begin()), std::make_move_iterator(__h.end()));
+        }
+    }
+
+    hive(size_type __n, const _Tp& __value, const allocator_type& __alloc = allocator_type()) :
+        __allocator_(__alloc)
+    {
+        assign(__n, __value);
+    }
+
+    explicit hive(size_type __n) { assign(__n, _Tp()); }
+
+    hive(size_type __n, const allocator_type& __alloc) :
+        __allocator_(__alloc)
+    {
+        assign(__n, _Tp());
+    }
+
+    template<class _InIt> requires (!is_integral_v<_InIt>)
+    hive(_InIt __first, _InIt __last)
+    {
+        assign(std::move(__first), std::move(__last));
+    }
+
+    template<class _InIt> requires (!is_integral_v<_InIt>)
+    hive(_InIt __first, _InIt __last, const allocator_type& __alloc) :
+        __allocator_(__alloc)
+    {
+        assign(std::move(__first), std::move(__last));
+    }
+
+    hive(std::initializer_list<_Tp> __il, const type_identity_t<allocator_type>& __alloc = allocator_type()) :
+        __allocator_(__alloc)
+    {
+        assign(__il.begin(), __il.end());
+    }
+
+#if !PLF_HIVE_P2596
+    hive(size_type n, const _Tp& value, hive_limits limits, const allocator_type& alloc = allocator_type()) :
+        __allocator_(alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(limits.max))
+    {
+        __check_limits(limits);
+        assign(n, value);
+    }
+
+    hive(size_type n, hive_limits limits, const allocator_type& alloc = allocator_type()) :
+        __allocator_(alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(limits.max))
+    {
+        __check_limits(limits);
+        assign(n, _Tp());
+    }
+
+    template<class _InputIter>
+        requires __is_cpp17_input_iterator<_InputIter>::value
+    hive(_InputIter __first, _InputIter __last, hive_limits __limits, const allocator_type& __alloc = allocator_type()) :
+        __allocator_(__alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(__limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(__limits.max))
+    {
+        __check_limits(__limits);
+        assign(std::move(__first), std::move(__last));
+    }
+
+    hive(std::initializer_list<_Tp> __il, hive_limits __limits, const allocator_type& __alloc = allocator_type()):
+        __allocator_(__alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(__limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(__limits.max))
+    {
+        __check_limits(__limits);
+        assign(__il.begin(), __il.end());
+    }
+#endif
+
+    template<__container_compatible_range<_Tp> _Rp>
+    hive(std::from_range_t, _Rp&& __r)
+    {
+        assign_range(std::forward<_Rp>(__r));
+    }
+
+    template<__container_compatible_range<_Tp> _Rp>
+    hive(std::from_range_t, _Rp&& __r, const allocator_type& __alloc) :
+        __allocator_(__alloc)
+    {
+        assign_range(std::forward<_Rp>(__r));
+    }
+
+#if !PLF_HIVE_P2596
+    template<__container_compatible_range<_Tp> _Rp>
+    explicit hive(std::from_range_t, _Rp&& __r, hive_limits __limits, const allocator_type& __alloc = allocator_type()) :
+        __allocator_(__alloc),
+        __min_group_capacity_(static_cast<_SkipfieldType>(__limits.min)),
+        __max_group_capacity_(static_cast<_SkipfieldType>(__limits.max))
+    {
+        __check_limits(__limits);
+        assign_range(std::forward<_Rp>(__r));
+    }
+#endif // !PLF_HIVE_P2596
+
+    ~hive() {
+        __assert_invariants();
+        __destroy_all_data();
+    }
+
+private:
+    struct GroupAllocHelper {
+        union _Up {
+            group g_;
+            _OveralignedElt elt_;
+        };
+        struct type {
+            alignas(_Up) char dummy;
+        };
+
+        static _AlignedEltPtr elements(_GroupPtr __g) {
+            auto __p = _PtrOf<char>(__g);
+            __p += sizeof(_Up);
+            return _AlignedEltPtr(__p);
+        }
+
+        static _SkipfieldPtr skipfield(_GroupPtr __g) {
+            return _SkipfieldPtr(elements(__g) + __g->capacity);
+        }
+
+        static _GroupPtr __allocate_group(allocator_type a, size_t cap) {
+            auto ta = _AllocOf<type>(a);
+            size_t bytes_for_group = sizeof(_Up);
+            size_t bytes_for_elts = sizeof(_OveralignedElt) * cap;
+            size_t bytes_for_skipfield = sizeof(_SkipfieldType) * (cap + 1);
+            size_t n = (bytes_for_group + bytes_for_elts + bytes_for_skipfield + sizeof(type) - 1) / sizeof(type);
+            _PtrOf<type> p = std::allocator_traits<_AllocOf<type>>::allocate(ta, n);
+            _GroupPtr g = _PtrOf<group>(p);
+            ::new (bitcast_pointer<void*>(g)) group(cap);
+            return g;
+        }
+        static void __deallocate_group(allocator_type a, _GroupPtr g) {
+            size_t cap = g->capacity;
+            auto ta = _AllocOf<type>(a);
+            size_t bytes_for_group = sizeof(_Up);
+            size_t bytes_for_elts = sizeof(_OveralignedElt) * cap;
+            size_t bytes_for_skipfield = sizeof(_SkipfieldType) * (cap + 1);
+            size_t n = (bytes_for_group + bytes_for_elts + bytes_for_skipfield + sizeof(type) - 1) / sizeof(type);
+            std::allocator_traits<_AllocOf<type>>::deallocate(ta, _PtrOf<type>(g), n);
+        }
+    };
+
+    void __allocate_unused_group(size_type cap) {
+        _GroupPtr g = GroupAllocHelper::__allocate_group(get_allocator(), cap);
+        __unused_groups_push_front(g);
+        capacity_ += cap;
+    }
+
+    void __deallocate_group(_GroupPtr g) {
+        GroupAllocHelper::__deallocate_group(get_allocator(), g);
+    }
+
+    void __unspecialcase_end_group(_GroupPtr g) {
+        _LIBCPP_ASSERT(g == __end_.group_, "");
+        size_type __trailing = g->__end_of_elements() - g->last_endpoint;
+        size_type sb = g->capacity - __trailing;
+        if (__trailing != 0) {
+            g->skipfield(sb) = __trailing;
+            g->skipfield(g->capacity - 1) = __trailing;
+            if (g->free_list_head == std::numeric_limits<_SkipfieldType>::max()) {
+                g->next_erasure_ = std::exchange(__groups_with_erasures_, g);
+            }
+            g->element(sb).nextlink_ = std::exchange(g->free_list_head, sb);
+            g->element(sb).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+            g->last_endpoint = g->__end_of_elements();
+        }
+    }
+
+    void __destroy_all_data() {
+        if (_GroupPtr g = __begin_.group_) {
+            __end_.group_->next_group = __unused_groups_;
+
+            if constexpr (!std::is_trivially_destructible<_Tp>::value) {
+                if (size_ != 0) {
+                    while (true) {
+                        // Erase elements without bothering to update skipfield - much faster:
+                        _SkipfieldType __end_pointer = g->index_of_last_endpoint();
+                        do {
+                            _AllocTraits::destroy(__allocator_, __begin_.operator->());
+                            __begin_.idx_ += 1 + __begin_.group_->skipfield(__begin_.idx_ + 1);
+                        } while (__begin_.idx_ != __end_pointer); // ie. beyond end of available data
+
+                        _GroupPtr next = g->next_group;
+                        __deallocate_group(g);
+                        g = next;
+
+                        if (g == __unused_groups_) {
+                            break;
+                        }
+                        __begin_ = iterator(g, g->skipfield(0));
+                    }
+                }
+            }
+
+            while (g != nullptr) {
+                _GroupPtr next = g->next_group;
+                __deallocate_group(g);
+                g = next;
+            }
+        }
+    }
+
+public:
+    template<class... _Args>
+    iterator emplace(_Args&&... __args) {
+        allocator_type ea = get_allocator();
+        if (__trailing_capacity() != 0) {
+            iterator result = __end_;
+            _GroupPtr g = result.group_;
+            _AllocTraits::construct(ea, result.operator->(), static_cast<_Args&&>(__args)...);
+            _LIBCPP_ASSERT(__end_.group_->skipfield(__end_.idx_) == 0, "");
+            ++__end_.idx_;
+            g->last_endpoint += 1;
+            g->size += 1;
+            ++size_;
+            __assert_invariants();
+            return result;
+        } else if (__groups_with_erasures_ != nullptr) {
+            _GroupPtr g = __groups_with_erasures_;
+            _SkipfieldType sb = g->free_list_head;
+            _LIBCPP_ASSERT(sb < g->capacity, "");
+            auto result = iterator(g, sb);
+            _SkipfieldType nextsb = g->element(sb).nextlink_;
+            _LIBCPP_ASSERT(g->element(sb).prevlink_ == std::numeric_limits<_SkipfieldType>::max(), "");
+            std::__hive_try_rollback([&]() {
+                _AllocTraits::construct(ea, result.operator->(), static_cast<_Args&&>(__args)...);
+            }, [&]() {
+                g->element(sb).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                g->element(sb).nextlink_ = nextsb;
+            });
+            g->size += 1;
+            size_ += 1;
+            if (g == __begin_.group_ && sb == 0) {
+                __begin_ = result;
+            }
+            _SkipfieldType old_skipblock_length = std::exchange(g->skipfield(sb), 0);
+            _LIBCPP_ASSERT(1 <= old_skipblock_length && old_skipblock_length <= g->capacity, "");
+            _SkipfieldType new_skipblock_length = (old_skipblock_length - 1);
+            if (new_skipblock_length == 0) {
+                g->free_list_head = nextsb;
+                if (nextsb == std::numeric_limits<_SkipfieldType>::max()) {
+                    __groups_with_erasures_ = g->next_erasure_;
+                } else {
+                    g->element(nextsb).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                }
+            } else {
+                g->skipfield(sb + 1) = new_skipblock_length;
+                g->skipfield(sb + old_skipblock_length - 1) = new_skipblock_length;
+                g->free_list_head = sb + 1;
+                g->element(sb + 1).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                g->element(sb + 1).nextlink_ = nextsb;
+                if (nextsb != std::numeric_limits<_SkipfieldType>::max()) {
+                    g->element(nextsb).prevlink_ = sb + 1;
+                }
+            }
+            __assert_invariants();
+            return result;
+        } else {
+            if (__unused_groups_ == nullptr) {
+                __allocate_unused_group(__recommend_block_size());
+            }
+            _GroupPtr g = __unused_groups_;
+            _AllocTraits::construct(ea, g->element(0).t(), static_cast<_Args&&>(__args)...);
+            (void)__unused_groups_pop_front();
+            std::fill_n(g->addr_of_skipfield(0), g->capacity, _SkipfieldType());
+            g->size = 1;
+            g->last_endpoint = g->addr_of_element(1);
+            g->free_list_head = std::numeric_limits<_SkipfieldType>::max();
+            g->next_group = nullptr;
+            g->prev_group = __end_.group_;
+            auto result = iterator(g, 0);
+            if (__end_.group_ != nullptr) {
+                if (__end_.group_->group_number() == std::numeric_limits<size_type>::max()) {
+                    __renumber_all_groups();
+                }
+                __end_.group_->next_group = g;
+                g->set_group_number(__end_.group_->group_number() + 1);
+            } else {
+                __begin_ = result;
+                g->set_group_number(0);
+            }
+            __end_ = iterator(g, 1);
+            ++size_;
+            return result;
+        }
+    }
+
+    iterator insert(const _Tp& __value) { return emplace(__value); }
+    iterator insert(_Tp&& __value) { return emplace(std::move(__value)); }
+
+    void insert(size_type __n, const _Tp& __value) {
+        if (__n == 0) {
+            // do nothing
+        } else if (__n == 1) {
+            insert(__value);
+        } else {
+            __callback_insert_impl(__n, __make_value_callback(__n, __value));
+        }
+    }
+
+    template <class _InputIter>
+        requires __is_cpp17_input_iterator<_InputIter>::value
+    void insert(_InputIter __first, _InputIter __last) {
+        __range_insert_impl(std::move(__first), std::move(__last));
+    }
+
+    template <__container_compatible_range<_Tp> _Rp>
+    void insert_range(_Rp&& __r) {
+        if constexpr (std::ranges::sized_range<_Rp&>) {
+            reserve(size() + std::ranges::size(__r));
+        }
+        __range_insert_impl(std::ranges::begin(__r), std::ranges::end(__r));
+    }
+
+    void insert(std::initializer_list<_Tp> __il) {
+        __range_insert_impl(__il.begin(), __il.end());
+    }
+
+    iterator erase(const_iterator it) {
+        _LIBCPP_ASSERT(size_ != 0, "");
+        _LIBCPP_ASSERT(it.group_ != nullptr, "");
+        _LIBCPP_ASSERT(it.idx_ != it.group_->index_of_last_endpoint(), "");
+        _LIBCPP_ASSERT(it.group_->skipfield(it.idx_) == 0, "");
+
+        if constexpr (!std::is_trivially_destructible<_Tp>::value) {
+            allocator_type ea = get_allocator();
+            _AllocTraits::destroy(ea, it.operator->());
+        }
+
+        _GroupPtr g = it.group_;
+
+        --size_;
+        --(g->size);
+
+        if (g->size != 0) {
+            const char prev_skipfield = (g->skipfield(it.idx_ - (it.idx_ != 0)) != 0);
+            const char after_skipfield = (g->skipfield(it.idx_ + 1) != 0);
+            _SkipfieldType update_value = 1;
+
+            if (!(prev_skipfield | after_skipfield)) {
+                g->skipfield(it.idx_) = 1;
+                if (g->is_packed()) {
+                    g->next_erasure_ = std::exchange(__groups_with_erasures_, g);
+                } else {
+                    g->element(g->free_list_head).prevlink_ = it.idx_;
+                }
+                g->element(it.idx_).nextlink_ = g->free_list_head;
+                g->element(it.idx_).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                g->free_list_head = it.idx_;
+            } else if (prev_skipfield & (!after_skipfield)) {
+                // previous erased consecutive elements, none following
+                _SkipfieldType new_skipblock_length = g->skipfield(it.idx_ - 1) + 1;
+                g->skipfield(it.idx_) = new_skipblock_length;
+                g->skipfield(it.idx_ - (new_skipblock_length - 1)) = new_skipblock_length;
+            } else if ((!prev_skipfield) & after_skipfield) {
+                // following erased consecutive elements, none preceding
+                _SkipfieldType new_skipblock_length = g->skipfield(it.idx_ + 1) + 1;
+                g->skipfield(it.idx_) = new_skipblock_length;
+                g->skipfield(it.idx_ + (new_skipblock_length - 1)) = new_skipblock_length;
+
+                const _SkipfieldType following_previous = g->element(it.idx_ + 1).nextlink_;
+                const _SkipfieldType following_next = g->element(it.idx_ + 1).prevlink_;
+                g->element(it.idx_).nextlink_ = following_previous;
+                g->element(it.idx_).prevlink_ = following_next;
+
+                const _SkipfieldType index = static_cast<_SkipfieldType>(it.__index_in_group());
+
+                if (following_previous != std::numeric_limits<_SkipfieldType>::max()) {
+                    g->element(following_previous).prevlink_ = index;
+                }
+
+                if (following_next != std::numeric_limits<_SkipfieldType>::max()) {
+                    g->element(following_next).nextlink_ = index;
+                } else {
+                    g->free_list_head = index;
+                }
+                update_value = new_skipblock_length;
+            } else {
+                // both preceding and following consecutive erased elements - erased element is between two skipblocks
+                _SkipfieldType preceding_value = g->skipfield(it.idx_ - 1);
+                _SkipfieldType following_value = g->skipfield(it.idx_ + 1);
+                _SkipfieldType new_skipblock_length = preceding_value + following_value + 1;
+
+                // Join the skipblocks
+                g->skipfield(it.idx_ - preceding_value) = new_skipblock_length;
+                g->skipfield(it.idx_ + following_value) = new_skipblock_length;
+
+                // Remove the following skipblock's entry from the free list
+                const _SkipfieldType following_previous = g->element(it.idx_ + 1).nextlink_;
+                const _SkipfieldType following_next = g->element(it.idx_ + 1).prevlink_;
+
+                if (following_previous != std::numeric_limits<_SkipfieldType>::max()) {
+                    it.group_->element(following_previous).prevlink_ = following_next;
+                }
+
+                if (following_next != std::numeric_limits<_SkipfieldType>::max()) {
+                    it.group_->element(following_next).nextlink_ = following_previous;
+                } else {
+                    it.group_->free_list_head = following_previous;
+                }
+                update_value = following_value + 1;
+            }
+
+            iterator result = it.__unconst();
+            result.idx_ += update_value;
+
+            if (result.idx_ == g->index_of_last_endpoint() && g->next_group != nullptr) {
+                result = iterator(g->next_group, g->next_group->skipfield(0));
+            }
+
+            if (it == __begin_) {
+                __begin_ = result;
+            }
+            // __assert_invariants();
+            return result;
+        } else {
+            iterator result;
+            if (g->next_group != nullptr && g->prev_group != nullptr) {
+                g->next_group->prev_group = g->prev_group;
+                g->prev_group->next_group = g->next_group;
+                result = iterator(g->next_group, g->next_group->skipfield(0));
+            } else if (g->next_group != nullptr) {
+                g->next_group->prev_group = nullptr;
+                __begin_ = iterator(g->next_group, g->next_group->skipfield(0));
+                result = __begin_;
+            } else if (g->prev_group != nullptr) {
+                g->prev_group->next_group = nullptr;
+                __end_ = iterator(g->prev_group, g->prev_group->capacity);
+                result = __end_;
+            } else {
+                __begin_ = iterator();
+                __end_ = iterator();
+                result = __end_;
+            }
+            if (!g->is_packed()) {
+                __remove_from_groups_with_erasures_list(g);
+            }
+            __unused_groups_push_front(g);
+            __assert_invariants();
+            return result;
+        }
+    }
+
+    iterator erase(const_iterator first, const_iterator last) {
+        allocator_type ea = get_allocator();
+        const_iterator current = first;
+        if (current.group_ != last.group_) {
+            if (current.idx_ != current.group_->skipfield(0)) {
+                size_type number_of_group_erasures = 0;
+                _SkipfieldType end = first.group_->index_of_last_endpoint();
+                if (std::is_trivially_destructible<_Tp>::value && current.group_->is_packed()) {
+                    number_of_group_erasures += static_cast<size_type>(current.group_->size - current.idx_);
+                } else {
+                    while (current.idx_ != end) {
+                        if (current.group_->skipfield(current.idx_) == 0) {
+                            if constexpr (!std::is_trivially_destructible<_Tp>::value) {
+                                _AllocTraits::destroy(ea, current.operator->());
+                            }
+                            ++number_of_group_erasures;
+                            ++current.idx_;
+                        } else {
+                            const _SkipfieldType prev_free_list_index = current.group_->element(current.idx_).nextlink_;
+                            const _SkipfieldType next_free_list_index = current.group_->element(current.idx_).prevlink_;
+                            current.idx_ += current.group_->skipfield(current.idx_);
+                            if (next_free_list_index == std::numeric_limits<_SkipfieldType>::max() && prev_free_list_index == std::numeric_limits<_SkipfieldType>::max()) {
+                                __remove_from_groups_with_erasures_list(first.group_);
+                                first.group_->free_list_head = std::numeric_limits<_SkipfieldType>::max();
+                                number_of_group_erasures += (end - current.idx_);
+                                if constexpr (!std::is_trivially_destructible<_Tp>::value) {
+                                    while (current.idx_ != end) {
+                                        _AllocTraits::destroy(ea, current.operator->());
+                                        ++current.idx_;
+                                    }
+                                }
+                                break; // end overall while loop
+                            } else if (next_free_list_index == std::numeric_limits<_SkipfieldType>::max()) {
+                                current.group_->free_list_head = prev_free_list_index; // make free list head equal to next free list node
+                                current.group_->element(prev_free_list_index).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                            } else {
+                                current.group_->element(next_free_list_index).nextlink_ = prev_free_list_index;
+                                if (prev_free_list_index != std::numeric_limits<_SkipfieldType>::max()) {
+                                    current.group_->element(prev_free_list_index).prevlink_ = next_free_list_index;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const _SkipfieldType previous_node_value = first.group_->skipfield(first.idx_ - 1);
+                const _SkipfieldType distance_to_end = end - first.idx_;
+
+                if (previous_node_value == 0) {
+                    first.group_->skipfield(first.idx_) = distance_to_end;
+                    first.group_->skipfield(first.idx_ + (distance_to_end - 1)) = distance_to_end;
+                    if (first.group_->is_packed()) {
+                        first.group_->next_erasure_ = std::exchange(__groups_with_erasures_, first.group_);
+                    } else {
+                        first.group_->element(first.group_->free_list_head).prevlink_ = first.idx_;
+                    }
+
+                    first.group_->element(first.idx_).nextlink_ = first.group_->free_list_head;
+                    first.group_->element(first.idx_).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                    first.group_->free_list_head = first.idx_;
+                } else {
+                    _SkipfieldType new_skipblock_length = previous_node_value + distance_to_end;
+                    first.group_->skipfield(first.idx_ - previous_node_value) = new_skipblock_length;
+                    first.group_->skipfield(first.idx_ + (distance_to_end - 1)) = new_skipblock_length;
+                }
+                first.group_->size -= number_of_group_erasures;
+                size_ -= number_of_group_erasures;
+                current.group_ = current.group_->next_group;
+            }
+
+            // Intermediate groups:
+            const _GroupPtr prev = current.group_->prev_group;
+            while (current.group_ != last.group_) {
+                if constexpr (!std::is_trivially_destructible<_Tp>::value) {
+                    current.idx_ = current.group_->skipfield(0);
+                    _SkipfieldType end = current.group_->index_of_last_endpoint();
+                    do {
+                        _AllocTraits::destroy(ea, current.operator->());
+                        current.idx_ += 1 + current.group_->skipfield(current.idx_ + 1);
+                    } while (current.idx_ != end);
+                }
+                if (!current.group_->is_packed()) {
+                    __remove_from_groups_with_erasures_list(current.group_);
+                }
+                size_ -= current.group_->size;
+                _GroupPtr current_group = std::exchange(current.group_, current.group_->next_group);
+                __unused_groups_push_front(current_group);
+            }
+
+            current.idx_ = current.group_->skipfield(0);
+            current.group_->prev_group = prev;
+
+            if (prev != nullptr) {
+                prev->next_group = current.group_;
+            } else {
+                __begin_ = last.__unconst();
+            }
+        }
+
+        _LIBCPP_ASSERT(current.group_ == last.group_, "");
+        if (current == last) {
+            __assert_invariants();
+            return last.__unconst();
+        }
+
+        if (last != __end_ || current.idx_ != current.group_->skipfield(0)) {
+            size_type number_of_group_erasures = 0;
+            const_iterator current_saved = current;
+
+            if (std::is_trivially_destructible_v<_Tp> && current.group_->is_packed()) {
+                number_of_group_erasures += (last.idx_ - current.idx_);
+            } else {
+                while (current.idx_ != last.idx_) {
+                    if (current.group_->skipfield(current.idx_) == 0) {
+                        if constexpr (!std::is_trivially_destructible_v<_Tp>) {
+                            _AllocTraits::destroy(ea, current.operator->());
+                        }
+                        ++number_of_group_erasures;
+                        ++current.idx_;
+                    } else {
+                        const _SkipfieldType prev_free_list_index = current.group_->element(current.idx_).nextlink_;
+                        const _SkipfieldType next_free_list_index = current.group_->element(current.idx_).prevlink_;
+
+                        current.idx_ += current.group_->skipfield(current.idx_);
+
+                        if (next_free_list_index == std::numeric_limits<_SkipfieldType>::max() && prev_free_list_index == std::numeric_limits<_SkipfieldType>::max()) {
+                            __remove_from_groups_with_erasures_list(last.group_);
+                            last.group_->free_list_head = std::numeric_limits<_SkipfieldType>::max();
+                            number_of_group_erasures += (last.idx_ - current.idx_);
+                            if constexpr (!std::is_trivially_destructible_v<_Tp>) {
+                                while (current.idx_ != last.idx_) {
+                                    _AllocTraits::destroy(ea, current.operator->());
+                                    ++current.idx_;
+                                }
+                            }
+                            break; // end overall while loop
+                        } else if (next_free_list_index == std::numeric_limits<_SkipfieldType>::max()) {
+                            current.group_->free_list_head = prev_free_list_index;
+                            current.group_->element(prev_free_list_index).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                        } else {
+                            current.group_->element(next_free_list_index).nextlink_ = prev_free_list_index;
+                            if (prev_free_list_index != std::numeric_limits<_SkipfieldType>::max()) {
+                                current.group_->element(prev_free_list_index).prevlink_ = next_free_list_index;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const _SkipfieldType distance_to_last = (last.idx_ - current_saved.idx_);
+            const _SkipfieldType index = current_saved.idx_;
+
+            if (current_saved.idx_ == 0 || current_saved.group_->skipfield(current_saved.idx_ - 1) == 0) {
+                current_saved.group_->skipfield(current_saved.idx_) = distance_to_last;
+                last.group_->skipfield(last.idx_ - 1) = distance_to_last;
+
+                if (last.group_->is_packed()) {
+                    last.group_->next_erasure_ = std::exchange(__groups_with_erasures_, last.group_);
+                } else {
+                    last.group_->element(last.group_->free_list_head).prevlink_ = index;
+                }
+
+                current_saved.group_->element(current_saved.idx_).nextlink_ = last.group_->free_list_head;
+                current_saved.group_->element(current_saved.idx_).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                last.group_->free_list_head = index;
+            } else {
+                _SkipfieldType prev_node_value = current_saved.group_->skipfield(current_saved.idx_ - 1);
+                _SkipfieldType new_skipblock_length = prev_node_value + distance_to_last;
+                current_saved.group_->skipfield(current_saved.idx_ - prev_node_value) = new_skipblock_length;
+                last.group_->skipfield(last.idx_ - 1) = new_skipblock_length;
+            }
+
+            if (first == __begin_) {
+                __begin_ = last.__unconst();
+            }
+            last.group_->size -= number_of_group_erasures;
+            size_ -= number_of_group_erasures;
+        } else {
+            if constexpr (!std::is_trivially_destructible_v<_Tp>) {
+                while (current.idx_ != last.idx_) {
+                    _AllocTraits::destroy(ea, current.operator->());
+                    current.idx_ += 1 + current.group_->skipfield(current.idx_ + 1);
+                }
+            }
+
+            size_ -= current.group_->size;
+            if (size_ != 0) {
+                if (!current.group_->is_packed()) {
+                    __remove_from_groups_with_erasures_list(current.group_);
+                }
+
+                current.group_->prev_group->next_group = current.group_->next_group;
+
+                if (current.group_ == __end_.group_) {
+                    _GroupPtr prev = current.group_->prev_group;
+                    __end_ = iterator(prev, prev->index_of_last_endpoint());
+                    __unused_groups_push_front(current.group_);
+                    return __end_;
+                } else if (current.group_ == __begin_.group_) {
+                    _GroupPtr next = current.group_->next_group;
+                    __begin_ = iterator(next, next->skipfield(0));
+                }
+
+                if (current.group_->next_group != __end_.group_) {
+                    capacity_ -= current.group_->capacity;
+                } else {
+                    __unused_groups_push_front(current.group_);
+                    return last.__unconst();
+                }
+            } else {
+                __reset_only_group_left(current.group_);
+                return __end_;
+            }
+
+            __deallocate_group(current.group_);  // TODO FIXME BUG HACK: don't do this
+        }
+
+        return last.__unconst();
+    }
+
+    void swap(hive& __h)
+        noexcept(_AllocTraits::propagate_on_container_swap::value || _AllocTraits::is_always_equal::value)
+    {
+        using std::swap;
+        swap(__end_, __h.__end_);
+        swap(__begin_, __h.__begin_);
+        swap(__groups_with_erasures_, __h.__groups_with_erasures_);
+        swap(__unused_groups_, __h.__unused_groups_);
+        swap(__unused_groups_tail_, __h.__unused_groups_tail_);
+        swap(size_, __h.size_);
+        swap(capacity_, __h.capacity_);
+#if !PLF_HIVE_P2596
+        swap(__min_group_capacity_, __h.__min_group_capacity_);
+        swap(__max_group_capacity_, __h.__max_group_capacity_);
+#endif
+        if constexpr (_AllocTraits::propagate_on_container_swap::value && !_AllocTraits::is_always_equal::value) {
+            swap(__allocator_, __h.__allocator_);
+        }
+    }
+
+    friend void swap(hive& __a, hive& __b) noexcept(noexcept(__a.swap(__b))) { __a.swap(__b); }
+
+    void clear() noexcept {
+        if (size_ != 0) {
+            if constexpr (!std::is_trivially_destructible_v<_Tp>) {
+                allocator_type ea = get_allocator();
+                for (iterator it = __begin_; it != __end_; ++it) {
+                    _AllocTraits::destroy(ea, it.operator->());
+                }
+            }
+            if (__begin_.group_ != __end_.group_) {
+                // Move all other groups onto the unused_groups list
+                __end_.group_->next_group = __unused_groups_;
+                if (__unused_groups_ == nullptr) {
+                    __unused_groups_tail_ = __end_.group_;
+                }
+                __unused_groups_ = __begin_.group_->next_group;
+            }
+            __reset_only_group_left(__begin_.group_);
+            __groups_with_erasures_ = nullptr;
+            size_ = 0;
+        }
+    }
+
+    void splice(hive& source) {
+        __assert_invariants();
+        source.__assert_invariants();
+        _LIBCPP_ASSERT(&source != this, "");
+
+        if (capacity_ + source.capacity_ > max_size()) {
+            std::__throw_length_error("Result of splice would exceed max_size()");
+        }
+
+#if !PLF_HIVE_P2596
+        if (source.__min_group_capacity_ < __min_group_capacity_ || source.__max_group_capacity_ > __max_group_capacity_) {
+            for (_GroupPtr it = source.__begin_.group_; it != nullptr; it = it->next_group) {
+                if (it->capacity < __min_group_capacity_ || it->capacity > __max_group_capacity_) {
+                    std::__throw_length_error("Cannot splice: source hive contains blocks that do not match the block limits of the destination hive");
+                }
+            }
+        }
+#endif
+
+        size_type __trailing = __trailing_capacity();
+        if (__trailing > source.__trailing_capacity()) {
+            source.splice(*this);
+            swap(source);
+        } else {
+            if (source.__groups_with_erasures_ != nullptr) {
+                if (__groups_with_erasures_ == nullptr) {
+                    __groups_with_erasures_ = source.__groups_with_erasures_;
+                } else {
+                    _GroupPtr tail = __groups_with_erasures_;
+                    while (tail->next_erasure_ != nullptr) {
+                        tail = tail->next_erasure_;
+                    }
+                    tail->next_erasure_ = source.__groups_with_erasures_;
+                }
+            }
+            if (source.__unused_groups_ != nullptr) {
+                if (__unused_groups_ == nullptr) {
+                    __unused_groups_ = std::exchange(source.__unused_groups_, nullptr);
+                } else {
+                    __unused_groups_tail_->next_group = std::exchange(source.__unused_groups_, nullptr);
+                }
+                __unused_groups_tail_ = std::exchange(source.__unused_groups_tail_, nullptr);
+            }
+            if (__trailing != 0 && source.__begin_.group_ != nullptr) {
+                __unspecialcase_end_group(__end_.group_);
+            }
+            if (source.__begin_.group_ != nullptr) {
+                source.__begin_.group_->prev_group = __end_.group_;
+                if (__end_.group_ != nullptr) {
+                    __end_.group_->next_group = source.__begin_.group_;
+#if PLF_HIVE_RELATIONAL_OPERATORS
+                    if (source.__begin_.group_->group_number() <= __end_.group_->group_number()) {
+                        __renumber_all_groups();
+                    }
+#endif
+                } else {
+                    _LIBCPP_ASSERT(__begin_.group_ == nullptr, "");
+                    __begin_ = std::move(source.__begin_);
+                }
+                __end_ = std::move(source.__end_);
+            }
+            size_ += std::exchange(source.size_, 0);
+            capacity_ += std::exchange(source.capacity_, 0);
+
+            source.__begin_ = iterator();
+            source.__end_ = iterator();
+            source.__groups_with_erasures_ = nullptr;
+        }
+
+        __assert_invariants();
+        source.__assert_invariants();
+    }
+
+    inline void splice(hive&& source) { this->splice(source); }
+
+private:
+    iterator __end_;
+    iterator __begin_;
+    _GroupPtr __groups_with_erasures_ = _GroupPtr();
+    _GroupPtr __unused_groups_ = _GroupPtr();
+    _GroupPtr __unused_groups_tail_ = _GroupPtr();
+    size_type size_ = 0;
+    size_type capacity_ = 0;
+    _LIBCPP_NO_UNIQUE_ADDRESS allocator_type __allocator_;
+#if !PLF_HIVE_P2596
+    _SkipfieldType __min_group_capacity_ = block_capacity_hard_limits().min;
+    _SkipfieldType __max_group_capacity_ = block_capacity_hard_limits().max;
+#endif
+
+#if !PLF_HIVE_P2596
+    static void __check_limits(hive_limits __soft) {
+        auto __hard = block_capacity_hard_limits();
+        if (!(__hard.min <= __soft.min && __soft.min <= __soft.max && __soft.max <= __hard.max)) {
+            std::__throw_length_error("Supplied limits are outside the allowable range");
+        }
+    }
+#endif
+
+    size_type __trailing_capacity() const {
+        if (__end_.group_ == nullptr) {
+            return 0;
+        } else {
+            return (__end_.group_->capacity - __end_.__index_in_group());
+        }
+    }
+
+    void __blank() {
+        __end_ = iterator();
+        __begin_ = iterator();
+        __groups_with_erasures_ = nullptr;
+        __unused_groups_ = nullptr;
+        __unused_groups_tail_ = nullptr;
+        size_ = 0;
+        capacity_ = 0;
+    }
+
+#if PLF_HIVE_RELATIONAL_OPERATORS
+    void __renumber_all_groups() {
+        size_type __groupno = 0;
+        for (_GroupPtr __g = __begin_.group_; __g != nullptr; __g = __g->next_group) {
+            __g->set_group_number(__groupno++);
+        }
+    }
+#else
+    void __renumber_all_groups() { }
+#endif
+
+    template<bool MightFillIt, class _Callback>
+    void __callback_fill_skipblock(_SkipfieldType n, _Callback __cb, _GroupPtr g) {
+        _LIBCPP_ASSERT(g == __groups_with_erasures_, "");
+        allocator_type ea = get_allocator();
+        _SkipfieldType sb = g->free_list_head;
+        _AlignedEltPtr d_first = g->addr_of_element(sb);
+        _AlignedEltPtr d_last = d_first + n;
+        _SkipfieldType nextsb = d_first[0].nextlink_;
+        _SkipfieldType old_skipblock_length = g->skipfield(sb);
+        _LIBCPP_ASSERT(1 <= n && n <= old_skipblock_length, "");
+        _LIBCPP_ASSERT(g->skipfield(sb + old_skipblock_length - 1) == old_skipblock_length, "");
+        _AlignedEltPtr p = d_first;
+        std::__hive_try_finally([&]() {
+            while (p != d_last) {
+                __cb.__construct_and_increment(ea, p);
+            }
+        }, [&]() {
+            _SkipfieldType nadded = p - d_first;
+            g->size += nadded;
+            size_ += nadded;
+            if (nadded != 0 && d_first == __begin_.group_->addr_of_element(0)) {
+                __begin_ = iterator(g, 0);
+            }
+            std::fill_n(g->addr_of_skipfield(sb), nadded, _SkipfieldType());
+            _SkipfieldType new_skipblock_length = (old_skipblock_length - nadded);
+            if (MightFillIt && new_skipblock_length == 0) {
+                g->free_list_head = nextsb;
+                if (nextsb == std::numeric_limits<_SkipfieldType>::max()) {
+                    __groups_with_erasures_ = g->next_erasure_;
+                }
+            } else {
+                g->skipfield(sb + nadded) = new_skipblock_length;
+                g->skipfield(sb + old_skipblock_length - 1) = new_skipblock_length;
+                g->free_list_head = sb + nadded;
+                g->element(sb + nadded).prevlink_ = std::numeric_limits<_SkipfieldType>::max();
+                g->element(sb + nadded).nextlink_ = nextsb;
+                if (nextsb != std::numeric_limits<_SkipfieldType>::max()) {
+                    g->element(nextsb).prevlink_ = sb + nadded;
+                }
+            }
+        });
+    }
+
+    template<class _Callback>
+    void __callback_fill_trailing_capacity(_SkipfieldType n, _Callback __cb, _GroupPtr g) {
+        allocator_type ea = get_allocator();
+        _LIBCPP_ASSERT(g == __end_.group_, "");
+        _LIBCPP_ASSERT(g->is_packed(), "");
+        _LIBCPP_ASSERT(1 <= n && n <= g->capacity - g->size, "");
+        _LIBCPP_ASSERT(g->next_group == nullptr, "");
+        _AlignedEltPtr d_first = g->last_endpoint;
+        _AlignedEltPtr d_last = g->last_endpoint + n;
+        _AlignedEltPtr p = d_first;
+        std::__hive_try_finally([&]() {
+            while (p != d_last) {
+                __cb.__construct_and_increment(ea, p);
+            }
+        }, [&]() {
+            _SkipfieldType nadded = p - d_first;
+            g->last_endpoint = p;
+            g->size += nadded;
+            size_ += nadded;
+            __end_ = iterator(g, p - g->addr_of_element(0));
+        });
+    }
+
+    template<class _Callback>
+    void __callback_fill_unused_group(_SkipfieldType n, _Callback __cb, _GroupPtr g) {
+        if (__end_.group_ != nullptr && __end_.group_->group_number() == std::numeric_limits<size_type>::max()) {
+            __renumber_all_groups();
+        }
+        allocator_type ea = get_allocator();
+        _LIBCPP_ASSERT(g == __unused_groups_, "");
+        _LIBCPP_ASSERT(1 <= n && n <= g->capacity, "");
+        _AlignedEltPtr d_first = g->addr_of_element(0);
+        _AlignedEltPtr d_last = g->addr_of_element(n);
+        _AlignedEltPtr p = d_first;
+        std::__hive_try_finally([&]() {
+            while (p != d_last) {
+                __cb.__construct_and_increment(ea, p);
+            }
+        }, [&]() {
+            _SkipfieldType nadded = p - d_first;
+            if (nadded != 0) {
+                (void)__unused_groups_pop_front();
+                std::fill_n(g->addr_of_skipfield(0), g->capacity, _SkipfieldType());
+                g->free_list_head = std::numeric_limits<_SkipfieldType>::max();
+                g->last_endpoint = p;
+                g->size = nadded;
+                size_ += nadded;
+                g->next_group = nullptr;
+                if (__end_.group_ != nullptr) {
+                    if (__end_.group_->group_number() == std::numeric_limits<size_type>::max()) {
+                        __renumber_all_groups();
+                    }
+                    __end_.group_->next_group = g;
+                    g->prev_group = __end_.group_;
+                    g->set_group_number(__end_.group_->group_number() + 1);
+                } else {
+                    g->prev_group = nullptr;
+                    g->set_group_number(0);
+                }
+                __end_ = iterator(g, nadded);
+                if (__begin_.group_ == nullptr) {
+                    __begin_ = iterator(g, 0);
+                }
+            } else {
+                _LIBCPP_ASSERT(g == __unused_groups_, "");
+                _LIBCPP_ASSERT(g != __end_.group_, "");
+            }
+        });
+    }
+
+    template<class _Callback>
+    void __callback_insert_impl(size_type n, _Callback __cb) {
+        reserve(size_ + n);
+        __assert_invariants();
+        while (__groups_with_erasures_ != nullptr) {
+            _GroupPtr g = __groups_with_erasures_;
+            _LIBCPP_ASSERT(g->free_list_head != std::numeric_limits<_SkipfieldType>::max(), "");
+            _SkipfieldType skipblock_length = g->skipfield(g->free_list_head);
+            if (skipblock_length >= n) {
+                __callback_fill_skipblock<false>(n, __cb, g);
+                __assert_invariants();
+                return;
+            } else {
+                __callback_fill_skipblock<true>(skipblock_length, __cb, g);
+                n -= skipblock_length;
+            }
+        }
+        __assert_invariants();
+        if (n != 0 && __end_.group_ != nullptr) {
+            _GroupPtr g = __end_.group_;
+            _LIBCPP_ASSERT(g->is_packed(), "");
+            size_type space = g->capacity - g->size;
+            if (space >= n) {
+                __callback_fill_trailing_capacity(n, __cb, g);
+                __assert_invariants();
+                return;
+            } else if (space != 0) {
+                __callback_fill_trailing_capacity(space, __cb, g);
+                n -= space;
+            }
+        }
+        __assert_invariants();
+        while (n != 0) {
+            _GroupPtr g = __unused_groups_;
+            if (g->capacity >= n) {
+                __callback_fill_unused_group(n, __cb, g);
+                __assert_invariants();
+                return;
+            } else {
+                __callback_fill_unused_group(g->capacity, __cb, g);
+                n -= g->capacity;
+            }
+        }
+        __assert_invariants();
+    }
+
+    template<class It, class Sent>
+    void __range_assign_impl(It first, Sent last) {
+        if constexpr (!forward_iterator<It>) {
+            clear();
+            for ( ; first != last; ++first) {
+                emplace(*first);
+            }
+        } else if (first == last) {
+            clear();
+        } else {
+            size_type n = std::ranges::distance(first, last);
+            clear();
+            __callback_insert_impl(n, __make_itpair_callback(first, last));
+            __assert_invariants();
+        }
+    }
+
+    template<class It, class Sent>
+    void __range_insert_impl(It first, Sent last) {
+        if constexpr (!forward_iterator<It>) {
+            for ( ; first != last; ++first) {
+                emplace(*first);
+            }
+        } else if (first == last) {
+            return;
+        } else {
+            size_type n = std::ranges::distance(first, last);
+            __callback_insert_impl(n, __make_itpair_callback(first, last));
+        }
+    }
+
+    void __update_subsequent_group_numbers(_GroupPtr __g) {
+#if PLF_HIVE_RELATIONAL_OPERATORS
+        do {
+            __g->groupno_ -= 1;
+            __g = __g->next_group;
+        } while (__g != nullptr);
+#endif
+        (void)__g;
+    }
+
+    void __remove_from_groups_with_erasures_list(_GroupPtr g) {
+        _LIBCPP_ASSERT(__groups_with_erasures_ != nullptr, "");
+        if (g == __groups_with_erasures_) {
+            __groups_with_erasures_ = __groups_with_erasures_->next_erasure_;
+        } else {
+            _GroupPtr prev = __groups_with_erasures_;
+            _GroupPtr curr = __groups_with_erasures_->next_erasure_;
+            while (g != curr) {
+                prev = curr;
+                curr = curr->next_erasure_;
+            }
+            prev->next_erasure_ = curr->next_erasure_;
+        }
+    }
+
+    void __reset_only_group_left(_GroupPtr g) {
+        __groups_with_erasures_ = nullptr;
+        g->reset(0, nullptr, nullptr, 0);
+        __begin_ = iterator(g, 0);
+        __end_ = __begin_;
+    }
+
+    void __unused_groups_push_front(_GroupPtr g) {
+        g->next_group = std::exchange(__unused_groups_, g);
+        if (__unused_groups_tail_ == nullptr) {
+            __unused_groups_tail_ = g;
+        }
+    }
+
+    _GroupPtr __unused_groups_pop_front() {
+        _GroupPtr g = std::exchange(__unused_groups_, __unused_groups_->next_group);
+        _LIBCPP_ASSERT(g != nullptr, "");
+        if (__unused_groups_tail_ == g) {
+            __unused_groups_tail_ = nullptr;
+        }
+        return g;
+    }
+
+public:
+    template <class _InputIter>
+        requires __is_cpp17_input_iterator<_InputIter>::value
+    void assign(_InputIter __first, _InputIter __last) {
+        __range_assign_impl(std::move(__first), std::move(__last));
+    }
+
+    template<__container_compatible_range<_Tp> _Rp>
+    void assign_range(_Rp&& __r) {
+        _LIBCPP_ASSERT((assignable_from<_Tp&, std::ranges::range_reference_t<_Rp>>), "mandated");
+        __range_assign_impl(std::ranges::begin(__r), std::ranges::end(__r));
+    }
+
+    void assign(size_type __n, const _Tp& __value) {
+        clear();
+        insert(__n, __value);
+    }
+
+    void assign(std::initializer_list<_Tp> __il) {
+        __range_assign_impl(__il.begin(), __il.end());
+    }
+
+    allocator_type get_allocator() const noexcept { return __allocator_; }
+
+    iterator begin() noexcept { return __begin_; }
+    const_iterator begin() const noexcept { return __begin_; }
+    iterator end() noexcept { return __end_; }
+    const_iterator end() const noexcept { return __end_; }
+    reverse_iterator rbegin() noexcept { return reverse_iterator(__end_); }
+    const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(__end_); }
+    reverse_iterator rend() noexcept { return reverse_iterator(__begin_); }
+    const_reverse_iterator rend() const noexcept { return const_reverse_iterator(__begin_); }
+
+    const_iterator cbegin() const noexcept { return __begin_; }
+    const_iterator cend() const noexcept { return __end_; }
+    const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(__end_); }
+    const_reverse_iterator crend() const noexcept { return const_reverse_iterator(__begin_); }
+
+    [[nodiscard]] bool empty() const noexcept { return size_ == 0; }
+    size_type size() const noexcept { return size_; }
+    size_type max_size() const noexcept { return _AllocTraits::max_size(get_allocator()); }
+    size_type capacity() const noexcept { return capacity_; }
+
+#if PLF_HIVE_P2596
+    size_type max_block_size() const noexcept {
+        size_type __a = __impl_max_block_size();
+        size_type __b = max_size();
+        return __a < __b ? __a : __b;
+    }
+#endif
+
+#if PLF_HIVE_P2596
+    bool reshape(size_type min, size_type n = 0) {
+        if (n > max_size()) {
+            std::__throw_length_error("n must be at most max_size()");
+        }
+        if (min > max_block_size()) {
+            std::__throw_length_error("min must be at most max_block_size()");
+        }
+        __reshape_impl_deallocate_unused_groups(min, std::numeric_limits<size_type>::max());
+        size_type oldsize = size();
+        hive other(get_allocator());
+        for (_GroupPtr g = __begin_.group_; g != nullptr; ) {
+            _GroupPtr next = g->next_group;
+            _LIBCPP_ASSERT(g->size >= 1, "");
+            if (g->capacity < min) {
+                other.__transfer_group_impl(*this, g);
+            }
+            g = next;
+        }
+        __assert_invariants();
+        other.__assert_invariants();
+        if (other.empty()) {
+            return false;
+        } else {
+            std::__hive_try_rollback([&]() {
+                __reserve_impl(oldsize, min, max_block_size());
+                while (!other.empty()) {
+                    emplace(std::move(*other.begin()));
+                    other.erase(other.begin());
+                }
+            }, [&]() {
+                this->splice(other);
+            });
+            return true;
+        }
+    }
+#else
+    void reshape(hive_limits __limits) {
+        __check_limits(__limits);
+        __assert_invariants();
+
+        __reshape_impl_deallocate_unused_groups(__limits.min, __limits.max);
+
+        for (_GroupPtr g = __begin_.group_; g != nullptr; g = g->next_group) {
+            if (g->capacity < __limits.min || g->capacity > __limits.max) {
+                hive __temp(__limits, get_allocator());
+                __temp.__range_assign_impl(std::make_move_iterator(begin()), std::make_move_iterator(end()));
+                this->swap(__temp);
+                return;
+            }
+        }
+        __min_group_capacity_ = __limits.min;
+        __max_group_capacity_ = __limits.max;
+    }
+
+    hive_limits block_capacity_limits() const noexcept {
+        return hive_limits(__min_group_capacity_, __max_group_capacity_);
+    }
+
+    static constexpr hive_limits block_capacity_hard_limits() noexcept {
+        return hive_limits(__impl_min_block_size(), __impl_max_block_size());
+    }
+#endif
+
+    hive& operator=(const hive& __source) {
+        if constexpr (_AllocTraits::propagate_on_container_copy_assignment::value) {
+            allocator_type __source_allocator = __source.get_allocator();
+            if (!_AllocTraits::is_always_equal::value && get_allocator() != __source_allocator) {
+                // Deallocate existing blocks as source allocator is not necessarily able to do so
+                __destroy_all_data();
+                __blank();
+            }
+            __allocator_ = std::move(__source_allocator);
+        }
+        __range_assign_impl(__source.begin(), __source.end());
+        return *this;
+    }
+
+    hive& operator=(hive&& __source)
+        noexcept(_AllocTraits::propagate_on_container_move_assignment::value ||
+                 _AllocTraits::is_always_equal::value)
+    {
+        _LIBCPP_ASSERT(std::addressof(__source) != this, "");
+        __destroy_all_data();
+
+        bool __should_use_source_allocator = (
+            _AllocTraits::propagate_on_container_move_assignment::value ||
+            _AllocTraits::is_always_equal::value ||
+            this->get_allocator() == __source.get_allocator()
+        );
+        if (__should_use_source_allocator) {
+            constexpr bool __can_just_memcpy = (
+                std::is_trivially_copyable_v<allocator_type> &&
+                std::is_trivial_v<_GroupPtr> &&
+                std::is_trivial_v<_AlignedEltPtr> &&
+                std::is_trivial_v<_SkipfieldPtr>
+            );
+            if constexpr (__can_just_memcpy) {
+                ::__builtin_memcpy(static_cast<void *>(this), std::addressof(__source), sizeof(hive));
+            } else {
+                __end_ = std::move(__source.__end_);
+                __begin_ = std::move(__source.__begin_);
+                __groups_with_erasures_ = std::move(__source.__groups_with_erasures_);
+                __unused_groups_ = std::move(__source.__unused_groups_);
+                __unused_groups_tail_ = std::move(__source.__unused_groups_tail_);
+                size_ = __source.size_;
+                capacity_ = __source.capacity_;
+#if !PLF_HIVE_P2596
+                __min_group_capacity_ = __source.__min_group_capacity_;
+                __max_group_capacity_ = __source.__max_group_capacity_;
+#endif
+                if constexpr (_AllocTraits::propagate_on_container_move_assignment::value) {
+                    __allocator_ = std::move(__source.__allocator_);
+                }
+            }
+        } else {
+            reserve(__source.size());
+            __range_assign_impl(std::make_move_iterator(__source.begin()), std::make_move_iterator(__source.end()));
+            __source.__destroy_all_data();
+        }
+
+        __source.__blank();
+        __assert_invariants();
+        return *this;
+    }
+
+    hive& operator=(std::initializer_list<_Tp> __il) {
+        __range_assign_impl(__il.begin(), __il.end());
+        __assert_invariants();
+        return *this;
+    }
+
+    void shrink_to_fit() {
+#if PLF_HIVE_P2596
+        const size_type min = __impl_min_block_size();
+        const size_type max = __impl_max_block_size();
+#else
+        const size_type min = __min_group_capacity_;
+        const size_type max = __max_group_capacity_;
+#endif
+        trim_capacity();
+        size_type oldsize = size();
+        hive other(get_allocator());
+        for (_GroupPtr g = __begin_.group_; g != nullptr; ) {
+            _GroupPtr next = g->next_group;
+            if (next != nullptr) {
+                if (g->size != max) {
+                    other.__transfer_group_impl(*this, g);
+                }
+            } else {
+                if (g->capacity > min && g->capacity > g->size) {
+                    other.__transfer_group_impl(*this, g);
+                }
+            }
+            g = next;
+        }
+        __assert_invariants();
+        other.__assert_invariants();
+        if (!other.empty()) {
+            std::__hive_try_rollback([&]() {
+                reserve(oldsize);
+                while (!other.empty()) {
+                    emplace(std::move(*other.begin()));
+                    other.erase(other.begin());
+                }
+            }, [&]() {
+                this->splice(other);
+            });
+        }
+    }
+
+    void trim_capacity() noexcept {
+        for (_GroupPtr g = __unused_groups_; g != nullptr; ) {
+            _GroupPtr next = g->next_group;
+            capacity_ -= g->capacity;
+            __deallocate_group(g);
+            g = next;
+        }
+        __unused_groups_ = nullptr;
+        __unused_groups_tail_ = nullptr;
+        __assert_invariants();
+    }
+
+    void reserve(size_type n) {
+#if PLF_HIVE_P2596
+        __reserve_impl(n, __impl_min_block_size(), __impl_max_block_size());
+#else
+        __reserve_impl(n, __min_group_capacity_, __max_group_capacity_);
+#endif
+    }
+
+    template <class _Comp>
+    void sort(_Comp __less) {
+        if (size_ <= 1) {
+            return;
+        }
+
+        struct _ItemT {
+            _Tp *__ptr_;
+            size_type __idx_;
+        };
+
+        std::unique_ptr<_ItemT[]> __a = std::make_unique<_ItemT[]>(size_);
+        auto __it = __begin_;
+        for (size_type __i = 0; __i < size_; ++__i) {
+            __a[__i] = _ItemT{std::addressof(*__it), __i};
+            ++__it;
+        }
+        _LIBCPP_ASSERT(__it == __end_, "");
+        std::sort(__a.get(), __a.get() + size_, [&](const _ItemT& __x, const _ItemT& __y) { return __less(*__x.__ptr_, *__y.__ptr_); });
+
+        for (size_type __i = 0; __i < size_; ++__i) {
+            size_type __src = __a[__i].__idx_;
+            size_type __dest = __i;
+            if (__src != __dest) {
+                _Tp __temp = std::move(*__a[__i].__ptr_);
+                do {
+                    *__a[__dest].__ptr_ = std::move(*__a[__src].__ptr_);
+                    __dest = __src;
+                    __src = __a[__dest].__idx_;
+                    __a[__dest].__idx_ = __dest;
+                } while (__src != __i);
+                *__a[__dest].__ptr_ = std::move(__temp);
+            }
+        }
+        __assert_invariants();
+    }
+
+    void sort() { sort(std::less<_Tp>()); }
+
+    template<class _Comp>
+    size_type unique(_Comp __eq) {
+        size_type __count = 0;
+        auto end = cend();
+        for (auto it = cbegin(); it != end; ) {
+            auto previous = it++;
+            if (it == end) {
+                break;
+            }
+            if (__eq(*it, *previous)) {
+                auto orig = ++__count;
+                auto last = it;
+                while (++last != end && __eq(*last, *previous)) {
+                    ++__count;
+                }
+                if (__count != orig) {
+                    it = erase(it, last);
+                } else {
+                    it = erase(it);
+                }
+                end = cend();
+            }
+        }
+        __assert_invariants();
+        return __count;
+    }
+
+    size_type unique() { return unique(std::equal_to<_Tp>()); }
+
+private:
+    static constexpr size_type __impl_min_block_size() { return 3; }
+    static constexpr size_type __impl_max_block_size() { return std::numeric_limits<_SkipfieldType>::max(); }
+
+    size_type __recommend_block_size() const {
+        size_type __r = size_;
+        if (__r < 8) __r = 8;
+#if PLF_HIVE_P2596
+        if (__r > __impl_max_block_size()) __r = __impl_max_block_size();
+#else
+        if (__r < __min_group_capacity_) __r = __min_group_capacity_;
+        if (__r > __max_group_capacity_) __r = __max_group_capacity_;
+#endif
+        return __r;
+    }
+
+    void __reserve_impl(size_type n, size_type min, size_type max) {
+        if (n <= capacity_) {
+            return;
+        } else if (n > max_size()) {
+            std::__throw_length_error("n must be at most max_size()");
+        }
+        size_type needed = n - capacity_;
+        while (needed >= max) {
+            __allocate_unused_group(max);
+            needed -= max;
+        }
+        if (needed != 0) {
+            if (needed < min) {
+                needed = min;
+            }
+            bool __should_move_to_back_of_list = (__unused_groups_ != nullptr && __unused_groups_->capacity > needed);
+            __allocate_unused_group(needed);
+            if (__should_move_to_back_of_list) {
+                _GroupPtr g = __unused_groups_pop_front();
+                std::exchange(__unused_groups_tail_, g)->next_group = g;
+                g->next_group = nullptr;
+            }
+        }
+        _LIBCPP_ASSERT(capacity_ >= n, "");
+        __assert_invariants();
+    }
+
+    void __reshape_impl_deallocate_unused_groups(size_t __min, size_t __max) {
+        _GroupPtr __g = __unused_groups_;
+        _GroupPtr __prev = nullptr;
+        while (__g != nullptr) {
+            if (__g->capacity < __min || __g->capacity > __max) {
+                if (__prev != nullptr) {
+                    __prev->next_group = __g->next_group;
+                } else {
+                    __unused_groups_ = __g->next_group;
+                }
+                if (__g->next_group == nullptr) {
+                    __unused_groups_tail_ = __prev;
+                }
+                capacity_ -= __g->capacity;
+                __deallocate_group(std::exchange(__g, __g->next_group));
+            } else {
+                __prev = std::exchange(__g, __g->next_group);
+            }
+        }
+    }
+
+    void __transfer_group_impl(hive& h, _GroupPtr g) {
+        if (g->prev_group != nullptr && g->next_group != nullptr) {
+            g->prev_group->next_group = g->next_group;
+            g->next_group->prev_group = g->prev_group;
+        } else if (g->prev_group != nullptr) {
+            g->prev_group->next_group = g->next_group;
+            h.__end_ = iterator(g->prev_group, g->prev_group->capacity);
+        } else if (g->next_group != nullptr) {
+            g->next_group->prev_group = g->prev_group;
+            h.__begin_ = iterator(g->next_group, g->next_group->skipfield(0));
+        } else {
+            h.__begin_ = iterator();
+            h.__end_ = iterator();
+        }
+        if (!g->is_packed()) {
+            h.__remove_from_groups_with_erasures_list(g);
+            g->next_erasure_ = std::exchange(__groups_with_erasures_, g);
+        }
+        h.capacity_ -= g->capacity;
+        h.size_ -= g->size;
+        g->next_group = nullptr;
+        g->prev_group = __end_.group_;
+        if (__end_.group_ != nullptr) {
+            __end_.group_->next_group = g;
+        } else {
+            __begin_ = iterator(g, g->skipfield(0));
+        }
+        __end_ = iterator(g, g->index_of_last_endpoint());
+        capacity_ += g->capacity;
+        size_ += g->size;
+    }
+};
+
+template<class _Tp, class _Allocator, class _Pred>
+typename hive<_Tp, _Allocator>::size_type erase_if(hive<_Tp, _Allocator>& __h, _Pred __pred) {
+    typename hive<_Tp, _Allocator>::size_type __count = 0;
+    auto __end = __h.end();
+    for (auto __it = __h.begin(); __it != __end; ++__it) {
+        if (__pred(*__it)) {
+            auto __orig = ++__count;
+            auto __last = __it;
+            while (++__last != __end && __pred(*__last)) {
+                ++__count;
+            }
+            if (__count != __orig) {
+                __it = __h.erase(__it, __last);
+            } else {
+                __it = __h.erase(__it);
+            }
+            __end = __h.end();
+            if (__it == __end) {
+                break;
+            }
+        }
+    }
+    return __count;
+}
+
+template<class _Tp, class _Allocator>
+inline typename hive<_Tp, _Allocator>::size_type erase(hive<_Tp, _Allocator>& __h, const _Tp& __value) {
+    return std::erase_if(__h, [&](const _Tp& __x) { return __x == __value; });
+}
+
+_LIBCPP_END_NAMESPACE_STD
+
+_LIBCPP_POP_MACROS
+
+#endif // _LIBCPP_STD_VER >= 23
+
+#endif // _LIBCPP_HIVE
