@@ -72,6 +72,7 @@ module;
 #endif
 #include <functional>
 #include <future>
+#include <hive>
 #include <initializer_list>
 #if !defined(_LIBCPP_HAS_NO_LOCALIZATION)
 #  include <iomanip>

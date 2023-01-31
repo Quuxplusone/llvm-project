@@ -1372,6 +1372,11 @@ module std [system] {
     export *
   }
 
+  module hive {
+    header "hive"
+    export *
+  }
+
   module initializer_list {
     header "initializer_list"
     export *
