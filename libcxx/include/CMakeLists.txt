@@ -855,6 +855,7 @@ set(files
   fstream
   functional
   future
+  hive
   initializer_list
   inttypes.h
   iomanip
