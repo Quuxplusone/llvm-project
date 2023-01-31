@@ -441,6 +441,8 @@ namespace std {
   class deque;
   template <class T, class Alloc>
   class list;
+  template <class T, class Alloc>
+  class hive;
   template <class _Key, class _Value, class _Less, class _Alloc>
   class map;
   template <class _Key, class _Value, class _Less, class _Alloc>
@@ -473,6 +475,8 @@ template <class T = CopyInsertable<1>>
 using deque = std::deque<T, ContainerTestAllocator<T, T> >;
 template <class T = CopyInsertable<1>>
 using list = std::list<T, ContainerTestAllocator<T, T> >;
+template <class T = CopyInsertable<1>>
+using hive = std::hive<T, ContainerTestAllocator<T, T> >;
 
 template <class Key = CopyInsertable<1>, class Value = CopyInsertable<2>,
           class ValueTp = std::pair<const Key, Value> >
