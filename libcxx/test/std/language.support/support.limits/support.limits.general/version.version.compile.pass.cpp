@@ -85,6 +85,7 @@
     __cpp_lib_generic_unordered_lookup             201811L [C++20]
     __cpp_lib_hardware_interference_size           201703L [C++17]
     __cpp_lib_has_unique_object_representations    201606L [C++17]
+    __cpp_lib_hive                                 202300L [C++2b]
     __cpp_lib_hypot                                201603L [C++17]
     __cpp_lib_incomplete_container_elements        201505L [C++17]
     __cpp_lib_int_pow2                             202002L [C++20]
@@ -451,6 +452,10 @@
 
 # ifdef __cpp_lib_has_unique_object_representations
 #   error "__cpp_lib_has_unique_object_representations should not be defined before c++17"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++2b"
 # endif
 
 # ifdef __cpp_lib_hypot
@@ -1101,6 +1106,10 @@
 
 # ifdef __cpp_lib_has_unique_object_representations
 #   error "__cpp_lib_has_unique_object_representations should not be defined before c++17"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++2b"
 # endif
 
 # ifdef __cpp_lib_hypot
@@ -1877,6 +1886,10 @@
 # endif
 # if __cpp_lib_has_unique_object_representations != 201606L
 #   error "__cpp_lib_has_unique_object_representations should have the value 201606L in c++17"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++2b"
 # endif
 
 # ifndef __cpp_lib_hypot
@@ -2920,6 +2933,10 @@
 # endif
 # if __cpp_lib_has_unique_object_representations != 201606L
 #   error "__cpp_lib_has_unique_object_representations should have the value 201606L in c++20"
+# endif
+
+# ifdef __cpp_lib_hive
+#   error "__cpp_lib_hive should not be defined before c++2b"
 # endif
 
 # ifndef __cpp_lib_hypot
@@ -4149,6 +4166,13 @@
 # endif
 # if __cpp_lib_has_unique_object_representations != 201606L
 #   error "__cpp_lib_has_unique_object_representations should have the value 201606L in c++2b"
+# endif
+
+# ifndef __cpp_lib_hive
+#   error "__cpp_lib_hive should be defined in c++2b"
+# endif
+# if __cpp_lib_hive != 202300L
+#   error "__cpp_lib_hive should have the value 202300L in c++2b"
 # endif
 
 # ifndef __cpp_lib_hypot
