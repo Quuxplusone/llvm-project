@@ -235,6 +235,7 @@ experimental/iterator version
 experimental/memory cstdint
 experimental/memory cstring
 experimental/memory version
+experimental/propagate_const cstdint
 experimental/propagate_const version
 experimental/simd cstdint
 experimental/simd limits
@@ -251,9 +252,11 @@ experimental/utility version
 filesystem compare
 filesystem version
 flat_map compare
+flat_map cstdint
 flat_map initializer_list
 flat_map version
 flat_set compare
+flat_set cstdint
 flat_set initializer_list
 flat_set version
 format version
@@ -320,6 +323,18 @@ future string_view
 future tuple
 future typeinfo
 future version
+hive cctype
+hive climits
+hive compare
+hive cstdint
+hive cstring
+hive cwchar
+hive cwctype
+hive initializer_list
+hive limits
+hive stdexcept
+hive tuple
+hive version
 initializer_list version
 iomanip cctype
 iomanip cerrno
@@ -507,6 +522,7 @@ mutex tuple
 mutex version
 new version
 numbers version
+numeric cstdint
 numeric version
 optional compare
 optional cstdint
@@ -660,6 +676,7 @@ shared_mutex ratio
 shared_mutex version
 source_location cstdint
 source_location version
+span cstdint
 span initializer_list
 span limits
 span stdexcept
