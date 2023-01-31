@@ -942,6 +942,11 @@ module std [system] {
     header "future"
     export *
   }
+  module hive {
+    header "hive"
+    export initializer_list
+    export *
+  }
   module initializer_list {
     header "initializer_list"
     export *
