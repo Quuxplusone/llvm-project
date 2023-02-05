@@ -360,6 +360,7 @@ namespace std {
 #include <__ranges/enable_borrowed_range.h>
 #include <__ranges/enable_view.h>
 #include <__ranges/filter_view.h>
+#include <__ranges/from_range.h>
 #include <__ranges/iota_view.h>
 #include <__ranges/join_view.h>
 #include <__ranges/lazy_split_view.h>
