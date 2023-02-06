@@ -130,14 +130,12 @@ int main(int, char **) {
     assert(s.size() == 0);
   }
 
-#if 0 // LWG ????
   {
     std::flat_set<long> source;
     std::flat_set s(source, std::allocator<long>());
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<long>);
     assert(s.size() == 0);
   }
-#endif
 
   {
     std::flat_set s{ 1, 2, 1, INT_MAX, 3 };
