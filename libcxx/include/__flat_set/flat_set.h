@@ -408,6 +408,28 @@ public:
   explicit flat_set(const _Alloc& __a)
     : __c_(std::__make_obj_using_allocator<container_type>(__a)) {}
 
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(const flat_set& __fs, const _Alloc& __a)
+    : __compare_(__fs.__compare_), __c_(std::__make_obj_using_allocator<container_type>(__a, __fs.__c_)) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(flat_set&& __fs, const _Alloc& __a)
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+    try
+#endif
+    : __compare_(__fs.__compare_), __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__fs.__c_))) {
+    __fs.__c_.clear();
+  }
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+  catch (...) {
+    __fs.__restore_invariant();
+  }
+#endif
+
   template <class _InputIterator>
     requires __has_input_iterator_category<_InputIterator>::value
   _LIBCPP_HIDE_FROM_ABI
