@@ -67,7 +67,6 @@ int main(int, char**)
     std::flat_set<int, std::greater<int>, std::deque<int, A>> m({5,2,2,3,1,3}, {}, a);
     assert(std::equal(m.rbegin(), m.rend(), expected, expected+4));
   }
-#if 0 // LWG 3884, flat_foo is missing allocator-extended copy/move constructors
   {
     using C = test_less<int>;
     using M = std::flat_set<int, C, std::pmr::vector<int>>;
@@ -79,6 +78,5 @@ int main(int, char**)
     assert(std::move(vm[0]).extract().get_allocator().resource() == &mr);
     assert(vm[0].key_comp() == C(5));
   }
-#endif
   return 0;
 }
