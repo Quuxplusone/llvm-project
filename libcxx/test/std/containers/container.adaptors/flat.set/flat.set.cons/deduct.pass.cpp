@@ -66,14 +66,12 @@ void test_copy() {
     ASSERT_SAME_TYPE(decltype(s), decltype(source));
     assert(s == source);
   }
-#if 0 // LWG 3884, flat_foo is missing allocator-extended copy/move constructors
   {
     std::flat_set<long, std::greater<long>> source = {1, 2, 3};
     std::flat_set s(source, std::allocator<int>());
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<long, std::greater<long>>);
     assert(s == source);
   }
-#endif
 }
 
 void test_container() {
