@@ -69,7 +69,6 @@ int main(int, char**)
     assert((m == M{1,2,3}));
     assert(std::move(m).extract().get_allocator() == A(5));
   }
-#if 0 // LWG ????, flat_foo is missing allocator-extended copy/move constructors
   {
     using C = test_less<int>;
     using M = std::flat_set<int, C, std::pmr::vector<int>>;
@@ -92,6 +91,5 @@ int main(int, char**)
     assert(vm[0].key_comp() == C(4));
     assert(std::move(vm[0]).extract().get_allocator().resource() == &mr);
   }
-#endif
   return 0;
 }

@@ -74,7 +74,6 @@ int main(int, char**)
     assert((m == M{1,2,4,10}));
     assert(std::move(m).extract().get_allocator() == A(5));
   }
-#if 0 // LWG ????, flat_foo is missing allocator-extended copy/move constructors
   {
     using M = std::flat_set<int, std::less<int>, std::pmr::vector<int>>;
     std::pmr::monotonic_buffer_resource mr;
@@ -116,7 +115,6 @@ int main(int, char**)
     vm.emplace_back(std::sorted_unique, std::move(v)); // this was a hard error before LWG 3802
     assert(vm.size() == 1);
   }
-#endif
 #endif
   return 0;
 }
