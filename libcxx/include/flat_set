@@ -433,6 +433,20 @@ public:
   explicit flat_set(const _Alloc& __a)
     : __c_(std::__make_obj_using_allocator<container_type>(__a)) {}
 
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(const flat_set& __fs, const _Alloc& __a)
+    : __compare_(__fs.__compare_), __c_(std::__make_obj_using_allocator<container_type>(__a, __fs.__c_)) {}
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(flat_set&& __fs, const _Alloc& __a)
+    : __compare_(__fs.__compare_), __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__fs.__c_))) {
+    __fs.__c_.clear();
+  }
+
   template <class _InputIterator>
     requires __is_cpp17_input_iterator<_InputIterator>::value
   _LIBCPP_HIDE_FROM_ABI
