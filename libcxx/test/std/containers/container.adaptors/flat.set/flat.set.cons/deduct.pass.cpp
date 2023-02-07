@@ -260,7 +260,6 @@ int main(int, char **) {
   }
 #endif
 
-#if 0 // LWG 3786
   {
     std::list<int> v = { 1, 2, 1, INT_MAX, 3 };
     std::flat_set s(std::from_range, v, test_allocator<int>(0, 45));
@@ -282,7 +281,6 @@ int main(int, char **) {
                       std::end(expected_s)));
     assert(std::move(s).extract().get_allocator().get_id() == 45);
   }
-#endif
 
   {
     NotAnAllocator a;
