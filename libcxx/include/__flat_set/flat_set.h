@@ -253,6 +253,7 @@ namespace std {
 #include <__iterator/iterator_traits.h>
 #include <__iterator/reverse_iterator.h>
 #include <__memory/allocator.h>
+#include <__memory/allocator_traits.h>
 #include <__memory/uses_allocator.h>
 #include <__memory/uses_allocator_construction.h>
 #include <__ranges/concepts.h>
@@ -1078,17 +1079,19 @@ flat_set(sorted_unique_t, _InputIterator, _InputIterator, _Compare = _Compare())
 
 template<ranges::input_range _Rp,
          class _Compare = less<ranges::range_value_t<_Rp>>,
-         class _Allocator = allocator<ranges::range_value_t<_Rp>>,
+         class _Allocator = allocator<int>,
          class = enable_if_t<!__is_allocator<_Compare>::value>,
          class = enable_if_t<__is_allocator<_Allocator>::value>>
 flat_set(from_range_t, _Rp&&, _Compare = _Compare(), _Allocator = _Allocator())
-  -> flat_set<ranges::range_value_t<_Rp>, _Compare>;
+  -> flat_set<ranges::range_value_t<_Rp>, _Compare,
+              vector<ranges::range_value_t<_Rp>, __allocator_traits_rebind_t<_Allocator, ranges::range_value_t<_Rp>>>>;
 
 template<ranges::input_range _Rp,
          class _Allocator,
          class = enable_if_t<__is_allocator<_Allocator>::value>>
 flat_set(from_range_t, _Rp&&, _Allocator)
-  -> flat_set<ranges::range_value_t<_Rp>, less<ranges::range_value_t<_Rp>>>;
+  -> flat_set<ranges::range_value_t<_Rp>, less<ranges::range_value_t<_Rp>>,
+              vector<ranges::range_value_t<_Rp>, __allocator_traits_rebind_t<_Allocator, ranges::range_value_t<_Rp>>>>;
 
 template<class _Key,
          class _Compare = less<_Key>,
