@@ -304,14 +304,12 @@ void test_from_range() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::less<int>>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3786, flat maps' deduction guide needs to default Allocator to be useful
   {
     std::flat_set s(std::from_range, r, test_allocator<long>(0, 42));
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::less<int>, std::vector<int, test_allocator<int>>>);
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 void test_from_range_compare() {
@@ -322,14 +320,12 @@ void test_from_range_compare() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::greater<int>>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3786, flat maps' deduction guide needs to default Allocator to be useful
   {
     std::flat_set s(std::from_range, r, std::greater<int>(), test_allocator<long>(0, 42));
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::greater<int>, std::vector<int, test_allocator<int>>>);
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 int main(int, char **)
