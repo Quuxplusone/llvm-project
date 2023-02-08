@@ -67,7 +67,7 @@ int main(int, char**)
     {
       std::flat_set<int, DefaultCtableComp, std::vector<int, A>> m = {1,2,3};
       assert(m.size() == 1);
-      assert(1 <= *m.begin() && *m.begin() <= 3); // uncertain because sorting is unstable
+      LIBCPP_ASSERT(*m.begin() == 1);
       assert(m.key_comp().default_constructed_);
     }
     {
