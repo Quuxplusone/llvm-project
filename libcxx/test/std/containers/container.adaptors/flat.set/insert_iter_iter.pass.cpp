@@ -72,6 +72,7 @@ int main(int, char**)
     m.insert(ar, ar + 5);
     assert(m.size() == 6);
     assert((m == M{21, 42, 43, 15, 37, 18}) || (m == M{21, 42, 43, 15, 37, 28}));
+    LIBCPP_ASSERT((m == M{21, 42, 43, 15, 37, 18}));
   }
   return 0;
 }
