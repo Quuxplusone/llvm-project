@@ -277,7 +277,7 @@ namespace std {
 #include <__algorithm/lexicographical_compare_three_way.h>
 #include <__algorithm/partition_point.h>
 #include <__algorithm/remove_if.h>
-#include <__algorithm/sort.h>
+#include <__algorithm/stable_sort.h>
 #include <__compare/synth_three_way.h>
 #include <__config>
 #include <__functional/is_transparent.h>
@@ -717,7 +717,7 @@ public:
     auto __it = __c_.insert(__c_.end(), __first, __last);
     auto __end = __c_.end();
     if (__it != __end) {
-      std::sort(__it, __end, __comp_ref());
+      std::stable_sort(__it, __end, __comp_ref());
       std::inplace_merge(__c_.begin(), __it, __end, __comp_ref());
     }
     __guard.__complete();
@@ -750,7 +750,7 @@ public:
     if (__n != 0) {
       auto __end = __c_.end();
       auto __it = __end - __n;
-      std::sort(__it, __end, __comp_ref());
+      std::stable_sort(__it, __end, __comp_ref());
       std::inplace_merge(__c_.begin(), __it, __end, __comp_ref());
     }
     __guard.__complete();
@@ -987,7 +987,7 @@ private:
      // we will have no flat_multiset object and thus no invariant to restore.
      auto __begin = __c_.begin();
      auto __end = __c_.end();
-     std::sort(__begin, __end, __comp_ref());
+     std::stable_sort(__begin, __end, __comp_ref());
   }
 
   _LIBCPP_HIDE_FROM_ABI
