@@ -13,6 +13,8 @@
 // explicit flat_set(container_type cont);
 // template<class Allocator>
 //   flat_set(const container_type& cont, const Allocator& a);
+// template<class Allocator>
+//   flat_set(container_type&& cont, const Allocator& a);
 
 #include <deque>
 #include <flat_set>
@@ -98,7 +100,7 @@ int main(int, char**)
     std::pmr::vector<int> v = {1,1,1,2,2,3,2,3,3};
     assert(v.get_allocator().resource() != &mr);
     vm.emplace_back(std::move(v));
-    assert(v.size() == 9); // v's value is unchanged (before LWG 3802)
+    LIBCPP_ASSERT(v.size() == 9); // v is untouched, since it uses a different allocator
     assert((vm[0] == M{1,2,3}));
     assert(std::move(vm[0]).extract().get_allocator().resource() == &mr);
   }
@@ -109,11 +111,10 @@ int main(int, char**)
     std::pmr::vector<int> v({1,1,1,2,2,3,2,3,3}, &mr);
     assert(v.get_allocator().resource() == &mr);
     vm.emplace_back(std::move(v));
-    assert(v.size() == 9); // v's value is unchanged (before LWG 3802)
+    assert(v.empty());  // v is moved-from (after LWG 3802)
     assert((vm[0] == M{1,2,3}));
     assert(std::move(vm[0]).extract().get_allocator().resource() == &mr);
   }
-#if 0 // LWG 3802, flat_foo allocator-extended constructors lack move semantics
   {
     using M = std::flat_set<MoveOnly, std::less<>, std::pmr::vector<MoveOnly>>;
     std::pmr::vector<M> vm;
@@ -121,6 +122,5 @@ int main(int, char**)
     vm.emplace_back(std::move(v)); // this was a hard error before LWG 3802
     assert(vm.size() == 1);
   }
-#endif
   return 0;
 }
