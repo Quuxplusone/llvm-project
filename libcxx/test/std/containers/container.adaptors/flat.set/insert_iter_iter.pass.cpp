@@ -69,7 +69,7 @@ int main(int, char**)
     int ar[] = {33, 18, 55, 28, 42};
     m.insert(ar, ar + 5);
     assert(std::ranges::is_permutation(m, M{21, 42, 43, 15, 37, 18}));
-    // LIBCPP_ASSERT(std::ranges::equal(m, std::vector{21, 42, 43, 15, 37, 18}));
+    LIBCPP_ASSERT(std::ranges::equal(m, std::vector{21, 42, 43, 15, 37, 18}));
   }
   return 0;
 }
