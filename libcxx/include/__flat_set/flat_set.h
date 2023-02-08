@@ -358,6 +358,14 @@ public:
     __construct_invariant();
   }
 
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(container_type&& __cont, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__cont))) {
+    __construct_invariant();
+  }
+
   _LIBCPP_HIDE_FROM_ABI
   flat_set(sorted_unique_t, container_type __cont)
     : __c_(std::move(__cont)) {
@@ -370,6 +378,15 @@ public:
   _LIBCPP_HIDE_FROM_ABI
   flat_set(sorted_unique_t, const container_type& __cont, const _Alloc& __a)
     : __c_(std::__make_obj_using_allocator<container_type>(__a, __cont)) {
+    _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
+        "sorted_unique expects input that is sorted and uniqued");
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(sorted_unique_t, container_type&& __cont, const _Alloc& __a)
+    : __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__cont))) {
     _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
         "sorted_unique expects input that is sorted and uniqued");
   }
