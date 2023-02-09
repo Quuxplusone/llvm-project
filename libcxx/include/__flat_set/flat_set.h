@@ -266,6 +266,7 @@ namespace std {
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_default_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/type_identity.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
 #include <__utility/move.h>
@@ -528,7 +529,7 @@ public:
   template <class _Alloc>
     requires uses_allocator_v<container_type, _Alloc>
   _LIBCPP_HIDE_FROM_ABI
-  flat_set(initializer_list<value_type> __il, const key_compare& __comp, const _Alloc& __a)
+  flat_set(initializer_list<value_type> __il, const type_identity_t<key_compare>& __comp, const _Alloc& __a)
     : flat_set(__il.begin(), __il.end(), __comp, __a) {}
 
   template <class _Alloc>
@@ -546,7 +547,7 @@ public:
     requires uses_allocator_v<container_type, _Alloc>
   _LIBCPP_HIDE_FROM_ABI
   flat_set(sorted_unique_t __s, initializer_list<value_type> __il,
-           const key_compare& __comp, const _Alloc& __a)
+           const type_identity_t<key_compare>& __comp, const _Alloc& __a)
     : flat_set(__s, __il.begin(), __il.end(), __comp, __a) {}
 
   template <class _Alloc>
@@ -1104,17 +1105,39 @@ private:
 
 template<class _InputIterator,
          class _Compare = less<__iter_value_type<_InputIterator>>,
+         class _Allocator = allocator<int>,
          class = enable_if_t<__has_input_iterator_category<_InputIterator>::value>,
-         class = enable_if_t<!__is_allocator<_Compare>::value>>
-flat_set(_InputIterator, _InputIterator, _Compare = _Compare())
-  -> flat_set<__iter_value_type<_InputIterator>, _Compare>;
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(_InputIterator, _InputIterator, _Compare = _Compare(), _Allocator = _Allocator())
+  -> flat_set<__iter_value_type<_InputIterator>, _Compare,
+              vector<__iter_value_type<_InputIterator>, __allocator_traits_rebind_t<_Allocator, __iter_value_type<_InputIterator>>>>;
 
 template<class _InputIterator,
          class _Compare = less<__iter_value_type<_InputIterator>>,
+         class _Allocator = allocator<int>,
          class = enable_if_t<__has_input_iterator_category<_InputIterator>::value>,
-         class = enable_if_t<!__is_allocator<_Compare>::value>>
-flat_set(sorted_unique_t, _InputIterator, _InputIterator, _Compare = _Compare())
-  -> flat_set<__iter_value_type<_InputIterator>, _Compare>;
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(sorted_unique_t, _InputIterator, _InputIterator, _Compare = _Compare(), _Allocator = _Allocator())
+  -> flat_set<__iter_value_type<_InputIterator>, _Compare,
+              vector<__iter_value_type<_InputIterator>, __allocator_traits_rebind_t<_Allocator, __iter_value_type<_InputIterator>>>>;
+
+template<class _InputIterator,
+         class _Allocator,
+         class = enable_if_t<__has_input_iterator_category<_InputIterator>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(_InputIterator, _InputIterator, _Allocator)
+  -> flat_set<__iter_value_type<_InputIterator>, less<__iter_value_type<_InputIterator>>,
+              vector<__iter_value_type<_InputIterator>, __allocator_traits_rebind_t<_Allocator, __iter_value_type<_InputIterator>>>>;
+
+template<class _InputIterator,
+         class _Allocator = allocator<int>,
+         class = enable_if_t<__has_input_iterator_category<_InputIterator>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(sorted_unique_t, _InputIterator, _InputIterator, _Allocator)
+  -> flat_set<__iter_value_type<_InputIterator>, less<__iter_value_type<_InputIterator>>,
+              vector<__iter_value_type<_InputIterator>, __allocator_traits_rebind_t<_Allocator, __iter_value_type<_InputIterator>>>>;
 
 template<ranges::input_range _Rp,
          class _Compare = less<ranges::range_value_t<_Rp>>,
@@ -1134,15 +1157,35 @@ flat_set(from_range_t, _Rp&&, _Allocator)
 
 template<class _Key,
          class _Compare = less<_Key>,
-         class = enable_if_t<!__is_allocator<_Compare>::value>>
-flat_set(initializer_list<_Key>, _Compare = _Compare())
-  -> flat_set<_Key, _Compare>;
+         class _Allocator = allocator<_Key>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(initializer_list<_Key>, _Compare = _Compare(), _Allocator = _Allocator())
+  -> flat_set<_Key, _Compare,
+              vector<_Key, __allocator_traits_rebind_t<_Allocator, _Key>>>;
 
 template<class _Key,
          class _Compare = less<_Key>,
-         class = enable_if_t<!__is_allocator<_Compare>::value>>
-flat_set(sorted_unique_t, initializer_list<_Key>, _Compare = _Compare())
-  -> flat_set<_Key, _Compare>;
+         class _Allocator = allocator<_Key>,
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(sorted_unique_t, initializer_list<_Key>, _Compare = _Compare(), _Allocator = _Allocator())
+  -> flat_set<_Key, _Compare,
+              vector<_Key, __allocator_traits_rebind_t<_Allocator, _Key>>>;
+
+template<class _Key,
+         class _Allocator,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(initializer_list<_Key>, _Allocator)
+  -> flat_set<_Key, less<_Key>,
+              vector<_Key, __allocator_traits_rebind_t<_Allocator, _Key>>>;
+
+template<class _Key,
+         class _Allocator,
+         class = enable_if_t<__is_allocator<_Allocator>::value>>
+flat_set(sorted_unique_t, initializer_list<_Key>, _Allocator)
+  -> flat_set<_Key, less<_Key>,
+              vector<_Key, __allocator_traits_rebind_t<_Allocator, _Key>>>;
 
 template <class _Key, class _Compare, class _KeyContainer, class _Alloc>
 struct uses_allocator<flat_set<_Key, _Compare, _KeyContainer>, _Alloc>
