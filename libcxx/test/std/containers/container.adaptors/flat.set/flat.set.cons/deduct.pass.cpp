@@ -179,7 +179,6 @@ void test_iter_iter() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3804, flat_foo missing some allocator-extended deduction guides
   {
     std::flat_set s(arr, arr + 5, test_allocator<int>(0, 42));
 
@@ -194,7 +193,6 @@ void test_iter_iter() {
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 void test_iter_iter_compare() {
@@ -212,7 +210,6 @@ void test_iter_iter_compare() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::greater<int>>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3804, flat_foo missing some allocator-extended deduction guides
   {
     std::flat_set s(arr, arr + 5, std::greater<int>(), test_allocator<int>(0, 42));
 
@@ -227,7 +224,6 @@ void test_iter_iter_compare() {
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 void test_initializer_list() {
@@ -244,7 +240,6 @@ void test_initializer_list() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3804, flat_foo missing some allocator-extended deduction guides
   {
     std::flat_set s({ 1, 2, 1, INT_MAX, 3 }, test_allocator<long>(0, 42));
 
@@ -259,7 +254,6 @@ void test_initializer_list() {
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 void test_initializer_list_compare() {
@@ -276,7 +270,6 @@ void test_initializer_list_compare() {
     ASSERT_SAME_TYPE(decltype(s), std::flat_set<int, std::greater<int>>);
     assert(std::ranges::equal(s, expected_s));
   }
-#if 0 // LWG 3804, flat_foo missing some allocator-extended deduction guides
   {
     std::flat_set s({ 1, 2, 1, INT_MAX, 3 }, std::greater<int>(), test_allocator<long>(0, 42));
 
@@ -291,7 +284,6 @@ void test_initializer_list_compare() {
     assert(std::ranges::equal(s, expected_s));
     assert(std::move(s).extract().get_allocator().get_id() == 42);
   }
-#endif
 }
 
 void test_from_range() {
@@ -339,9 +331,7 @@ int main(int, char **)
   test_from_range();
   test_from_range_compare();
 
-#if 0 // LWG 3804, flat_foo missing some allocator-extended deduction guides
   AssociativeContainerDeductionGuidesSfinaeAway<std::flat_set, std::flat_set<int>>();
-#endif
 
   {
     NotAnAllocator a;
