@@ -81,7 +81,6 @@ void test_container() {
     assert(std::ranges::equal(s, expected));
     assert(std::move(s).extract().get_allocator().get_id() == 43);
   }
-#if 0 // LWG ????, Alloc parameter doesn't have to be an allocator
   {
     std::pmr::monotonic_buffer_resource mr;
     std::pmr::monotonic_buffer_resource mr2;
@@ -102,7 +101,6 @@ void test_container() {
     assert(std::ranges::equal(s, expected));
     assert(std::move(s).extract().get_allocator().resource() == &mr2);
   }
-#endif
 }
 
 void test_container_compare() {
@@ -136,7 +134,6 @@ void test_container_compare() {
     assert(std::ranges::equal(s, expected));
     assert(std::move(s).extract().get_allocator().get_id() == 43);
   }
-#if 0 // LWG ????, Alloc parameter doesn't have to be an allocator
   {
     std::pmr::monotonic_buffer_resource mr;
     std::pmr::monotonic_buffer_resource mr2;
@@ -157,7 +154,6 @@ void test_container_compare() {
     assert(std::ranges::equal(s, expected));
     assert(std::move(s).extract().get_allocator().resource() == &mr2);
   }
-#endif
 }
 
 void test_iter_iter() {
