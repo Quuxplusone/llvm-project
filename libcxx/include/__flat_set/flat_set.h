@@ -1170,6 +1170,7 @@ template<class _KeyContainer,
          class _Alloc,
          class = typename _KeyContainer::const_iterator,
          class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+  requires true
 flat_set(_KeyContainer, _Alloc)
   -> flat_set<typename _KeyContainer::value_type, less<typename _KeyContainer::value_type>, _KeyContainer>;
 
@@ -1193,6 +1194,7 @@ template<class _KeyContainer,
          class _Alloc,
          class = typename _KeyContainer::const_iterator,
          class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+  requires true
 flat_set(sorted_unique_t, _KeyContainer, _Alloc)
   -> flat_set<typename _KeyContainer::value_type, less<typename _KeyContainer::value_type>, _KeyContainer>;
 
