@@ -25,7 +25,7 @@
 #include <compare>
 #include <deque>
 //#include <flat_map>
-//#include <flat_set>
+#include <flat_set>
 #include <forward_list>
 #include <functional>
 #include <future>
@@ -270,6 +270,6 @@ static_assert(std::is_trivially_relocatable_v<std::move_only_function<void()>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multimap<K,bool>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multiset<K>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multiset<bool>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_set<K>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_set<bool>>);
+static_assert(std::is_trivially_relocatable_v<std::flat_set<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::flat_set<bool>>);
 #endif
