@@ -368,6 +368,28 @@ public:
   }
 
   _LIBCPP_HIDE_FROM_ABI
+  flat_set(container_type __cont, const key_compare& __comp)
+    : __compare_(__comp), __c_(std::move(__cont)) {
+    __construct_invariant();
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(const container_type& __cont, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a, __cont)) {
+    __construct_invariant();
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(container_type&& __cont, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__cont))) {
+    __construct_invariant();
+  }
+
+  _LIBCPP_HIDE_FROM_ABI
   flat_set(sorted_unique_t, container_type __cont)
     : __c_(std::move(__cont)) {
     _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
@@ -388,6 +410,31 @@ public:
   _LIBCPP_HIDE_FROM_ABI
   flat_set(sorted_unique_t, container_type&& __cont, const _Alloc& __a)
     : __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__cont))) {
+    _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
+        "sorted_unique expects input that is sorted and uniqued");
+  }
+
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(sorted_unique_t, container_type __cont, const key_compare& __comp)
+    : __compare_(__comp), __c_(std::move(__cont)) {
+    _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
+        "sorted_unique expects input that is sorted and uniqued");
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(sorted_unique_t, const container_type& __cont, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a, __cont)) {
+    _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
+        "sorted_unique expects input that is sorted and uniqued");
+  }
+
+  template <class _Alloc>
+    requires uses_allocator_v<container_type, _Alloc>
+  _LIBCPP_HIDE_FROM_ABI
+  flat_set(sorted_unique_t, container_type&& __cont, const key_compare& __comp, const _Alloc& __a)
+    : __compare_(__comp), __c_(std::__make_obj_using_allocator<container_type>(__a, std::move(__cont))) {
     _LIBCPP_ASSERT_UNCATEGORIZED(__is_sorted_uniqued(begin(), end()),
         "sorted_unique expects input that is sorted and uniqued");
   }
@@ -1104,6 +1151,52 @@ private:
   _LIBCPP_NO_UNIQUE_ADDRESS key_compare __compare_ = key_compare();
   container_type __c_ = container_type();
 };
+
+template<class _KeyContainer,
+         class _Compare = less<typename _KeyContainer::value_type>,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(_KeyContainer, _Compare = _Compare())
+  -> flat_set<typename _KeyContainer::value_type, _Compare, _KeyContainer>;
+
+template<class _KeyContainer,
+         class _Compare,
+         class _Alloc,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+flat_set(_KeyContainer, _Compare, _Alloc)
+  -> flat_set<typename _KeyContainer::value_type, _Compare, _KeyContainer>;
+
+template<class _KeyContainer,
+         class _Alloc,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+flat_set(_KeyContainer, _Alloc)
+  -> flat_set<typename _KeyContainer::value_type, less<typename _KeyContainer::value_type>, _KeyContainer>;
+
+template<class _KeyContainer,
+         class _Compare = less<typename _KeyContainer::value_type>,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<!__is_allocator<_Compare>::value>>
+flat_set(sorted_unique_t, _KeyContainer, _Compare = _Compare())
+  -> flat_set<typename _KeyContainer::value_type, _Compare, _KeyContainer>;
+
+template<class _KeyContainer,
+         class _Compare,
+         class _Alloc,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<!__is_allocator<_Compare>::value>,
+         class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+flat_set(sorted_unique_t, _KeyContainer, _Compare, _Alloc)
+  -> flat_set<typename _KeyContainer::value_type, _Compare, _KeyContainer>;
+
+template<class _KeyContainer,
+         class _Alloc,
+         class = typename _KeyContainer::const_iterator,
+         class = enable_if_t<uses_allocator_v<_KeyContainer, _Alloc>>>
+flat_set(sorted_unique_t, _KeyContainer, _Alloc)
+  -> flat_set<typename _KeyContainer::value_type, less<typename _KeyContainer::value_type>, _KeyContainer>;
 
 template<class _InputIterator,
          class _Compare = less<__iter_value_type<_InputIterator>>,
