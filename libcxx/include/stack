@@ -285,12 +285,12 @@ public:
 };
 
 #if _LIBCPP_STD_VER >= 17
-template <class _Container, class = enable_if_t<!__is_allocator<_Container>::value> >
+template <class _Container, class = typename _Container::const_iterator>
 stack(_Container) -> stack<typename _Container::value_type, _Container>;
 
 template <class _Container,
           class _Alloc,
-          class = enable_if_t<!__is_allocator<_Container>::value>,
+          class = typename _Container::const_iterator,
           class = enable_if_t<uses_allocator<_Container, _Alloc>::value> >
 stack(_Container, _Alloc) -> stack<typename _Container::value_type, _Container>;
 #endif
