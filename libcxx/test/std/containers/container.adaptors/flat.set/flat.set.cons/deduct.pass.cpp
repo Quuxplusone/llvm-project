@@ -53,7 +53,6 @@ void test_copy() {
 void test_container() {
   std::deque<int, test_allocator<int>> v({ 1, 2, 1, INT_MAX, 3 }, test_allocator<int>(0, 42));
   std::deque<int, test_allocator<int>> expected({ 1, 2, 3, INT_MAX }, test_allocator<int>(0, 42));
-#if 0 // LWG ????, missing deduction guides for flat_foo's container constructors
   {
     std::flat_set s(v);
 
@@ -104,13 +103,11 @@ void test_container() {
     assert(std::move(s).extract().get_allocator().resource() == &mr2);
   }
 #endif
-#endif
 }
 
 void test_container_compare() {
   std::deque<int, test_allocator<int>> v({ 1, 2, 1, INT_MAX, 3 }, test_allocator<int>(0, 42));
   std::deque<int, test_allocator<int>> expected({ INT_MAX, 3, 2, 1 }, test_allocator<int>(0, 42));
-#if 0 // LWG ????, missing deduction guides for flat_foo's container constructors
   {
     std::flat_set s(v, std::greater<int>());
 
@@ -160,7 +157,6 @@ void test_container_compare() {
     assert(std::ranges::equal(s, expected));
     assert(std::move(s).extract().get_allocator().resource() == &mr2);
   }
-#endif
 #endif
 }
 
