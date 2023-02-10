@@ -399,14 +399,14 @@ public:
 
 #if _LIBCPP_STD_VER > 14
 template<class _Container,
-         class = enable_if_t<!__is_allocator<_Container>::value>
+         class = typename _Container::const_iterator
 >
 queue(_Container)
     -> queue<typename _Container::value_type, _Container>;
 
 template<class _Container,
          class _Alloc,
-         class = enable_if_t<!__is_allocator<_Container>::value>,
+         class = typename _Container::const_iterator,
          class = enable_if_t<uses_allocator<_Container, _Alloc>::value>
 >
 queue(_Container, _Alloc)
@@ -643,7 +643,7 @@ public:
 template <class _Compare,
           class _Container,
           class = enable_if_t<!__is_allocator<_Compare>::value>,
-          class = enable_if_t<!__is_allocator<_Container>::value>
+          class = typename _Container::const_iterator
 >
 priority_queue(_Compare, _Container)
     -> priority_queue<typename _Container::value_type, _Container, _Compare>;
@@ -653,7 +653,7 @@ template<class _InputIterator,
          class _Container = vector<__iter_value_type<_InputIterator>>,
          class = enable_if_t<__is_cpp17_input_iterator<_InputIterator>::value>,
          class = enable_if_t<!__is_allocator<_Compare>::value>,
-         class = enable_if_t<!__is_allocator<_Container>::value>
+         class = typename _Container::const_iterator
 >
 priority_queue(_InputIterator, _InputIterator, _Compare = _Compare(), _Container = _Container())
     -> priority_queue<__iter_value_type<_InputIterator>, _Container, _Compare>;
@@ -662,7 +662,7 @@ template<class _Compare,
          class _Container,
          class _Alloc,
          class = enable_if_t<!__is_allocator<_Compare>::value>,
-         class = enable_if_t<!__is_allocator<_Container>::value>,
+         class = typename _Container::const_iterator,
          class = enable_if_t<uses_allocator<_Container, _Alloc>::value>
 >
 priority_queue(_Compare, _Container, _Alloc)
@@ -689,7 +689,7 @@ priority_queue(_InputIterator, _InputIterator, _Compare, _Allocator)
 template<class _InputIterator, class _Compare, class _Container, class _Alloc,
          class = enable_if_t<__is_cpp17_input_iterator<_InputIterator>::value>,
          class = enable_if_t<!__is_allocator<_Compare>::value>,
-         class = enable_if_t<!__is_allocator<_Container>::value>,
+         class = typename _Container::const_iterator,
          class = enable_if_t<uses_allocator<_Container, _Alloc>::value>
 >
 priority_queue(_InputIterator, _InputIterator, _Compare, _Container, _Alloc)
