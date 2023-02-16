@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <set>
+// <forward_list>
 //   The container's value type must be the same as the allocator's value type
 
-#include <set>
+#include <forward_list>
 
-int main(int, char**)
-{
-    std::multiset<int, std::less<int>, std::allocator<long> > ms;
-
-  return 0;
-}
+std::forward_list<int, std::allocator<long> > fl;
+  // expected-error-re@forward_list:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}

@@ -11,9 +11,5 @@
 
 #include <unordered_set>
 
-int main(int, char**)
-{
-    std::unordered_multiset<int, std::hash<int>, std::less<int>, std::allocator<long> > v;
-
-  return 0;
-}
+std::unordered_multiset<int, std::hash<int>, std::less<int>, std::allocator<long> > v;
+  // expected-error-re@unordered_set:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}
