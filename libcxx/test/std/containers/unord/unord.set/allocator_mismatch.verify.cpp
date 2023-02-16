@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <map>
+// <unordered_set>
 //   The container's value type must be the same as the allocator's value type
 
-#include <map>
+#include <unordered_set>
 
-int main(int, char**)
-{
-    std::multimap<int, int, std::less<int>, std::allocator<long> > m;
-
-  return 0;
-}
+std::unordered_set<int, std::hash<int>, std::less<int>, std::allocator<long> > v;
+  // expected-error-re@unordered_set:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}

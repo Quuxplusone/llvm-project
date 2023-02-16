@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <deque>
+// <vector>
 //   The container's value type must be the same as the allocator's value type
 
-#include <deque>
+#include <vector>
 
-int main(int, char**)
-{
-    std::deque<int, std::allocator<long> > d;
-
-  return 0;
-}
+std::vector<int, std::allocator<long> > v;
+  // expected-error-re@vector:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}

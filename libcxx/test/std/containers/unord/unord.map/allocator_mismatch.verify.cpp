@@ -11,9 +11,5 @@
 
 #include <unordered_map>
 
-int main(int, char**)
-{
-    std::unordered_multimap<int, int, std::hash<int>, std::less<int>, std::allocator<long> > m;
-
-  return 0;
-}
+std::unordered_map<int, int, std::hash<int>, std::less<int>, std::allocator<long> > m;
+  // expected-error-re@unordered_map:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}

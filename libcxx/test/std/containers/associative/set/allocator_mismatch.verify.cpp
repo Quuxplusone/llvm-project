@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <forward_list>
+// <set>
 //   The container's value type must be the same as the allocator's value type
 
-#include <forward_list>
+#include <set>
 
-int main(int, char**)
-{
-    std::forward_list<int, std::allocator<long> > fl;
-
-  return 0;
-}
+std::set<int, std::less<int>, std::allocator<long> > m;
+  // expected-error-re@set:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}
