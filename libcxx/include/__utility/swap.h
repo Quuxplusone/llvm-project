@@ -38,21 +38,42 @@ template <class>
 using __swap_result_t = void;
 #endif
 
+#ifndef _LIBCPP_TRIVIAL_SWAP_SIZE
+#  define _LIBCPP_TRIVIAL_SWAP_SIZE 128
+#endif
+
 template <class _Tp>
 inline _LIBCPP_INLINE_VISIBILITY __swap_result_t<_Tp> _LIBCPP_CONSTEXPR_SINCE_CXX20 swap(_Tp& __x, _Tp& __y)
     _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value)
 {
     if (__libcpp_is_trivially_relocatable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
-        if (!is_empty<_Tp>::value) {
-            // TODO: if either __x or __y is a "possibly overlapping subobject"
-            // in Itanium ABI terms, this will memcpy too much data. But the
-            // same caveat has applied to std::copy and friends, since forever.
-            char __t[sizeof (_Tp)];
-            // We cannot use __libcpp_relocate_at here, because the stack array
-            // is deliberately underaligned for an actual object of type _Tp.
-            // We are deliberately shuffling bytes here, not objects.
+        // If either __x or __y is a "possibly overlapping subobject"
+        // in Itanium ABI terms, this will memcpy too much data. But the
+        // same caveat has applied to std::copy and friends, since forever.
+        char *__px = (char *)std::addressof(__x);
+        char *__py = (char *)std::addressof(__y);
+        if (is_empty<_Tp>::value || __px == __py) {
+            // swap nothing
+        } else if (_LIBCPP_TRIVIAL_SWAP_SIZE != 0 && sizeof(_Tp) > 128) {
+            char __t[_LIBCPP_TRIVIAL_SWAP_SIZE];
+            size_t __i = sizeof(_Tp);
+            while (__i >= _LIBCPP_TRIVIAL_SWAP_SIZE) {
+                ::__builtin_memcpy(__t, __px, _LIBCPP_TRIVIAL_SWAP_SIZE);
+                ::__builtin_memcpy(__px, __py, _LIBCPP_TRIVIAL_SWAP_SIZE);
+                ::__builtin_memcpy(__py, __t, _LIBCPP_TRIVIAL_SWAP_SIZE);
+                __px += _LIBCPP_TRIVIAL_SWAP_SIZE;
+                __py += _LIBCPP_TRIVIAL_SWAP_SIZE;
+                __i -= _LIBCPP_TRIVIAL_SWAP_SIZE;
+            }
+            if (__i != 0) {
+                ::__builtin_memcpy(__t, __px, __i);
+                ::__builtin_memcpy(__px, __py, __i);
+                ::__builtin_memcpy(__py, __t, __i);
+            }
+        } else {
+            char __t[sizeof(_Tp)];
             ::__builtin_memcpy(__t, std::addressof(__x), sizeof(_Tp));
-            ::__builtin_memmove(std::addressof(__x), std::addressof(__y), sizeof(_Tp));
+            ::__builtin_memcpy(std::addressof(__x), std::addressof(__y), sizeof(_Tp));
             ::__builtin_memcpy(std::addressof(__y), __t, sizeof(_Tp));
         }
     } else {
