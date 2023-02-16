@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <vector>
+// <list>
 //   The container's value type must be the same as the allocator's value type
 
-#include <vector>
+#include <list>
 
-int main(int, char**)
-{
-    std::vector<int, std::allocator<long> > v;
-
-  return 0;
-}
+std::list<int, std::allocator<long> > l;
+  // expected-error-re@list:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}

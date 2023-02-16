@@ -6,14 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <set>
+// <map>
 //   The container's value type must be the same as the allocator's value type
 
-#include <set>
+#include <map>
 
-int main(int, char**)
-{
-    std::set<int, std::less<int>, std::allocator<long> > s;
-
-  return 0;
-}
+std::map<int, int, std::less<int>, std::allocator<long> > m;
+  // expected-error-re@map:* {{static assertion failed {{.*}}: Allocator::value_type must be same type as value_type}}
