@@ -597,38 +597,38 @@ public:
   template <class... _Args>
   _LIBCPP_HIDE_FROM_ABI
   pair<iterator, bool> emplace(_Args&&... __args) {
-    return insert(key_type(std::forward<_Args>(__args)...));
+    // Notice that we construct this value_type with the wrong allocator at first.
+    // That seems to be unavoidable, since the container might be allocator-unaware.
+    value_type __tmp = value_type(std::forward<_Args>(__args)...);
+    return insert(std::move(__tmp));
   }
 
   template <class... _Args>
   _LIBCPP_HIDE_FROM_ABI
   iterator emplace_hint(const_iterator __pos, _Args&&... __args) {
-    return insert(__pos, key_type(std::forward<_Args>(__args)...));
+    // Notice that we construct this value_type with the wrong allocator at first.
+    // That seems to be unavoidable, since the container might be allocator-unaware.
+    value_type __tmp = value_type(std::forward<_Args>(__args)...);
+    return insert(__pos, std::move(__tmp));
   }
 
   _LIBCPP_HIDE_FROM_ABI
   pair<iterator, bool> insert(const value_type& __x) {
-    auto __it = lower_bound(__x);
-    if (__it == end() || __compare_(__x, *__it)) {
-      auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
-      __it = __c_.emplace(__it, __x);
-      __guard.__complete();
-      return {__it, true};
+    auto __pos = lower_bound(__x);
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      return {__emplace_unchecked(__pos, __x), true};
     } else {
-      return {__it, false};
+      return {__pos, false};
     }
   }
 
   _LIBCPP_HIDE_FROM_ABI
   pair<iterator, bool> insert(value_type&& __x) {
-    auto __it = lower_bound(__x);
-    if (__it == end() || __compare_(__x, *__it)) {
-      auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
-      __it = __c_.emplace(__it, std::move(__x));
-      __guard.__complete();
-      return {__it, true};
+    auto __pos = lower_bound(__x);
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      return {__emplace_unchecked(__pos, std::move(__x)), true};
     } else {
-      return {__it, false};
+      return {__pos, false};
     }
   }
 
@@ -637,28 +637,44 @@ public:
              is_constructible_v<value_type, _K2>
   _LIBCPP_HIDE_FROM_ABI
   pair<iterator, bool> insert(_K2&& __x) {
-    auto __it = lower_bound(__x);
-    if (__it == end() || __compare_(__x, *__it)) {
-      auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
-      __it = __c_.emplace(__it, std::forward<_K2>(__x));
-      __guard.__complete();
-      return {__it, true};
+    auto __pos = lower_bound(__x);
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      return {__emplace_unchecked(__pos, std::forward<_K2>(__x)), true};
     } else {
-      return {__it, false};
+      return {__pos, false};
     }
   }
 
   _LIBCPP_HIDE_FROM_ABI
-  iterator insert(const_iterator, const value_type& __x) { return insert(__x).first; }
+  iterator insert(const_iterator __pos, const value_type& __x) {
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      if (__pos == begin() || __compare_(__pos[-1], __x)) {
+        return __emplace_unchecked(__pos, __x);
+      }
+    }
+    return insert(__x).first;
+  }
 
   _LIBCPP_HIDE_FROM_ABI
-  iterator insert(const_iterator, value_type&& __x) { return insert(std::move(__x)).first; }
+  iterator insert(const_iterator __pos, value_type&& __x) {
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      if (__pos == begin() || __compare_(__pos[-1], __x)) {
+        return __emplace_unchecked(__pos, std::move(__x));
+      }
+    }
+    return insert(std::move(__x)).first;
+  }
 
   template <class _K2>
     requires __is_transparent<_Compare, _K2>::value &&
              is_constructible_v<value_type, _K2>
   _LIBCPP_HIDE_FROM_ABI
-  iterator insert(const_iterator, _K2&& __x) {
+  iterator insert(const_iterator __pos, _K2&& __x) {
+    if (__pos == end() || __compare_(__x, *__pos)) {
+      if (__pos == begin() || __compare_(__pos[-1], __x)) {
+        return __emplace_unchecked(__pos, std::forward<_K2>(__x));
+      }
+    }
     return insert(std::forward<_K2>(__x)).first;
   }
 
@@ -1040,6 +1056,15 @@ private:
   _LIBCPP_HIDE_FROM_ABI
   reference_wrapper<const _Compare> __comp_ref() const {
     return reference_wrapper<const _Compare>(__compare_);
+  }
+
+  template <class _K2>
+  _LIBCPP_HIDE_FROM_ABI
+  iterator __emplace_unchecked(const_iterator __pos, _K2&& __x) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    __pos = __c_.emplace(__pos, std::forward<_K2>(__x));
+    __guard.__complete();
+    return __pos;
   }
 
   _LIBCPP_NO_UNIQUE_ADDRESS key_compare __compare_ = key_compare();
