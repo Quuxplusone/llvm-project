@@ -107,6 +107,8 @@ struct __copy_backward_loop {
 };
 
 struct __copy_backward_trivial {
+  static const bool __can_consteval = true;
+
   // At this point, the iterators have been unwrapped so any `contiguous_iterator` has been unwrapped to a pointer.
   template <class _In, class _Out,
             __enable_if_t<__can_lower_copy_assignment_to_memmove<_In, _Out>::value, int> = 0>
