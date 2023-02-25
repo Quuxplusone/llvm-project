@@ -20,10 +20,13 @@
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_copy_constructible.h>
 #include <__type_traits/is_trivially_assignable.h>
+#include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_volatile.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
+#include <__utility/swap.h>
 #include <cstddef>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -52,10 +55,11 @@ struct __can_lower_to_memmove_in_consteval {
 #else
   // In Clang, `__builtin_memmove` only supports fully trivially copyable types (just having trivial copy assignment is
   // insufficient). Also, conversions are not supported.
+  // Also, swap_ranges cannot be constant-evaluated because of its pointer math: test __can_consteval.
   // _FromIter always has a value_type, but _ToIter might not; hence the template indirection here.
   using _From = typename _IterOps::template __value_type<_FromIter>;
   static const bool value =
-      is_trivially_copyable<_From>::value && __can_copy_without_conversion<_IterOps, _From, _ToIter>::value;
+      _OptimizedAlgorithm::__can_consteval && is_trivially_copyable<_From>::value && __can_copy_without_conversion<_IterOps, _From, _ToIter>::value;
 #endif
 };
 
@@ -80,6 +84,20 @@ struct __can_lower_move_assignment_to_memmove {
     !is_volatile<_To>::value;
 };
 
+template <class _From, class _To>
+struct __can_lower_swap_to_memswap {
+  static const bool value =
+    __is_always_bitcastable<_From, _To>::value &&
+    __is_always_bitcastable<_To, _From>::value &&
+    // These are the operations performed by `From& = std::exchange(To&, From&&)`.
+    is_trivially_constructible<_To, _To&&>::value &&
+    is_trivially_assignable<_To&, _From&&>::value &&
+    is_trivially_assignable<_From&, _To&&>::value &&
+    is_trivially_destructible<_To>::value &&
+    !is_volatile<_From>::value &&
+    !is_volatile<_To>::value;
+};
+
 // `memmove` algorithms implementation.
 
 template <class _In, class _Out>
@@ -100,6 +118,14 @@ __copy_backward_trivial_impl(_In* __first, _In* __last, _Out* __result) {
   ::__builtin_memmove(__result, __first, __n * sizeof(_Out));
 
   return std::make_pair(__last, __result);
+}
+
+template <class _Tp, class _Up>
+_LIBCPP_HIDE_FROM_ABI pair<_Tp*, _Up*>
+__swap_ranges_trivial_impl(_Tp* __first1, _Tp* __last1, _Up* __first2) {
+  const size_t __n = static_cast<size_t>(__last1 - __first1);
+  std::__libcpp_memswap(__first1, __first2, __n * sizeof(_Tp));
+  return std::make_pair(__last1, __first2 + __n);
 }
 
 // Iterator unwrapping and dispatching to the correct overload.
