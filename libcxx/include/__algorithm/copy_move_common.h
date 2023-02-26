@@ -140,6 +140,32 @@ __unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2) {
   return _Algorithm()(std::move(__first1), std::move(__last1), std::move(__first2));
 }
 
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<__can_rewrap<_Iter1>::value && __can_rewrap<_Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  auto __range1  = std::__unwrap_range(__first1, std::move(__last1));
+  auto __range2  = std::__unwrap_range(__first2, std::move(__last2));
+  auto __result = _Algorithm()(std::move(__range1.first), std::move(__range1.second), std::move(__range2.first), std::move(__range2.second));
+  return std::make_pair(std::__rewrap_range<_Sent1>(std::move(__first1), std::move(__result.first)),
+                        std::__rewrap_range<_Sent2>(std::move(__first2), std::move(__result.second)));
+}
+
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<!__can_rewrap<_Iter1>::value || !__can_rewrap<_Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  return _Algorithm()(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
+}
+
 template <class _AlgPolicy,
           class _NaiveAlgorithm,
           class _OptimizedAlgorithm,
@@ -153,6 +179,22 @@ __dispatch_copy_or_move(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2) {
   }
   using _Algorithm = __overload<_NaiveAlgorithm, _OptimizedAlgorithm>;
   return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first1), std::move(__last1), std::move(__first2));
+}
+
+template <class _AlgPolicy,
+          class _NaiveAlgorithm,
+          class _OptimizedAlgorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__dispatch_copy_or_move(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  if (__libcpp_is_constant_evaluated() && !__can_lower_to_memmove_in_consteval<_OptimizedAlgorithm, _IterOps<_AlgPolicy>, _Iter1, _Iter2>::value) {
+    return std::__unwrap_and_dispatch<_NaiveAlgorithm>(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
+  }
+  using _Algorithm = __overload<_NaiveAlgorithm, _OptimizedAlgorithm>;
+  return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
 }
 
 _LIBCPP_END_NAMESPACE_STD
