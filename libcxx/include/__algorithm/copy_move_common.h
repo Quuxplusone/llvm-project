@@ -34,6 +34,31 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 // Type traits.
 
+template <class _IterOps, class _From, class _ToIter, class = void>
+struct __can_copy_without_conversion : false_type {};
+
+template <class _IterOps, class _From, class _ToIter>
+struct __can_copy_without_conversion<
+    _IterOps,
+    _From,
+    _ToIter,
+    __enable_if_t<is_same<_From, typename _IterOps::template __value_type<_ToIter> >::value> > : true_type {};
+
+template <class _OptimizedAlgorithm, class _IterOps, class _FromIter, class _ToIter>
+struct __can_lower_to_memmove_in_consteval {
+#ifdef _LIBCPP_COMPILER_GCC
+  // GCC doesn't support `__builtin_memmove` during constant evaluation.
+  static const bool value = false;
+#else
+  // In Clang, `__builtin_memmove` only supports fully trivially copyable types (just having trivial copy assignment is
+  // insufficient). Also, conversions are not supported.
+  // _FromIter always has a value_type, but _ToIter might not; hence the template indirection here.
+  using _From = typename _IterOps::template __value_type<_FromIter>;
+  static const bool value =
+      is_trivially_copyable<_From>::value && __can_copy_without_conversion<_IterOps, _From, _ToIter>::value;
+#endif
+};
+
 template <class _From, class _To>
 struct __can_lower_copy_assignment_to_memmove {
   static const bool value =
@@ -85,77 +110,49 @@ struct __overload : _F1, _F2 {
   using _F2::operator();
 };
 
-template <class _InIter, class _Sent, class _OutIter, class = void>
+template <class _Iter, class = void>
 struct __can_rewrap : false_type {};
 
-template <class _InIter, class _Sent, class _OutIter>
-struct __can_rewrap<_InIter,
-                    _Sent,
-                    _OutIter,
-                    // Note that sentinels are always copy-constructible.
-                    __enable_if_t< is_copy_constructible<_InIter>::value &&
-                                   is_copy_constructible<_OutIter>::value > > : true_type {};
+template <class _Iter>
+struct __can_rewrap<_Iter,
+                    __enable_if_t<is_copy_constructible<_Iter>::value> > : true_type {};
 
 template <class _Algorithm,
-          class _InIter,
-          class _Sent,
-          class _OutIter,
-          __enable_if_t<__can_rewrap<_InIter, _Sent, _OutIter>::value, int> = 0>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_InIter, _OutIter>
-__unwrap_and_dispatch(_InIter __first, _Sent __last, _OutIter __out_first) {
-  auto __range  = std::__unwrap_range(__first, std::move(__last));
-  auto __result = _Algorithm()(std::move(__range.first), std::move(__range.second), std::__unwrap_iter(__out_first));
-  return std::make_pair(std::__rewrap_range<_Sent>(std::move(__first), std::move(__result.first)),
-                                 std::__rewrap_iter(std::move(__out_first), std::move(__result.second)));
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          __enable_if_t<__can_rewrap<_Iter1>::value && __can_rewrap<_Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2) {
+  auto __range  = std::__unwrap_range(__first1, std::move(__last1));
+  auto __result = _Algorithm()(std::move(__range.first), std::move(__range.second), std::__unwrap_iter(__first2));
+  return std::make_pair(std::__rewrap_range<_Sent1>(std::move(__first1), std::move(__result.first)),
+                                 std::__rewrap_iter(std::move(__first2), std::move(__result.second)));
 }
 
 template <class _Algorithm,
-          class _InIter,
-          class _Sent,
-          class _OutIter,
-          __enable_if_t<!__can_rewrap<_InIter, _Sent, _OutIter>::value, int> = 0>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_InIter, _OutIter>
-__unwrap_and_dispatch(_InIter __first, _Sent __last, _OutIter __out_first) {
-  return _Algorithm()(std::move(__first), std::move(__last), std::move(__out_first));
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          __enable_if_t<!__can_rewrap<_Iter1>::value || !__can_rewrap<_Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2) {
+  return _Algorithm()(std::move(__first1), std::move(__last1), std::move(__first2));
 }
-
-template <class _IterOps, class _InValue, class _OutIter, class = void>
-struct __can_copy_without_conversion : false_type {};
-
-template <class _IterOps, class _InValue, class _OutIter>
-struct __can_copy_without_conversion<
-    _IterOps,
-    _InValue,
-    _OutIter,
-    __enable_if_t<is_same<_InValue, typename _IterOps::template __value_type<_OutIter> >::value> > : true_type {};
 
 template <class _AlgPolicy,
           class _NaiveAlgorithm,
           class _OptimizedAlgorithm,
-          class _InIter,
-          class _Sent,
-          class _OutIter>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_InIter, _OutIter>
-__dispatch_copy_or_move(_InIter __first, _Sent __last, _OutIter __out_first) {
-#ifdef _LIBCPP_COMPILER_GCC
-  // GCC doesn't support `__builtin_memmove` during constant evaluation.
-  if (__libcpp_is_constant_evaluated()) {
-    return std::__unwrap_and_dispatch<_NaiveAlgorithm>(std::move(__first), std::move(__last), std::move(__out_first));
+          class _Iter1,
+          class _Sent1,
+          class _Iter2>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__dispatch_copy_or_move(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2) {
+  if (__libcpp_is_constant_evaluated() && !__can_lower_to_memmove_in_consteval<_OptimizedAlgorithm, _IterOps<_AlgPolicy>, _Iter1, _Iter2>::value) {
+    return std::__unwrap_and_dispatch<_NaiveAlgorithm>(std::move(__first1), std::move(__last1), std::move(__first2));
   }
-#else
-  // In Clang, `__builtin_memmove` only supports fully trivially copyable types (just having trivial copy assignment is
-  // insufficient). Also, conversions are not supported.
-  if (__libcpp_is_constant_evaluated()) {
-    using _InValue = typename _IterOps<_AlgPolicy>::template __value_type<_InIter>;
-    if (!is_trivially_copyable<_InValue>::value ||
-        !__can_copy_without_conversion<_IterOps<_AlgPolicy>, _InValue, _OutIter>::value) {
-      return std::__unwrap_and_dispatch<_NaiveAlgorithm>(std::move(__first), std::move(__last), std::move(__out_first));
-    }
-  }
-#endif // _LIBCPP_COMPILER_GCC
-
   using _Algorithm = __overload<_NaiveAlgorithm, _OptimizedAlgorithm>;
-  return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first), std::move(__last), std::move(__out_first));
+  return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first1), std::move(__last1), std::move(__first2));
 }
 
 _LIBCPP_END_NAMESPACE_STD
