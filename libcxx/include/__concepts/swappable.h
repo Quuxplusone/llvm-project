@@ -91,7 +91,7 @@ namespace __swap {
     constexpr void operator()(_Tp& __x, _Tp& __y) const
       noexcept(is_nothrow_move_constructible_v<_Tp> && is_nothrow_move_assignable_v<_Tp>)
     {
-      __y = _VSTD::exchange(__x, _VSTD::move(__y));
+      std::__generic_swap(__x, __y);
     }
   };
 } // namespace __swap
