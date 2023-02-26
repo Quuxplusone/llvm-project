@@ -19,9 +19,8 @@
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/remove_cvref.h>
-#include <__utility/exchange.h>
 #include <__utility/forward.h>
-#include <__utility/move.h>
+#include <__utility/swap.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -92,7 +91,7 @@ struct __fn {
   template <__exchangeable _Tp>
   _LIBCPP_HIDE_FROM_ABI constexpr void operator()(_Tp& __x, _Tp& __y) const
       noexcept(is_nothrow_move_constructible_v<_Tp> && is_nothrow_move_assignable_v<_Tp>) {
-    __y = std::exchange(__x, std::move(__y));
+    std::__generic_swap(__x, __y);
   }
 };
 } // namespace __swap
