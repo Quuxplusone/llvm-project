@@ -37,11 +37,17 @@ using __swap_result_t = void;
 #endif
 
 template <class _Tp>
-inline _LIBCPP_HIDE_FROM_ABI __swap_result_t<_Tp> _LIBCPP_CONSTEXPR_SINCE_CXX20 swap(_Tp& __x, _Tp& __y)
-    _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value&& is_nothrow_move_assignable<_Tp>::value) {
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __generic_swap(_Tp& __x, _Tp& __y)
+    _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value) {
   _Tp __t(std::move(__x));
   __x = std::move(__y);
   __y = std::move(__t);
+}
+
+template <class _Tp>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 __swap_result_t<_Tp> swap(_Tp& __x, _Tp& __y)
+    _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value) {
+  std::__generic_swap(__x, __y);
 }
 
 template <class _Tp, size_t _Np, __enable_if_t<__is_swappable_v<_Tp>, int> >
