@@ -10,11 +10,15 @@
 #define _LIBCPP___UTILITY_SWAP_H
 
 #include <__config>
+#include <__memory/addressof.h>
+#include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_move_assignable.h>
 #include <__type_traits/is_move_constructible.h>
 #include <__type_traits/is_nothrow_move_assignable.h>
 #include <__type_traits/is_nothrow_move_constructible.h>
 #include <__type_traits/is_swappable.h>
+#include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_volatile.h>
 #include <__utility/declval.h>
 #include <__utility/move.h>
 #include <cstddef>
@@ -33,6 +37,29 @@ template <class>
 using __swap_result_t = void;
 #endif
 
+#ifndef _LIBCPP_TRIVIAL_SWAP_SIZE
+#  define _LIBCPP_TRIVIAL_SWAP_SIZE 128
+#endif
+
+inline _LIBCPP_HIDE_FROM_ABI void __libcpp_memswap(void* __vpx, void* __vpy, size_t __n) {
+  char* __px = (char*)__vpx;
+  char* __py = (char*)__vpy;
+  char __t[_LIBCPP_TRIVIAL_SWAP_SIZE];
+  while (__n >= _LIBCPP_TRIVIAL_SWAP_SIZE) {
+    ::__builtin_memcpy(__t, __px, _LIBCPP_TRIVIAL_SWAP_SIZE);
+    ::__builtin_memmove(__px, __py, _LIBCPP_TRIVIAL_SWAP_SIZE);
+    ::__builtin_memcpy(__py, __t, _LIBCPP_TRIVIAL_SWAP_SIZE);
+    __px += _LIBCPP_TRIVIAL_SWAP_SIZE;
+    __py += _LIBCPP_TRIVIAL_SWAP_SIZE;
+    __n -= _LIBCPP_TRIVIAL_SWAP_SIZE;
+  }
+  if (__n != 0) {
+    ::__builtin_memcpy(__t, __px, __n);
+    ::__builtin_memmove(__px, __py, __n);
+    ::__builtin_memcpy(__py, __t, __n);
+  }
+}
+
 template <class _Tp>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __generic_swap(_Tp& __x, _Tp& __y)
     _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value) {
@@ -50,8 +77,12 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 __swap_result_t<_Tp> 
 template <class _Tp, size_t _Np>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX20 typename enable_if<__is_swappable<_Tp>::value>::type
 swap(_Tp (&__a)[_Np], _Tp (&__b)[_Np]) _NOEXCEPT_(__is_nothrow_swappable<_Tp>::value) {
-  for (size_t __i = 0; __i != _Np; ++__i) {
-    swap(__a[__i], __b[__i]);
+  if (is_trivially_copyable<_Tp>::value && !is_volatile<_Tp>::value && !__libcpp_is_constant_evaluated()) {
+    std::__libcpp_memswap(std::addressof(__a), std::addressof(__b), sizeof(__a));
+  } else {
+    for (size_t __i = 0; __i != _Np; ++__i) {
+      swap(__a[__i], __b[__i]);
+    }
   }
 }
 
