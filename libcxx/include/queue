@@ -220,6 +220,7 @@ template <class T, class Container, class Compare>
 #include <__algorithm/make_heap.h>
 #include <__algorithm/pop_heap.h>
 #include <__algorithm/push_heap.h>
+#include <__algorithm/sift_down.h>
 #include <__assert> // all public C++ headers provide the assertion handler
 #include <__config>
 #include <__functional/operations.h>
@@ -630,6 +631,22 @@ public:
 #endif // _LIBCPP_CXX03_LANG
     _LIBCPP_INLINE_VISIBILITY
     void pop();
+
+    _LIBCPP_HIDE_FROM_ABI void replace_top(const value_type& __v) {
+      c.front() = __v;
+      std::poke_heap(c.begin(), c.end(), comp);
+    }
+
+#ifndef _LIBCPP_CXX03_LANG
+    _LIBCPP_HIDE_FROM_ABI void replace_top(value_type&& __v) {
+      c.front() = std::move(__v);
+      std::poke_heap(c.begin(), c.end(), comp);
+    }
+    template <class... _Args>
+    _LIBCPP_HIDE_FROM_ABI void reemplace_top(_Args&&... __args) {
+      replace_top(value_type(std::forward<_Args>(__args)...));
+    }
+#endif // _LIBCPP_CXX03_LANG
 
     _LIBCPP_INLINE_VISIBILITY
     void swap(priority_queue& __q)

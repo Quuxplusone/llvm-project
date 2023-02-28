@@ -472,6 +472,10 @@ module std [system] {
       module ranges_partition                { private header "__algorithm/ranges_partition.h" }
       module ranges_partition_copy           { private header "__algorithm/ranges_partition_copy.h" }
       module ranges_partition_point          { private header "__algorithm/ranges_partition_point.h" }
+      module ranges_poke_heap {
+        private header "__algorithm/ranges_poke_heap.h"
+        export functional.__functional.ranges_operations
+      }
       module ranges_pop_heap {
         private header "__algorithm/ranges_pop_heap.h"
         export functional.__functional.ranges_operations
