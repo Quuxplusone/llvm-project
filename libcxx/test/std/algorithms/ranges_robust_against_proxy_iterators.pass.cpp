@@ -165,6 +165,7 @@ constexpr void run_tests() {
     test_mid(std::ranges::inplace_merge, in, mid);
   test(std::ranges::make_heap, in);
   test(std::ranges::push_heap, in);
+  test(std::ranges::poke_heap, in);
   test(std::ranges::pop_heap, in);
   test(std::ranges::sort_heap, in);
   test(std::ranges::prev_permutation, in);
