@@ -9,10 +9,14 @@
 #ifndef _LIBCPP___ALGORITHM_SIFT_DOWN_H
 #define _LIBCPP___ALGORITHM_SIFT_DOWN_H
 
+#include <__algorithm/comp.h>
+#include <__algorithm/comp_ref_type.h>
 #include <__algorithm/iterator_operations.h>
 #include <__assert>
 #include <__config>
 #include <__iterator/iterator_traits.h>
+#include <__type_traits/is_copy_constructible.h>
+#include <__type_traits/is_copy_assignable.h>
 #include <__utility/move.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -110,6 +114,29 @@ __floyd_sift_down(_RandomAccessIterator __first, _Compare&& __comp,
         if (__child > (__len - 2) / 2)
             return __hole;
     }
+}
+
+template <class _AlgPolicy, class _RandomAccessIterator, class _Compare>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14
+void __poke_heap(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare& __comp) {
+  typename iterator_traits<_RandomAccessIterator>::difference_type __len = __last - __first;
+  _LIBCPP_ASSERT(__len > 0, "The heap given to poke_heap must be non-empty");
+  std::__sift_down<_AlgPolicy, __comp_ref_type<_Compare> >(__first, __comp, __len, __first);
+}
+
+template <class _RandomAccessIterator, class _Compare>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
+void poke_heap(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __comp) {
+  static_assert(std::is_copy_constructible<_RandomAccessIterator>::value, "Iterators must be copy constructible.");
+  static_assert(std::is_copy_assignable<_RandomAccessIterator>::value, "Iterators must be copy assignable.");
+
+  std::__poke_heap<_ClassicAlgPolicy>(std::move(__first), std::move(__last), __comp);
+}
+
+template <class _RandomAccessIterator>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
+void poke_heap(_RandomAccessIterator __first, _RandomAccessIterator __last) {
+  std::poke_heap(std::move(__first), std::move(__last), __less<>());
 }
 
 _LIBCPP_END_NAMESPACE_STD
