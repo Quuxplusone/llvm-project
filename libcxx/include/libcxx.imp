@@ -163,6 +163,7 @@
   { include: [ "<__algorithm/ranges_partition.h>", "private", "<algorithm>", "public" ] },
   { include: [ "<__algorithm/ranges_partition_copy.h>", "private", "<algorithm>", "public" ] },
   { include: [ "<__algorithm/ranges_partition_point.h>", "private", "<algorithm>", "public" ] },
+  { include: [ "<__algorithm/ranges_poke_heap.h>", "private", "<algorithm>", "public" ] },
   { include: [ "<__algorithm/ranges_pop_heap.h>", "private", "<algorithm>", "public" ] },
   { include: [ "<__algorithm/ranges_prev_permutation.h>", "private", "<algorithm>", "public" ] },
   { include: [ "<__algorithm/ranges_push_heap.h>", "private", "<algorithm>", "public" ] },
