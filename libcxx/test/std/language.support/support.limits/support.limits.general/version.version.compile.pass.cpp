@@ -168,6 +168,7 @@
     __cpp_lib_philox_engine                                 202406L [C++26]
     __cpp_lib_polymorphic_allocator                         201902L [C++20]
     __cpp_lib_print                                         202207L [C++23]
+    __cpp_lib_priority_queue_replace_top                    201804L [C++14]
     __cpp_lib_quoted_string_io                              201304L [C++14]
     __cpp_lib_ranges                                        202110L [C++20]
                                                             202406L [C++23]
@@ -827,6 +828,10 @@
 
 # ifdef __cpp_lib_print
 #   error "__cpp_lib_print should not be defined before c++23"
+# endif
+
+# ifdef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should not be defined before c++14"
 # endif
 
 # ifdef __cpp_lib_quoted_string_io
@@ -1726,6 +1731,13 @@
 
 # ifdef __cpp_lib_print
 #   error "__cpp_lib_print should not be defined before c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++14"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++14"
 # endif
 
 # if !defined(_LIBCPP_VERSION) || _LIBCPP_HAS_LOCALIZATION
@@ -2808,6 +2820,13 @@
 
 # ifdef __cpp_lib_print
 #   error "__cpp_lib_print should not be defined before c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++17"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++17"
 # endif
 
 # if !defined(_LIBCPP_VERSION) || _LIBCPP_HAS_LOCALIZATION
@@ -4154,6 +4173,13 @@
 
 # ifdef __cpp_lib_print
 #   error "__cpp_lib_print should not be defined before c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++20"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++20"
 # endif
 
 # if !defined(_LIBCPP_VERSION) || _LIBCPP_HAS_LOCALIZATION
@@ -5650,6 +5676,13 @@
 # endif
 # if __cpp_lib_print != 202207L
 #   error "__cpp_lib_print should have the value 202207L in c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++23"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++23"
 # endif
 
 # if !defined(_LIBCPP_VERSION) || _LIBCPP_HAS_LOCALIZATION
@@ -7509,6 +7542,13 @@
 # endif
 # if __cpp_lib_print != 202207L
 #   error "__cpp_lib_print should have the value 202207L in c++26"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++26"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++26"
 # endif
 
 # if !defined(_LIBCPP_VERSION) || _LIBCPP_HAS_LOCALIZATION
