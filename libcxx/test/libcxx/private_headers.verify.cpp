@@ -161,6 +161,7 @@ END-SCRIPT
 #include <__algorithm/ranges_partition.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_partition.h'}}
 #include <__algorithm/ranges_partition_copy.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_partition_copy.h'}}
 #include <__algorithm/ranges_partition_point.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_partition_point.h'}}
+#include <__algorithm/ranges_poke_heap.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_poke_heap.h'}}
 #include <__algorithm/ranges_pop_heap.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_pop_heap.h'}}
 #include <__algorithm/ranges_prev_permutation.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_prev_permutation.h'}}
 #include <__algorithm/ranges_push_heap.h> // expected-error@*:* {{use of private header from outside its module: '__algorithm/ranges_push_heap.h'}}
