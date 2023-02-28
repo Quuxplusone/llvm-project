@@ -191,6 +191,8 @@ constexpr bool all_the_algorithms()
     (void)std::ranges::partition_copy(a, first2, last2, UnaryTrue(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::partition_point(first, last, UnaryTrue(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::partition_point(a, UnaryTrue(), Proj(&copies)); assert(copies == 0);
+    (void)std::ranges::poke_heap(first, last, Less(), Proj(&copies)); assert(copies == 0);
+    (void)std::ranges::poke_heap(a, Less(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::pop_heap(first, last, Less(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::pop_heap(a, Less(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::prev_permutation(first, last, Less(), Proj(&copies)); assert(copies == 0);
