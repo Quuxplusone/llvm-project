@@ -18,6 +18,7 @@
 /*  Constant                                       Value
     __cpp_lib_adaptor_iterator_pair_constructor    202106L [C++23]
     __cpp_lib_containers_ranges                    202202L [C++23]
+    __cpp_lib_priority_queue_replace_top           201804L [C++14]
 */
 
 #include <queue>
@@ -33,6 +34,10 @@
 #   error "__cpp_lib_containers_ranges should not be defined before c++23"
 # endif
 
+# ifdef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should not be defined before c++14"
+# endif
+
 #elif TEST_STD_VER == 14
 
 # ifdef __cpp_lib_adaptor_iterator_pair_constructor
@@ -41,6 +46,13 @@
 
 # ifdef __cpp_lib_containers_ranges
 #   error "__cpp_lib_containers_ranges should not be defined before c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++14"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++14"
 # endif
 
 #elif TEST_STD_VER == 17
@@ -53,6 +65,13 @@
 #   error "__cpp_lib_containers_ranges should not be defined before c++23"
 # endif
 
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++17"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++17"
+# endif
+
 #elif TEST_STD_VER == 20
 
 # ifdef __cpp_lib_adaptor_iterator_pair_constructor
@@ -61,6 +80,13 @@
 
 # ifdef __cpp_lib_containers_ranges
 #   error "__cpp_lib_containers_ranges should not be defined before c++23"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++20"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++20"
 # endif
 
 #elif TEST_STD_VER == 23
@@ -79,6 +105,13 @@
 #   error "__cpp_lib_containers_ranges should have the value 202202L in c++23"
 # endif
 
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++23"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++23"
+# endif
+
 #elif TEST_STD_VER > 23
 
 # ifndef __cpp_lib_adaptor_iterator_pair_constructor
@@ -93,6 +126,13 @@
 # endif
 # if __cpp_lib_containers_ranges != 202202L
 #   error "__cpp_lib_containers_ranges should have the value 202202L in c++26"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++26"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++26"
 # endif
 
 #endif // TEST_STD_VER > 23

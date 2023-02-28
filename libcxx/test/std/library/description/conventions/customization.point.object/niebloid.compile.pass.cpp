@@ -128,6 +128,7 @@ static_assert(test(std::ranges::partial_sort_copy, a, a));
 static_assert(test(std::ranges::partition, a, odd));
 static_assert(test(std::ranges::partition_copy, a, a, a, odd));
 static_assert(test(std::ranges::partition_point, a, odd));
+static_assert(test(std::ranges::poke_heap, a));
 static_assert(test(std::ranges::pop_heap, a));
 static_assert(test(std::ranges::prev_permutation, a));
 static_assert(test(std::ranges::push_heap, a));
