@@ -767,6 +767,14 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void clear() _NOEXCEPT {__tree_.clear();}
 
+    _LIBCPP_HIDE_FROM_ABI
+    value_type displace(const_iterator __pos) {
+        _LIBCPP_ASSERT(__pos != end(), "Iterator passed to displace() must be dereferenceable");
+        value_type __v = std::move(*const_cast<value_type*>(std::addressof(*__pos)));
+        __tree_.erase(__pos);
+        return __v;
+    }
+
 #if _LIBCPP_STD_VER >= 17
     _LIBCPP_INLINE_VISIBILITY
     insert_return_type insert(node_type&& __nh)
@@ -1301,6 +1309,14 @@ public:
         {return __tree_.erase(__f, __l);}
     _LIBCPP_INLINE_VISIBILITY
     void clear() _NOEXCEPT {__tree_.clear();}
+
+    _LIBCPP_HIDE_FROM_ABI
+    value_type displace(const_iterator __pos) {
+        _LIBCPP_ASSERT(__pos != end(), "Iterator passed to displace() must be dereferenceable");
+        value_type __v = std::move(*const_cast<value_type*>(std::addressof(*__pos)));
+        __tree_.erase(__pos);
+        return __v;
+    }
 
 #if _LIBCPP_STD_VER >= 17
     _LIBCPP_INLINE_VISIBILITY
