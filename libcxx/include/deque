@@ -758,6 +758,14 @@ public:
 
     _LIBCPP_HIDE_FROM_ABI void pop_front();
     _LIBCPP_HIDE_FROM_ABI void pop_back();
+
+    _LIBCPP_HIDE_FROM_ABI void displace_back() {
+        _LIBCPP_ASSERT(!empty(), "deque::displace_back called on an empty deque");
+        value_type __v = std::move(back());
+        pop_back();
+        return __v;
+    }
+
     _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __p);
     _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __f, const_iterator __l);
 
