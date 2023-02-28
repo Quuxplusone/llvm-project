@@ -258,6 +258,7 @@ template <class T, class Container, class Compare>
 #include <__algorithm/pop_heap.h>
 #include <__algorithm/push_heap.h>
 #include <__algorithm/ranges_copy.h>
+#include <__algorithm/sift_down.h>
 #include <__config>
 #include <__functional/operations.h>
 #include <__fwd/deque.h>
@@ -677,6 +678,22 @@ public:
   _LIBCPP_HIDE_FROM_ABI void emplace(_Args&&... __args);
 #endif // _LIBCPP_CXX03_LANG
   _LIBCPP_HIDE_FROM_ABI void pop();
+
+  _LIBCPP_HIDE_FROM_ABI void replace_top(const value_type& __v) {
+    c.front() = __v;
+    std::poke_heap(c.begin(), c.end(), comp);
+  }
+
+#ifndef _LIBCPP_CXX03_LANG
+  _LIBCPP_HIDE_FROM_ABI void replace_top(value_type&& __v) {
+    c.front() = std::move(__v);
+    std::poke_heap(c.begin(), c.end(), comp);
+  }
+  template <class... _Args>
+  _LIBCPP_HIDE_FROM_ABI void reemplace_top(_Args&&... __args) {
+    replace_top(value_type(std::forward<_Args>(__args)...));
+  }
+#endif // _LIBCPP_CXX03_LANG
 
   _LIBCPP_HIDE_FROM_ABI void swap(priority_queue& __q)
       _NOEXCEPT_(__is_nothrow_swappable<container_type>::value&& __is_nothrow_swappable<value_compare>::value);
