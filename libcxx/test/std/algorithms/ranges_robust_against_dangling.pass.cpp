@@ -216,6 +216,7 @@ constexpr bool test_all() {
   }
   dangling_1st(std::ranges::make_heap, in);
   dangling_1st(std::ranges::push_heap, in);
+  dangling_1st(std::ranges::poke_heap, in);
   dangling_1st(std::ranges::pop_heap, in);
   dangling_1st(std::ranges::make_heap, in);
   dangling_1st(std::ranges::sort_heap, in);

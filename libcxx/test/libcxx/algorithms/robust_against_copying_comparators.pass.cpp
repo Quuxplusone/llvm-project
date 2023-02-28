@@ -236,6 +236,8 @@ TEST_CONSTEXPR_CXX20 bool all_the_algorithms() {
   assert(copies == 0);
   (void)std::partition_point(first, last, UnaryTrue<T>(&copies));
   assert(copies == 0);
+  (void)std::poke_heap(first, last, Less<T>(&copies));
+  assert(copies == 0);
   (void)std::pop_heap(first, last, Less<T>(&copies));
   assert(copies == 0);
   (void)std::prev_permutation(first, last, Less<T>(&copies));
