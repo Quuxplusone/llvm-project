@@ -174,6 +174,7 @@ constexpr bool test_all() {
     test_mid(std::ranges::inplace_merge, in, mid, &Foo::binary_pred, &Bar::val);
   test(std::ranges::make_heap, in, &Foo::binary_pred, &Bar::val);
   test(std::ranges::push_heap, in, &Foo::binary_pred, &Bar::val);
+  test(std::ranges::poke_heap, in, &Foo::binary_pred, &Bar::val);
   test(std::ranges::pop_heap, in, &Foo::binary_pred, &Bar::val);
   test(std::ranges::sort_heap, in, &Foo::binary_pred, &Bar::val);
   test(std::ranges::prev_permutation, in, &Foo::binary_pred, &Bar::val);
