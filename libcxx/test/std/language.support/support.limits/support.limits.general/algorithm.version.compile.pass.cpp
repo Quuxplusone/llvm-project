@@ -21,6 +21,7 @@
     __cpp_lib_default_template_type_for_algorithm_values    202403L [C++26]
     __cpp_lib_freestanding_algorithm                        202311L [C++26]
     __cpp_lib_parallel_algorithm                            201603L [C++17]
+    __cpp_lib_priority_queue_replace_top                    201804L [C++14]
     __cpp_lib_ranges                                        202110L [C++20]
                                                             202406L [C++23]
     __cpp_lib_ranges_contains                               202207L [C++23]
@@ -54,6 +55,10 @@
 
 # ifdef __cpp_lib_parallel_algorithm
 #   error "__cpp_lib_parallel_algorithm should not be defined before c++17"
+# endif
+
+# ifdef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should not be defined before c++14"
 # endif
 
 # ifdef __cpp_lib_ranges
@@ -104,6 +109,13 @@
 
 # ifdef __cpp_lib_parallel_algorithm
 #   error "__cpp_lib_parallel_algorithm should not be defined before c++17"
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++14"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++14"
 # endif
 
 # ifdef __cpp_lib_ranges
@@ -169,6 +181,13 @@
 #   ifdef __cpp_lib_parallel_algorithm
 #     error "__cpp_lib_parallel_algorithm should not be defined because it is unimplemented in libc++!"
 #   endif
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++17"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++17"
 # endif
 
 # ifdef __cpp_lib_ranges
@@ -240,6 +259,13 @@
 #   ifdef __cpp_lib_parallel_algorithm
 #     error "__cpp_lib_parallel_algorithm should not be defined because it is unimplemented in libc++!"
 #   endif
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++20"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++20"
 # endif
 
 # ifndef __cpp_lib_ranges
@@ -317,6 +343,13 @@
 #   ifdef __cpp_lib_parallel_algorithm
 #     error "__cpp_lib_parallel_algorithm should not be defined because it is unimplemented in libc++!"
 #   endif
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++23"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++23"
 # endif
 
 # ifndef __cpp_lib_ranges
@@ -421,6 +454,13 @@
 #   ifdef __cpp_lib_parallel_algorithm
 #     error "__cpp_lib_parallel_algorithm should not be defined because it is unimplemented in libc++!"
 #   endif
+# endif
+
+# ifndef __cpp_lib_priority_queue_replace_top
+#   error "__cpp_lib_priority_queue_replace_top should be defined in c++26"
+# endif
+# if __cpp_lib_priority_queue_replace_top != 201804L
+#   error "__cpp_lib_priority_queue_replace_top should have the value 201804L in c++26"
 # endif
 
 # ifndef __cpp_lib_ranges

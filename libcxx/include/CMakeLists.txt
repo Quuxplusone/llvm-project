@@ -134,6 +134,7 @@ set(files
   __algorithm/ranges_partition.h
   __algorithm/ranges_partition_copy.h
   __algorithm/ranges_partition_point.h
+  __algorithm/ranges_poke_heap.h
   __algorithm/ranges_pop_heap.h
   __algorithm/ranges_prev_permutation.h
   __algorithm/ranges_push_heap.h

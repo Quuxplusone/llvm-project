@@ -682,6 +682,10 @@ module std [system] {
     module ranges_partition {
       header "__algorithm/ranges_partition.h"
     }
+    module ranges_poke_heap {
+      header "__algorithm/ranges_poke_heap.h"
+      export std.functional.ranges_operations
+    }
     module ranges_pop_heap {
       header "__algorithm/ranges_pop_heap.h"
       export std.functional.ranges_operations
