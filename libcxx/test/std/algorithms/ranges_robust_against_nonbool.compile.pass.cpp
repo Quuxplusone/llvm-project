@@ -279,6 +279,7 @@ void f(Iterator it, Range in, Iterator out, std::size_t n, Value const& val, std
   }
   in_pred(std::ranges::make_heap, pred2);
   in_pred(std::ranges::push_heap, pred2);
+  in_pred(std::ranges::poke_heap, pred2);
   in_pred(std::ranges::pop_heap, pred2);
   in_pred(std::ranges::sort_heap, pred2);
   in_pred(std::ranges::prev_permutation, pred2);
