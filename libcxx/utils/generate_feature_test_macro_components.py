@@ -1057,6 +1057,13 @@ feature_test_macros = [
             "libcxx_guard": "_LIBCPP_AVAILABILITY_HAS_TO_CHARS_FLOATING_POINT",
         },
         {
+            "name": "__cpp_lib_priority_queue_replace_top",
+            "values": {
+                "c++14": 201804,
+            },
+            "headers": ["algorithm", "queue"],
+        },
+        {
             "name": "__cpp_lib_quoted_string_io",
             "values": {"c++14": 201304},
             "headers": ["iomanip"],
