@@ -201,6 +201,8 @@ TEST_CONSTEXPR_CXX20 bool all_the_algorithms()
     (void)std::partition(first, last, UnaryTrue());
     (void)std::partition_copy(first, last, first2, last2, UnaryTrue());
     (void)std::partition_point(first, last, UnaryTrue());
+    (void)std::poke_heap(first, last);
+    (void)std::poke_heap(first, last, std::less<void*>());
     (void)std::pop_heap(first, last);
     (void)std::pop_heap(first, last, std::less<void*>());
     (void)std::prev_permutation(first, last);
