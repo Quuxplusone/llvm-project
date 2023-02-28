@@ -172,6 +172,8 @@ void test() {
   (void) std::partition_copy(it, it, it, it, pred);
   (void) std::partition_point(it, it, pred);
   (void) std::partition(it, it, pred);
+  (void) std::poke_heap(it, it);
+  (void) std::poke_heap(it, it, pred);
   (void) std::pop_heap(it, it);
   (void) std::pop_heap(it, it, pred);
   (void) std::prev_permutation(it, it);
