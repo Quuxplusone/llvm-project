@@ -678,23 +678,13 @@ public:
     }
 
     _LIBCPP_INLINE_VISIBILITY
-          iterator begin() _NOEXCEPT       {return __tree_.begin();}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator begin() const _NOEXCEPT {return __tree_.begin();}
-    _LIBCPP_INLINE_VISIBILITY
-          iterator end() _NOEXCEPT         {return __tree_.end();}
     _LIBCPP_INLINE_VISIBILITY
     const_iterator end()   const _NOEXCEPT {return __tree_.end();}
 
     _LIBCPP_INLINE_VISIBILITY
-          reverse_iterator rbegin() _NOEXCEPT
-            {return reverse_iterator(end());}
-    _LIBCPP_INLINE_VISIBILITY
     const_reverse_iterator rbegin() const _NOEXCEPT
         {return const_reverse_iterator(end());}
-    _LIBCPP_INLINE_VISIBILITY
-          reverse_iterator rend() _NOEXCEPT
-            {return reverse_iterator(begin());}
     _LIBCPP_INLINE_VISIBILITY
     const_reverse_iterator rend() const _NOEXCEPT
         {return const_reverse_iterator(begin());}
@@ -849,14 +839,8 @@ public:
 
     // set operations:
     _LIBCPP_INLINE_VISIBILITY
-    iterator find(const key_type& __k)             {return __tree_.find(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator find(const key_type& __k) const {return __tree_.find(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    find(const _K2& __k)                           {return __tree_.find(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -883,17 +867,9 @@ public:
 #endif // _LIBCPP_STD_VER >= 20
 
     _LIBCPP_INLINE_VISIBILITY
-    iterator lower_bound(const key_type& __k)
-        {return __tree_.lower_bound(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator lower_bound(const key_type& __k) const
         {return __tree_.lower_bound(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    lower_bound(const _K2& __k)       {return __tree_.lower_bound(__k);}
-
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -901,16 +877,9 @@ public:
 #endif
 
     _LIBCPP_INLINE_VISIBILITY
-    iterator upper_bound(const key_type& __k)
-        {return __tree_.upper_bound(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator upper_bound(const key_type& __k) const
         {return __tree_.upper_bound(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    upper_bound(const _K2& __k)       {return __tree_.upper_bound(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -918,16 +887,9 @@ public:
 #endif
 
     _LIBCPP_INLINE_VISIBILITY
-    pair<iterator,iterator> equal_range(const key_type& __k)
-        {return __tree_.__equal_range_unique(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     pair<const_iterator,const_iterator> equal_range(const key_type& __k) const
         {return __tree_.__equal_range_unique(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,pair<iterator,iterator>>::type
-    equal_range(const _K2& __k)       {return __tree_.__equal_range_multi(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,pair<const_iterator,const_iterator>>::type
@@ -1222,23 +1184,13 @@ public:
     }
 
     _LIBCPP_INLINE_VISIBILITY
-          iterator begin() _NOEXCEPT       {return __tree_.begin();}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator begin() const _NOEXCEPT {return __tree_.begin();}
-    _LIBCPP_INLINE_VISIBILITY
-          iterator end() _NOEXCEPT         {return __tree_.end();}
     _LIBCPP_INLINE_VISIBILITY
     const_iterator end()   const _NOEXCEPT {return __tree_.end();}
 
     _LIBCPP_INLINE_VISIBILITY
-          reverse_iterator rbegin() _NOEXCEPT
-            {return reverse_iterator(end());}
-    _LIBCPP_INLINE_VISIBILITY
     const_reverse_iterator rbegin() const _NOEXCEPT
         {return const_reverse_iterator(end());}
-    _LIBCPP_INLINE_VISIBILITY
-          reverse_iterator rend() _NOEXCEPT
-            {return       reverse_iterator(begin());}
     _LIBCPP_INLINE_VISIBILITY
     const_reverse_iterator rend() const _NOEXCEPT
         {return const_reverse_iterator(begin());}
@@ -1393,14 +1345,8 @@ public:
 
     // set operations:
     _LIBCPP_INLINE_VISIBILITY
-    iterator find(const key_type& __k)             {return __tree_.find(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator find(const key_type& __k) const {return __tree_.find(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    find(const _K2& __k)                           {return __tree_.find(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -1427,17 +1373,9 @@ public:
 #endif // _LIBCPP_STD_VER >= 20
 
     _LIBCPP_INLINE_VISIBILITY
-    iterator lower_bound(const key_type& __k)
-        {return __tree_.lower_bound(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator lower_bound(const key_type& __k) const
             {return __tree_.lower_bound(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    lower_bound(const _K2& __k)       {return __tree_.lower_bound(__k);}
-
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -1445,16 +1383,9 @@ public:
 #endif
 
     _LIBCPP_INLINE_VISIBILITY
-    iterator upper_bound(const key_type& __k)
-            {return __tree_.upper_bound(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     const_iterator upper_bound(const key_type& __k) const
             {return __tree_.upper_bound(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,iterator>::type
-    upper_bound(const _K2& __k)       {return __tree_.upper_bound(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,const_iterator>::type
@@ -1462,16 +1393,9 @@ public:
 #endif
 
     _LIBCPP_INLINE_VISIBILITY
-    pair<iterator,iterator>             equal_range(const key_type& __k)
-            {return __tree_.__equal_range_multi(__k);}
-    _LIBCPP_INLINE_VISIBILITY
     pair<const_iterator,const_iterator> equal_range(const key_type& __k) const
             {return __tree_.__equal_range_multi(__k);}
 #if _LIBCPP_STD_VER >= 14
-    template <typename _K2>
-    _LIBCPP_INLINE_VISIBILITY
-    typename enable_if<__is_transparent<_Compare, _K2>::value,pair<iterator,iterator>>::type
-    equal_range(const _K2& __k)       {return __tree_.__equal_range_multi(__k);}
     template <typename _K2>
     _LIBCPP_INLINE_VISIBILITY
     typename enable_if<__is_transparent<_Compare, _K2>::value,pair<const_iterator,const_iterator>>::type
