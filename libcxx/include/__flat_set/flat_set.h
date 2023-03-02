@@ -879,27 +879,7 @@ public:
   // set operations
 
   _LIBCPP_HIDE_FROM_ABI
-  iterator find(const key_type& __x) {
-    auto __it = lower_bound(__x);
-    if (__it == end() || __compare_(__x, *__it)) {
-      return end();
-    }
-    return __it;
-  }
-
-  _LIBCPP_HIDE_FROM_ABI
   const_iterator find(const key_type& __x) const {
-    auto __it = lower_bound(__x);
-    if (__it == end() || __compare_(__x, *__it)) {
-      return end();
-    }
-    return __it;
-  }
-
-  template <class _K2>
-    requires __is_transparent<_Compare, _K2>::value
-  _LIBCPP_HIDE_FROM_ABI
-  iterator find(const _K2& __x) {
     auto __it = lower_bound(__x);
     if (__it == end() || __compare_(__x, *__it)) {
       return end();
@@ -944,23 +924,7 @@ public:
   }
 
   _LIBCPP_HIDE_FROM_ABI
-  iterator lower_bound(const key_type& __x) {
-    return std::partition_point(begin(), end(), [&](const value_type& __e) {
-      return __compare_(__e, __x);
-    });
-  }
-
-  _LIBCPP_HIDE_FROM_ABI
   const_iterator lower_bound(const key_type& __x) const {
-    return std::partition_point(begin(), end(), [&](const value_type& __e) {
-      return __compare_(__e, __x);
-    });
-  }
-
-  template <class _K2>
-    requires __is_transparent<_Compare, _K2>::value
-  _LIBCPP_HIDE_FROM_ABI
-  iterator lower_bound(const _K2& __x) {
     return std::partition_point(begin(), end(), [&](const value_type& __e) {
       return __compare_(__e, __x);
     });
@@ -976,23 +940,7 @@ public:
   }
 
   _LIBCPP_HIDE_FROM_ABI
-  iterator upper_bound(const key_type& __x) {
-    return std::partition_point(begin(), end(), [&](const value_type& __e) {
-      return !bool(__compare_(__x, __e));
-    });
-  }
-
-  _LIBCPP_HIDE_FROM_ABI
   const_iterator upper_bound(const key_type& __x) const {
-    return std::partition_point(begin(), end(), [&](const value_type& __e) {
-      return !__compare_(__x, __e);
-    });
-  }
-
-  template <class _K2>
-    requires __is_transparent<_Compare, _K2>::value
-  _LIBCPP_HIDE_FROM_ABI
-  iterator upper_bound(const _K2& __x) {
     return std::partition_point(begin(), end(), [&](const value_type& __e) {
       return !__compare_(__x, __e);
     });
@@ -1008,18 +956,6 @@ public:
   }
 
   _LIBCPP_HIDE_FROM_ABI
-  pair<iterator, iterator> equal_range(const key_type& __x) {
-    auto __end = end();
-    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
-      return __compare_(__e, __x);
-    });
-    if (__first == __end || __compare_(__x, *__first)) {
-      return {__first, __first};
-    }
-    return {__first, __first + 1};
-  }
-
-  _LIBCPP_HIDE_FROM_ABI
   pair<const_iterator, const_iterator> equal_range(const key_type& __x) const {
     auto __end = end();
     auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
@@ -1029,20 +965,6 @@ public:
       return {__first, __first};
     }
     return {__first, __first + 1};
-  }
-
-  template <class _K2>
-    requires __is_transparent<_Compare, _K2>::value
-  _LIBCPP_HIDE_FROM_ABI
-  pair<iterator, iterator> equal_range(const _K2& __x) {
-    auto __end = end();
-    auto __first = std::partition_point(begin(), __end, [&](const value_type& __e) {
-      return __compare_(__e, __x);
-    });
-    auto __last = std::partition_point(__first, __end, [&](const value_type& __e) {
-      return !__compare_(__x, __e);
-    });
-    return {__first, __last};
   }
 
   template <class _K2>
