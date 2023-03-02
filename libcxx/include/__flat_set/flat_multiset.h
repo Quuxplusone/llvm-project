@@ -538,17 +538,7 @@ public:
   }
 
   // map operations
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator find(const key_type& __x) {
-    return __find_impl(*this, __x);
-  }
-
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const_iterator find(const key_type& __x) const {
-    return __find_impl(*this, __x);
-  }
-
-  template <class _Kp>
-    requires __is_transparent_v<_Compare>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator find(const _Kp& __x) {
     return __find_impl(*this, __x);
   }
 
@@ -580,11 +570,6 @@ public:
     return find(__x) != end();
   }
 
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator lower_bound(const key_type& __x) {
-    const auto& __keys = __keys_;
-    return iterator(std::lower_bound(__keys.begin(), __keys.end(), __x, __compare_));
-  }
-
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const_iterator
   lower_bound(const key_type& __x) const {
     return const_iterator(std::lower_bound(__keys_.begin(), __keys_.end(), __x, __compare_));
@@ -592,20 +577,8 @@ public:
 
   template <class _Kp>
     requires __is_transparent_v<_Compare>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator lower_bound(const _Kp& __x) {
-    const auto& __keys = __keys_;
-    return iterator(std::lower_bound(__keys.begin(), __keys.end(), __x, __compare_));
-  }
-
-  template <class _Kp>
-    requires __is_transparent_v<_Compare>
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const_iterator lower_bound(const _Kp& __x) const {
     return const_iterator(std::lower_bound(__keys_.begin(), __keys_.end(), __x, __compare_));
-  }
-
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator upper_bound(const key_type& __x) {
-    const auto& __keys = __keys_;
-    return iterator(std::upper_bound(__keys.begin(), __keys.end(), __x, __compare_));
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const_iterator
@@ -615,20 +588,8 @@ public:
 
   template <class _Kp>
     requires __is_transparent_v<_Compare>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator upper_bound(const _Kp& __x) {
-    const auto& __keys = __keys_;
-    return iterator(std::upper_bound(__keys.begin(), __keys.end(), __x, __compare_));
-  }
-
-  template <class _Kp>
-    requires __is_transparent_v<_Compare>
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const_iterator upper_bound(const _Kp& __x) const {
     return const_iterator(std::upper_bound(__keys_.begin(), __keys_.end(), __x, __compare_));
-  }
-
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<iterator, iterator>
-  equal_range(const key_type& __x) {
-    return __equal_range_impl(*this, __x);
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<const_iterator, const_iterator>
@@ -636,12 +597,6 @@ public:
     return __equal_range_impl(*this, __x);
   }
 
-  template <class _Kp>
-    requires __is_transparent_v<_Compare>
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<iterator, iterator>
-  equal_range(const _Kp& __x) {
-    return __equal_range_impl(*this, __x);
-  }
   template <class _Kp>
     requires __is_transparent_v<_Compare>
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<const_iterator, const_iterator>
