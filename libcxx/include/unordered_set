@@ -747,10 +747,6 @@ public:
     size_type max_size() const _NOEXCEPT {return __table_.max_size();}
 
     _LIBCPP_HIDE_FROM_ABI
-    iterator       begin() _NOEXCEPT        {return __table_.begin();}
-    _LIBCPP_HIDE_FROM_ABI
-    iterator       end() _NOEXCEPT          {return __table_.end();}
-    _LIBCPP_HIDE_FROM_ABI
     const_iterator begin()  const _NOEXCEPT {return __table_.begin();}
     _LIBCPP_HIDE_FROM_ABI
     const_iterator end()    const _NOEXCEPT {return __table_.end();}
@@ -887,13 +883,8 @@ public:
     key_equal key_eq() const {return __table_.key_eq();}
 
     _LIBCPP_HIDE_FROM_ABI
-    iterator       find(const key_type& __k)       {return __table_.find(__k);}
-    _LIBCPP_HIDE_FROM_ABI
     const_iterator find(const key_type& __k) const {return __table_.find(__k);}
 #if _LIBCPP_STD_VER >= 20
-    template <class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
-    _LIBCPP_HIDE_FROM_ABI
-    iterator       find(const _K2& __k)            {return __table_.find(__k);}
     template <class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
     _LIBCPP_HIDE_FROM_ABI
     const_iterator find(const _K2& __k) const      {return __table_.find(__k);}
@@ -917,16 +908,9 @@ public:
 #endif // _LIBCPP_STD_VER >= 20
 
     _LIBCPP_HIDE_FROM_ABI
-    pair<iterator, iterator>             equal_range(const key_type& __k)
-        {return __table_.__equal_range_unique(__k);}
-    _LIBCPP_HIDE_FROM_ABI
     pair<const_iterator, const_iterator> equal_range(const key_type& __k) const
         {return __table_.__equal_range_unique(__k);}
 #if _LIBCPP_STD_VER >= 20
-    template <class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
-    _LIBCPP_HIDE_FROM_ABI
-    pair<iterator, iterator>             equal_range(const _K2& __k)
-        {return __table_.__equal_range_unique(__k);}
     template <class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
     _LIBCPP_HIDE_FROM_ABI
     pair<const_iterator, const_iterator> equal_range(const _K2& __k) const
@@ -943,10 +927,6 @@ public:
     _LIBCPP_HIDE_FROM_ABI
     size_type bucket(const key_type& __k) const {return __table_.bucket(__k);}
 
-    _LIBCPP_HIDE_FROM_ABI
-    local_iterator       begin(size_type __n)        {return __table_.begin(__n);}
-    _LIBCPP_HIDE_FROM_ABI
-    local_iterator       end(size_type __n)          {return __table_.end(__n);}
     _LIBCPP_HIDE_FROM_ABI
     const_local_iterator begin(size_type __n) const  {return __table_.cbegin(__n);}
     _LIBCPP_HIDE_FROM_ABI
@@ -1438,10 +1418,6 @@ public:
     size_type max_size() const _NOEXCEPT {return __table_.max_size();}
 
     _LIBCPP_HIDE_FROM_ABI
-    iterator       begin() _NOEXCEPT        {return __table_.begin();}
-    _LIBCPP_HIDE_FROM_ABI
-    iterator       end() _NOEXCEPT          {return __table_.end();}
-    _LIBCPP_HIDE_FROM_ABI
     const_iterator begin()  const _NOEXCEPT {return __table_.begin();}
     _LIBCPP_HIDE_FROM_ABI
     const_iterator end()    const _NOEXCEPT {return __table_.end();}
@@ -1575,13 +1551,8 @@ public:
     key_equal key_eq() const {return __table_.key_eq();}
 
     _LIBCPP_HIDE_FROM_ABI
-    iterator       find(const key_type& __k)       {return __table_.find(__k);}
-    _LIBCPP_HIDE_FROM_ABI
     const_iterator find(const key_type& __k) const {return __table_.find(__k);}
 #if _LIBCPP_STD_VER >= 20
-    template<class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
-    _LIBCPP_HIDE_FROM_ABI
-    iterator       find(const _K2& __k)            {return __table_.find(__k);}
     template<class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
     _LIBCPP_HIDE_FROM_ABI
     const_iterator find(const _K2& __k) const      {return __table_.find(__k);}
@@ -1605,16 +1576,9 @@ public:
 #endif // _LIBCPP_STD_VER >= 20
 
     _LIBCPP_HIDE_FROM_ABI
-    pair<iterator, iterator>             equal_range(const key_type& __k)
-        {return __table_.__equal_range_multi(__k);}
-    _LIBCPP_HIDE_FROM_ABI
     pair<const_iterator, const_iterator> equal_range(const key_type& __k) const
         {return __table_.__equal_range_multi(__k);}
 #if _LIBCPP_STD_VER >= 20
-    template<class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
-    _LIBCPP_HIDE_FROM_ABI
-    pair<iterator, iterator>             equal_range(const _K2& __k)
-        {return __table_.__equal_range_multi(__k);}
     template<class _K2, enable_if_t<__is_transparent<hasher, _K2>::value && __is_transparent<key_equal, _K2>::value>* = nullptr>
     _LIBCPP_HIDE_FROM_ABI
     pair<const_iterator, const_iterator> equal_range(const _K2& __k) const
@@ -1631,10 +1595,6 @@ public:
     _LIBCPP_HIDE_FROM_ABI
     size_type bucket(const key_type& __k) const {return __table_.bucket(__k);}
 
-    _LIBCPP_HIDE_FROM_ABI
-    local_iterator       begin(size_type __n)        {return __table_.begin(__n);}
-    _LIBCPP_HIDE_FROM_ABI
-    local_iterator       end(size_type __n)          {return __table_.end(__n);}
     _LIBCPP_HIDE_FROM_ABI
     const_local_iterator begin(size_type __n) const  {return __table_.cbegin(__n);}
     _LIBCPP_HIDE_FROM_ABI
