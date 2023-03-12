@@ -763,6 +763,14 @@ public:
   _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __f, const_iterator __l) { return __tree_.erase(__f, __l); }
   _LIBCPP_HIDE_FROM_ABI void clear() _NOEXCEPT { __tree_.clear(); }
 
+    _LIBCPP_HIDE_FROM_ABI
+    value_type displace(const_iterator __pos) {
+        _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(__pos != end(), "Iterator passed to displace() must be dereferenceable");
+        value_type __v = std::move(*const_cast<value_type*>(std::addressof(*__pos)));
+        __tree_.erase(__pos);
+        return __v;
+    }
+
 #if _LIBCPP_STD_VER >= 17
   _LIBCPP_HIDE_FROM_ABI insert_return_type insert(node_type&& __nh) {
     _LIBCPP_ASSERT_COMPATIBLE_ALLOCATOR(__nh.empty() || __nh.get_allocator() == get_allocator(),
@@ -1190,6 +1198,14 @@ public:
   _LIBCPP_HIDE_FROM_ABI size_type erase(const key_type& __k) { return __tree_.__erase_multi(__k); }
   _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __f, const_iterator __l) { return __tree_.erase(__f, __l); }
   _LIBCPP_HIDE_FROM_ABI void clear() _NOEXCEPT { __tree_.clear(); }
+
+    _LIBCPP_HIDE_FROM_ABI
+    value_type displace(const_iterator __pos) {
+        _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(__pos != end(), "Iterator passed to displace() must be dereferenceable");
+        value_type __v = std::move(*const_cast<value_type*>(std::addressof(*__pos)));
+        __tree_.erase(__pos);
+        return __v;
+    }
 
 #if _LIBCPP_STD_VER >= 17
   _LIBCPP_HIDE_FROM_ABI iterator insert(node_type&& __nh) {
