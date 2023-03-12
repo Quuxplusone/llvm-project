@@ -1301,6 +1301,7 @@ module std_private_filesystem_recursive_directory_iterator [system] {
 module std_private_filesystem_space_info                   [system] { header "__filesystem/space_info.h" }
 module std_private_filesystem_u8path                       [system] { header "__filesystem/u8path.h" }
 
+module std_private_flat_set_flat_multiset                 [system] { header "__flat_set/flat_multiset.h" }
 module std_private_flat_set_flat_set                      [system] { header "__flat_set/flat_set.h" }
 
 module std_private_format_buffer                          [system] { header "__format/buffer.h" }
