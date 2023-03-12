@@ -21,7 +21,7 @@ export namespace std {
   using std::erase_if;
 
   // [flat.multiset], class template flat_multiset
-  //using std::flat_multiset;
+  using std::flat_multiset;
 
   using std::sorted_equivalent;
   using std::sorted_equivalent_t;
