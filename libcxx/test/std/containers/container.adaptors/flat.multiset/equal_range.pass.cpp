@@ -1,0 +1,85 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+
+// <flat_set>
+
+// pair<iterator,iterator>         equal_range(const key_type& k);
+// pair<const_iterator,const_iterator> equal_range(const key_type& k) const;
+
+#include <cassert>
+#include <deque>
+#include <flat_set>
+#include <functional>
+#include <utility>
+
+#include "test_macros.h"
+#include "min_allocator.h"
+
+int main(int, char**)
+{
+  {
+    using M = std::flat_multiset<int>;
+    using R = std::pair<M::iterator, M::iterator>;
+    using CR = std::pair<M::const_iterator, M::const_iterator>;
+    M m = {1, 1, 2, 4, 4, 5, 8, 8, 8};
+    ASSERT_SAME_TYPE(decltype(m.equal_range(0)), R);
+    ASSERT_SAME_TYPE(decltype(std::as_const(m).equal_range(0)), CR);
+    auto begin = m.begin();
+    assert(m.equal_range(0) == std::pair(begin, begin));
+    assert(m.equal_range(1) == std::pair(begin, begin+2));
+    assert(m.equal_range(2) == std::pair(begin+2, begin+3));
+    assert(m.equal_range(3) == std::pair(begin+3, begin+3));
+    assert(m.equal_range(4) == std::pair(begin+3, begin+5));
+    assert(m.equal_range(5) == std::pair(begin+5, begin+6));
+    assert(m.equal_range(6) == std::pair(begin+6, begin+6));
+    assert(m.equal_range(7) == std::pair(begin+6, begin+6));
+    assert(std::as_const(m).equal_range(8) == std::pair(m.cbegin()+6, m.cbegin()+9));
+    assert(std::as_const(m).equal_range(9) == std::pair(m.cbegin()+9, m.cbegin()+9));
+  }
+  {
+    using M = std::flat_multiset<int, std::greater<int>, std::deque<int, min_allocator<int>>>;
+    using R = std::pair<M::iterator, M::iterator>;
+    using CR = std::pair<M::const_iterator, M::const_iterator>;
+    M m = {1, 1, 2, 4, 4, 5, 8, 8, 8};
+    ASSERT_SAME_TYPE(decltype(m.equal_range(0)), R);
+    ASSERT_SAME_TYPE(decltype(std::as_const(m).equal_range(0)), CR);
+    auto begin = m.begin();
+    assert(m.equal_range(0) == std::pair(begin+9, begin+9));
+    assert(m.equal_range(1) == std::pair(begin+7, begin+9));
+    assert(m.equal_range(2) == std::pair(begin+6, begin+7));
+    assert(m.equal_range(3) == std::pair(begin+6, begin+6));
+    assert(m.equal_range(4) == std::pair(begin+4, begin+6));
+    assert(m.equal_range(5) == std::pair(begin+3, begin+4));
+    assert(m.equal_range(6) == std::pair(begin+3, begin+3));
+    assert(m.equal_range(7) == std::pair(begin+3, begin+3));
+    assert(std::as_const(m).equal_range(8) == std::pair(m.cbegin(), m.cbegin()+3));
+    assert(std::as_const(m).equal_range(9) == std::pair(m.cbegin(), m.cbegin()));
+  }
+  {
+    using M = std::flat_multiset<bool>;
+    using R = std::pair<M::iterator, M::iterator>;
+    using CR = std::pair<M::const_iterator, M::const_iterator>;
+    M m = {true, false};
+    ASSERT_SAME_TYPE(decltype(m.equal_range(0)), R);
+    ASSERT_SAME_TYPE(decltype(std::as_const(m).equal_range(0)), CR);
+    assert(m.equal_range(true) == std::pair(m.begin()+1, m.end()));
+    assert(m.equal_range(false) == std::pair(m.begin(), m.begin()+1));
+    m = {true};
+    assert(m.equal_range(true) == std::pair(m.begin(), m.end()));
+    assert(m.equal_range(false) == std::pair(m.begin(), m.begin()));
+    m = {false};
+    assert(std::as_const(m).equal_range(true) == std::pair(m.cend(), m.cend()));
+    assert(std::as_const(m).equal_range(false) == std::pair(m.cbegin(), m.cend()));
+    m.clear();
+    assert(m.equal_range(true) == std::pair(m.begin(), m.begin()));
+    assert(m.equal_range(false) == std::pair(m.begin(), m.begin()));
+  }
+  return 0;
+}
