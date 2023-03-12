@@ -27,7 +27,7 @@
 #include <exception>
 #include <expected>
 //#include <flat_map>
-//#include <flat_set>
+#include <flat_set>
 #include <forward_list>
 #include <functional>
 #include <future>
@@ -276,10 +276,10 @@ static_assert(std::is_trivially_relocatable_v<std::unexpected<R>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_map<K,bool>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multimap<K,T>>);
 //static_assert(std::is_trivially_relocatable_v<std::flat_multimap<K,bool>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_multiset<K>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_multiset<bool>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_set<K>>);
-//static_assert(std::is_trivially_relocatable_v<std::flat_set<bool>>);
+static_assert(std::is_trivially_relocatable_v<std::flat_multiset<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::flat_multiset<bool>>);
+static_assert(std::is_trivially_relocatable_v<std::flat_set<K>> == NotDebug);
+static_assert(std::is_trivially_relocatable_v<std::flat_set<bool>>);
 static_assert(std::is_trivially_relocatable_v<std::move_only_function<T(T)>>);
 static_assert(std::is_trivially_relocatable_v<std::move_only_function<void()>>);
 #endif
