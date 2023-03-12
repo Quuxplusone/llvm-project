@@ -295,6 +295,7 @@ namespace std {
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_default_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
@@ -338,7 +339,7 @@ __flatset_unique(_FwdIt __first, _FwdIt __last, reference_wrapper<const _Compare
 
 template <class _Key, class _Compare = less<_Key>,
           class _KeyContainer = vector<_Key>>
-class flat_set {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__libcpp_is_trivially_relocatable<_KeyContainer>::value && __libcpp_is_trivially_relocatable<_Compare>::value) flat_set {
   static_assert(is_same_v<_Key, typename _KeyContainer::value_type>);
   static_assert(__is_cpp17_random_access_iterator<typename _KeyContainer::iterator>::value);
   static_assert(__is_cpp17_random_access_iterator<typename _KeyContainer::const_iterator>::value);
