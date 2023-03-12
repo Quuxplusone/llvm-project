@@ -355,6 +355,7 @@ set(files
   __filesystem/recursive_directory_iterator.h
   __filesystem/space_info.h
   __filesystem/u8path.h
+  __flat_set/flat_multiset.h
   __flat_set/flat_set.h
   __format/buffer.h
   __format/concepts.h
