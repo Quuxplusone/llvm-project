@@ -860,6 +860,16 @@ public:
   }
 
   _LIBCPP_HIDE_FROM_ABI
+  value_type displace(const_iterator __pos) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    auto __it = __c_.erase(__pos, __pos);
+    auto __v = std::move(*__it);
+    __c_.erase(__it);
+    __guard.__complete();
+    return __v;
+  }
+
+  _LIBCPP_HIDE_FROM_ABI
   void swap(flat_set& __y) noexcept {
     using std::swap;
     swap(__compare_, __y.__compare_);
