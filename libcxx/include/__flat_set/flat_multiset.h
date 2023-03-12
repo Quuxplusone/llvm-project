@@ -299,6 +299,7 @@ namespace std {
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_default_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/exception_guard.h>
 #include <__utility/forward.h>
@@ -317,7 +318,10 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Key, class _Compare = less<_Key>,
           class _KeyContainer = vector<_Key>>
-class flat_multiset {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(
+  __libcpp_is_trivially_relocatable<_KeyContainer>::value &&
+  __libcpp_is_trivially_relocatable<_Compare>::value
+) flat_multiset {
   static_assert(is_same_v<_Key, typename _KeyContainer::value_type>);
   static_assert(__has_random_access_iterator_category<typename _KeyContainer::iterator>::value);
   static_assert(__has_random_access_iterator_category<typename _KeyContainer::const_iterator>::value);
