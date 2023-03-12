@@ -90,6 +90,7 @@ set(files
   __algorithm/ranges_copy_n.h
   __algorithm/ranges_count.h
   __algorithm/ranges_count_if.h
+  __algorithm/ranges_displace_heap.h
   __algorithm/ranges_ends_with.h
   __algorithm/ranges_equal.h
   __algorithm/ranges_equal_range.h
@@ -144,6 +145,7 @@ set(files
   __algorithm/ranges_remove.h
   __algorithm/ranges_remove_copy.h
   __algorithm/ranges_remove_copy_if.h
+  __algorithm/ranges_remove_heap.h
   __algorithm/ranges_remove_if.h
   __algorithm/ranges_replace.h
   __algorithm/ranges_replace_copy.h

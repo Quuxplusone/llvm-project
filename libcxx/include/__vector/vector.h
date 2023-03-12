@@ -38,6 +38,7 @@
 #include <__memory/compressed_pair.h>
 #include <__memory/noexcept_move_assign_container.h>
 #include <__memory/pointer_traits.h>
+#include <__memory/relocate_at.h>
 #include <__memory/swap_allocator.h>
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
@@ -522,6 +523,38 @@ public:
   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void pop_back() {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(!empty(), "vector::pop_back called on an empty vector");
     this->__destruct_at_end(__layout_.__end_ptr() - 1);
+  }
+
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI value_type displace(const_iterator __pos) {
+    _LIBCPP_ASSERT_UNCATEGORIZED(__pos != end(),
+        "vector::displace(iterator) called with a non-dereferenceable iterator");
+    if (!__libcpp_is_constant_evaluated()) {
+      pointer __p = this->__layout_.__begin_ptr() + (__pos - begin());
+      value_type __v = std::relocate(std::addressof(*__p));
+      pointer __endp = this->__layout_.__end_ptr();
+      std::uninitialized_relocate(__p + 1, __endp, __p);
+      this->__layout_.__set_bound_using_pointer(__endp - 1);
+      __annotate_shrink(size() + 1);
+      return __v;
+    } else {
+      pointer __p = this->__layout_.__begin_ptr() + (__pos - begin());
+      value_type __v = std::move(*__p);
+      erase(__pos);
+      return __v;
+    }
+  }
+
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI value_type displace_back() {
+    if (!__libcpp_is_constant_evaluated()) {
+      value_type __v = std::relocate(std::addressof(back()));
+      this->__layout_.__set_bound_using_pointer(this->__layout_.__end_ptr() - 1);
+      __annotate_shrink(size() + 1);
+      return __v;
+    } else {
+      value_type __v = std::move(back());
+      pop_back();
+      return __v;
+    }
   }
 
   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI iterator insert(const_iterator __position, const_reference __x);
