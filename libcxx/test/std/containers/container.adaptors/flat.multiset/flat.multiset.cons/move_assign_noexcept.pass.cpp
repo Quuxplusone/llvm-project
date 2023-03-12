@@ -1,0 +1,76 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+
+// <flat_set>
+
+// flat_multiset& operator=(flat_multiset&& c)
+//     noexcept(
+//          is_nothrow_move_assignable<container_type>::value &&
+//          is_nothrow_copy_assignable<key_compare>::value);
+
+// This tests a conforming extension
+
+#include <flat_set>
+#include <functional>
+#include <memory_resource>
+#include <type_traits>
+#include <vector>
+
+#include "MoveOnly.h"
+#include "test_allocator.h"
+#include "test_macros.h"
+
+struct MoveSensitiveComp {
+  MoveSensitiveComp() noexcept(false) = default;
+  MoveSensitiveComp(const MoveSensitiveComp&) noexcept(false) = default;
+  MoveSensitiveComp(MoveSensitiveComp&& rhs) { rhs.is_moved_from_ = true; }
+  MoveSensitiveComp& operator=(const MoveSensitiveComp&) noexcept = default;
+  MoveSensitiveComp& operator=(MoveSensitiveComp&& rhs) { rhs.is_moved_from_ = true; return *this; }
+  bool operator()(const auto&, const auto&) const { return false; }
+  bool is_moved_from_ = false;
+};
+
+int main(int, char**)
+{
+  {
+    using C = std::flat_multiset<int>;
+    LIBCPP_STATIC_ASSERT(std::is_nothrow_move_assignable_v<C>);
+  }
+  {
+    using C = std::flat_multiset<MoveOnly, std::less<MoveOnly>, std::vector<MoveOnly, test_allocator<MoveOnly>>>;
+    static_assert(!std::is_nothrow_move_assignable_v<C>);
+  }
+  {
+    using C = std::flat_multiset<MoveOnly, std::less<MoveOnly>, std::vector<MoveOnly, other_allocator<MoveOnly>>>;
+    LIBCPP_STATIC_ASSERT(std::is_nothrow_move_assignable_v<C>);
+  }
+  {
+    // Test with a comparator that throws on copy-assignment.
+    using C = std::flat_multiset<int, std::function<bool(int,int)>>;
+    LIBCPP_STATIC_ASSERT(!std::is_nothrow_move_assignable_v<C>);
+  }
+  {
+    // Test with a container that throws on move-assignment.
+    using C = std::flat_multiset<int, std::less<int>, std::pmr::vector<int>>;
+    static_assert(!std::is_nothrow_move_assignable_v<C>);
+  }
+  {
+    // Moving the flat_multiset copies the comparator (to support std::function comparators)
+    using C = std::flat_multiset<int, MoveSensitiveComp>;
+    LIBCPP_STATIC_ASSERT(std::is_nothrow_move_assignable_v<C>);
+    C c;
+    assert(!c.key_comp().is_moved_from_);
+    C d;
+    d = std::move(c);
+    LIBCPP_ASSERT(!c.key_comp().is_moved_from_);
+    assert(!d.key_comp().is_moved_from_);
+  }
+  return 0;
+}
