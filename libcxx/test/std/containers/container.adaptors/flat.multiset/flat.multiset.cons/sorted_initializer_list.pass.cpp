@@ -1,0 +1,89 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+
+// <flat_set>
+
+// flat_multiset(sorted_equivalent_t, initializer_list<value_type> il, const key_compare& comp = key_compare());
+// template<class Alloc> flat_multiset(sorted_equivalent_t, initializer_list<value_type> il, const Alloc& a);
+
+#include <cassert>
+#include <deque>
+#include <flat_set>
+#include <functional>
+#include <memory_resource>
+#include <type_traits>
+#include <vector>
+
+#include "test_macros.h"
+#include "min_allocator.h"
+
+struct DefaultCtableComp {
+  explicit DefaultCtableComp() { default_constructed_ = true; }
+  bool operator()(int, int) const { return false; }
+  bool default_constructed_ = false;
+};
+
+int main(int, char**)
+{
+  int expected[] = {1,3,3,5};
+  {
+    using M = std::flat_multiset<int>;
+    M m = M(std::sorted_equivalent, {1,3,3,5});
+    assert(m.size() == 4);
+    assert(std::equal(m.begin(), m.end(), expected, expected+4));
+  }
+  {
+    using M = std::flat_multiset<int, std::greater<int>, std::deque<int, min_allocator<int>>>;
+    M m = M(std::sorted_equivalent, {5,3,3,1});
+    assert(m.size() == 4);
+    assert(std::equal(m.rbegin(), m.rend(), expected, expected+4));
+  }
+  {
+    using M = std::flat_multiset<int, std::greater<int>, std::deque<int, min_allocator<int>>>;
+    std::initializer_list<int> il = {5,3,3,1};
+    M m = M(std::sorted_equivalent, il);
+    assert(m.size() == 4);
+    assert(std::equal(m.rbegin(), m.rend(), expected, expected+4));
+  }
+  {
+    using M = std::flat_multiset<short>;
+    M m = M(std::sorted_equivalent, {1,3,3,5}); // ints implicitly converted to shorts
+    assert(m.size() == 4);
+    assert(std::equal(m.begin(), m.end(), expected, expected+4));
+    static_assert( std::is_constructible_v<M, std::initializer_list<short>>);
+    static_assert( std::is_constructible_v<M, std::initializer_list<short>, std::allocator<int>>);
+    static_assert(!std::is_constructible_v<M, std::initializer_list<int>>);
+    static_assert(!std::is_constructible_v<M, std::initializer_list<int>, std::allocator<int>>);
+  }
+  {
+    using A = explicit_allocator<int>;
+    {
+      using M = std::flat_multiset<int, DefaultCtableComp, std::vector<int, A>>;
+      M m = M(std::sorted_equivalent, {42,42});
+      assert((m == M{42,42}));
+      assert(m.key_comp().default_constructed_);
+    }
+    {
+      A a;
+      std::flat_multiset<int, std::greater<int>, std::deque<int, A>> m(std::sorted_equivalent, {5,3,3,1}, a);
+      assert(std::equal(m.rbegin(), m.rend(), expected, expected+4));
+    }
+  }
+  {
+    using M = std::flat_multiset<int, std::less<int>, std::pmr::vector<int>>;
+    std::pmr::monotonic_buffer_resource mr;
+    std::pmr::vector<M> vm(&mr);
+    std::initializer_list<int> il = {1,3,4,4};
+    vm.emplace_back(std::sorted_equivalent, il);
+    assert((vm[0] == M{1,3,4,4}));
+    assert(std::move(vm[0]).extract().get_allocator().resource() == &mr);
+  }
+  return 0;
+}
