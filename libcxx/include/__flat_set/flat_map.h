@@ -378,6 +378,7 @@ namespace std {
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_default_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
 #include <__utility/arrow_proxy.h>
 #include <__utility/exception_guard.h>
@@ -536,7 +537,11 @@ private:
 
 template <class _Key, class _Tp, class _Compare = less<_Key>,
           class _KeyContainer = vector<_Key>, class _MappedContainer = vector<_Tp>>
-class flat_map {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(
+  __libcpp_is_trivially_relocatable<_KeyContainer>::value &&
+  __libcpp_is_trivially_relocatable<_MappedContainer>::value &&
+  __libcpp_is_trivially_relocatable<_Compare>::value
+) flat_map {
   static_assert(is_same_v<_Key, typename _KeyContainer::value_type>);
   static_assert(is_same_v<_Tp, typename _MappedContainer::value_type>);
   static_assert(__has_random_access_iterator_category<typename _KeyContainer::iterator>::value);
