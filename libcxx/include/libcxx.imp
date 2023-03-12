@@ -366,6 +366,7 @@
   { include: [ "<__filesystem/recursive_directory_iterator.h>", "private", "<filesystem>", "public" ] },
   { include: [ "<__filesystem/space_info.h>", "private", "<filesystem>", "public" ] },
   { include: [ "<__filesystem/u8path.h>", "private", "<filesystem>", "public" ] },
+  { include: [ "<__flat_set/flat_multiset.h>", "private", "<flat_set>", "public" ] },
   { include: [ "<__flat_set/flat_set.h>", "private", "<flat_set>", "public" ] },
   { include: [ "<__format/buffer.h>", "private", "<format>", "public" ] },
   { include: [ "<__format/concepts.h>", "private", "<format>", "public" ] },
