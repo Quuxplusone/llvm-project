@@ -1237,6 +1237,7 @@ module std [system] {
   }
 
   module flat_set {
+    module flat_multiset         { header "__flat_set/flat_multiset.h" }
     module flat_set              { header "__flat_set/flat_set.h" }
     module sorted_equivalent     { header "__utility/sorted_equivalent.h" }
     module sorted_unique         { header "__utility/sorted_unique.h" }
