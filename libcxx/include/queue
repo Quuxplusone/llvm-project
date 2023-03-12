@@ -791,6 +791,11 @@ public:
     }
 #endif // _LIBCPP_CXX03_LANG
 
+    _LIBCPP_HIDE_FROM_ABI value_type displace_top() {
+      std::pop_heap(c.begin(), c.end(), comp);
+      return c.displace_back();
+    }
+
     _LIBCPP_INLINE_VISIBILITY
     void swap(priority_queue& __q)
         _NOEXCEPT_(__is_nothrow_swappable<container_type>::value &&
