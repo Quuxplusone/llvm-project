@@ -330,6 +330,7 @@ template<class T, class charT> requires is-vector-bool-reference<T> // Since C++
 #include <__memory/allocate_at_least.h>
 #include <__memory/allocator_traits.h>
 #include <__memory/pointer_traits.h>
+#include <__memory/relocate_at.h>
 #include <__memory/swap_allocator.h>
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
@@ -748,6 +749,37 @@ public:
 
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __position);
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __first, const_iterator __last);
+
+    _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI value_type displace(const_iterator __pos) {
+        _LIBCPP_ASSERT_UNCATEGORIZED(__pos != end(),
+            "vector::displace(iterator) called with a non-dereferenceable iterator");
+        if (!__libcpp_is_constant_evaluated()) {
+            pointer __p = __begin_ + (__pos - begin());
+            value_type __v = std::relocate(std::addressof(*__p));
+            std::uninitialized_relocate(__p + 1, __end_, __p);
+            --__end_;
+            __annotate_shrink(size() + 1);
+            return __v;
+        } else {
+            pointer __p = __begin_ + (__pos - begin());
+            value_type __v = std::move(*__p);
+            erase(__pos);
+            return __v;
+        }
+    }
+
+    _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI value_type displace_back() {
+        if (!__libcpp_is_constant_evaluated()) {
+            value_type __v = std::relocate(std::addressof(back()));
+            --__end_;
+            __annotate_shrink(size() + 1);
+            return __v;
+        } else {
+            value_type __v = std::move(back());
+            pop_back();
+            return __v;
+        }
+    }
 
     _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI
     void clear() _NOEXCEPT
