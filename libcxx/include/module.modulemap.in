@@ -535,6 +535,7 @@ module std [system] {
     }
     module ranges_count_if                        { header "__algorithm/ranges_count_if.h" }
     module ranges_count                           { header "__algorithm/ranges_count.h" }
+    module ranges_displace_heap                   { header "__algorithm/ranges_displace_heap.h" }
     module ranges_ends_with                       { header "__algorithm/ranges_ends_with.h" }
     module ranges_equal_range {
       header "__algorithm/ranges_equal_range.h"
@@ -723,6 +724,10 @@ module std [system] {
     }
     module ranges_remove_if {
       header "__algorithm/ranges_remove_if.h"
+    }
+    module ranges_remove_heap {
+      header "__algorithm/ranges_remove_heap.h"
+      export std.functional.ranges_operations
     }
     module ranges_remove {
       header "__algorithm/ranges_remove.h"

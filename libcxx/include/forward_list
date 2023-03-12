@@ -814,6 +814,13 @@ public:
 
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI void pop_front();
 
+  [[__nodiscard__]] _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI value_type displace_front() {
+    _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(!empty(), "forward_list::displace_front called on an empty list");
+    value_type __v = std::move(front());
+    pop_front();
+    return __v;
+  }
+
 #  ifndef _LIBCPP_CXX03_LANG
   template <class... _Args>
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI iterator emplace_after(const_iterator __p, _Args&&... __args);
@@ -847,6 +854,15 @@ public:
 
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI iterator erase_after(const_iterator __p);
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI iterator erase_after(const_iterator __f, const_iterator __l);
+
+  [[__nodiscard__]] _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI value_type displace_after(const_iterator __f) {
+    __begin_node_pointer __p = __f.__ptr_;
+    __node_pointer __n       = __p->__next_;
+    __p->__next_             = __n->__next_;
+    value_type __value = std::move(__n->__get_value());
+    this->__delete_node(__n);
+    return __value;
+  }
 
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI void swap(forward_list& __x)
 #  if _LIBCPP_STD_VER >= 14

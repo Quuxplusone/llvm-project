@@ -31,6 +31,7 @@
 #include <__fwd/vector.h>
 #include <__iterator/concepts.h>
 #include <__iterator/iterator_traits.h>
+#include <__iterator/iter_move.h>
 #include <__iterator/prev.h>
 #include <__iterator/reverse_iterator.h>
 #include <__memory/allocator_traits.h>
@@ -516,6 +517,18 @@ public:
     auto __key_it     = __keys_.erase(__first.__base(), __last.__base());
     __on_failure.__complete();
     return iterator(std::move(__key_it));
+  }
+
+  [[__nodiscard__]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26
+  value_type displace(const_iterator __pos) {
+    auto __key_it = __keys_.erase(__pos.__base(), __pos.__base()); // convert to mutable iterator
+    auto __on_failure = std::__make_exception_guard([&]() noexcept {
+      clear() /* noexcept */;
+    });
+    value_type __v = ranges::iter_move(__key_it);
+    __keys_.erase(__key_it);
+    __on_failure.__complete();
+    return __v;
   }
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 void

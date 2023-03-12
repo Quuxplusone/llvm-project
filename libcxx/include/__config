@@ -327,6 +327,10 @@ typedef __char32_t char32_t;
 #    define _LIBCPP_TRIVIALLY_RELOCATABLE
 #  endif // defined(_LIBCPP_TRIVIALLY_RELOCATABLE_IF)
 
+#  ifndef _LIBCPP_DISPLACE_TOP_USE_DISPLACE_BACK
+#    define _LIBCPP_DISPLACE_TOP_USE_DISPLACE_BACK 0
+#  endif
+
 // clang-format off
 #  define _LIBCPP_PUSH_MACROS _Pragma("push_macro(\"min\")") _Pragma("push_macro(\"max\")") _Pragma("push_macro(\"refresh\")") _Pragma("push_macro(\"move\")") _Pragma("push_macro(\"erase\")")
 #  define _LIBCPP_POP_MACROS _Pragma("pop_macro(\"min\")") _Pragma("pop_macro(\"max\")") _Pragma("pop_macro(\"refresh\")") _Pragma("pop_macro(\"move\")") _Pragma("pop_macro(\"erase\")")

@@ -929,6 +929,20 @@ public:
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI void pop_front();
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI void pop_back();
 
+  [[__nodiscard__]] _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI value_type displace_front() {
+    _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(!empty(), "list::displace_front called on an empty list");
+    value_type __v = std::move(front());
+    pop_front();
+    return __v;
+  }
+
+  [[__nodiscard__]] _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI value_type displace_back() {
+    _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(!empty(), "list::displace_back called on an empty list");
+    value_type __v = std::move(back());
+    pop_back();
+    return __v;
+  }
+
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __p);
   _LIBCPP_CONSTEXPR_SINCE_CXX26 _LIBCPP_HIDE_FROM_ABI iterator erase(const_iterator __f, const_iterator __l);
 
