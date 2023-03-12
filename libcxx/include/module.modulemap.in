@@ -892,6 +892,7 @@ module std [system] {
     export *
 
     module __flat_set {
+      module flat_multiset                { private header "__flat_set/flat_multiset.h" }
       module flat_set                     { private header "__flat_set/flat_set.h" }
     }
   }

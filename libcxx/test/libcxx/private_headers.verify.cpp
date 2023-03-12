@@ -367,6 +367,8 @@ END-SCRIPT
 #include <__filesystem/recursive_directory_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/recursive_directory_iterator.h'}}
 #include <__filesystem/space_info.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/space_info.h'}}
 #include <__filesystem/u8path.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/u8path.h'}}
+#include <__flat_set/flat_multiset.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_multiset.h'}}
+#include <__flat_set/flat_set.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_set.h'}}
 #include <__format/buffer.h> // expected-error@*:* {{use of private header from outside its module: '__format/buffer.h'}}
 #include <__format/concepts.h> // expected-error@*:* {{use of private header from outside its module: '__format/concepts.h'}}
 #include <__format/container_adaptor.h> // expected-error@*:* {{use of private header from outside its module: '__format/container_adaptor.h'}}
