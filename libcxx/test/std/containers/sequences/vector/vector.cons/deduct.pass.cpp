@@ -6,8 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <vector>
 // UNSUPPORTED: c++03, c++11, c++14
+
+// <vector>
 
 // template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
 //    vector(InputIterator, InputIterator, Allocator = Allocator())
@@ -15,11 +16,11 @@
 //
 
 #include <vector>
+#include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <climits> // INT_MAX
 #include <iterator>
-#include <type_traits>
+#include <memory>
 
 #include "deduction_guides_sfinae_checks.h"
 #include "test_macros.h"
@@ -29,126 +30,99 @@
 struct A {};
 
 TEST_CONSTEXPR_CXX20 bool tests() {
-
-//  Test the explicit deduction guides
-    {
-    const int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  {
+    const int arr[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     std::vector vec(std::begin(arr), std::end(arr));
-
-    static_assert(std::is_same_v<decltype(vec), std::vector<int>>, "");
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<int>);
     assert(std::equal(vec.begin(), vec.end(), std::begin(arr), std::end(arr)));
-    }
-
-    {
-    const long arr[] = {INT_MAX, 1L, 2L, 3L };
+  }
+  {
+    const long arr[] = { INT_MAX, 1L, 2L, 3L };
     std::vector vec(std::begin(arr), std::end(arr), std::allocator<long>());
-    static_assert(std::is_same_v<decltype(vec)::value_type, long>, "");
-    assert(vec.size() == 4);
-    assert(vec[0] == INT_MAX);
-    assert(vec[1] == 1L);
-    assert(vec[2] == 2L);
-    }
-
-//  Test the implicit deduction guides
-
-    {
-//  We don't expect this one to work.
-//  std::vector vec(std::allocator<int>()); // vector (allocator &)
-    }
-
-    {
-    std::vector vec(1, A{}); // vector (size_type, T)
-    static_assert(std::is_same_v<decltype(vec)::value_type, A>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, std::allocator<A>>, "");
-    assert(vec.size() == 1);
-    }
-
-    {
-    std::vector vec(1, A{}, test_allocator<A>()); // vector (size_type, T, allocator)
-    static_assert(std::is_same_v<decltype(vec)::value_type, A>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, test_allocator<A>>, "");
-    assert(vec.size() == 1);
-    }
-
-    {
-    std::vector vec{1U, 2U, 3U, 4U, 5U}; // vector(initializer-list)
-    static_assert(std::is_same_v<decltype(vec)::value_type, unsigned>, "");
-    assert(vec.size() == 5);
-    assert(vec[2] == 3U);
-    }
-
-    {
-    std::vector vec({1.0, 2.0, 3.0, 4.0}, test_allocator<double>()); // vector(initializer-list, allocator)
-    static_assert(std::is_same_v<decltype(vec)::value_type, double>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, test_allocator<double>>, "");
-    assert(vec.size() == 4);
-    assert(vec[3] == 4.0);
-    }
-
-    {
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<long>);
+    assert((vec == std::vector<long>{INT_MAX,1,2,3}));
+  }
+  {
+    std::vector vec(42, A{}); // (Count, T)
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<A>);
+    assert(vec.size() == 42);
+  }
+  {
+    std::vector vec(42, std::allocator<int>()); // (Count, T) again!
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<std::allocator<int>>);
+    assert(vec.size() == 42);
+  }
+  {
+    std::vector vec(42, A{}, test_allocator<A>(0, 43)); // (Count, T, Alloc)
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<A, test_allocator<A>>);
+    assert(vec.size() == 42);
+    assert(vec.get_allocator().get_id() == 43);
+  }
+  {
+    std::vector vec = {1u, 2u, 3u, 4u, 5u}; // (initializer-list)
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<unsigned>);
+    assert((vec == std::vector<unsigned>{1,2,3,4,5}));
+  }
+  {
+    std::vector vec({1.0, 2.0, 3.0, 4.0}, test_allocator<double>(0, 42)); // (initializer-list, Alloc)
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<double, test_allocator<double>>);
+    assert((vec == decltype(vec){1,2,3,4}));
+    assert(vec.get_allocator().get_id() == 42);
+  }
+  {
     std::vector<long double> source;
-    std::vector vec(source); // vector(vector &)
-    static_assert(std::is_same_v<decltype(vec)::value_type, long double>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, std::allocator<long double>>, "");
+    std::vector vec(source); // copy ctor
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<long double>);
     assert(vec.size() == 0);
-    }
+  }
 
-
-//  A couple of vector<bool> tests, too!
-    {
-    std::vector vec(3, true); // vector(initializer-list)
-    static_assert(std::is_same_v<decltype(vec)::value_type, bool>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, std::allocator<bool>>, "");
+  // A couple of vector<bool> tests, too!
+  {
+    std::vector vec(3, true); // (Count, T)
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<bool>);
     assert(vec.size() == 3);
     assert(vec[0] && vec[1] && vec[2]);
-    }
-
-    {
+  }
+  {
     std::vector<bool> source;
-    std::vector vec(source); // vector(vector &)
-    static_assert(std::is_same_v<decltype(vec)::value_type, bool>, "");
-    static_assert(std::is_same_v<decltype(vec)::allocator_type, std::allocator<bool>>, "");
+    std::vector vec(source); // copy ctor
+    ASSERT_SAME_TYPE(decltype(vec), std::vector<bool>);
     assert(vec.size() == 0);
-    }
-
+  }
+  {
+    typedef test_allocator<short> Alloc;
+    typedef test_allocator<int> ConvertibleToAlloc;
     {
-        typedef test_allocator<short> Alloc;
-        typedef test_allocator<int> ConvertibleToAlloc;
-
-        {
-        std::vector<short, Alloc> source;
-        std::vector vec(source, Alloc(2));
-        static_assert(std::is_same_v<decltype(vec), decltype(source)>);
-        }
-
-        {
-        std::vector<short, Alloc> source;
-        std::vector vec(source, ConvertibleToAlloc(2));
-        static_assert(std::is_same_v<decltype(vec), decltype(source)>);
-        }
-
-        {
-        std::vector<short, Alloc> source;
-        std::vector vec(std::move(source), Alloc(2));
-        static_assert(std::is_same_v<decltype(vec), decltype(source)>);
-        }
-
-        {
-        std::vector<short, Alloc> source;
-        std::vector vec(std::move(source), ConvertibleToAlloc(2));
-        static_assert(std::is_same_v<decltype(vec), decltype(source)>);
-        }
+      std::vector<short, Alloc> source;
+      std::vector vec(source, Alloc(2));
+      static_assert(std::is_same_v<decltype(vec), decltype(source)>);
     }
+    {
+      std::vector<short, Alloc> source;
+      std::vector vec(source, ConvertibleToAlloc(2));
+      static_assert(std::is_same_v<decltype(vec), decltype(source)>);
+    }
+    {
+      std::vector<short, Alloc> source;
+      std::vector vec(std::move(source), Alloc(2));
+      static_assert(std::is_same_v<decltype(vec), decltype(source)>);
+    }
+    {
+      std::vector<short, Alloc> source;
+      std::vector vec(std::move(source), ConvertibleToAlloc(2));
+      static_assert(std::is_same_v<decltype(vec), decltype(source)>);
+    }
+  }
 
-    SequenceContainerDeductionGuidesSfinaeAway<std::vector, std::vector<int>>();
+  SequenceContainerDeductionGuidesSfinaeAway<std::vector, std::vector<int>>();
 
-    return true;
+  return true;
 }
 
 int main(int, char**) {
-    tests();
+  tests();
 #if TEST_STD_VER > 17
-    static_assert(tests());
+  static_assert(tests());
 #endif
-    return 0;
+  return 0;
 }
