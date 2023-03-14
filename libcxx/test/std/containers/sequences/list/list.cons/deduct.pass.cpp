@@ -6,8 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <list>
 // UNSUPPORTED: c++03, c++11, c++14
+
+// <list>
 
 // template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
 //    list(InputIterator, InputIterator, Allocator = Allocator())
@@ -15,10 +16,11 @@
 //
 
 #include <list>
-#include <iterator>
+#include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <climits> // INT_MAX
+#include <iterator>
+#include <memory>
 
 #include "deduction_guides_sfinae_checks.h"
 #include "test_macros.h"
@@ -27,107 +29,83 @@
 
 struct A {};
 
-int main(int, char**)
-{
-
-//  Test the explicit deduction guides
-    {
-    const int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+bool tests() {
+  {
+    const int arr[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     std::list lst(std::begin(arr), std::end(arr));
-
-    static_assert(std::is_same_v<decltype(lst), std::list<int>>, "");
+    ASSERT_SAME_TYPE(decltype(lst), std::list<int>);
     assert(std::equal(lst.begin(), lst.end(), std::begin(arr), std::end(arr)));
-    }
-
-    {
-    const long arr[] = {INT_MAX, 1L, 2L, 3L };
+  }
+  {
+    const long arr[] = { INT_MAX, 1L, 2L, 3L };
     std::list lst(std::begin(arr), std::end(arr), std::allocator<long>());
-    static_assert(std::is_same_v<decltype(lst)::value_type, long>, "");
-    assert(lst.size() == 4);
-    auto it = lst.begin();
-    assert(*it++ == INT_MAX);
-    assert(*it++ == 1L);
-    assert(*it++ == 2L);
-    }
-
-//  Test the implicit deduction guides
-
-    {
-//  We don't expect this one to work.
-//  std::list lst(std::allocator<int>()); // list (allocator &)
-    }
-
-    {
-    std::list lst(1, A{}); // list (size_type, T)
-    static_assert(std::is_same_v<decltype(lst)::value_type, A>, "");
-    static_assert(std::is_same_v<decltype(lst)::allocator_type, std::allocator<A>>, "");
-    assert(lst.size() == 1);
-    }
-
-    {
-    std::list lst(1, A{}, test_allocator<A>()); // list (size_type, T, allocator)
-    static_assert(std::is_same_v<decltype(lst)::value_type, A>, "");
-    static_assert(std::is_same_v<decltype(lst)::allocator_type, test_allocator<A>>, "");
-    assert(lst.size() == 1);
-    }
-
-    {
-    std::list lst{1U, 2U, 3U, 4U, 5U}; // list(initializer-list)
-    static_assert(std::is_same_v<decltype(lst)::value_type, unsigned>, "");
-    assert(lst.size() == 5);
-    auto it = lst.begin();
-    std::advance(it, 2);
-    assert(*it == 3U);
-    }
-
-    {
-    std::list lst({1.0, 2.0, 3.0, 4.0}, test_allocator<double>()); // list(initializer-list, allocator)
-    static_assert(std::is_same_v<decltype(lst)::value_type, double>, "");
-    static_assert(std::is_same_v<decltype(lst)::allocator_type, test_allocator<double>>, "");
-    assert(lst.size() == 4);
-    auto it = lst.begin();
-    std::advance(it, 3);
-    assert(*it == 4.0);
-    }
-
-    {
+    ASSERT_SAME_TYPE(decltype(lst), std::list<long>);
+    assert((lst == std::list<long>{INT_MAX,1,2,3}));
+  }
+  {
+    std::list lst(42, A{}); // (Count, T)
+    ASSERT_SAME_TYPE(decltype(lst), std::list<A>);
+    assert(lst.size() == 42);
+  }
+  {
+    std::list lst(42, std::allocator<int>()); // (Count, T) again!
+    ASSERT_SAME_TYPE(decltype(lst), std::list<std::allocator<int>>);
+    assert(lst.size() == 42);
+  }
+  {
+    std::list lst(42, A{}, test_allocator<A>(0, 43)); // (Count, T, Alloc)
+    ASSERT_SAME_TYPE(decltype(lst), std::list<A, test_allocator<A>>);
+    assert(lst.size() == 42);
+    assert(lst.get_allocator().get_id() == 43);
+  }
+  {
+    std::list lst = {1u, 2u, 3u, 4u, 5u}; // (initializer-list)
+    ASSERT_SAME_TYPE(decltype(lst), std::list<unsigned>);
+    assert((lst == std::list<unsigned>{1,2,3,4,5}));
+  }
+  {
+    std::list lst({1.0, 2.0, 3.0, 4.0}, test_allocator<double>(0, 42)); // (initializer-list, Alloc)
+    ASSERT_SAME_TYPE(decltype(lst), std::list<double, test_allocator<double>>);
+    assert((lst == decltype(lst){1,2,3,4}));
+    assert(lst.get_allocator().get_id() == 42);
+  }
+  {
     std::list<long double> source;
-    std::list lst(source); // list(list &)
-    static_assert(std::is_same_v<decltype(lst)::value_type, long double>, "");
-    static_assert(std::is_same_v<decltype(lst)::allocator_type, std::allocator<long double>>, "");
+    std::list lst(source); // copy ctor
+    ASSERT_SAME_TYPE(decltype(lst), std::list<long double>);
     assert(lst.size() == 0);
-    }
-
+  }
+  {
+    typedef test_allocator<short> Alloc;
+    typedef test_allocator<int> ConvertibleToAlloc;
     {
-        typedef test_allocator<short> Alloc;
-        typedef test_allocator<int> ConvertibleToAlloc;
-
-        {
-        std::list<short, Alloc> source;
-        std::list lst(source, Alloc(2));
-        static_assert(std::is_same_v<decltype(lst), decltype(source)>);
-        }
-
-        {
-        std::list<short, Alloc> source;
-        std::list lst(source, ConvertibleToAlloc(2));
-        static_assert(std::is_same_v<decltype(lst), decltype(source)>);
-        }
-
-        {
-        std::list<short, Alloc> source;
-        std::list lst(std::move(source), Alloc(2));
-        static_assert(std::is_same_v<decltype(lst), decltype(source)>);
-        }
-
-        {
-        std::list<short, Alloc> source;
-        std::list lst(std::move(source), ConvertibleToAlloc(2));
-        static_assert(std::is_same_v<decltype(lst), decltype(source)>);
-        }
+      std::list<short, Alloc> source;
+      std::list lst(source, Alloc(2));
+      static_assert(std::is_same_v<decltype(lst), decltype(source)>);
     }
+    {
+      std::list<short, Alloc> source;
+      std::list lst(source, ConvertibleToAlloc(2));
+      static_assert(std::is_same_v<decltype(lst), decltype(source)>);
+    }
+    {
+      std::list<short, Alloc> source;
+      std::list lst(std::move(source), Alloc(2));
+      static_assert(std::is_same_v<decltype(lst), decltype(source)>);
+    }
+    {
+      std::list<short, Alloc> source;
+      std::list lst(std::move(source), ConvertibleToAlloc(2));
+      static_assert(std::is_same_v<decltype(lst), decltype(source)>);
+    }
+  }
 
-    SequenceContainerDeductionGuidesSfinaeAway<std::list, std::list<int>>();
+  SequenceContainerDeductionGuidesSfinaeAway<std::list, std::list<int>>();
 
-    return 0;
+  return true;
+}
+
+int main(int, char**) {
+  tests();
+  return 0;
 }
