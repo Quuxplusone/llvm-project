@@ -7131,8 +7131,9 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       }
     }
 
-    // A move-constructible, destructible object type T is a
-    // trivially relocatable type if [...]
+    // If a type T is declared with the trivially_relocatable attribute,
+    // and T is either not move-constructible or not destructible,
+    // the program is ill-formed.
 
     if (Record->hasAttr<TriviallyRelocatableAttr>() ||
         Record->hasAttr<MaybeTriviallyRelocatableAttr>()) {
