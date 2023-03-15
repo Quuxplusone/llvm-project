@@ -55,10 +55,10 @@ struct NonMoveConstructible {
     NonMoveConstructible(NonMoveConstructible&&) = delete;
     // expected-note@-1{{explicitly marked deleted here}}
 };
-static_assert(!__is_trivially_relocatable(NonDestructible), "");
-static_assert(!__is_trivially_relocatable(NonCopyConstructible), "");
+static_assert(__is_trivially_relocatable(NonDestructible), "");
+static_assert(__is_trivially_relocatable(NonCopyConstructible), "");
 static_assert(!__is_constructible(NonCopyConstructible, NonCopyConstructible&&), "");
-static_assert(!__is_trivially_relocatable(NonMoveConstructible), "");
+static_assert(__is_trivially_relocatable(NonMoveConstructible), "");
 static_assert(!__is_constructible(NonMoveConstructible, NonMoveConstructible&&), "");
 
 struct [[clang::maybe_trivially_relocatable]] D1 { ~D1() = delete; };
@@ -240,12 +240,12 @@ void relocate_example(CCDMC&& src) {
     src.~CCDMC();  // this calls the trivial destructor
 }
 static_assert(!__is_constructible(CCDMC, CCDMC&&), "");
-static_assert(!__is_trivially_relocatable(CCDMC), "");
+static_assert(__is_trivially_relocatable(CCDMC), "");
 
 struct DD { ~DD() = delete; };
 static_assert(__is_trivially_copyable(DD), "");
 static_assert(!__is_trivially_destructible(DD), "");
-static_assert(!__is_trivially_relocatable(DD), "");
+static_assert(__is_trivially_relocatable(DD), "");
 
 
 struct T5 { int x; T5(T5&&) {} };
@@ -482,7 +482,7 @@ static_assert(__is_trivially_destructible(T23b::Evil), "");
 static_assert(__is_trivially_relocatable(T23b::Evil), "it has no user-provided copy constructors");
 static_assert(!__is_constructible(T23b, T23b&&), "");
 static_assert(__is_trivially_copyable(T23b), "");
-static_assert(!__is_trivially_relocatable(T23b), "because it is not move-constructible");
+static_assert(__is_trivially_relocatable(T23b), "because it is trivially copyable, despite not being move-constructible");
 
 
 // Verify that the attribute is not inappropriately inherited by derived classes.
@@ -721,7 +721,7 @@ struct CantPassInRegisters {
   CantPassInRegisters(const CantPassInRegisters&) = delete;
 };
 static_assert(__is_trivially_copyable(CantPassInRegisters), "");
-static_assert(!__is_trivially_relocatable(CantPassInRegisters), "not move-constructible");
+static_assert(__is_trivially_relocatable(CantPassInRegisters), "despite not being move-constructible");
 
 template<class A>
 struct [[clang::maybe_trivially_relocatable]] Vec1 {
