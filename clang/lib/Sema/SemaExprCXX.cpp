@@ -5370,20 +5370,7 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
   case UTT_HasUniqueObjectRepresentations:
     return C.hasUniqueObjectRepresentations(T);
   case UTT_IsTriviallyRelocatable:
-    if (!T.isTriviallyRelocatableType(C))
-      return false;
-    if (auto *Record = T->getAsCXXRecordDecl()) {
-      // A move-constructible, destructible object type [...]
-      Sema::SpecialMemberOverloadResult SMOR = Self.LookupSpecialMember(
-        Record, Sema::CXXDestructor, false, false, false, false, false);
-      if (SMOR.getKind() != Sema::SpecialMemberOverloadResult::Success)
-        return false;
-      SMOR = Self.LookupSpecialMember(
-        Record, Sema::CXXMoveConstructor, false, false, false, false, false);
-      if (SMOR.getKind() != Sema::SpecialMemberOverloadResult::Success)
-        return false;
-    }
-    return true;
+    return T.isTriviallyRelocatableType(C);
   case UTT_IsReferenceable:
     return T.isReferenceable();
   case UTT_CanPassInRegs:
