@@ -237,22 +237,24 @@ static_assert(!std::is_trivially_relocatable_v<std::packaged_task<T&(T)>>);  // 
 static_assert(!std::is_trivially_relocatable_v<std::packaged_task<void(T)>>);  // contains pointer into self
 
 // The following types are not move-constructible at all.
-static_assert(!std::is_trivially_relocatable_v<std::atomic<int>>);
-static_assert(!std::is_trivially_relocatable_v<std::atomic_flag>);
-static_assert(!std::is_trivially_relocatable_v<std::condition_variable>);
-static_assert(!std::is_trivially_relocatable_v<std::condition_variable_any>);
-static_assert(!std::is_trivially_relocatable_v<std::lock_guard<std::mutex>>);
-static_assert(!std::is_trivially_relocatable_v<std::mutex>);
-static_assert(!std::is_trivially_relocatable_v<std::scoped_lock<std::mutex>>);
-static_assert(!std::is_trivially_relocatable_v<std::seed_seq>);
-static_assert(!std::is_trivially_relocatable_v<std::shared_mutex>);
+// Since P1144R7, that doesn't stop their being trivially relocatable.
+// But let's not bother to test them.
+static_assert(!std::is_relocatable_v<std::atomic<int>>);
+static_assert(!std::is_relocatable_v<std::atomic_flag>);
+static_assert(!std::is_relocatable_v<std::condition_variable>);
+static_assert(!std::is_relocatable_v<std::condition_variable_any>);
+static_assert(!std::is_relocatable_v<std::lock_guard<std::mutex>>);
+static_assert(!std::is_relocatable_v<std::mutex>);
+static_assert(!std::is_relocatable_v<std::scoped_lock<std::mutex>>);
+static_assert(!std::is_relocatable_v<std::seed_seq>);
+static_assert(!std::is_relocatable_v<std::shared_mutex>);
 
 #if TEST_STD_VER >= 20
-static_assert(!std::is_trivially_relocatable_v<std::barrier<>>);
-static_assert(!std::is_trivially_relocatable_v<std::binary_semaphore>);
-static_assert(!std::is_trivially_relocatable_v<std::counting_semaphore<3>>);
+static_assert(!std::is_relocatable_v<std::barrier<>>);
+static_assert(!std::is_relocatable_v<std::binary_semaphore>);
+static_assert(!std::is_relocatable_v<std::counting_semaphore<3>>);
 //static_assert(std::is_trivially_relocatable_v<std::jthread>);
-static_assert(!std::is_trivially_relocatable_v<std::latch>);
+static_assert(!std::is_relocatable_v<std::latch>);
 static_assert(std::is_trivially_relocatable_v<std::partial_ordering>);
 static_assert(std::is_trivially_relocatable_v<std::ranges::subrange<T*>>);
 static_assert(std::is_trivially_relocatable_v<std::ranges::subrange<std::string::iterator>> == NotDebug);
