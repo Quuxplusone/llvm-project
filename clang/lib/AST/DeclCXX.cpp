@@ -283,7 +283,7 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
       //   An aggregate is a class with [...] no virtual functions.
       data().Aggregate = false;
 
-      // A move-constructible, destructible object type T is a trivially relocatable type if it is: [...]
+      // An object type T is a trivially relocatable type if it is: [...]
       // -- a (possibly cv-qualified) class type which: [...]
       //    -- has no virtual member functions
       setIsNotNaturallyTriviallyRelocatable();
@@ -769,7 +769,7 @@ void CXXRecordDecl::addedMember(Decl *D) {
       data().IsStandardLayout = false;
       data().IsCXX11StandardLayout = false;
 
-      // A move-constructible, destructible object type T is a trivially relocatable type if it is: [...]
+      // An object type T is a trivially relocatable type if it is: [...]
       // -- a (possibly cv-qualified) class type which: [...]
       //    -- has no virtual member functions
       setIsNotNaturallyTriviallyRelocatable();
@@ -841,7 +841,7 @@ void CXXRecordDecl::addedMember(Decl *D) {
               : (Constructor->isUserProvided() || Constructor->isExplicit()))
         data().Aggregate = false;
 
-      // A move-constructible, destructible object type T is a trivially relocatable type if it is:
+      // An object type T is a trivially relocatable type if it is:
       // -- a (possibly cv-qualified) class type which: [...]
       //    -- has no user-provided move constructors or move assignment operators,
       //    -- has no user-provided copy constructors or copy assignment operators,

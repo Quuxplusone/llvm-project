@@ -118,20 +118,12 @@ struct __attribute__((trivial_abi)) CopyMoveDeleted { // expected-warning {{'tri
   CopyMoveDeleted(const CopyMoveDeleted &) = delete;
   CopyMoveDeleted(CopyMoveDeleted &&) = delete;
 };
-#ifdef __ORBIS__
 static_assert(__is_trivially_relocatable(CopyMoveDeleted), "");
-#else
-static_assert(!__is_trivially_relocatable(CopyMoveDeleted), "");
-#endif
 
 struct __attribute__((trivial_abi)) S18 { // expected-warning {{'trivial_abi' cannot be applied to 'S18'}} expected-note {{copy constructors and move constructors are all deleted}}
   CopyMoveDeleted a;
 };
-#ifdef __ORBIS__
 static_assert(__is_trivially_relocatable(S18), "");
-#else
-static_assert(!__is_trivially_relocatable(S18), "");
-#endif
 
 struct __attribute__((trivial_abi)) CopyDeleted {
   CopyDeleted(const CopyDeleted &) = delete;
@@ -147,17 +139,13 @@ struct __attribute__((trivial_abi)) MoveDeleted {
   MoveDeleted(const MoveDeleted &) = default;
   MoveDeleted(MoveDeleted &&) = delete;
 };
-static_assert(!__is_trivially_relocatable(MoveDeleted), "");
+static_assert(__is_trivially_relocatable(MoveDeleted), "");
 
 struct __attribute__((trivial_abi)) S19 { // expected-warning {{'trivial_abi' cannot be applied to 'S19'}} expected-note {{copy constructors and move constructors are all deleted}}
   CopyDeleted a;
   MoveDeleted b;
 };
-#ifdef __ORBIS__
 static_assert(__is_trivially_relocatable(S19), "");
-#else
-static_assert(!__is_trivially_relocatable(S19), "");
-#endif
 
 // This is fine since the move constructor isn't deleted.
 struct __attribute__((trivial_abi)) S20 {
