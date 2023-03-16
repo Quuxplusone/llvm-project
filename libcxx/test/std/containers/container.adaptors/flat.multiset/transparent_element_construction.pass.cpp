@@ -74,7 +74,7 @@ void test_insert()
     Counter::reset();
     m.insert(4);
     assert(Counter::gConstructed == 1);
-    assert(Counter::gMoveConstructed == 1); // [P2767] flat_multiset lacks transparent insert(K&&)
+    assert(Counter::gMoveConstructed == 0); // after P2767
     assert(Counter::gCopyConstructed == 0);
   }
 }
@@ -104,7 +104,7 @@ void test_insert_hint()
     Counter::reset();
     m.insert(m.begin(), 4);
     assert(Counter::gConstructed == 1);
-    assert(Counter::gMoveConstructed == 1); // [P2767] flat_multiset lacks transparent insert(K&&)
+    assert(Counter::gMoveConstructed == 0); // after P2767
     assert(Counter::gCopyConstructed == 0);
   }
 }
