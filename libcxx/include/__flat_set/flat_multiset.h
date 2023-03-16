@@ -687,6 +687,15 @@ public:
     return __insert_unchecked(__pos, std::move(__x));
   }
 
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value &&
+             is_constructible_v<value_type, _K2>
+  _LIBCPP_HIDE_FROM_ABI
+  iterator insert(_K2&& __x) {
+    auto __pos = upper_bound(__x);
+    return __emplace_unchecked(__pos, std::forward<_K2>(__x));
+  }
+
   _LIBCPP_HIDE_FROM_ABI
   iterator insert(const_iterator __pos, const value_type& __x) {
     if (__pos != end() && __compare_(*__pos, __x)) {
@@ -705,6 +714,20 @@ public:
       __pos = upper_bound(__x);
     }
     return __insert_unchecked(__pos, std::move(__x));
+  }
+
+  template <class _K2>
+    requires __is_transparent<_Compare, _K2>::value &&
+             is_constructible_v<value_type, _K2> &&
+             (!is_convertible_v<_K2&&, const_iterator>)
+  _LIBCPP_HIDE_FROM_ABI
+  iterator insert(const_iterator __pos, _K2&& __x) {
+    if (__pos != end() && __compare_(*__pos, __x)) {
+      __pos = lower_bound(__x);
+    } else if (__pos != begin() && __compare_(__x, __pos[-1])) {
+      __pos = upper_bound(__x);
+    }
+    return __emplace_unchecked(__pos, std::forward<_K2>(__x));
   }
 
   template <class _InputIterator>
@@ -1022,6 +1045,15 @@ private:
   iterator __insert_unchecked(const_iterator __pos, _K2&& __x) {
     auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
     __pos = __c_.insert(__pos, std::forward<_K2>(__x));
+    __guard.__complete();
+    return __pos;
+  }
+
+  template <class _K2>
+  _LIBCPP_HIDE_FROM_ABI
+  iterator __emplace_unchecked(const_iterator __pos, _K2&& __x) {
+    auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
+    __pos = __c_.emplace(__pos, std::forward<_K2>(__x));
     __guard.__complete();
     return __pos;
   }
