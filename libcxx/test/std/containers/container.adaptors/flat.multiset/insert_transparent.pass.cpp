@@ -57,8 +57,8 @@ int main(int, char**)
     expensive_comparisons = 0;
     cheap_comparisons = 0;
     std::same_as<M::iterator> auto it = m.insert(3); // conversion happens last
-    assert(expensive_comparisons >= 2); // [P2767] flat_multiset lacks transparent insert(K&&)
-    assert(cheap_comparisons == 0);
+    assert(expensive_comparisons == 0);
+    assert(cheap_comparisons >= 2);
     assert(it == m.begin() + 2);
     assert(std::ranges::equal(m, expected));
   }
@@ -69,8 +69,8 @@ int main(int, char**)
     expensive_comparisons = 0;
     cheap_comparisons = 0;
     std::same_as<M::iterator> auto it = m.insert(m.begin(), 3);
-    assert(expensive_comparisons >= 2); // [P2767] flat_multiset lacks transparent insert(K&&)
-    assert(cheap_comparisons == 0);
+    assert(expensive_comparisons == 0);
+    assert(cheap_comparisons >= 2);
     assert(it == m.begin() + 2);
     assert(std::ranges::equal(m, expected));
   }
