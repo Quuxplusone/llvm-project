@@ -48,3 +48,9 @@ void is_subsumed(F);
 
 static_assert(subsumes(std::less<int>()));
 static_assert(is_subsumed(std::less<int>()));
+
+// Test ADL-proofing.
+struct Incomplete;
+template<class T> struct Holder { T t; };
+static_assert(std::indirectly_comparable<Holder<Incomplete>**, Holder<Incomplete>**, std::less<Holder<Incomplete>*>>);
+static_assert(!std::indirectly_comparable<Holder<Incomplete>**, Holder<Incomplete>**, Holder<Incomplete>*>);
