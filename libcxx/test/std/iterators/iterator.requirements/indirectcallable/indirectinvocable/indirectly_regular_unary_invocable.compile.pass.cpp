@@ -85,3 +85,10 @@ static_assert(!std::indirectly_regular_unary_invocable<int (*)(int*, int*), int*
 static_assert(!std::indirectly_regular_unary_invocable<int (&)(int*, int*), int*>);
 static_assert(!std::indirectly_regular_unary_invocable<int (S::*)(int*), S*>);
 static_assert(!std::indirectly_regular_unary_invocable<int (S::*)(int*) const, S*>);
+
+// Test ADL-proofing.
+struct Incomplete;
+template<class T> struct Holder { T t; };
+struct HolderIncompletePred { bool operator()(Holder<Incomplete>*) const; };
+static_assert(std::indirectly_regular_unary_invocable<HolderIncompletePred, Holder<Incomplete>**>);
+static_assert(!std::indirectly_regular_unary_invocable<Holder<Incomplete>*, Holder<Incomplete>**>);
