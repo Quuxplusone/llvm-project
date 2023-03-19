@@ -29,3 +29,13 @@ constexpr bool has_indirect_result = requires {
 
 static_assert(!has_indirect_result<int (*)(int), int>); // int isn't indirectly_readable
 static_assert(!has_indirect_result<int, int*>);         // int isn't invocable
+
+// Test ADL-proofing.
+struct Incomplete;
+template<class T> struct Holder { T t; };
+static_assert(std::same_as<std::indirect_result_t<int                (&)(int), int*>, int>);
+static_assert(std::same_as<std::indirect_result_t<Holder<Incomplete>&(&)(int), int*>, Holder<Incomplete>&>);
+static_assert(std::same_as<std::indirect_result_t<Holder<Incomplete>*(&)(int), int*>, Holder<Incomplete>*>);
+static_assert(std::same_as<std::indirect_result_t<int                (&)(Holder<Incomplete>*), Holder<Incomplete>**>, int>);
+static_assert(std::same_as<std::indirect_result_t<Holder<Incomplete>&(&)(Holder<Incomplete>*), Holder<Incomplete>**>, Holder<Incomplete>&>);
+static_assert(std::same_as<std::indirect_result_t<Holder<Incomplete>*(&)(Holder<Incomplete>*), Holder<Incomplete>**>, Holder<Incomplete>*>);

@@ -18,8 +18,8 @@
 #include "test_iterators.h"
 
 using IntPtr = std::projected<int const*, std::identity>;
-static_assert(std::same_as<IntPtr::value_type, int>);
-static_assert(std::same_as<decltype(*std::declval<IntPtr>()), int const&>);
+static_assert(std::same_as<std::iter_value_t<IntPtr>, int>);
+static_assert(std::same_as<std::iter_reference_t<IntPtr>, int const&>);
 static_assert(std::same_as<std::iter_difference_t<IntPtr>, std::ptrdiff_t>);
 
 struct S { };
