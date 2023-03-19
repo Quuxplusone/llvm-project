@@ -95,3 +95,9 @@ struct BadOrder6 {
     bool operator()(std::iter_common_reference_t<It1>, std::iter_common_reference_t<It2>) const = delete;
 };
 static_assert(!std::indirect_strict_weak_order<BadOrder6, It1, It2>);
+
+// Test ADL-proofing.
+struct Incomplete;
+template<class T> struct Holder { T t; };
+static_assert(std::indirect_strict_weak_order<std::less<Holder<Incomplete>*>, Holder<Incomplete>**, Holder<Incomplete>**>);
+static_assert(!std::indirect_strict_weak_order<Holder<Incomplete>*, Holder<Incomplete>**, Holder<Incomplete>**>);
