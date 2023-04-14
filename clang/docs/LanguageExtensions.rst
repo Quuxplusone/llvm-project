@@ -4929,7 +4929,7 @@ Note, all of debugging pragmas are subject to change.
 `dump`
 ------
 Accepts either a single identifier or an expression. When a single identifier is passed,
-the lookup results for the identifier are printed to `stderr`. When an expression is passed, 
+the lookup results for the identifier are printed to `stderr`. When an expression is passed,
 the AST for the expression is printed to `stderr`. The expression is an unevaluated operand,
 so things like overload resolution and template instantiations are performed,
 but the expression has no runtime effects.
