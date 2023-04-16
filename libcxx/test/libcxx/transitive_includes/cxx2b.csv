@@ -18,6 +18,7 @@ any typeinfo
 any version
 array compare
 array cstddef
+array cstdint
 array initializer_list
 array limits
 array stdexcept
