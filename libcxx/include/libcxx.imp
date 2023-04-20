@@ -27,6 +27,7 @@
   { include: [ "@<__exception/.*>", "private", "<exception>", "public" ] },
   { include: [ "@<__expected/.*>", "private", "<expected>", "public" ] },
   { include: [ "@<__filesystem/.*>", "private", "<filesystem>", "public" ] },
+  { include: [ "@<__flat_set/.*>", "private", "<flat_map>", "public" ] },
   { include: [ "@<__flat_set/.*>", "private", "<flat_set>", "public" ] },
   { include: [ "@<__format/.*>", "private", "<format>", "public" ] },
   { include: [ "@<__functional/.*>", "private", "<functional>", "public" ] },
