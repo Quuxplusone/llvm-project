@@ -139,7 +139,6 @@ mandatory_inclusions = {
 # modules will fail to build if a header is added but this list is not updated.
 headers_not_available = [
     "debugging",
-    "flat_map",
     "generator",
     "hazard_pointer",
     "linalg",
