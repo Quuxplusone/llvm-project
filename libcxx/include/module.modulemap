@@ -79,6 +79,10 @@ module std_filesystem [system] {
   header "filesystem"
   export *
 }
+module std_flat_map [system] {
+  header "flat_map"
+  export *
+}
 module std_flat_set [system] {
   header "flat_set"
   export *
@@ -1305,6 +1309,7 @@ module std_private_filesystem_recursive_directory_iterator [system] {
 module std_private_filesystem_space_info                   [system] { header "__filesystem/space_info.h" }
 module std_private_filesystem_u8path                       [system] { header "__filesystem/u8path.h" }
 
+module std_private_flat_map_flat_map                      [system] { header "__flat_map/flat_map.h" }
 module std_private_flat_set_flat_multiset                 [system] { header "__flat_set/flat_multiset.h" }
 module std_private_flat_set_flat_set                      [system] { header "__flat_set/flat_set.h" }
 
@@ -2085,6 +2090,7 @@ module std_private_type_traits_underlying_type                           [system
 module std_private_type_traits_unwrap_ref                                [system] { header "__type_traits/unwrap_ref.h" }
 module std_private_type_traits_void_t                                    [system] { header "__type_traits/void_t.h" }
 
+module std_private_utility_arrow_proxy            [system] { header "__utility/arrow_proxy.h" }
 module std_private_utility_as_const               [system] { header "__utility/as_const.h" }
 module std_private_utility_as_lvalue              [system] { header "__utility/as_lvalue.h" }
 module std_private_utility_auto_cast              [system] {
