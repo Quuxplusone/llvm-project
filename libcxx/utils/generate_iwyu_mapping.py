@@ -42,8 +42,10 @@ def IWYU_mapping(header: str) -> typing.Optional[typing.List[str]]:
         return ["map", "set"]
     elif header == "__fwd/byte.h":
         return ["cstddef"]
+    elif header in ["__utility/arrow_proxy.h"]:
+        return ["flat_map"]
     elif header in ["__utility/sorted_equivalent.h", "__utility/sorted_unique.h"]:
-        return ["flat_set"]
+        return ["flat_map", "flat_set"]
     elif header == "__fwd/pair.h":
         return ["utility"]
     elif header == "__fwd/subrange.h":
