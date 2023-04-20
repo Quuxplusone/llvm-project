@@ -10,22 +10,22 @@
 export namespace std {
 #if _LIBCPP_STD_VER >= 23
   // [flat.map], class template flat_map
-  //using std::flat_map;
+  using std::flat_map;
 
-  //using std::sorted_unique;
-  //using std::sorted_unique_t;
+  using std::sorted_unique;
+  using std::sorted_unique_t;
 
   using std::uses_allocator;
 
   // [flat.map.erasure], erasure for flat_map
-  //using std::erase_if;
+  using std::erase_if;
 
   // [flat.multimap], class template flat_multimap
   //using std::flat_multimap;
 
-  //using std::sorted_equivalent;
-  //using std::sorted_equivalent_t;
+  using std::sorted_equivalent;
+  using std::sorted_equivalent_t;
 
   // [flat.multimap.erasure], erasure for flat_multimap
-#endif
+#endif // _LIBCPP_STD_VER >= 23
 } // namespace std
