@@ -258,6 +258,17 @@ experimental/unordered_set unordered_set
 experimental/utility utility
 experimental/vector experimental/memory_resource
 experimental/vector vector
+flat_map climits
+flat_map compare
+flat_map cstddef
+flat_map cstdint
+flat_map cstring
+flat_map initializer_list
+flat_map limits
+flat_map new
+flat_map tuple
+flat_map vector
+flat_map version
 flat_set climits
 flat_set compare
 flat_set cstddef
