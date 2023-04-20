@@ -370,6 +370,7 @@ END-SCRIPT
 #include <__filesystem/recursive_directory_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/recursive_directory_iterator.h'}}
 #include <__filesystem/space_info.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/space_info.h'}}
 #include <__filesystem/u8path.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/u8path.h'}}
+#include <__flat_set/flat_map.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_map.h'}}
 #include <__flat_set/flat_multiset.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_multiset.h'}}
 #include <__flat_set/flat_set.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_set.h'}}
 #include <__format/buffer.h> // expected-error@*:* {{use of private header from outside its module: '__format/buffer.h'}}
@@ -776,6 +777,7 @@ END-SCRIPT
 #include <__type_traits/type_list.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/type_list.h'}}
 #include <__type_traits/underlying_type.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/underlying_type.h'}}
 #include <__type_traits/void_t.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/void_t.h'}}
+#include <__utility/arrow_proxy.h> // expected-error@*:* {{use of private header from outside its module: '__utility/arrow_proxy.h'}}
 #include <__utility/as_const.h> // expected-error@*:* {{use of private header from outside its module: '__utility/as_const.h'}}
 #include <__utility/auto_cast.h> // expected-error@*:* {{use of private header from outside its module: '__utility/auto_cast.h'}}
 #include <__utility/cmp.h> // expected-error@*:* {{use of private header from outside its module: '__utility/cmp.h'}}
