@@ -1287,6 +1287,14 @@ module std [system] {
     export *
   }
 
+  module flat_map {
+    module flat_map              { header "__flat_map/flat_map.h" }
+    module flat_map_iterator     { header "__flat_map/flat_map_iterator.h" }
+
+    header "flat_map"
+    export *
+  }
+
   module flat_set {
     module flat_multiset         { header "__flat_set/flat_multiset.h" }
     module flat_set              { header "__flat_set/flat_set.h" }
@@ -2114,6 +2122,7 @@ module std [system] {
   }
 
   module utility {
+    module arrow_proxy                { header "__utility/arrow_proxy.h" }
     module as_const                   { header "__utility/as_const.h" }
     module as_lvalue                  { header "__utility/as_lvalue.h" }
     module auto_cast                  {

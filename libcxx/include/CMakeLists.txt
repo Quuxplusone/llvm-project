@@ -365,6 +365,8 @@ set(files
   __filesystem/recursive_directory_iterator.h
   __filesystem/space_info.h
   __filesystem/u8path.h
+  __flat_map/flat_map.h
+  __flat_map/flat_map_iterator.h
   __flat_set/flat_multiset.h
   __flat_set/flat_set.h
   __format/buffer.h
@@ -899,6 +901,7 @@ set(files
   __type_traits/unwrap_ref.h
   __type_traits/void_t.h
   __undef_macros
+  __utility/arrow_proxy.h
   __utility/as_const.h
   __utility/as_lvalue.h
   __utility/auto_cast.h
@@ -1008,6 +1011,7 @@ set(files
   ext/hash_set
   fenv.h
   filesystem
+  flat_map
   flat_set
   float.h
   format
