@@ -684,6 +684,7 @@ module std_private_algorithm_is_partitioned                              [system
 module std_private_algorithm_is_permutation                              [system] { header "__algorithm/is_permutation.h" }
 module std_private_algorithm_is_sorted                                   [system] { header "__algorithm/is_sorted.h" }
 module std_private_algorithm_is_sorted_until                             [system] { header "__algorithm/is_sorted_until.h" }
+module std_private_algorithm_is_uniqued                                  [system] { header "__algorithm/is_uniqued.h" }
 module std_private_algorithm_iter_swap                                   [system] { header "__algorithm/iter_swap.h" }
 module std_private_algorithm_iterator_operations                         [system] {
   header "__algorithm/iterator_operations.h"
@@ -806,6 +807,10 @@ module std_private_algorithm_ranges_is_sorted                            [system
 }
 module std_private_algorithm_ranges_is_sorted_until                      [system] {
   header "__algorithm/ranges_is_sorted_until.h"
+  export std_private_functional_ranges_operations
+}
+module std_private_algorithm_ranges_is_uniqued                           [system] {
+  header "__algorithm/ranges_is_uniqued.h"
   export std_private_functional_ranges_operations
 }
 module std_private_algorithm_ranges_iterator_concept                     [system] { header "__algorithm/ranges_iterator_concept.h" }
