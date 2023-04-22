@@ -284,6 +284,7 @@ module std [system] {
       module is_permutation                  { private header "__algorithm/is_permutation.h" }
       module is_sorted                       { private header "__algorithm/is_sorted.h" }
       module is_sorted_until                 { private header "__algorithm/is_sorted_until.h" }
+      module is_uniqued                      { private header "__algorithm/is_uniqued.h" }
       module iter_swap                       { private header "__algorithm/iter_swap.h" }
       module iterator_operations             {
         private header "__algorithm/iterator_operations.h"
@@ -396,6 +397,10 @@ module std [system] {
       }
       module ranges_is_sorted_until {
         private header "__algorithm/ranges_is_sorted_until.h"
+        export functional.__functional.ranges_operations
+      }
+      module ranges_is_uniqued {
+        private header "__algorithm/ranges_is_uniqued.h"
         export functional.__functional.ranges_operations
       }
       module ranges_iterator_concept         { private header "__algorithm/ranges_iterator_concept.h" }
