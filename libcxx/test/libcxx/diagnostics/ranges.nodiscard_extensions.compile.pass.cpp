@@ -60,6 +60,8 @@ void test() {
   std::ranges::is_sorted_until(iter, iter);
   std::ranges::is_sorted(range);
   std::ranges::is_sorted(iter, iter);
+  std::ranges::is_uniqued(range);
+  std::ranges::is_uniqued(iter, iter);
   std::ranges::lexicographical_compare(range, range);
   std::ranges::lexicographical_compare(iter, iter, iter, iter);
   std::ranges::lower_bound(range, 1);
