@@ -140,6 +140,8 @@ TEST_CONSTEXPR_CXX20 bool all_the_algorithms()
     (void)std::is_sorted(first, last, std::less<void*>());
     (void)std::is_sorted_until(first, last);
     (void)std::is_sorted_until(first, last, std::less<void*>());
+    (void)std::is_uniqued(first, last);
+    (void)std::is_uniqued(first, last, std::equal_to<void*>());
     if (!TEST_IS_CONSTANT_EVALUATED) (void)std::inplace_merge(first, mid, last);
     if (!TEST_IS_CONSTANT_EVALUATED) (void)std::inplace_merge(first, mid, last, std::less<void*>());
     (void)std::iter_swap(first, mid);
