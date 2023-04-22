@@ -448,6 +448,7 @@ module std [system] {
     module is_permutation                         { header "__algorithm/is_permutation.h" }
     module is_sorted_until                        { header "__algorithm/is_sorted_until.h" }
     module is_sorted                              { header "__algorithm/is_sorted.h" }
+    module is_uniqued                             { header "__algorithm/is_uniqued.h" }
     module iter_swap                              { header "__algorithm/iter_swap.h" }
     module iterator_operations {
       header "__algorithm/iterator_operations.h"
@@ -587,6 +588,10 @@ module std [system] {
     }
     module ranges_is_sorted {
       header "__algorithm/ranges_is_sorted.h"
+      export std.functional.ranges_operations
+    }
+    module ranges_is_uniqued {
+      header "__algorithm/ranges_is_uniqued.h"
       export std.functional.ranges_operations
     }
     module ranges_iterator_concept {
