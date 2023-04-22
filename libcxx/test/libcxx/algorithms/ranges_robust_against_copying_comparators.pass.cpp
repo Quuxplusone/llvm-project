@@ -139,6 +139,8 @@ constexpr bool all_the_algorithms()
     (void)std::ranges::is_sorted(a, Less(&copies)); assert(copies == 0);
     (void)std::ranges::is_sorted_until(first, last, Less(&copies)); assert(copies == 0);
     (void)std::ranges::is_sorted_until(a, Less(&copies)); assert(copies == 0);
+    (void)std::ranges::is_uniqued(first, last, Equal(&copies)); assert(copies == 0);
+    (void)std::ranges::is_uniqued(a, Equal(&copies)); assert(copies == 0);
     if (!std::is_constant_evaluated()) { (void)std::ranges::inplace_merge(first, mid, last, Less(&copies)); assert(copies == 0); }
     if (!std::is_constant_evaluated()) { (void)std::ranges::inplace_merge(a, mid, Less(&copies)); assert(copies == 0); }
     (void)std::ranges::lexicographical_compare(first, last, first2, last2, Less(&copies)); assert(copies == 0);

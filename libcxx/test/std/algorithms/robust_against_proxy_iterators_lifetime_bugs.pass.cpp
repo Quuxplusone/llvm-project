@@ -689,6 +689,7 @@ TEST_CONSTEXPR_CXX20 bool test() {
   // TODO: is_partitioned
   // TODO: is_sorted
   // TODO: is_sorted_until
+  // TODO: is_uniqued
   // TODO: includes
   // TODO: is_heap
   // TODO: is_heap_until
