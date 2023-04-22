@@ -136,6 +136,8 @@ void test() {
   (void) std::is_sorted_until(it, it, pred);
   (void) std::is_sorted(it, it);
   (void) std::is_sorted(it, it, pred);
+  (void) std::is_uniqued(it, it);
+  (void) std::is_uniqued(it, it, pred);
   (void) std::lexicographical_compare(it, it, it, it);
   (void) std::lexicographical_compare(it, it, it, it, pred);
 #if TEST_STD_VER > 17
