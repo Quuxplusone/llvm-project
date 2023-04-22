@@ -155,6 +155,12 @@ void test() {
   std::is_sorted(std::begin(arr), std::end(arr), std::greater<int>());
 
   // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::is_uniqued(std::begin(arr), std::end(arr));
+
+  // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::is_uniqued(std::begin(arr), std::end(arr), std::equal_to<int>());
+
+  // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::lexicographical_compare(std::begin(arr), std::end(arr), std::begin(arr),
                                std::end(arr));
 
@@ -331,6 +337,8 @@ void test() {
   std::ranges::is_sorted_until(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::is_sorted(range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::is_sorted(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::ranges::is_uniqued(range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::ranges::is_uniqued(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lexicographical_compare(range, range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lexicographical_compare(iter, iter, iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lower_bound(range, 1); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
