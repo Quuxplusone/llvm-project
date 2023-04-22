@@ -140,6 +140,7 @@ TEST_CONSTEXPR_CXX20 bool all_the_algorithms()
 #endif
     (void)std::is_sorted(first, last, Less<T>(&copies)); assert(copies == 0);
     (void)std::is_sorted_until(first, last, Less<T>(&copies)); assert(copies == 0);
+    (void)std::is_uniqued(first, last, Equal<T>(&copies)); assert(copies == 0);
     if (!TEST_IS_CONSTANT_EVALUATED) { (void)std::inplace_merge(first, mid, last, Less<T>(&copies)); assert(copies == 0); }
     (void)std::lexicographical_compare(first, last, first2, last2, Less<T>(&copies)); assert(copies == 0);
 #if TEST_STD_VER > 17
