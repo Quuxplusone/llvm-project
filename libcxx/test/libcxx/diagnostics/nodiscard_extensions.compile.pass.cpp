@@ -90,6 +90,8 @@ void test_algorithms() {
   std::is_sorted_until(std::begin(arr), std::end(arr), std::greater<int>());
   std::is_sorted(std::begin(arr), std::end(arr));
   std::is_sorted(std::begin(arr), std::end(arr), std::greater<int>());
+  std::is_uniqued(std::begin(arr), std::end(arr));
+  std::is_uniqued(std::begin(arr), std::end(arr), std::equal_to<int>());
   std::lexicographical_compare(std::begin(arr), std::end(arr), std::begin(arr),
                                std::end(arr));
   std::lexicographical_compare(std::begin(arr), std::end(arr), std::begin(arr),
