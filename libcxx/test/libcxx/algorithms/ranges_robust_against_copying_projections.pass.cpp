@@ -147,6 +147,8 @@ constexpr bool all_the_algorithms()
     (void)std::ranges::is_sorted(a, Less(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::is_sorted_until(first, last, Less(), Proj(&copies)); assert(copies == 0);
     (void)std::ranges::is_sorted_until(a, Less(), Proj(&copies)); assert(copies == 0);
+    (void)std::ranges::is_uniqued(first, last, Equal(), Proj(&copies)); assert(copies == 0);
+    (void)std::ranges::is_uniqued(a, Equal(), Proj(&copies)); assert(copies == 0);
     if (TEST_STD_AT_LEAST_26_OR_RUNTIME_EVALUATED) {
       (void)std::ranges::inplace_merge(first, mid, last, Less(), Proj(&copies));
       assert(copies == 0);
