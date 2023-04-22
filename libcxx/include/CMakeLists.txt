@@ -44,6 +44,7 @@ set(files
   __algorithm/is_permutation.h
   __algorithm/is_sorted.h
   __algorithm/is_sorted_until.h
+  __algorithm/is_uniqued.h
   __algorithm/iter_swap.h
   __algorithm/iterator_operations.h
   __algorithm/lexicographical_compare.h
@@ -110,6 +111,7 @@ set(files
   __algorithm/ranges_is_permutation.h
   __algorithm/ranges_is_sorted.h
   __algorithm/ranges_is_sorted_until.h
+  __algorithm/ranges_is_uniqued.h
   __algorithm/ranges_iterator_concept.h
   __algorithm/ranges_lexicographical_compare.h
   __algorithm/ranges_lower_bound.h
