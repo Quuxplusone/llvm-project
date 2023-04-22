@@ -170,6 +170,8 @@ TEST_CONSTEXPR_CXX20 bool all_the_algorithms() {
   assert(copies == 0);
   (void)std::is_sorted_until(first, last, Less<T>(&copies));
   assert(copies == 0);
+  (void)std::is_uniqued(first, last, Equal<T>(&copies));
+  assert(copies == 0);
   if (!TEST_IS_CONSTANT_EVALUATED) {
     (void)std::inplace_merge(first, mid, last, Less<T>(&copies));
     assert(copies == 0);
