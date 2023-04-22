@@ -167,6 +167,12 @@ void test_algorithms() {
   std::is_sorted(std::begin(arr), std::end(arr), std::greater<int>());
 
   // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::is_uniqued(std::begin(arr), std::end(arr));
+
+  // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::is_uniqued(std::begin(arr), std::end(arr), std::equal_to<int>());
+
+  // expected-warning@+1 {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::lexicographical_compare(std::begin(arr), std::end(arr), std::begin(arr),
                                std::end(arr));
 

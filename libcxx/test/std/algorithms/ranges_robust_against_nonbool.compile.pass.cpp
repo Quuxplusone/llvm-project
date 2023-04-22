@@ -131,6 +131,7 @@ void f(Iterator it, Range in, Iterator out, std::size_t n, Value const& val, std
   in_pred(std::ranges::is_partitioned, pred1);
   in_pred(std::ranges::is_sorted, pred2);
   in_pred(std::ranges::is_sorted_until, pred2);
+  in_pred(std::ranges::is_uniqued, pred2);
   in_in_pred(std::ranges::includes, pred2);
   in_pred(std::ranges::is_heap, pred2);
   in_pred(std::ranges::is_heap_until, pred2);
