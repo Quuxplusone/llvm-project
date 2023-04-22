@@ -57,6 +57,8 @@ void test() {
   std::ranges::is_sorted_until(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::is_sorted(range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::is_sorted(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::ranges::is_uniqued(range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
+  std::ranges::is_uniqued(iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lexicographical_compare(range, range); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lexicographical_compare(iter, iter, iter, iter); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
   std::ranges::lower_bound(range, 1); // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
