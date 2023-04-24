@@ -1072,10 +1072,11 @@ module std [system] {
         private header "__iterator/ostreambuf_iterator.h"
         export iosfwd
       }
-      module permutable            { private header "__iterator/permutable.h" }
-      module prev                  { private header "__iterator/prev.h" }
-      module projected             { private header "__iterator/projected.h" }
-      module readable_traits       {
+      module permutable             { private header "__iterator/permutable.h" }
+      module prev                   { private header "__iterator/prev.h" }
+      module projected              { private header "__iterator/projected.h" }
+      module ranges_iterator_traits { private header "__iterator/ranges_iterator_traits.h" }
+      module readable_traits        {
         private header "__iterator/readable_traits.h"
         export __iterator.iterator_traits
       }

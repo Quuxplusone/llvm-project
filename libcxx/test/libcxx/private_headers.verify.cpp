@@ -471,6 +471,7 @@ END-SCRIPT
 #include <__iterator/permutable.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/permutable.h'}}
 #include <__iterator/prev.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/prev.h'}}
 #include <__iterator/projected.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/projected.h'}}
+#include <__iterator/ranges_iterator_traits.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/ranges_iterator_traits.h'}}
 #include <__iterator/readable_traits.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/readable_traits.h'}}
 #include <__iterator/reverse_access.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/reverse_access.h'}}
 #include <__iterator/reverse_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__iterator/reverse_iterator.h'}}
