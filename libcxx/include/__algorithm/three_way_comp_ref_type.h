@@ -28,6 +28,13 @@ struct __debug_three_way_comp {
   _LIBCPP_HIDE_FROM_ABI constexpr __debug_three_way_comp(_Comp& __c) : __comp_(__c) {}
 
   template <class _Tp, class _Up>
+  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(const _Tp& __x, const _Up& __y) {
+    auto __r = __comp_(__x, __y);
+    __do_compare_assert(0, __y, __x, __r);
+    return __r;
+  }
+
+  template <class _Tp, class _Up>
   _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp& __x, _Up& __y) {
     auto __r = __comp_(__x, __y);
     __do_compare_assert(0, __y, __x, __r);
