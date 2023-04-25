@@ -25,15 +25,7 @@ struct __debug_less {
   _LIBCPP_CONSTEXPR_SINCE_CXX14 _LIBCPP_HIDE_FROM_ABI __debug_less(_Compare& __c) : __comp_(__c) {}
 
   template <class _Tp, class _Up>
-  _LIBCPP_CONSTEXPR_SINCE_CXX14 _LIBCPP_HIDE_FROM_ABI bool operator()(const _Tp& __x, const _Up& __y) {
-    bool __r = __comp_(__x, __y);
-    if (__r)
-      __do_compare_assert(0, __y, __x);
-    return __r;
-  }
-
-  template <class _Tp, class _Up>
-  _LIBCPP_CONSTEXPR_SINCE_CXX14 _LIBCPP_HIDE_FROM_ABI bool operator()(_Tp& __x, _Up& __y) {
+  _LIBCPP_CONSTEXPR_SINCE_CXX14 _LIBCPP_HIDE_FROM_ABI bool operator()(_Tp&& __x, _Up&& __y) {
     bool __r = __comp_(__x, __y);
     if (__r)
       __do_compare_assert(0, __y, __x);
