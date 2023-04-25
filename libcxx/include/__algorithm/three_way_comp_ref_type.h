@@ -28,32 +28,26 @@ struct __debug_three_way_comp {
   _LIBCPP_HIDE_FROM_ABI constexpr __debug_three_way_comp(_Comp& __c) : __comp_(__c) {}
 
   template <class _Tp, class _Up>
-  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(const _Tp& __x, const _Up& __y) {
+  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp&& __x, _Up&& __y) const {
     auto __r = __comp_(__x, __y);
-    if constexpr (__comparison_category<decltype(__comp_(__x, __y))>)
+    if constexpr (__comparison_category<decltype(__r)>) {
       __do_compare_assert(__y, __x, __r);
+    }
     return __r;
   }
 
-  template <class _Tp, class _Up>
-  _LIBCPP_HIDE_FROM_ABI constexpr auto operator()(_Tp& __x, _Up& __y) {
-    auto __r = __comp_(__x, __y);
-    if constexpr (__comparison_category<decltype(__comp_(__x, __y))>)
-      __do_compare_assert(__y, __x, __r);
-    return __r;
-  }
-
-  template <class _LHS, class _RHS, class _Order>
-  _LIBCPP_HIDE_FROM_ABI constexpr void __do_compare_assert(_LHS& __l, _RHS& __r, _Order __o) {
-    _Order __expected = __o;
-    if (__o == _Order::less)
-      __expected = _Order::greater;
-    if (__o == _Order::greater)
-      __expected = _Order::less;
+  template <class _LHS, class _RHS>
+  _LIBCPP_HIDE_FROM_ABI constexpr void __do_compare_assert(_LHS& __l, _RHS& __r, partial_ordering __o) const {
+    auto __expected = __o;
+    if (__o == partial_ordering::less)
+      __expected = partial_ordering::greater;
+    else if (__o == partial_ordering::greater)
+      __expected = partial_ordering::less;
     _LIBCPP_ASSERT_SEMANTIC_REQUIREMENT(
         __comp_(__l, __r) == __expected, "Comparator does not induce a strict weak ordering");
     (void)__l;
     (void)__r;
+    (void)__expected;
   }
 };
 
