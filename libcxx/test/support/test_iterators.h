@@ -41,10 +41,10 @@ public:
 
     TEST_CONSTEXPR explicit cpp17_output_iterator(It it) : it_(std::move(it)) {}
 
-    template <class U>
+    template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR cpp17_output_iterator(const cpp17_output_iterator<U>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR_CXX14 cpp17_output_iterator(cpp17_output_iterator<U>&& u)
         : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
       u.it_ = U();
@@ -88,10 +88,10 @@ public:
 
     TEST_CONSTEXPR explicit cpp17_input_iterator(It it) : it_(it) {}
 
-    template <class U, class T>
+    template <class U, class T, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR cpp17_input_iterator(const cpp17_input_iterator<U, T>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class T, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class T, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR_CXX14 cpp17_input_iterator(cpp17_input_iterator<U, T>&& u)
         : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
       u.it_ = U();
@@ -136,10 +136,10 @@ public:
     TEST_CONSTEXPR forward_iterator() : it_() {}
     TEST_CONSTEXPR explicit forward_iterator(It it) : it_(it) {}
 
-    template <class U>
+    template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR forward_iterator(const forward_iterator<U>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR_CXX14 forward_iterator(forward_iterator<U>&& other)
         : it_(std::move(other.it_)), tracker_(std::move(other.tracker_)) {
       other.it_ = U();
@@ -180,10 +180,10 @@ public:
     TEST_CONSTEXPR bidirectional_iterator() : it_() {}
     TEST_CONSTEXPR explicit bidirectional_iterator(It it) : it_(it) {}
 
-    template <class U>
+    template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR bidirectional_iterator(const bidirectional_iterator<U>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR_CXX14 bidirectional_iterator(bidirectional_iterator<U>&& u)
         : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
       u.it_ = U();
@@ -226,10 +226,10 @@ public:
     TEST_CONSTEXPR random_access_iterator() : it_() {}
     TEST_CONSTEXPR explicit random_access_iterator(It it) : it_(it) {}
 
-    template <class U>
+    template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR random_access_iterator(const random_access_iterator<U>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     TEST_CONSTEXPR_CXX14 random_access_iterator(random_access_iterator<U>&& u)
         : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
       u.it_ = U();
@@ -383,10 +383,10 @@ public:
   constexpr contiguous_iterator() : it_() {}
   constexpr explicit contiguous_iterator(It it) : it_(it) {}
 
-  template <class U>
+  template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
   constexpr contiguous_iterator(const contiguous_iterator<U>& u) : it_(u.it_), tracker_(u.tracker_) {}
 
-  template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+  template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
   constexpr contiguous_iterator(contiguous_iterator<U>&& u) : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
     u.it_ = U();
   }
@@ -475,11 +475,11 @@ public:
     constexpr three_way_contiguous_iterator() : it_() {}
     constexpr explicit three_way_contiguous_iterator(It it) : it_(it) {}
 
-    template <class U>
+    template <class U, class = typename std::enable_if<std::is_convertible<U, It>::value>::type>
     constexpr three_way_contiguous_iterator(const three_way_contiguous_iterator<U>& u)
         : it_(u.it_), tracker_(u.tracker_) {}
 
-    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value>::type>
+    template <class U, class = typename std::enable_if<std::is_default_constructible<U>::value && std::is_convertible<U, It>::value>::type>
     constexpr three_way_contiguous_iterator(three_way_contiguous_iterator<U>&& u)
         : it_(std::move(u.it_)), tracker_(std::move(u.tracker_)) {
       u.it_ = U();
