@@ -886,6 +886,16 @@ module std [system] {
       module u8path                       { private header "__filesystem/u8path.h" }
     }
   }
+  module flat_set {
+    header "flat_set"
+    export initializer_list
+    export *
+
+    module __flat_set {
+      module flat_multiset                { private header "__flat_set/flat_multiset.h" }
+      module flat_set                     { private header "__flat_set/flat_set.h" }
+    }
+  }
   module format {
     header "format"
     export *
@@ -1310,6 +1320,7 @@ module std [system] {
       module as_rvalue_view         { private header "__ranges/as_rvalue_view.h" }
       module common_view            { private header "__ranges/common_view.h" }
       module concepts               { private header "__ranges/concepts.h" }
+      module container_compatible_range { private header "__ranges/container_compatible_range.h" }
       module copyable_box           { private header "__ranges/copyable_box.h" }
       module counted                {
         private header "__ranges/counted.h"
@@ -1325,6 +1336,7 @@ module std [system] {
       module enable_borrowed_range  { private header "__ranges/enable_borrowed_range.h" }
       module enable_view            { private header "__ranges/enable_view.h" }
       module filter_view            { private header "__ranges/filter_view.h" }
+      module from_range             { private header "__ranges/from_range.h" }
       module iota_view              { private header "__ranges/iota_view.h" }
       module istream_view           {
         @requires_LIBCXX_ENABLE_LOCALIZATION@
@@ -1692,6 +1704,8 @@ module std [system] {
       module piecewise_construct { private header "__utility/piecewise_construct.h" }
       module priority_tag        { private header "__utility/priority_tag.h" }
       module rel_ops             { private header "__utility/rel_ops.h" }
+      module sorted_equivalent   { private header "__utility/sorted_equivalent.h" }
+      module sorted_unique       { private header "__utility/sorted_unique.h" }
       module swap                { private header "__utility/swap.h" }
       module to_underlying       { private header "__utility/to_underlying.h" }
       module unreachable         { private header "__utility/unreachable.h" }

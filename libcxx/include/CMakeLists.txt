@@ -325,6 +325,8 @@ set(files
   __filesystem/recursive_directory_iterator.h
   __filesystem/space_info.h
   __filesystem/u8path.h
+  __flat_set/flat_multiset.h
+  __flat_set/flat_set.h
   __format/buffer.h
   __format/concepts.h
   __format/container_adaptor.h
@@ -579,6 +581,7 @@ set(files
   __ranges/as_rvalue_view.h
   __ranges/common_view.h
   __ranges/concepts.h
+  __ranges/container_compatible_range.h
   __ranges/copyable_box.h
   __ranges/counted.h
   __ranges/dangling.h
@@ -591,6 +594,7 @@ set(files
   __ranges/enable_borrowed_range.h
   __ranges/enable_view.h
   __ranges/filter_view.h
+  __ranges/from_range.h
   __ranges/iota_view.h
   __ranges/istream_view.h
   __ranges/join_view.h
@@ -799,6 +803,8 @@ set(files
   __utility/piecewise_construct.h
   __utility/priority_tag.h
   __utility/rel_ops.h
+  __utility/sorted_equivalent.h
+  __utility/sorted_unique.h
   __utility/swap.h
   __utility/to_underlying.h
   __utility/unreachable.h
@@ -874,6 +880,7 @@ set(files
   ext/hash_set
   fenv.h
   filesystem
+  flat_set
   float.h
   format
   forward_list

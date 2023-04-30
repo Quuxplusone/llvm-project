@@ -367,6 +367,8 @@ END-SCRIPT
 #include <__filesystem/recursive_directory_iterator.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/recursive_directory_iterator.h'}}
 #include <__filesystem/space_info.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/space_info.h'}}
 #include <__filesystem/u8path.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/u8path.h'}}
+#include <__flat_set/flat_multiset.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_multiset.h'}}
+#include <__flat_set/flat_set.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_set.h'}}
 #include <__format/buffer.h> // expected-error@*:* {{use of private header from outside its module: '__format/buffer.h'}}
 #include <__format/concepts.h> // expected-error@*:* {{use of private header from outside its module: '__format/concepts.h'}}
 #include <__format/container_adaptor.h> // expected-error@*:* {{use of private header from outside its module: '__format/container_adaptor.h'}}
@@ -580,6 +582,7 @@ END-SCRIPT
 #include <__ranges/as_rvalue_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/as_rvalue_view.h'}}
 #include <__ranges/common_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/common_view.h'}}
 #include <__ranges/concepts.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/concepts.h'}}
+#include <__ranges/container_compatible_range.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/container_compatible_range.h'}}
 #include <__ranges/copyable_box.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/copyable_box.h'}}
 #include <__ranges/counted.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/counted.h'}}
 #include <__ranges/dangling.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/dangling.h'}}
@@ -592,6 +595,7 @@ END-SCRIPT
 #include <__ranges/enable_borrowed_range.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/enable_borrowed_range.h'}}
 #include <__ranges/enable_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/enable_view.h'}}
 #include <__ranges/filter_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/filter_view.h'}}
+#include <__ranges/from_range.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/from_range.h'}}
 #include <__ranges/iota_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/iota_view.h'}}
 #include <__ranges/istream_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/istream_view.h'}}
 #include <__ranges/join_view.h> // expected-error@*:* {{use of private header from outside its module: '__ranges/join_view.h'}}
@@ -781,6 +785,8 @@ END-SCRIPT
 #include <__utility/piecewise_construct.h> // expected-error@*:* {{use of private header from outside its module: '__utility/piecewise_construct.h'}}
 #include <__utility/priority_tag.h> // expected-error@*:* {{use of private header from outside its module: '__utility/priority_tag.h'}}
 #include <__utility/rel_ops.h> // expected-error@*:* {{use of private header from outside its module: '__utility/rel_ops.h'}}
+#include <__utility/sorted_equivalent.h> // expected-error@*:* {{use of private header from outside its module: '__utility/sorted_equivalent.h'}}
+#include <__utility/sorted_unique.h> // expected-error@*:* {{use of private header from outside its module: '__utility/sorted_unique.h'}}
 #include <__utility/swap.h> // expected-error@*:* {{use of private header from outside its module: '__utility/swap.h'}}
 #include <__utility/to_underlying.h> // expected-error@*:* {{use of private header from outside its module: '__utility/to_underlying.h'}}
 #include <__utility/unreachable.h> // expected-error@*:* {{use of private header from outside its module: '__utility/unreachable.h'}}
