@@ -910,6 +910,7 @@ module std [system] {
 
     module __flat_map {
       module flat_map                     { private header "__flat_set/flat_map.h" }
+      module flat_multimap                { private header "__flat_set/flat_multimap.h" }
     }
   }
   module flat_set {
