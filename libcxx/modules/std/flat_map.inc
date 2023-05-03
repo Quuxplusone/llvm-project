@@ -20,7 +20,7 @@ export namespace std {
   using std::erase_if;
 
   // [flat.multimap], class template flat_multimap
-  //using std::flat_multimap;
+  using std::flat_multimap;
 
   using std::sorted_equivalent;
   using std::sorted_equivalent_t;
