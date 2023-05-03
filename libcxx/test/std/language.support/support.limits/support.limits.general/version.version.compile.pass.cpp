@@ -5030,17 +5030,11 @@
 #    endif
 #  endif
 
-#  if !defined(_LIBCPP_VERSION)
-#    ifndef __cpp_lib_flat_map
-#      error "__cpp_lib_flat_map should be defined in c++23"
-#    endif
-#    if __cpp_lib_flat_map != 202207L
-#      error "__cpp_lib_flat_map should have the value 202207L in c++23"
-#    endif
-#  else
-#    ifdef __cpp_lib_flat_map
-#      error "__cpp_lib_flat_map should not be defined because it is unimplemented in libc++!"
-#    endif
+#  ifndef __cpp_lib_flat_map
+#    error "__cpp_lib_flat_map should be defined in c++23"
+#  endif
+#  if __cpp_lib_flat_map != 202207L
+#    error "__cpp_lib_flat_map should have the value 202207L in c++23"
 #  endif
 
 #  ifndef __cpp_lib_flat_set
@@ -6771,17 +6765,11 @@
 #    endif
 #  endif
 
-#  if !defined(_LIBCPP_VERSION)
-#    ifndef __cpp_lib_flat_map
-#      error "__cpp_lib_flat_map should be defined in c++26"
-#    endif
-#    if __cpp_lib_flat_map != 202207L
-#      error "__cpp_lib_flat_map should have the value 202207L in c++26"
-#    endif
-#  else
-#    ifdef __cpp_lib_flat_map
-#      error "__cpp_lib_flat_map should not be defined because it is unimplemented in libc++!"
-#    endif
+#  ifndef __cpp_lib_flat_map
+#    error "__cpp_lib_flat_map should be defined in c++26"
+#  endif
+#  if __cpp_lib_flat_map != 202207L
+#    error "__cpp_lib_flat_map should have the value 202207L in c++26"
 #  endif
 
 #  ifndef __cpp_lib_flat_set

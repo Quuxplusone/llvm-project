@@ -1290,6 +1290,7 @@ module std [system] {
   module flat_map {
     module flat_map              { header "__flat_map/flat_map.h" }
     module flat_map_iterator     { header "__flat_map/flat_map_iterator.h" }
+    module flat_multimap         { header "__flat_map/flat_multimap.h" }
 
     header "flat_map"
     export *

@@ -548,7 +548,6 @@ feature_test_macros = [
             "name": "__cpp_lib_flat_map",
             "values": {"c++23": 202207},
             "headers": ["flat_map"],
-            "unimplemented": True,
         },
         {
             "name": "__cpp_lib_flat_set",
