@@ -1238,6 +1238,7 @@ module std [system] {
 
   module flat_map {
     module flat_map                           { header "__flat_map/flat_map.h" }
+    module flat_multimap                      { header "__flat_map/flat_multimap.h" }
   }
 
   module flat_set {
