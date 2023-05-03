@@ -62,6 +62,7 @@ namespace std {
 #include <__assert> // all public C++ headers provide the assertion handler
 #include <__config>
 #include <__flat_map/flat_map.h>
+#include <__flat_map/flat_multimap.h>
 #include <__utility/sorted_equivalent.h>
 #include <__utility/sorted_unique.h>
 #include <version>
