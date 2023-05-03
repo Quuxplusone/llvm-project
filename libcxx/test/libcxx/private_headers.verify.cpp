@@ -378,6 +378,7 @@ END-SCRIPT
 #include <__filesystem/space_info.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/space_info.h'}}
 #include <__filesystem/u8path.h> // expected-error@*:* {{use of private header from outside its module: '__filesystem/u8path.h'}}
 #include <__flat_set/flat_map.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_map.h'}}
+#include <__flat_set/flat_multimap.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_multimap.h'}}
 #include <__flat_set/flat_multiset.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_multiset.h'}}
 #include <__flat_set/flat_set.h> // expected-error@*:* {{use of private header from outside its module: '__flat_set/flat_set.h'}}
 #include <__format/buffer.h> // expected-error@*:* {{use of private header from outside its module: '__format/buffer.h'}}
