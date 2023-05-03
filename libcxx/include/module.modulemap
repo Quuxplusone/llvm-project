@@ -1304,6 +1304,7 @@ module std_private_filesystem_space_info                   [system] { header "__
 module std_private_filesystem_u8path                       [system] { header "__filesystem/u8path.h" }
 
 module std_private_flat_map_flat_map                      [system] { header "__flat_map/flat_map.h" }
+module std_private_flat_map_flat_multimap                 [system] { header "__flat_map/flat_multimap.h" }
 module std_private_flat_set_flat_multiset                 [system] { header "__flat_set/flat_multiset.h" }
 module std_private_flat_set_flat_set                      [system] { header "__flat_set/flat_set.h" }
 
