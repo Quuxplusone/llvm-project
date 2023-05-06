@@ -60,7 +60,7 @@ struct __libcpp_is_trivially_equality_comparable_impl<_Tp, _Tp>
 template <class _Tp>
 struct __libcpp_is_trivially_equality_comparable_impl<_Tp*, _Tp*> : true_type {};
 
-// TODO: Use is_pointer_inverconvertible_base_of
+// TODO: Use is_pointer_interconvertible_base_of
 template <class _Tp, class _Up>
 struct __libcpp_is_trivially_equality_comparable_impl<_Tp*, _Up*>
     : integral_constant<
