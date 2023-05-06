@@ -63,6 +63,34 @@ __constexpr_memcmp(const _Tp* __lhs, const _Up* __rhs, size_t __count) {
   }
 }
 
+// Because of __libcpp_is_trivially_equality_comparable we know that comparing the object representations is equivalent
+// to a std::memcmp(...) == 0. Since we have multiple objects contiguously in memory, we can call memcmp once instead
+// of invoking it on every object individually.
+template <class _Tp, class _Up>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 bool
+__constexpr_memcmp_equal(const _Tp* __lhs, const _Up* __rhs, size_t __count) {
+  static_assert(__libcpp_is_trivially_equality_comparable<_Tp, _Up>::value,
+                "_Tp and _Up have to be trivially equality comparable");
+
+  if (__libcpp_is_constant_evaluated()) {
+#ifdef _LIBCPP_COMPILER_CLANG_BASED
+    if (sizeof(_Tp) == 1 && is_integral<_Tp>::value && !is_same<_Tp, bool>::value)
+      return __builtin_memcmp(__lhs, __rhs, __count) == 0;
+#endif
+    while (__count != 0) {
+      if (*__lhs != *__rhs)
+        return false;
+
+      __count -= sizeof(_Tp);
+      ++__lhs;
+      ++__rhs;
+    }
+    return true;
+  } else {
+    return __builtin_memcmp(__lhs, __rhs, __count) == 0;
+  }
+}
+
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const char*
 __constexpr_char_memchr(const char* __str, int __char, size_t __count) {
 #if __has_builtin(__builtin_char_memchr)
