@@ -20,6 +20,7 @@
 #include <ranges>
 #include <vector>
 
+#include "MoveOnly.h"
 #include "test_macros.h"
 #include "test_iterators.h"
 #include "min_allocator.h"
@@ -79,6 +80,23 @@ int main(int, char**)
     const P expected[] = {{21,0}, {42,1}, {43,0}, {33,1}, {15,0}, {55,1}, {37,0}, {18,1}, {28,1}};
     assert(std::ranges::is_permutation(m, expected));
     LIBCPP_ASSERT(std::ranges::equal(m, expected));
+  }
+  {
+    // Items are forwarded correctly from the input range (P2767).
+    std::pair<MoveOnly, MoveOnly> a[] = {{3,3}, {1,1}, {4,4}, {1,1}, {5,5}};
+    std::flat_multimap<MoveOnly, MoveOnly> m;
+    m.insert_range(a | std::views::as_rvalue);
+    std::pair<MoveOnly, MoveOnly> expected[] = {{1,1}, {1,1}, {3,3}, {4,4}, {5,5}};
+    assert(std::ranges::equal(m, expected));
+  }
+  {
+    // The element type of the range doesn't need to be std::pair (P2767).
+    std::pair<int, int> pa[] = {{3,3}, {1,1}, {4,4}, {1,1}, {5,5}};
+    std::deque<std::reference_wrapper<std::pair<int, int>>> a(pa, pa+5);
+    std::flat_multimap<int, int> m;
+    m.insert_range(a);
+    std::pair<int, int> expected[] = {{1,1}, {1,1}, {3,3}, {4,4}, {5,5}};
+    assert(std::ranges::equal(m, expected));
   }
   return 0;
 }
