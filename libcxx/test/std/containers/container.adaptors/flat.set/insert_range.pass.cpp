@@ -20,6 +20,7 @@
 #include <ranges>
 #include <vector>
 
+#include "MoveOnly.h"
 #include "test_macros.h"
 #include "test_iterators.h"
 #include "min_allocator.h"
@@ -67,6 +68,14 @@ int main(int, char**)
     int ar[] = {33, 18, 55, 28, 42};
     m.insert_range(ar);
     LIBCPP_ASSERT((m == M{21, 42, 43, 15, 37, 18}));
+  }
+  {
+    // Items are forwarded correctly from the input range (P2767).
+    MoveOnly a[] = { 3, 1, 4, 1, 5 };
+    std::flat_set<MoveOnly> m;
+    m.insert_range(a | std::views::as_rvalue);
+    MoveOnly expected[] = {1, 3, 4, 5};
+    assert(std::ranges::equal(m, expected));
   }
   return 0;
 }
