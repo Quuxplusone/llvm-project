@@ -770,8 +770,8 @@ public:
   void insert_range(_Rp&& __r) {
     auto __guard = std::__make_exception_guard([&] { __restore_invariant(); });
     size_type __n = 0;
-    for (const auto& __e : __r) {
-      __c_.insert(__c_.end(), __e);
+    for (auto&& __e : __r) {
+      __c_.insert(__c_.end(), decltype(__e)(__e));
       ++__n;
     }
     if (__n != 0) {
