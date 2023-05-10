@@ -558,12 +558,6 @@ __uninitialized_allocator_copy(_Alloc& __alloc, _Iter1 __first1, _Sent1 __last1,
   return __first2;
 }
 
-template <class _Alloc, class _Type>
-struct __allocator_has_trivial_copy_construct : _Not<__has_construct<_Alloc, _Type*, const _Type&> > {};
-
-template <class _Type>
-struct __allocator_has_trivial_copy_construct<allocator<_Type>, _Type> : true_type {};
-
 template <class _Alloc,
           class _Type,
           class _RawType = __remove_const_t<_Type>,
@@ -611,18 +605,6 @@ _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _Iter2 __uninitialized_alloc
   __guard.__complete();
   return __first2;
 }
-
-template <class _Alloc, class _Type>
-struct __allocator_has_trivial_move_construct : _Not<__has_construct<_Alloc, _Type*, _Type&&> > {};
-
-template <class _Type>
-struct __allocator_has_trivial_move_construct<allocator<_Type>, _Type> : true_type {};
-
-template <class _Alloc, class _Type>
-struct __allocator_has_trivial_destroy : _Not<__has_destroy<_Alloc, _Type*> > {};
-
-template <class _Type>
-struct __allocator_has_trivial_destroy<allocator<_Type>, _Type> : true_type {};
 
 #ifndef _LIBCPP_COMPILER_GCC
 template <

@@ -11,6 +11,7 @@
 
 #include <__assert>
 #include <__config>
+#include <__memory/allocator_traits.h>
 #include <__memory_resource/memory_resource.h>
 #include <__utility/exception_guard.h>
 #include <cstddef>
@@ -214,6 +215,15 @@ operator!=(const polymorphic_allocator<_Tp>& __lhs, const polymorphic_allocator<
 }
 
 } // namespace pmr
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_copy_construct<pmr::polymorphic_allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_move_construct<pmr::polymorphic_allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_destroy<pmr::polymorphic_allocator<_Tp>, _Up> : true_type {};
 
 _LIBCPP_END_NAMESPACE_STD
 
