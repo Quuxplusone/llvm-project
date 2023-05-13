@@ -10,12 +10,14 @@
 
 // <memory>
 
-// template <class _Tp>
-// void relocate(_Tp *source, _Tp *dest);
+// template <class T>
+// T relocate(T *source);
 
-#include <memory>
-#include <cstdlib>
 #include <cassert>
+#include <cstdlib>
+#include <list>
+#include <memory>
+#include <vector>
 
 struct Counted {
   static int count;
@@ -43,7 +45,7 @@ int RCounted::count = 0;
 
 int main(int, char**)
 {
-    {
+  {
     void *mem1 = std::malloc(sizeof(Counted));
     assert(mem1);
     assert(Counted::count == 0);
@@ -53,9 +55,8 @@ int main(int, char**)
     assert(Counted::count == 1);
     assert(var2.m_data == 1234);
     std::free(mem1);
-    }
-
-    {
+  }
+  {
     void *mem1 = std::malloc(sizeof(RCounted));
     assert(mem1);
     assert(RCounted::count == 0);
@@ -65,7 +66,32 @@ int main(int, char**)
     assert(RCounted::count == 1);
     assert(var2.m_data == 5678);
     std::free(mem1);
-    }
-
-    return 0;
+  }
+  {
+    // Relocate from a const, trivially relocatable type
+    using T = std::vector<int>;
+    static_assert(std::is_trivially_relocatable<T>::value, "");
+    void *mem1 = std::malloc(sizeof(T));
+    assert(mem1);
+    const T *p = ::new (mem1) T{1,2,3,4,5};
+    assert(p->size() == 5);
+    T var2 = std::relocate(p);
+    assert(var2.size() == 5);
+    std::free(mem1);
+    assert((var2 == T{1,2,3,4,5}));
+  }
+  {
+    // Relocate from a const, non-trivially relocatable type
+    using T = std::list<int>;
+    static_assert(!std::is_trivially_relocatable<T>::value, "");
+    void *mem1 = std::malloc(sizeof(T));
+    assert(mem1);
+    const T *p = ::new (mem1) T{1,2,3,4,5};
+    assert(p->size() == 5);
+    T var2 = std::relocate(p);
+    assert(var2.size() == 5);
+    std::free(mem1);
+    assert((var2 == T{1,2,3,4,5}));
+  }
+  return 0;
 }

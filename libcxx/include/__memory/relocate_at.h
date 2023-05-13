@@ -10,6 +10,8 @@
 #define _LIBCPP___MEMORY_RELOCATE_AT_H
 
 #include <__config>
+#include <__type_traits/is_destructible.h>
+#include <__type_traits/is_move_constructible.h>
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_nothrow_move_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
@@ -36,18 +38,21 @@ struct __destroy_guard {
 };
 
 template<class _Tp, __enable_if_t<__libcpp_is_trivially_relocatable<_Tp>::value && !is_trivially_destructible<_Tp>::value, int> = 0>
-_LIBCPP_HIDE_FROM_ABI
-_Tp relocate(_Tp *__source) _NOEXCEPT
+_LIBCPP_NODISCARD _LIBCPP_HIDE_FROM_ABI
+__remove_cvref_t<_Tp> relocate(_Tp *__source) _NOEXCEPT
 {
+    static_assert(is_move_constructible<_Tp>::value && is_destructible<_Tp>::value,
+        "return std::move(source) must be well-formed");
+
     // This works on the Itanium ABI, because non-trivially-destructible objects
     // are always returned by hidden pointer, which happens to be the first argument.
-    auto __more_magic = (_Tp(*)(void*, size_t))memcpy;
+    auto __more_magic = (__remove_cvref_t<_Tp>(*)(const void*, size_t))memcpy;
     return __more_magic(__source, sizeof(_Tp));
 }
 
 template<class _Tp, __enable_if_t<is_trivially_destructible<_Tp>::value || !__libcpp_is_trivially_relocatable<_Tp>::value, int> = 0>
-_LIBCPP_HIDE_FROM_ABI
-_Tp relocate(_Tp *__source)
+_LIBCPP_NODISCARD _LIBCPP_HIDE_FROM_ABI
+__remove_cvref_t<_Tp> relocate(_Tp *__source)
     _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value)
 {
     // We need compiler magic to handle types which are trivially relocatable,
@@ -83,6 +88,9 @@ _LIBCPP_HIDE_FROM_ABI
 _Tp *relocate_at(_Tp *__source, _Tp *__dest)
     _NOEXCEPT_(noexcept(std::__libcpp_relocate_at2(0, __source, __dest)))
 {
+    static_assert(is_move_constructible<_Tp>::value && is_destructible<_Tp>::value,
+        "::new (voidify(*dest)) T(std::move(*source)) must be well-formed");
+
     return std::__libcpp_relocate_at2(0, __source, __dest);
 }
 

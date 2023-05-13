@@ -10,8 +10,8 @@
 
 // <memory>
 
-// template <class _Tp>
-// void relocate_at(_Tp *source, _Tp *dest);
+// template <class T>
+// T *relocate_at(T *source, T *dest);
 
 #include <memory>
 #include <cstdlib>
