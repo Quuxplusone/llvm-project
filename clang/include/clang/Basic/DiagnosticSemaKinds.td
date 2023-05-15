@@ -3631,10 +3631,10 @@ def note_cannot_use_trivial_abi_reason : Note<
   "it has a base of a non-trivial class type|it has a virtual base|"
   "it has a __weak field|it has a field of a non-trivial class type}1">;
 
-def err_trivially_relocatable_class_is_not_relocatable : Error<
-  "'trivially_relocatable' cannot be applied to "
-  "%select{struct|interface|union|class|enum}0 %1 because it is "
-  "not %select{move-constructible|destructible}2">;
+def warn_trivially_relocatable_class_is_not_relocatable : Warning<
+  "%select{struct|interface|union|class|enum}0 %1 "
+  "is marked 'trivially_relocatable', but it is "
+  "not %select{move-constructible|destructible}2">, InGroup<IgnoredAttributes>;
 
 // Availability attribute
 def warn_availability_unknown_platform : Warning<

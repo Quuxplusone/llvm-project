@@ -7135,9 +7135,9 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       }
     }
 
-    // If a type T is declared with the trivially_relocatable attribute,
-    // and T is either not move-constructible or not destructible,
-    // the program is ill-formed.
+    // P1144R6 said: "If a type T is declared with the trivially_relocatable
+    // attribute, and T is either not move-constructible or not destructible,
+    // the program is ill-formed." This is now just a warning.
 
     if (Record->hasAttr<TriviallyRelocatableAttr>() ||
         Record->hasAttr<MaybeTriviallyRelocatableAttr>()) {
@@ -7159,7 +7159,7 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
           Record->dropAttr<TriviallyRelocatableAttr>();
           if (!isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
             Diag(Record->getLocation(),
-                 diag::err_trivially_relocatable_class_is_not_relocatable)
+                 diag::warn_trivially_relocatable_class_is_not_relocatable)
                 << Record->getCanonicalDecl()->getTagKind()
                 << Context.getRecordType(Record) << (Reason == 1);
           }

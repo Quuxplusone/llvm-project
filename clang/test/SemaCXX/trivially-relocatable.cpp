@@ -67,26 +67,26 @@ static_assert(__is_trivially_relocatable(NonMoveConstructible), "");
 static_assert(!__is_constructible(NonMoveConstructible, NonMoveConstructible&&), "");
 
 struct [[clang::trivially_relocatable]] D1 { ~D1() = delete; };
-// expected-error@-1{{cannot be applied to struct 'D1' because it is not destructible}}
+// expected-warning@-1{{struct 'D1' is marked 'trivially_relocatable', but it is not destructible}}
 
 struct [[clang::trivially_relocatable]] D2 : private NonDestructible { };
-// expected-error@-1{{cannot be applied to struct 'D2' because it is not destructible}}
+// expected-warning@-1{{struct 'D2' is marked 'trivially_relocatable', but it is not destructible}}
 
 struct [[clang::trivially_relocatable]] D3 { D3(const D3&) = delete; };
-// expected-error@-1{{cannot be applied to struct 'D3' because it is not move-constructible}}
+// expected-warning@-1{{struct 'D3' is marked 'trivially_relocatable', but it is not move-constructible}}
 
 struct [[clang::trivially_relocatable]] D4 { D4(const D4&) = default; D4(D4&&) = delete; };
-// expected-error@-1{{cannot be applied to struct 'D4' because it is not move-constructible}}
+// expected-warning@-1{{struct 'D4' is marked 'trivially_relocatable', but it is not move-constructible}}
 
 struct [[clang::trivially_relocatable]] D5 : private NonCopyConstructible { };
-// expected-error@-1{{cannot be applied to struct 'D5' because it is not move-constructible}}
+// expected-warning@-1{{struct 'D5' is marked 'trivially_relocatable', but it is not move-constructible}}
 static_assert(!__is_constructible(D5, D5&&), "");
 
 struct [[clang::trivially_relocatable]] D6 : private NonMoveConstructible { D6(D6&&) = default; };
 // expected-warning@-1{{explicitly defaulted move constructor is implicitly deleted}}
 // expected-note@-2{{implicitly deleted because}}
 // expected-note@-3{{replace 'default' with 'delete'}}
-// expected-error@-4{{cannot be applied to struct 'D6' because it is not move-constructible}}
+// expected-warning@-4{{struct 'D6' is marked 'trivially_relocatable', but it is not move-constructible}}
 
 template<class T>
 struct [[clang::trivially_relocatable]] DT1 : private T { };  // ok
@@ -98,7 +98,7 @@ struct D7 {
 class [[clang::trivially_relocatable]] D8 {
     DT1<NonDestructible> m;
 };
-// expected-error@-3{{cannot be applied to class 'D8' because it is not destructible}}
+// expected-warning@-3{{class 'D8' is marked 'trivially_relocatable', but it is not destructible}}
 
 
 // Now test specific types for trivial relocatability.
