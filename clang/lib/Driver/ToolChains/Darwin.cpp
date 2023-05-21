@@ -2474,7 +2474,7 @@ void DarwinClang::AddClangCXXStdlibIncludeArgs(
     // 1. Alongside the compiler in         <install>/include/c++/v1
     // 2. In a SDK (or a custom sysroot) in <sysroot>/usr/include/c++/v1
     //
-    // The precendence of paths is as listed above, i.e. we take the first path
+    // The precedence of paths is as listed above, i.e. we take the first path
     // that exists. Also note that we never include libc++ twice -- we take the
     // first path that exists and don't send the other paths to CC1 (otherwise
     // include_next could break).
@@ -2557,25 +2557,43 @@ void DarwinClang::AddClangCXXStdlibIncludeArgs(
   }
 }
 
-void DarwinClang::AddCXXStdlibLibArgs(const ArgList &Args,
+void DarwinClang::AddCXXStdlibLibArgs(const ArgList &DriverArgs,
                                       ArgStringList &CmdArgs) const {
-  CXXStdlibType Type = GetCXXStdlibType(Args);
+  CXXStdlibType Type = GetCXXStdlibType(DriverArgs);
 
   switch (Type) {
-  case ToolChain::CST_Libcxx:
+  case ToolChain::CST_Libcxx: {
+    // On Darwin, libc++ can be installed in one of the following two places:
+    // 1. Alongside the compiler in         <install>/lib
+    // 2. In a SDK (or a custom sysroot) in <sysroot>/usr/lib
+
+    // Check for (1)
+    // Get from '<install>/bin' to '<install>/lib'.
+    // Note that InstallBin can be relative, so we use '..' instead of
+    // parent_path.
+    llvm::SmallString<128> InstallBin =
+        llvm::StringRef(getDriver().getInstalledDir()); // <install>/bin
+    llvm::sys::path::append(InstallBin, "..", "lib");
+    if (getVFS().exists(InstallBin)) {
+      CmdArgs.push_back(DriverArgs.MakeArgString("-L" + InstallBin));
+    } else if (DriverArgs.hasArg(options::OPT_v)) {
+      llvm::errs() << "ignoring nonexistent directory \"" << InstallBin
+                   << "\"\n";
+    }
+
     CmdArgs.push_back("-lc++");
-    if (Args.hasArg(options::OPT_fexperimental_library))
+    if (DriverArgs.hasArg(options::OPT_fexperimental_library))
       CmdArgs.push_back("-lc++experimental");
     break;
-
-  case ToolChain::CST_Libstdcxx:
+  }
+  case ToolChain::CST_Libstdcxx: {
     // Unfortunately, -lstdc++ doesn't always exist in the standard search path;
     // it was previously found in the gcc lib dir. However, for all the Darwin
     // platforms we care about it was -lstdc++.6, so we search for that
     // explicitly if we can't see an obvious -lstdc++ candidate.
 
     // Check in the sysroot first.
-    if (const Arg *A = Args.getLastArg(options::OPT_isysroot)) {
+    if (const Arg *A = DriverArgs.getLastArg(options::OPT_isysroot)) {
       SmallString<128> P(A->getValue());
       llvm::sys::path::append(P, "usr", "lib", "libstdc++.dylib");
 
@@ -2583,7 +2601,7 @@ void DarwinClang::AddCXXStdlibLibArgs(const ArgList &Args,
         llvm::sys::path::remove_filename(P);
         llvm::sys::path::append(P, "libstdc++.6.dylib");
         if (getVFS().exists(P)) {
-          CmdArgs.push_back(Args.MakeArgString(P));
+          CmdArgs.push_back(DriverArgs.MakeArgString(P));
           return;
         }
       }
@@ -2601,6 +2619,7 @@ void DarwinClang::AddCXXStdlibLibArgs(const ArgList &Args,
     // Otherwise, let the linker search.
     CmdArgs.push_back("-lstdc++");
     break;
+  }
   }
 }
 
