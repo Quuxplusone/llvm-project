@@ -14,10 +14,12 @@
 #include <__cstddef/byte.h>
 #include <__cstddef/max_align_t.h>
 #include <__fwd/pair.h>
+#include <__memory/allocator_traits.h>
 #include <__memory_resource/memory_resource.h>
 #include <__new/exceptions.h>
 #include <__new/placement_new_delete.h>
 #include <__type_traits/is_pmr_relocatable_container.h>
+#include <__type_traits/negation.h>
 #include <__utility/exception_guard.h>
 #include <__utility/piecewise_construct.h>
 #include <limits>
@@ -243,6 +245,15 @@ operator!=(const polymorphic_allocator<_Tp>& __lhs, const polymorphic_allocator<
 
 template <class _Tp>
 struct __is_pmr_allocator<pmr::polymorphic_allocator<_Tp>> : true_type {};
+
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_copy_construct_v<pmr::polymorphic_allocator<_Tp>, _Up> = !uses_allocator<_Up, pmr::polymorphic_allocator<_Tp>>::value;
+
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_move_construct_v<pmr::polymorphic_allocator<_Tp>, _Up> = !uses_allocator<_Up, pmr::polymorphic_allocator<_Tp>>::value;
+
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_destroy_v<pmr::polymorphic_allocator<_Tp>, _Up> = true;
 
 _LIBCPP_END_NAMESPACE_STD
 

@@ -172,6 +172,15 @@ inline _LIBCPP_HIDE_FROM_ABI bool operator!=(const allocator<_Tp>&, const alloca
 
 #endif
 
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_copy_construct_v<allocator<_Tp>, _Up> = true;
+
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_move_construct_v<allocator<_Tp>, _Up> = true;
+
+template <class _Tp, class _Up>
+inline const bool __allocator_has_trivial_destroy_v<allocator<_Tp>, _Up> = true;
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___MEMORY_ALLOCATOR_H

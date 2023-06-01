@@ -67,8 +67,8 @@ void test_reallocate_with_list()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ {}, {}, {} }));
-  // Breaking the PMR invariant causes UB.
-  // We use `allocator_traits::construct` to re-construct
+  // Breaking the PMR invariant causes UB. Here, pmr::list isn't trivially
+  // relocatable, so we use `allocator_traits::construct` to re-construct
   // the pmr::lists in the new buffer using v's own allocator (mr3).
   assert(v[0].get_allocator().resource() == &mr[3]);
   assert(v[1].get_allocator().resource() == &mr[3]);
