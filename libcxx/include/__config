@@ -966,6 +966,15 @@ typedef __char32_t char32_t;
 #    define _LIBCPP_IF_WIDE_CHARACTERS(...) __VA_ARGS__
 #  endif
 
+// This controls whether std::pmr::vector<int> is considered trivially
+// relocatable, despite the following infelicities:
+// - sometimes copy-and-destroy doesn't match move-and-destroy
+// - sometimes move-assign doesn't match destroy-and-move-construct
+//
+#  ifndef _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+#    define _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS 0
+#  endif // _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+
 // clang-format off
 #  define _LIBCPP_PUSH_MACROS _Pragma("push_macro(\"min\")") _Pragma("push_macro(\"max\")") _Pragma("push_macro(\"refresh\")") _Pragma("push_macro(\"move\")") _Pragma("push_macro(\"erase\")")
 #  define _LIBCPP_POP_MACROS _Pragma("pop_macro(\"min\")") _Pragma("pop_macro(\"max\")") _Pragma("pop_macro(\"refresh\")") _Pragma("pop_macro(\"move\")") _Pragma("pop_macro(\"erase\")")

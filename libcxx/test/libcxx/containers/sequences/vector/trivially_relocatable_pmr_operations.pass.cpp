@@ -19,6 +19,13 @@
 #include <string>
 #include <vector>
 
+[[maybe_unused]] static constexpr bool PmrIsTrivial =
+#if defined(_LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS) && _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+  true;
+#else
+  false;
+#endif
+
 void break_pmr_invariant(std::pmr::vector<std::pmr::string>& v, std::pmr::monotonic_buffer_resource *mrs)
 {
   using T = std::pmr::string;
@@ -48,7 +55,7 @@ void test_reallocate_with_string()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "1", "2" }));
-  // Breaking the PMR invariant causes UB. You might expect that
+  // Breaking the PMR invariant causes UB. You might expect that when !PmrIsTrivial,
   // we would use `allocator_traits::construct` to re-construct the pmr::strings in
   // the new buffer using v's own allocator (mr3), but in fact we now recognize the
   // "trivial move-destructibility" of pmr::string even when it's not fully trivially
@@ -67,8 +74,8 @@ void test_reallocate_with_list()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ {}, {}, {} }));
-  // Breaking the PMR invariant causes UB.
-  // We use `allocator_traits::construct` to re-construct
+  // Breaking the PMR invariant causes UB. Here, pmr::list isn't trivially
+  // relocatable, so we use `allocator_traits::construct` to re-construct
   // the pmr::lists in the new buffer using v's own allocator (mr3).
   assert(v[0].get_allocator().resource() == &mr[3]);
   assert(v[1].get_allocator().resource() == &mr[3]);
