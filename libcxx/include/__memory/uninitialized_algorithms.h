@@ -31,7 +31,6 @@
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/is_unbounded_array.h>
-#include <__type_traits/negation.h>
 #include <__type_traits/remove_const.h>
 #include <__type_traits/remove_extent.h>
 #include <__utility/exception_guard.h>
@@ -556,12 +555,6 @@ __uninitialized_allocator_copy_impl(_Alloc& __alloc, _Iter1 __first1, _Sent1 __l
   return __first2;
 }
 
-template <class _Alloc, class _Type>
-struct __allocator_has_trivial_copy_construct : _Not<__has_construct<_Alloc, _Type*, const _Type&> > {};
-
-template <class _Type>
-struct __allocator_has_trivial_copy_construct<allocator<_Type>, _Type> : true_type {};
-
 template <class _Alloc,
           class _In,
           class _RawTypeIn = __remove_const_t<_In>,
@@ -595,18 +588,6 @@ __uninitialized_allocator_copy(_Alloc& __alloc, _Iter1 __first1, _Sent1 __last1,
       __alloc, __unwrapped_range.first, __unwrapped_range.second, std::__unwrap_iter(__first2));
   return std::__rewrap_iter(__first2, __result);
 }
-
-template <class _Alloc, class _Type>
-struct __allocator_has_trivial_move_construct : _Not<__has_construct<_Alloc, _Type*, _Type&&> > {};
-
-template <class _Type>
-struct __allocator_has_trivial_move_construct<allocator<_Type>, _Type> : true_type {};
-
-template <class _Alloc, class _Tp>
-struct __allocator_has_trivial_destroy : _Not<__has_destroy<_Alloc, _Tp*> > {};
-
-template <class _Tp, class _Up>
-struct __allocator_has_trivial_destroy<allocator<_Tp>, _Up> : true_type {};
 
 template<class _Tp, class _Alloc>
 struct __uninitialized_allocator_relocate_via_memcpy : integral_constant<bool,
