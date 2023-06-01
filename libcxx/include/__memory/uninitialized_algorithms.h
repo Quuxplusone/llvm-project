@@ -550,12 +550,6 @@ __uninitialized_allocator_copy_impl(_Alloc& __alloc, _Iter1 __first1, _Sent1 __l
   return __first2;
 }
 
-template <class _Alloc, class _Type>
-inline const bool __allocator_has_trivial_copy_construct_v = !__has_construct_v<_Alloc, _Type*, const _Type&>;
-
-template <class _Type>
-inline const bool __allocator_has_trivial_copy_construct_v<allocator<_Type>, _Type> = true;
-
 template <class _Alloc,
           class _In,
           class _Out,
@@ -585,18 +579,6 @@ __uninitialized_allocator_copy(_Alloc& __alloc, _Iter1 __first1, _Sent1 __last1,
       __alloc, std::move(__unwrapped_range.first), std::move(__unwrapped_range.second), std::__unwrap_iter(__first2));
   return std::__rewrap_iter(__first2, __result);
 }
-
-template <class _Alloc, class _Type>
-inline const bool __allocator_has_trivial_move_construct_v = !__has_construct_v<_Alloc, _Type*, _Type&&>;
-
-template <class _Type>
-inline const bool __allocator_has_trivial_move_construct_v<allocator<_Type>, _Type> = true;
-
-template <class _Alloc, class _Tp>
-inline const bool __allocator_has_trivial_destroy_v = !__has_destroy_v<_Alloc, _Tp*>;
-
-template <class _Tp, class _Up>
-inline const bool __allocator_has_trivial_destroy_v<allocator<_Tp>, _Up> = true;
 
 template<class _Tp, class _Alloc>
 struct __uninitialized_allocator_relocate_via_memcpy : integral_constant<bool,
