@@ -13,7 +13,9 @@
 #include <__availability>
 #include <__config>
 #include <__fwd/pair.h>
+#include <__memory/allocator_traits.h>
 #include <__memory_resource/memory_resource.h>
+#include <__type_traits/negation.h>
 #include <__utility/exception_guard.h>
 #include <cstddef>
 #include <limits>
@@ -222,6 +224,25 @@ operator!=(const polymorphic_allocator<_Tp>& __lhs, const polymorphic_allocator<
 #  endif
 
 } // namespace pmr
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_copy_construct<pmr::polymorphic_allocator<_Tp>, _Up> : _Not<uses_allocator<_Up, pmr::polymorphic_allocator<_Tp>>> {};
+
+#if _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_move_construct<pmr::polymorphic_allocator<_Tp>, _Up> : true_type {};
+#else
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_move_construct<pmr::polymorphic_allocator<_Tp>, _Up> : _Not<uses_allocator<_Up, pmr::polymorphic_allocator<_Tp>>> {};
+#endif // _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_destroy<pmr::polymorphic_allocator<_Tp>, _Up> : true_type {};
+
+#if _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
+template <class _Tp>
+struct __allocator_pocma_models_relocatable<pmr::polymorphic_allocator<_Tp>> : true_type {};
+#endif // _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
 
 _LIBCPP_END_NAMESPACE_STD
 

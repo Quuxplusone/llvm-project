@@ -261,6 +261,15 @@ inline _LIBCPP_HIDE_FROM_ABI bool operator!=(const allocator<_Tp>&, const alloca
 
 #endif
 
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_copy_construct<allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_move_construct<allocator<_Tp>, _Up> : true_type {};
+
+template <class _Tp, class _Up>
+struct __allocator_has_trivial_destroy<allocator<_Tp>, _Up> : true_type {};
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___MEMORY_ALLOCATOR_H
