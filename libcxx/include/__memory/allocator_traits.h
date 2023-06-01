@@ -17,10 +17,12 @@
 #include <__memory/pointer_traits.h>
 #include <__type_traits/detected_or.h>
 #include <__type_traits/enable_if.h>
+#include <__type_traits/integral_constant.h>
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_empty.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/make_unsigned.h>
+#include <__type_traits/negation.h>
 #include <__type_traits/remove_reference.h>
 #include <__type_traits/void_t.h>
 #include <__utility/declval.h>
@@ -373,6 +375,28 @@ inline const bool __is_cpp17_copy_insertable_v =
     (is_copy_constructible<typename _Alloc::value_type>::value ||
      (!__is_std_allocator_v<_Alloc> &&
       __has_construct_v<_Alloc, typename _Alloc::value_type*, const typename _Alloc::value_type&>));
+
+template <class _Alloc, class _Type>
+inline const bool __allocator_has_trivial_copy_construct_v = !__has_construct_v<_Alloc, _Type*, const _Type&>;
+
+template <class _Alloc, class _Type>
+inline const bool __allocator_has_trivial_move_construct_v = !__has_construct_v<_Alloc, _Type*, _Type&&>;
+
+template <class _Alloc, class _Tp>
+inline const bool __allocator_has_trivial_destroy_v = !__has_destroy_v<_Alloc, _Tp*>;
+
+// This trait represents whether `vector<T, _Alloc>` will have an assignment operator
+// that correctly models the semantic requirements of `std::relocatable`. Basically,
+// `*x = move(*y); destroy_at(y)` needs to do the same thing as `destroy_at(x); relocate_at(y, x)`.
+// This means that `_Alloc` must propagate, or else not matter if it propagates.
+//
+template <class _Alloc>
+struct __allocator_pocma_models_relocatable : _BoolConstant<
+    allocator_traits<_Alloc>::is_always_equal::value ||
+    (allocator_traits<_Alloc>::propagate_on_container_copy_assignment::value &&
+     allocator_traits<_Alloc>::propagate_on_container_move_assignment::value &&
+     allocator_traits<_Alloc>::propagate_on_container_swap::value)
+> {};
 
 _LIBCPP_END_NAMESPACE_STD
 
