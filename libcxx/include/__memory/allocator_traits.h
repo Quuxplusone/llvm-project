@@ -14,10 +14,12 @@
 #include <__memory/construct_at.h>
 #include <__memory/pointer_traits.h>
 #include <__type_traits/enable_if.h>
+#include <__type_traits/integral_constant.h>
 #include <__type_traits/is_copy_constructible.h>
 #include <__type_traits/is_empty.h>
 #include <__type_traits/is_move_constructible.h>
 #include <__type_traits/make_unsigned.h>
+#include <__type_traits/negation.h>
 #include <__type_traits/remove_reference.h>
 #include <__type_traits/void_t.h>
 #include <__utility/declval.h>
@@ -400,6 +402,29 @@ struct __is_cpp17_copy_insertable<_Alloc, __enable_if_t<
 > >
     : __is_cpp17_move_insertable<_Alloc>
 { };
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_copy_construct : _Not<__has_construct<_Alloc, _Type*, const _Type&> > {};
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_move_construct : _Not<__has_construct<_Alloc, _Type*, _Type&&> > {};
+
+template <class _Alloc, class _Type>
+struct __allocator_has_trivial_destroy : _Not<__has_destroy<_Alloc, _Type*> > {};
+
+// This trait represents whether `vector<T, _Alloc>` will have an assignment operator
+// that correctly models the semantic requirements of `std::relocatable`. Basically,
+// `*x = move(*y); destroy_at(y)` needs to do the same thing as `destroy_at(x); relocate_at(y, x)`.
+// This means that `_Alloc` must propagate, or else not matter if it propagates.
+// (But `polymorphic_allocator` will lie when _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS.)
+//
+template <class _Alloc>
+struct __allocator_pocma_models_relocatable : _BoolConstant<
+    allocator_traits<_Alloc>::is_always_equal::value ||
+    (allocator_traits<_Alloc>::propagate_on_container_copy_assignment::value &&
+     allocator_traits<_Alloc>::propagate_on_container_move_assignment::value &&
+     allocator_traits<_Alloc>::propagate_on_container_swap::value)
+> {};
 
 // ASan choices
 #ifndef _LIBCPP_HAS_NO_ASAN
