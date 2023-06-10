@@ -8,7 +8,8 @@
 
 // <map>
 
-// class map class multimap
+// class map
+// class multimap
 
 // Extension:  SCARY/N2913 iterator compatibility between map and multimap
 
@@ -16,13 +17,9 @@
 
 #include "test_macros.h"
 
-int main(int, char**)
-{
-    typedef std::map<int, int> M1;
-    typedef std::multimap<int, int> M2;
-    M2::iterator i;
-    M1::iterator j = i;
-    ((void)j);
-
-  return 0;
+void test() {
+  typedef std::map<int, int> M1;
+  typedef std::multimap<int, int> M2;
+  ASSERT_SAME_TYPE(M1::iterator, M2::iterator);
+  ASSERT_SAME_TYPE(M1::const_iterator, M2::const_iterator);
 }
