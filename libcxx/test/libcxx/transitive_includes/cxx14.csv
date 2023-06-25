@@ -833,6 +833,7 @@ system_error string
 system_error type_traits
 system_error version
 thread array
+thread atomic
 thread cerrno
 thread chrono
 thread compare
