@@ -87,6 +87,7 @@ chrono tuple
 chrono version
 cinttypes cstdint
 cmath version
+codecvt atomic
 codecvt cctype
 codecvt clocale
 codecvt cstddef
@@ -360,6 +361,7 @@ list new
 list stdexcept
 list tuple
 list version
+locale atomic
 locale cctype
 locale cerrno
 locale clocale
@@ -517,6 +519,7 @@ regex limits
 regex mutex
 regex stdexcept
 regex string
+regex utility
 regex vector
 regex version
 scoped_allocator cstddef

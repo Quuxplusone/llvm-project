@@ -269,6 +269,8 @@ experimental/simd functional
 experimental/simd tuple
 experimental/string experimental/memory_resource
 experimental/string string
+experimental/type_traits initializer_list
+experimental/type_traits type_traits
 experimental/unordered_map algorithm
 experimental/unordered_map array
 experimental/unordered_map bit
@@ -599,6 +601,7 @@ mutex ratio
 mutex stdexcept
 mutex string
 mutex system_error
+mutex tuple
 mutex type_traits
 mutex typeinfo
 mutex version
@@ -872,7 +875,6 @@ system_error string
 system_error type_traits
 system_error version
 thread array
-thread atomic
 thread cerrno
 thread chrono
 thread compare
