@@ -687,6 +687,7 @@ set(files
   __system_error/error_condition.h
   __system_error/system_error.h
   __thread/formatter.h
+  __thread/jthread.h
   __thread/poll_with_backoff.h
   __thread/this_thread.h
   __thread/thread.h
