@@ -15,7 +15,7 @@ export namespace std {
   using std::swap;
 
   // [thread.jthread.class], class jthread
-  // using std::jthread;
+  using std::jthread;
 
   // [thread.thread.this], namespace this_thread
   namespace this_thread {

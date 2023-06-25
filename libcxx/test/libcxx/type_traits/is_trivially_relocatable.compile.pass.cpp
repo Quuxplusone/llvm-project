@@ -252,7 +252,7 @@ static_assert(!std::is_relocatable_v<std::shared_mutex>);
 static_assert(!std::is_relocatable_v<std::barrier<>>);
 static_assert(!std::is_relocatable_v<std::binary_semaphore>);
 static_assert(!std::is_relocatable_v<std::counting_semaphore<3>>);
-//static_assert(std::is_trivially_relocatable_v<std::jthread>);
+static_assert(std::is_trivially_relocatable_v<std::jthread>);
 static_assert(!std::is_relocatable_v<std::latch>);
 static_assert(std::is_trivially_relocatable_v<std::partial_ordering>);
 static_assert(std::is_trivially_relocatable_v<std::ranges::subrange<T*>>);
