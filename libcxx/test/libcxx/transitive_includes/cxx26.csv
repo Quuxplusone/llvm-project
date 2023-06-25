@@ -21,6 +21,7 @@ any typeinfo
 any version
 array compare
 array cstddef
+array cstdint
 array initializer_list
 array limits
 array stdexcept
@@ -570,10 +571,14 @@ stack limits
 stack version
 stdexcept iosfwd
 stop_token atomic
+stop_token cerrno
 stop_token cstddef
 stop_token cstdint
 stop_token limits
-stop_token thread
+stop_token ratio
+stop_token stdexcept
+stop_token string
+stop_token tuple
 stop_token version
 streambuf cstdint
 streambuf ios
@@ -615,6 +620,7 @@ system_error stdexcept
 system_error string
 system_error version
 thread array
+thread atomic
 thread cerrno
 thread compare
 thread cstddef
