@@ -3180,6 +3180,31 @@ struct TriviallyEqualityComparableContainsLambda {
 static_assert(!__is_trivially_equality_comparable(decltype(GetNonCapturingLambda()))); // padding
 static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsLambda));
 
+struct TriviallyEqualityComparableHasLambdaBase : decltype(GetNonCapturingLambda()) {
+  int i;
+
+  bool operator==(const TriviallyEqualityComparableHasLambdaBase&) const = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableHasLambdaBase));
+
+struct TriviallyEqualityComparableHasEmptyBase : Empty {
+  int i;
+
+  bool operator==(const TriviallyEqualityComparableHasEmptyBase&) const = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableHasEmptyBase));
+
+struct NonTriviallyEqualityComparableHasEmptyBaseWithoutFreshOperator : Empty {
+  int i;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasEmptyBaseWithoutFreshOperator));
+
+struct NonTriviallyEqualityComparableHasNonTrivialBase : NonTriviallyEqualityComparableNonDefaultedComparator {
+  int i;
+  bool operator==(const NonTriviallyEqualityComparableHasNonTrivialBase&) const = default;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasNonTrivialBase));
+
 struct TriviallyEqualityComparableNonTriviallyCopyable {
   TriviallyEqualityComparableNonTriviallyCopyable(const TriviallyEqualityComparableNonTriviallyCopyable&);
   ~TriviallyEqualityComparableNonTriviallyCopyable();
@@ -3317,6 +3342,10 @@ struct NotTriviallyEqualityComparableHasEnum {
 static_assert(!__is_trivially_equality_comparable(NotTriviallyEqualityComparableHasEnum));
 
 namespace hidden_friend {
+
+struct FriendEmpty {
+  friend bool operator==(const FriendEmpty&, const FriendEmpty&) = default;
+};
 
 struct TriviallyEqualityComparable {
   int i;
@@ -3464,6 +3493,24 @@ struct NotTriviallyEqualityComparableHasEnum {
   friend bool operator==(const NotTriviallyEqualityComparableHasEnum&, const NotTriviallyEqualityComparableHasEnum&) = default;
 };
 static_assert(!__is_trivially_equality_comparable(NotTriviallyEqualityComparableHasEnum));
+
+struct TriviallyEqualityComparableHasEmptyBase : FriendEmpty {
+  int i;
+
+  friend bool operator==(const TriviallyEqualityComparableHasEmptyBase&, const TriviallyEqualityComparableHasEmptyBase&) = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableHasEmptyBase));
+
+struct NonTriviallyEqualityComparableHasEmptyBaseWithoutFreshOperator : FriendEmpty {
+  int i;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasEmptyBaseWithoutFreshOperator));
+
+struct NonTriviallyEqualityComparableHasNonTrivialBase : NonTriviallyEqualityComparableNonDefaultedComparator {
+  int i;
+  friend bool operator==(const NonTriviallyEqualityComparableHasNonTrivialBase&, const NonTriviallyEqualityComparableHasNonTrivialBase&) = default;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasNonTrivialBase));
 
 struct NonTriviallyEqualityComparableValueComparisonNonTriviallyCopyable {
   int i;
