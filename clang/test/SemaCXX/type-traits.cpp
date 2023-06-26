@@ -3115,11 +3115,18 @@ static_assert(!__is_trivially_equality_comparable(float), "");
 static_assert(!__is_trivially_equality_comparable(double), "");
 static_assert(!__is_trivially_equality_comparable(long double), "");
 
-struct TriviallyEqualityComparableNoDefaultedComparator {
+struct NonTriviallyEqualityComparableNoComparator {
   int i;
   int j;
 };
-static_assert(!__is_trivially_equality_comparable(TriviallyEqualityComparableNoDefaultedComparator), "");
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableNoComparator), "");
+
+struct NonTriviallyEqualityComparableNonDefaultedComparator {
+  int i;
+  int j;
+  bool operator==(const NonTriviallyEqualityComparableNonDefaultedComparator&);
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableNonDefaultedComparator), "");
 
 #if __cplusplus >= 202002L
 
@@ -3140,6 +3147,38 @@ struct TriviallyEqualityComparableContainsArray {
   bool operator==(const TriviallyEqualityComparableContainsArray&) const = default;
 };
 static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsArray));
+
+
+struct Empty {
+  bool operator==(const Empty&) const = default;
+};
+
+struct TriviallyEqualityComparableContainsEmpty {
+  [[no_unique_address]] Empty e;
+  int i;
+
+  bool operator==(const TriviallyEqualityComparableContainsEmpty&) const = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsEmpty));
+
+struct NonTriviallyEqualityComparableContainsEmptyAndPadding {
+  Empty e;
+  int i;
+
+  bool operator==(const NonTriviallyEqualityComparableContainsEmptyAndPadding&) const = default;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableContainsEmptyAndPadding));
+
+auto GetNonCapturingLambda() { return [](){ return 42; }; }
+
+struct TriviallyEqualityComparableContainsLambda {
+  [[no_unique_address]] decltype(GetNonCapturingLambda()) l;
+  int i;
+
+  bool operator==(const TriviallyEqualityComparableContainsLambda&) const = default;
+};
+static_assert(!__is_trivially_equality_comparable(decltype(GetNonCapturingLambda()))); // padding
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsLambda));
 
 struct TriviallyEqualityComparableNonTriviallyCopyable {
   TriviallyEqualityComparableNonTriviallyCopyable(const TriviallyEqualityComparableNonTriviallyCopyable&);
