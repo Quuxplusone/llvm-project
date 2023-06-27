@@ -364,6 +364,11 @@ public:
     return *this;
   }
 
+#if _LIBCPP_STD_VER >= 20
+  // This makes complex trivially equality comparable if _Tp is trivially equality comparable
+  _LIBCPP_HIDE_FROM_ABI bool operator==(const complex&) const = default;
+#endif
+
 #if _LIBCPP_STD_VER >= 26
   template <size_t _Ip, class _Xp>
   friend _LIBCPP_HIDE_FROM_ABI constexpr _Xp& get(complex<_Xp>&) noexcept;
