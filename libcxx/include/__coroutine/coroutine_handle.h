@@ -73,6 +73,9 @@ public:
     __builtin_coro_destroy(__handle_);
   }
 
+    // This makes coroutine_handle<> trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const coroutine_handle&) const = default;
+
 private:
   _LIBCPP_HIDE_FROM_ABI bool __is_suspended() const {
     // FIXME actually implement a check for if the coro is suspended.
@@ -83,6 +86,9 @@ private:
 };
 
 // [coroutine.handle.compare]
+
+// The template parameter disambiguates this as a worse match than the defaulted coroutine_handle<>::operator==
+template <class = void>
 inline _LIBCPP_HIDE_FROM_ABI constexpr bool operator==(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
   return __x.address() == __y.address();
 }
@@ -152,6 +158,9 @@ public:
   _LIBCPP_HIDE_FROM_ABI _Promise& promise() const {
     return *static_cast<_Promise*>(__builtin_coro_promise(this->__handle_, alignof(_Promise), false));
   }
+
+    // This makes coroutine_handle<T> trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const coroutine_handle&) const = default;
 
 private:
   _LIBCPP_HIDE_FROM_ABI bool __is_suspended() const {
