@@ -108,6 +108,11 @@ public:
     return __x.__unex_ == __y.__unex_;
   }
 
+  // This makes unexpected trivially equality comparable if _Err is trivially equality comparable
+  _LIBCPP_HIDE_FROM_ABI bool operator==(const unexpected&) const
+    requires is_object_v<_Err>
+  = default;
+
 private:
   _Err __unex_;
 };

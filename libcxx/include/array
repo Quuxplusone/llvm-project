@@ -260,6 +260,11 @@ struct _LIBCPP_TEMPLATE_VIS array
     value_type* data() _NOEXCEPT {return __elems_;}
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX17
     const value_type* data() const _NOEXCEPT {return __elems_;}
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes pair trivially equality comparable if _Tp is trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const array&) const = default;
+#endif
 };
 
 template <class _Tp>
