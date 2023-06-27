@@ -285,26 +285,9 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 template <size_t _Ip, class _Hp,
           bool=is_empty<_Hp>::value && !__libcpp_is_final<_Hp>::value
          >
-class __tuple_leaf;
-
-template <size_t _Ip, class _Hp, bool _Ep>
-inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-void swap(__tuple_leaf<_Ip, _Hp, _Ep>& __x, __tuple_leaf<_Ip, _Hp, _Ep>& __y)
-    _NOEXCEPT_(__is_nothrow_swappable<_Hp>::value)
-{
-    swap(__x.get(), __y.get());
-}
-
-template <size_t _Ip, class _Hp, bool _Ep>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14
-void swap(const __tuple_leaf<_Ip, _Hp, _Ep>& __x, const __tuple_leaf<_Ip, _Hp, _Ep>& __y)
-     _NOEXCEPT_(__is_nothrow_swappable<const _Hp>::value) {
-  swap(__x.get(), __y.get());
-}
-
-template <size_t _Ip, class _Hp, bool>
-class __tuple_leaf
-{
+struct __tuple_leaf {
+  class __leaf
+  {
     _Hp __value_;
 
     template <class _Tp>
@@ -317,30 +300,30 @@ class __tuple_leaf
     }
 
     _LIBCPP_CONSTEXPR_SINCE_CXX14
-    __tuple_leaf& operator=(const __tuple_leaf&);
+    __leaf& operator=(const __leaf&);
 public:
-    _LIBCPP_INLINE_VISIBILITY constexpr __tuple_leaf()
+    _LIBCPP_INLINE_VISIBILITY constexpr __leaf()
              _NOEXCEPT_(is_nothrow_default_constructible<_Hp>::value) : __value_()
        {static_assert(!is_reference<_Hp>::value,
               "Attempted to default construct a reference element in a tuple");}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 0>, const _Alloc&)
+        __leaf(integral_constant<int, 0>, const _Alloc&)
             : __value_()
         {static_assert(!is_reference<_Hp>::value,
               "Attempted to default construct a reference element in a tuple");}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 1>, const _Alloc& __a)
+        __leaf(integral_constant<int, 1>, const _Alloc& __a)
             : __value_(allocator_arg_t(), __a)
         {static_assert(!is_reference<_Hp>::value,
               "Attempted to default construct a reference element in a tuple");}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 2>, const _Alloc& __a)
+        __leaf(integral_constant<int, 2>, const _Alloc& __a)
             : __value_(__a)
         {static_assert(!is_reference<_Hp>::value,
               "Attempted to default construct a reference element in a tuple");}
@@ -348,128 +331,127 @@ public:
     template <class _Tp,
               class = __enable_if_t<
                   _And<
-                      _IsNotSame<__remove_cvref_t<_Tp>, __tuple_leaf>,
+                      _IsNotSame<__remove_cvref_t<_Tp>, __leaf>,
                       is_constructible<_Hp, _Tp>
                     >::value
                 >
             >
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        explicit __tuple_leaf(_Tp&& __t) _NOEXCEPT_((is_nothrow_constructible<_Hp, _Tp>::value))
+        explicit __leaf(_Tp&& __t) _NOEXCEPT_((is_nothrow_constructible<_Hp, _Tp>::value))
             : __value_(_VSTD::forward<_Tp>(__t))
         {static_assert(__can_bind_reference<_Tp&&>(),
        "Attempted construction of reference element binds to a temporary whose lifetime has ended");}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        explicit __tuple_leaf(integral_constant<int, 0>, const _Alloc&, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 0>, const _Alloc&, _Tp&& __t)
             : __value_(_VSTD::forward<_Tp>(__t))
         {static_assert(__can_bind_reference<_Tp&&>(),
        "Attempted construction of reference element binds to a temporary whose lifetime has ended");}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        explicit __tuple_leaf(integral_constant<int, 1>, const _Alloc& __a, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 1>, const _Alloc& __a, _Tp&& __t)
             : __value_(allocator_arg_t(), __a, _VSTD::forward<_Tp>(__t))
         {static_assert(!is_reference<_Hp>::value,
             "Attempted to uses-allocator construct a reference element in a tuple");}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        explicit __tuple_leaf(integral_constant<int, 2>, const _Alloc& __a, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 2>, const _Alloc& __a, _Tp&& __t)
             : __value_(_VSTD::forward<_Tp>(__t), __a)
         {static_assert(!is_reference<_Hp>::value,
            "Attempted to uses-allocator construct a reference element in a tuple");}
 
-    _LIBCPP_HIDE_FROM_ABI __tuple_leaf(const __tuple_leaf& __t) = default;
-    _LIBCPP_HIDE_FROM_ABI __tuple_leaf(__tuple_leaf&& __t) = default;
+    _LIBCPP_HIDE_FROM_ABI __leaf(const __leaf& __t) = default;
+    _LIBCPP_HIDE_FROM_ABI __leaf(__leaf&& __t) = default;
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    int swap(__tuple_leaf& __t) _NOEXCEPT_(__is_nothrow_swappable<__tuple_leaf>::value)
-    {
-        _VSTD::swap(*this, __t);
+    int __leaf_swap(__leaf& __t) _NOEXCEPT_(__is_nothrow_swappable<_Hp>::value) {
+        swap(get(), __t.get());
         return 0;
     }
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    int swap(const __tuple_leaf& __t) const _NOEXCEPT_(__is_nothrow_swappable<const __tuple_leaf>::value) {
-        _VSTD::swap(*this, __t);
+    int __leaf_swap(const __leaf& __t) const _NOEXCEPT_(__is_nothrow_swappable<const _Hp>::value) {
+        swap(get(), __t.get());
         return 0;
     }
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14       _Hp& get()       _NOEXCEPT {return __value_;}
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Hp& get() const _NOEXCEPT {return __value_;}
+  };
 };
 
 template <size_t _Ip, class _Hp>
-class __tuple_leaf<_Ip, _Hp, true>
-    : private _Hp
-{
+struct __tuple_leaf<_Ip, _Hp, true> {
+  class __leaf : private _Hp
+  {
     _LIBCPP_CONSTEXPR_SINCE_CXX14
-    __tuple_leaf& operator=(const __tuple_leaf&);
+    __leaf& operator=(const __leaf&);
 public:
-    _LIBCPP_INLINE_VISIBILITY constexpr __tuple_leaf()
+    _LIBCPP_INLINE_VISIBILITY constexpr __leaf()
              _NOEXCEPT_(is_nothrow_default_constructible<_Hp>::value) {}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 0>, const _Alloc&) {}
+        __leaf(integral_constant<int, 0>, const _Alloc&) {}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 1>, const _Alloc& __a)
+        __leaf(integral_constant<int, 1>, const _Alloc& __a)
             : _Hp(allocator_arg_t(), __a) {}
 
     template <class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        __tuple_leaf(integral_constant<int, 2>, const _Alloc& __a)
+        __leaf(integral_constant<int, 2>, const _Alloc& __a)
             : _Hp(__a) {}
 
     template <class _Tp,
               class = __enable_if_t<
                   _And<
-                    _IsNotSame<__remove_cvref_t<_Tp>, __tuple_leaf>,
+                    _IsNotSame<__remove_cvref_t<_Tp>, __leaf>,
                     is_constructible<_Hp, _Tp>
                   >::value
                 >
             >
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        explicit __tuple_leaf(_Tp&& __t) _NOEXCEPT_((is_nothrow_constructible<_Hp, _Tp>::value))
+        explicit __leaf(_Tp&& __t) _NOEXCEPT_((is_nothrow_constructible<_Hp, _Tp>::value))
             : _Hp(_VSTD::forward<_Tp>(__t)) {}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        explicit __tuple_leaf(integral_constant<int, 0>, const _Alloc&, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 0>, const _Alloc&, _Tp&& __t)
             : _Hp(_VSTD::forward<_Tp>(__t)) {}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        explicit __tuple_leaf(integral_constant<int, 1>, const _Alloc& __a, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 1>, const _Alloc& __a, _Tp&& __t)
             : _Hp(allocator_arg_t(), __a, _VSTD::forward<_Tp>(__t)) {}
 
     template <class _Tp, class _Alloc>
         _LIBCPP_INLINE_VISIBILITY constexpr
-        explicit __tuple_leaf(integral_constant<int, 2>, const _Alloc& __a, _Tp&& __t)
+        explicit __leaf(integral_constant<int, 2>, const _Alloc& __a, _Tp&& __t)
             : _Hp(_VSTD::forward<_Tp>(__t), __a) {}
 
-    __tuple_leaf(__tuple_leaf const &) = default;
-    __tuple_leaf(__tuple_leaf &&) = default;
+    __leaf(__leaf const &) = default;
+    __leaf(__leaf &&) = default;
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    int
-    swap(__tuple_leaf& __t) _NOEXCEPT_(__is_nothrow_swappable<__tuple_leaf>::value)
-    {
-        _VSTD::swap(*this, __t);
+    int __leaf_swap(__leaf& __t) _NOEXCEPT_(__is_nothrow_swappable<_Hp>::value) {
+        swap(get(), __t.get());
         return 0;
     }
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    int swap(const __tuple_leaf& __rhs) const _NOEXCEPT_(__is_nothrow_swappable<const __tuple_leaf>::value) {
-        _VSTD::swap(*this, __rhs);
+    int __leaf_swap(const __leaf& __t) const _NOEXCEPT_(__is_nothrow_swappable<const _Hp>::value) {
+        swap(get(), __t.get());
         return 0;
     }
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14       _Hp& get()       _NOEXCEPT {return static_cast<_Hp&>(*this);}
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Hp& get() const _NOEXCEPT {return static_cast<const _Hp&>(*this);}
+  };
 };
 
 template <class ..._Tp>
@@ -490,45 +472,47 @@ template<class _Indx, class ..._Tp> struct __tuple_impl;
 
 template<size_t ..._Indx, class ..._Tp>
 struct _LIBCPP_DECLSPEC_EMPTY_BASES __tuple_impl<__tuple_indices<_Indx...>, _Tp...>
-    : public __tuple_leaf<_Indx, _Tp>...
 {
+  struct _LIBCPP_DECLSPEC_EMPTY_BASES __impl
+    : public __tuple_leaf<_Indx, _Tp>::__leaf...
+  {
     _LIBCPP_INLINE_VISIBILITY
-    constexpr __tuple_impl()
+    constexpr __impl()
         _NOEXCEPT_(__all<is_nothrow_default_constructible<_Tp>::value...>::value) {}
 
     template <size_t ..._Uf, class ..._Tf,
               size_t ..._Ul, class ..._Tl, class ..._Up>
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
         explicit
-        __tuple_impl(__tuple_indices<_Uf...>, __tuple_types<_Tf...>,
+        __impl(__tuple_indices<_Uf...>, __tuple_types<_Tf...>,
                      __tuple_indices<_Ul...>, __tuple_types<_Tl...>,
                      _Up&&... __u)
                      _NOEXCEPT_((__all<is_nothrow_constructible<_Tf, _Up>::value...>::value &&
                                  __all<is_nothrow_default_constructible<_Tl>::value...>::value)) :
-            __tuple_leaf<_Uf, _Tf>(_VSTD::forward<_Up>(__u))...,
-            __tuple_leaf<_Ul, _Tl>()...
+            __tuple_leaf<_Uf, _Tf>::__leaf(_VSTD::forward<_Up>(__u))...,
+            __tuple_leaf<_Ul, _Tl>::__leaf()...
             {}
 
     template <class _Alloc, size_t ..._Uf, class ..._Tf,
               size_t ..._Ul, class ..._Tl, class ..._Up>
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
         explicit
-        __tuple_impl(allocator_arg_t, const _Alloc& __a,
+        __impl(allocator_arg_t, const _Alloc& __a,
                      __tuple_indices<_Uf...>, __tuple_types<_Tf...>,
                      __tuple_indices<_Ul...>, __tuple_types<_Tl...>,
                      _Up&&... __u) :
-            __tuple_leaf<_Uf, _Tf>(__uses_alloc_ctor<_Tf, _Alloc, _Up>(), __a,
+            __tuple_leaf<_Uf, _Tf>::__leaf(__uses_alloc_ctor<_Tf, _Alloc, _Up>(), __a,
             _VSTD::forward<_Up>(__u))...,
-            __tuple_leaf<_Ul, _Tl>(__uses_alloc_ctor<_Tl, _Alloc>(), __a)...
+            __tuple_leaf<_Ul, _Tl>::__leaf(__uses_alloc_ctor<_Tl, _Alloc>(), __a)...
             {}
 
     template <class _Tuple,
               class = __enable_if_t<__tuple_constructible<_Tuple, tuple<_Tp...> >::value>
              >
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        __tuple_impl(_Tuple&& __t) _NOEXCEPT_((__all<is_nothrow_constructible<_Tp, typename tuple_element<_Indx,
+        __impl(_Tuple&& __t) _NOEXCEPT_((__all<is_nothrow_constructible<_Tp, typename tuple_element<_Indx,
                                        typename __make_tuple_types<_Tuple>::type>::type>::value...>::value))
-            : __tuple_leaf<_Indx, _Tp>(_VSTD::forward<typename tuple_element<_Indx,
+            : __tuple_leaf<_Indx, _Tp>::__leaf(_VSTD::forward<typename tuple_element<_Indx,
                                        typename __make_tuple_types<_Tuple>::type>::type>(_VSTD::get<_Indx>(__t)))...
             {}
 
@@ -536,29 +520,30 @@ struct _LIBCPP_DECLSPEC_EMPTY_BASES __tuple_impl<__tuple_indices<_Indx...>, _Tp.
               class = __enable_if_t<__tuple_constructible<_Tuple, tuple<_Tp...> >::value>
              >
         _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-        __tuple_impl(allocator_arg_t, const _Alloc& __a, _Tuple&& __t)
-            : __tuple_leaf<_Indx, _Tp>(__uses_alloc_ctor<_Tp, _Alloc, typename tuple_element<_Indx,
+        __impl(allocator_arg_t, const _Alloc& __a, _Tuple&& __t)
+            : __tuple_leaf<_Indx, _Tp>::__leaf(__uses_alloc_ctor<_Tp, _Alloc, typename tuple_element<_Indx,
                                        typename __make_tuple_types<_Tuple>::type>::type>(), __a,
                                        _VSTD::forward<typename tuple_element<_Indx,
                                        typename __make_tuple_types<_Tuple>::type>::type>(_VSTD::get<_Indx>(__t)))...
             {}
 
-    __tuple_impl(const __tuple_impl&) = default;
-    __tuple_impl(__tuple_impl&&) = default;
+    __impl(const __impl&) = default;
+    __impl(__impl&&) = default;
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    void swap(__tuple_impl& __t)
+    void swap(__impl& __t)
         _NOEXCEPT_(__all<__is_nothrow_swappable<_Tp>::value...>::value)
     {
-        _VSTD::__swallow(__tuple_leaf<_Indx, _Tp>::swap(static_cast<__tuple_leaf<_Indx, _Tp>&>(__t))...);
+        _VSTD::__swallow(this->__tuple_leaf<_Indx, _Tp>::__leaf::__leaf_swap(static_cast<typename __tuple_leaf<_Indx, _Tp>::__leaf&>(__t))...);
     }
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14
-    void swap(const __tuple_impl& __t) const
+    void swap(const __impl& __t) const
         _NOEXCEPT_(__all<__is_nothrow_swappable<const _Tp>::value...>::value)
     {
-        _VSTD::__swallow(__tuple_leaf<_Indx, _Tp>::swap(static_cast<const __tuple_leaf<_Indx, _Tp>&>(__t))...);
+        _VSTD::__swallow(this->__tuple_leaf<_Indx, _Tp>::__leaf::__leaf_swap(static_cast<const typename __tuple_leaf<_Indx, _Tp>::__leaf&>(__t))...);
     }
+  };
 };
 
 template<class _Dest, class _Source, size_t ..._Np>
@@ -581,7 +566,7 @@ struct __tuple_is_relocatable : _Or<is_reference<_Tp>, __libcpp_is_trivially_rel
 template <class ..._Tp>
 class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__all<__tuple_is_relocatable<_Tp>::value...>::value)) tuple
 {
-    typedef __tuple_impl<typename __make_tuple_indices<sizeof...(_Tp)>::type, _Tp...> _BaseT;
+    typedef typename __tuple_impl<typename __make_tuple_indices<sizeof...(_Tp)>::type, _Tp...>::__impl _BaseT;
 
     _BaseT __base_;
 
@@ -1396,7 +1381,7 @@ typename tuple_element<_Ip, tuple<_Tp...> >::type&
 get(tuple<_Tp...>& __t) _NOEXCEPT
 {
     typedef _LIBCPP_NODEBUG typename tuple_element<_Ip, tuple<_Tp...> >::type type;
-    return static_cast<__tuple_leaf<_Ip, type>&>(__t.__base_).get();
+    return static_cast<typename __tuple_leaf<_Ip, type>::__leaf&>(__t.__base_).get();
 }
 
 template <size_t _Ip, class ..._Tp>
@@ -1405,7 +1390,7 @@ const typename tuple_element<_Ip, tuple<_Tp...> >::type&
 get(const tuple<_Tp...>& __t) _NOEXCEPT
 {
     typedef _LIBCPP_NODEBUG typename tuple_element<_Ip, tuple<_Tp...> >::type type;
-    return static_cast<const __tuple_leaf<_Ip, type>&>(__t.__base_).get();
+    return static_cast<const typename __tuple_leaf<_Ip, type>::__leaf&>(__t.__base_).get();
 }
 
 template <size_t _Ip, class ..._Tp>
@@ -1415,7 +1400,7 @@ get(tuple<_Tp...>&& __t) _NOEXCEPT
 {
     typedef _LIBCPP_NODEBUG typename tuple_element<_Ip, tuple<_Tp...> >::type type;
     return static_cast<type&&>(
-             static_cast<__tuple_leaf<_Ip, type>&&>(__t.__base_).get());
+             static_cast<typename __tuple_leaf<_Ip, type>::__leaf&&>(__t.__base_).get());
 }
 
 template <size_t _Ip, class ..._Tp>
@@ -1425,7 +1410,7 @@ get(const tuple<_Tp...>&& __t) _NOEXCEPT
 {
     typedef _LIBCPP_NODEBUG typename tuple_element<_Ip, tuple<_Tp...> >::type type;
     return static_cast<const type&&>(
-             static_cast<const __tuple_leaf<_Ip, type>&&>(__t.__base_).get());
+             static_cast<const typename __tuple_leaf<_Ip, type>::__leaf&&>(__t.__base_).get());
 }
 
 #if _LIBCPP_STD_VER >= 14
