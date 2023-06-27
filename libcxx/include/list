@@ -397,12 +397,17 @@ public:
     return __t;
   }
 
+#if _LIBCPP_STD_VER >= 20
+  // This makes __list_iterator trivially equality comparable
+  _LIBCPP_HIDE_FROM_ABI bool operator==(const __list_iterator&) const = default;
+#else
   friend _LIBCPP_HIDE_FROM_ABI bool operator==(const __list_iterator& __x, const __list_iterator& __y) {
     return __x.__ptr_ == __y.__ptr_;
   }
   friend _LIBCPP_HIDE_FROM_ABI bool operator!=(const __list_iterator& __x, const __list_iterator& __y) {
     return !(__x == __y);
   }
+#endif
 };
 
 template <class _Tp, class _VoidPtr>
@@ -455,12 +460,17 @@ public:
     return __t;
   }
 
+#if _LIBCPP_STD_VER >= 20
+  // This makes __list_const_iterator trivially equality comparable
+  _LIBCPP_HIDE_FROM_ABI bool operator==(const __list_const_iterator&) const = default;
+#else
   friend _LIBCPP_HIDE_FROM_ABI bool operator==(const __list_const_iterator& __x, const __list_const_iterator& __y) {
     return __x.__ptr_ == __y.__ptr_;
   }
   friend _LIBCPP_HIDE_FROM_ABI bool operator!=(const __list_const_iterator& __x, const __list_const_iterator& __y) {
     return !(__x == __y);
   }
+#endif
 };
 
 template <class _Tp, class _Alloc>
