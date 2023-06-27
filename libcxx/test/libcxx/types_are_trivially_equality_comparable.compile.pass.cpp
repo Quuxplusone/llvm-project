@@ -109,16 +109,10 @@ static_assert(!is_tec<std::unexpected<int>>);
 #endif
 
 // Cases that should be trivial but aren't yet implemented
-static_assert(!is_tec<std::complex<int>>); // TODO
-static_assert(!is_tec<std::coroutine_handle<>>); // TODO
-static_assert(!is_tec<std::coroutine_handle<T>>); // TODO
 static_assert(!is_tec<std::deque<T>::iterator>); // TODO
 static_assert(!is_tec<std::deque<T>::const_iterator>); // TODO
-static_assert(!is_tec<std::exception_ptr>); // TODO
 static_assert(!is_tec<std::forward_list<T>::iterator>); // TODO
 static_assert(!is_tec<std::forward_list<T>::const_iterator>); // TODO
-static_assert(!is_tec<std::list<T>::iterator>); // TODO
-static_assert(!is_tec<std::list<T>::const_iterator>); // TODO
 static_assert(!is_tec<std::map<int, T>::iterator>); // TODO
 static_assert(!is_tec<std::map<int, T>::const_iterator>); // TODO
 static_assert(!is_tec<std::multimap<int, T>::iterator>); // TODO
@@ -131,10 +125,16 @@ static_assert(!is_tec<std::tuple<int, int>>); // TODO
 static_assert(!is_tec<Adjust<std::tuple<>>>); // TODO
 static_assert(!is_tec<std::unique_ptr<T>>); // TODO
 static_assert(!is_tec<std::unique_ptr<T[]>>); // TODO
-static_assert(!is_tec<std::vector<T>::iterator>); // TODO
-static_assert(!is_tec<std::vector<T>::const_iterator>); // TODO
 
 // Simple cases with `int` or `T`
+static_assert(is_tec<std::complex<int>>);
+static_assert(is_tec<std::coroutine_handle<>>);
+static_assert(is_tec<std::coroutine_handle<T>>);
+static_assert(is_tec<std::exception_ptr>);
+static_assert(is_tec<std::list<T>::iterator>);
+static_assert(is_tec<std::list<T>::const_iterator>);
+static_assert(is_tec<std::vector<T>::iterator>);
+static_assert(is_tec<std::vector<T>::const_iterator>);
 
 // Complicated cases with `H*` that work today
 #if TEST_STD_VER >= 23
