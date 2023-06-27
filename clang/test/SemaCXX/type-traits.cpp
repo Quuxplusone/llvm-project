@@ -3205,6 +3205,20 @@ struct NonTriviallyEqualityComparableHasNonTrivialBase : NonTriviallyEqualityCom
 };
 static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasNonTrivialBase));
 
+struct TriviallyEqualityComparableHasArray {
+  TriviallyEqualityComparableHasEmptyBase a[2];
+  int b[2];
+  bool operator==(const TriviallyEqualityComparableHasArray&) const = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableHasArray));
+
+struct NonTriviallyEqualityComparableHasArray {
+  NonTriviallyEqualityComparableHasEmptyBaseWithoutFreshOperator a[2];
+  int b[2];
+  bool operator==(const NonTriviallyEqualityComparableHasArray&) const = default;
+};
+static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparableHasArray));
+
 struct TriviallyEqualityComparableNonTriviallyCopyable {
   TriviallyEqualityComparableNonTriviallyCopyable(const TriviallyEqualityComparableNonTriviallyCopyable&);
   ~TriviallyEqualityComparableNonTriviallyCopyable();
