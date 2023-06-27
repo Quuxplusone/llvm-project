@@ -308,6 +308,11 @@ public:
             *this = *this / complex(__c.real(), __c.imag());
             return *this;
         }
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes complex trivially equality comparable if _Tp is trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const complex&) const = default;
+#endif
 };
 
 template<> class _LIBCPP_TEMPLATE_VIS complex<double>;
