@@ -78,6 +78,10 @@ public:
 
   _LIBCPP_HIDE_FROM_ABI explicit operator bool() const _NOEXCEPT { return __ptr_ != nullptr; }
 
+#if _LIBCPP_STD_VER >= 20
+  // This makes exception_ptr trivially equality comparable
+  friend _LIBCPP_HIDE_FROM_ABI bool operator==(const exception_ptr&, const exception_ptr&) = default;
+#else
   friend _LIBCPP_HIDE_FROM_ABI bool operator==(const exception_ptr& __x, const exception_ptr& __y) _NOEXCEPT {
     return __x.__ptr_ == __y.__ptr_;
   }
@@ -85,6 +89,7 @@ public:
   friend _LIBCPP_HIDE_FROM_ABI bool operator!=(const exception_ptr& __x, const exception_ptr& __y) _NOEXCEPT {
     return !(__x == __y);
   }
+#endif
 
   friend _LIBCPP_EXPORTED_FROM_ABI exception_ptr current_exception() _NOEXCEPT;
   friend _LIBCPP_EXPORTED_FROM_ABI void rethrow_exception(exception_ptr);
