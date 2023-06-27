@@ -77,8 +77,8 @@ template<class R>
 using IterOf = decltype(std::declval<R&>().begin());
 
 static_assert(!is_tec<std::array<int, 0>>); // padding
-static_assert(!is_tec<std::complex<int>>); // TODO
-static_assert(!is_tec<std::coroutine_handle<>>); // TODO
+static_assert(is_tec<std::complex<int>>);
+static_assert(is_tec<std::coroutine_handle<>>);
 static_assert(!is_tec<std::pair<int, char>>); // padding
 static_assert(!is_tec<std::pair<int, int&>>); // reference member
 static_assert(!is_tec<std::tuple<>>); // padding
@@ -92,8 +92,8 @@ static_assert(!is_tec<std::deque<H*>::iterator>); // TODO
 static_assert(!is_tec<std::deque<H*>::const_iterator>); // TODO
 static_assert(!is_tec<std::forward_list<H*>::iterator>); // TODO
 static_assert(!is_tec<std::forward_list<H*>::const_iterator>); // TODO
-static_assert(!is_tec<std::list<H*>::iterator>); // TODO
-static_assert(!is_tec<std::list<H*>::const_iterator>); // TODO
+static_assert(is_tec<std::list<H*>::iterator>);
+static_assert(is_tec<std::list<H*>::const_iterator>);
 static_assert(!is_tec<std::map<H*,H*>::iterator>); // TODO
 static_assert(!is_tec<std::map<H*,H*>::const_iterator>); // TODO
 static_assert(!is_tec<std::multimap<H*,H*>::iterator>); // TODO
@@ -107,12 +107,12 @@ static_assert(!is_tec<IterOf<std::ranges::elements_view<HTupleView, 0>>>); // TO
 static_assert(!is_tec<IterOf<std::ranges::iota_view<H**, H**>>>); // TODO
 static_assert(!is_tec<std::tuple<H*>>); // TODO
 static_assert(!is_tec<std::unique_ptr<H*>>); // TODO
-static_assert(!is_tec<std::vector<H*>::iterator>); // TODO
-static_assert(!is_tec<std::vector<H*>::const_iterator>); // TODO
+static_assert(is_tec<std::vector<H*>::iterator>);
+static_assert(is_tec<std::vector<H*>::const_iterator>);
 
 #if TEST_STD_VER >= 23
 static_assert(!is_tec<IterOf<std::ranges::zip_view<HView, HView>>>); // TODO
-static_assert(is_tec<std::unexpected<H*>>);
+static_assert(!is_tec<std::unexpected<H*>>); // TODO
 #endif
 
 void test_robust_against_adl(H *h, HH hh) {
