@@ -40,6 +40,7 @@
 #include <__type_traits/is_nothrow_copy_constructible.h>
 #include <__type_traits/is_nothrow_default_constructible.h>
 #include <__type_traits/is_nothrow_move_assignable.h>
+#include <__type_traits/is_object.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_swappable.h>
 #include <__type_traits/is_trivially_relocatable.h>
@@ -584,6 +585,12 @@ struct _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivia
         swap(second, __p.second);
     }
 #endif
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes pair trivially equality comparable if _T1 and _T2 are trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const pair&) const requires (is_object_v<_T1> && is_object_v<_T2>) = default;
+#endif
+
 private:
 
 #ifndef _LIBCPP_CXX03_LANG
