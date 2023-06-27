@@ -384,6 +384,10 @@ public:
         return __t;
     }
 
+#if _LIBCPP_STD_VER >= 20
+    // This makes __forward_list_iterator trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const __forward_list_iterator&) const = default;
+#else
     friend _LIBCPP_INLINE_VISIBILITY
     bool operator==(const __forward_list_iterator& __x,
                     const __forward_list_iterator& __y)
@@ -392,6 +396,7 @@ public:
     bool operator!=(const __forward_list_iterator& __x,
                     const __forward_list_iterator& __y)
         {return !(__x == __y);}
+#endif
 };
 
 template <class _NodeConstPtr>
@@ -468,6 +473,10 @@ public:
         return __t;
     }
 
+#if _LIBCPP_STD_VER >= 20
+    // This makes __forward_list_const_iterator trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const __forward_list_const_iterator&) const = default;
+#else
     friend _LIBCPP_INLINE_VISIBILITY
     bool operator==(const __forward_list_const_iterator& __x,
                     const __forward_list_const_iterator& __y)
@@ -476,6 +485,7 @@ public:
     bool operator!=(const __forward_list_const_iterator& __x,
                            const __forward_list_const_iterator& __y)
         {return !(__x == __y);}
+#endif
 };
 
 template <class _Tp, class _Alloc>

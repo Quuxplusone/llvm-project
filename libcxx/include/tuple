@@ -378,6 +378,11 @@ public:
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14       _Hp& get()       _NOEXCEPT {return __value_;}
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Hp& get() const _NOEXCEPT {return __value_;}
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes __leaf trivially equality comparable if _Hp is trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const __leaf&) const requires (is_object_v<_Hp>) = default;
+#endif
   };
 };
 
@@ -451,6 +456,11 @@ public:
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14       _Hp& get()       _NOEXCEPT {return static_cast<_Hp&>(*this);}
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Hp& get() const _NOEXCEPT {return static_cast<const _Hp&>(*this);}
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes __leaf trivially equality comparable if _Hp is trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const __leaf&) const requires (is_object_v<_Hp>) = default;
+#endif
   };
 };
 
@@ -543,6 +553,11 @@ struct _LIBCPP_DECLSPEC_EMPTY_BASES __tuple_impl<__tuple_indices<_Indx...>, _Tp.
     {
         _VSTD::__swallow(__tuple_leaf<_Indx, _Tp>::__leaf::swap(static_cast<const __tuple_leaf<_Indx, _Tp>::__leaf&>(__t))...);
     }
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes __impl trivially equality comparable if all _Tp are trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const __impl&) const requires(__all<is_object_v<_Tp>...>::value) = default;
+#endif
   };
 };
 
@@ -1303,6 +1318,11 @@ public:
         __base_.swap(__t.__base_);
     }
 #endif // _LIBCPP_STD_VER >= 23
+
+#if _LIBCPP_STD_VER >= 20
+    // This makes tuple trivially equality comparable if all _Tp are trivially equality comparable
+    _LIBCPP_HIDE_FROM_ABI bool operator==(const tuple&) const requires (__all<is_object_v<_Tp>...>::value) = default;
+#endif
 };
 
 template <>
@@ -1326,6 +1346,11 @@ public:
     void swap(tuple&) _NOEXCEPT {}
 #if _LIBCPP_STD_VER >= 23
     _LIBCPP_HIDE_FROM_ABI constexpr void swap(const tuple&) const noexcept {}
+#endif
+
+#if _LIBCPP_STD_VER >= 20
+public:
+    bool operator==(const tuple&) const = default;
 #endif
 };
 
