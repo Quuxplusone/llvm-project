@@ -117,6 +117,11 @@ private:
   friend class span;
   template <class _Tp, size_t _Size>
   friend struct array;
+
+#if _LIBCPP_STD_VER >= 20
+  // This makes __wrap_iter trivially equality comparable if _Iter is trivially equality comparable
+  friend _LIBCPP_HIDE_FROM_ABI bool operator==(const __wrap_iter&, const __wrap_iter&) = default;
+#endif
 };
 
 template <class _Iter1>
