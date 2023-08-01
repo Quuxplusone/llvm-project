@@ -1009,6 +1009,7 @@ module std_private_algorithm_stable_partition                            [system
 module std_private_algorithm_stable_sort                                 [system] { header "__algorithm/stable_sort.h" }
 module std_private_algorithm_swap_ranges                                 [system] {
   header "__algorithm/swap_ranges.h"
+  export std_private_algorithm_copy_move_common
   export std_private_algorithm_iterator_operations
 }
 module std_private_algorithm_three_way_comp_ref_type                     [system] { header "__algorithm/three_way_comp_ref_type.h" }
