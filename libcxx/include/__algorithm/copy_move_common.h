@@ -21,10 +21,13 @@
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_copy_constructible.h>
 #include <__type_traits/is_trivially_assignable.h>
+#include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_volatile.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
+#include <__utility/swap.h>
 #include <cstddef>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
@@ -56,6 +59,20 @@ struct __can_lower_move_assignment_to_memmove {
     !is_volatile<_To>::value;
 };
 
+template <class _From, class _To>
+struct __can_lower_swap_to_memswap {
+  static const bool value =
+    __is_always_bitcastable<_From, _To>::value &&
+    __is_always_bitcastable<_To, _From>::value &&
+    // These are the operations performed by `From& = std::exchange(To&, From&&)`.
+    is_trivially_constructible<_To, _To&&>::value &&
+    is_trivially_assignable<_To&, _From&&>::value &&
+    is_trivially_assignable<_From&, _To&&>::value &&
+    is_trivially_destructible<_To>::value &&
+    !is_volatile<_From>::value &&
+    !is_volatile<_To>::value;
+};
+
 // `memmove` algorithms implementation.
 
 template <class _In, class _Out>
@@ -77,6 +94,14 @@ __copy_backward_trivial_impl(_In* __first, _In* __last, _Out* __result) {
   std::__constexpr_memmove(__result, __first, __element_count(__n));
 
   return std::make_pair(__last, __result);
+}
+
+template <class _Tp, class _Up>
+_LIBCPP_HIDE_FROM_ABI pair<_Tp*, _Up*>
+__swap_ranges_trivial_impl(_Tp* __first1, _Tp* __last1, _Up* __first2) {
+  const size_t __n = static_cast<size_t>(__last1 - __first1);
+  std::__libcpp_memswap(__first1, __first2, __n * sizeof(_Tp));
+  return std::make_pair(__last1, __first2 + __n);
 }
 
 // Iterator unwrapping and dispatching to the correct overload.
@@ -131,6 +156,45 @@ _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_InIter, _OutIter>
 __dispatch_copy_or_move(_InIter __first, _Sent __last, _OutIter __out_first) {
   using _Algorithm = __overload<_NaiveAlgorithm, _OptimizedAlgorithm>;
   return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first), std::move(__last), std::move(__out_first));
+}
+
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<__can_rewrap<_Iter1, _Sent1, _Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  auto __range1 = std::__unwrap_range(__first1, std::move(__last1));
+  auto __range2 = std::__unwrap_range(__first2, std::move(__last2));
+  auto __result = _Algorithm()(std::move(__range1.first), std::move(__range1.second), std::move(__range2.first), std::move(__range2.second));
+  return std::make_pair(std::__rewrap_range<_Sent1>(std::move(__first1), std::move(__result.first)),
+                        std::__rewrap_range<_Sent2>(std::move(__first2), std::move(__result.second)));
+}
+
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<!__can_rewrap<_Iter1, _Sent1, _Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__unwrap_and_dispatch(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  return _Algorithm()(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
+}
+
+template <class _AlgPolicy,
+          class _NaiveAlgorithm,
+          class _OptimizedAlgorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 pair<_Iter1, _Iter2>
+__dispatch_copy_or_move(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  using _Algorithm = __overload<_NaiveAlgorithm, _OptimizedAlgorithm>;
+  return std::__unwrap_and_dispatch<_Algorithm>(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
 }
 
 _LIBCPP_END_NAMESPACE_STD
