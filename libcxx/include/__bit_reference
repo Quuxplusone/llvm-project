@@ -495,9 +495,8 @@ private:
   template <class _Cl, class _Cr>
   _LIBCPP_CONSTEXPR_SINCE_CXX20 friend __bit_iterator<_Cr, false>
       __swap_ranges_unaligned(__bit_iterator<_Cl, false>, __bit_iterator<_Cl, false>, __bit_iterator<_Cr, false>);
-  template <class, class _Cl, class _Cr>
-  _LIBCPP_CONSTEXPR_SINCE_CXX20 friend pair<__bit_iterator<_Cl, false>, __bit_iterator<_Cr, false> >
-      __swap_ranges(__bit_iterator<_Cl, false>, __bit_iterator<_Cl, false>, __bit_iterator<_Cr, false>);
+  template <class _AlgPolicy>
+  friend struct __swap_ranges_impl;
   template <class, class _Dp>
   _LIBCPP_CONSTEXPR_SINCE_CXX20 friend pair<__bit_iterator<_Dp, false>, __bit_iterator<_Dp, false> >
       __rotate(__bit_iterator<_Dp, false>, __bit_iterator<_Dp, false>, __bit_iterator<_Dp, false>);
