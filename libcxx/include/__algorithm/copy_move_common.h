@@ -19,6 +19,8 @@
 #include <__type_traits/is_always_bitcastable.h>
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_trivially_assignable.h>
+#include <__type_traits/is_trivially_constructible.h>
+#include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_volatile.h>
 #include <__utility/move.h>
 
@@ -49,6 +51,20 @@ struct __can_lower_move_assignment_to_memmove {
   static const bool value =
       __is_always_bitcastable<_From, _To>::value && is_trivially_assignable<_To&, _From&&>::value &&
       !is_volatile<_From>::value && !is_volatile<_To>::value;
+};
+
+template <class _From, class _To>
+struct __can_lower_swap_to_memswap {
+  static const bool value =
+    __is_always_bitcastable<_From, _To>::value &&
+    __is_always_bitcastable<_To, _From>::value &&
+    // These are the operations performed by `From& = std::exchange(To&, From&&)`.
+    is_trivially_constructible<_To, _To&&>::value &&
+    is_trivially_assignable<_To&, _From&&>::value &&
+    is_trivially_assignable<_From&, _To&&>::value &&
+    is_trivially_destructible<_To>::value &&
+    !is_volatile<_From>::value &&
+    !is_volatile<_To>::value;
 };
 
 // `memmove` algorithms implementation.
@@ -101,6 +117,32 @@ template <class _Algorithm,
 _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 __in_out_result<_InIter, _OutIter>
 __copy_move_unwrap_iters(_InIter __first, _Sent __last, _OutIter __out_first) {
   return _Algorithm()(std::move(__first), std::move(__last), std::move(__out_first));
+}
+
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<__can_rewrap<_Iter1, _Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 __in_out_result<_Iter1, _Iter2>
+__copy_move_unwrap_iters(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  auto __range1 = std::__unwrap_range(__first1, std::move(__last1));
+  auto __range2 = std::__unwrap_range(__first2, std::move(__last2));
+  auto __result = _Algorithm()(std::move(__range1.first), std::move(__range1.second), std::move(__range2.first), std::move(__range2.second));
+  return {std::__rewrap_range<_Sent1>(std::move(__first1), std::move(__result.__in_)),
+          std::__rewrap_range<_Sent2>(std::move(__first2), std::move(__result.__out_))};
+}
+
+template <class _Algorithm,
+          class _Iter1,
+          class _Sent1,
+          class _Iter2,
+          class _Sent2,
+          __enable_if_t<!__can_rewrap<_Iter1, _Iter2>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17 __in_out_result<_Iter1, _Iter2>
+__copy_move_unwrap_iters(_Iter1 __first1, _Sent1 __last1, _Iter2 __first2, _Sent2 __last2) {
+  return _Algorithm()(std::move(__first1), std::move(__last1), std::move(__first2), std::move(__last2));
 }
 
 _LIBCPP_END_NAMESPACE_STD
