@@ -57,11 +57,11 @@ struct __swap_ranges {
         else if (__last2 - __first2 < __last1 - __first1) {
           auto __reversed =
               std::__swap_ranges<_RangeAlgPolicy>(std::move(__first2), std::move(__last2), std::move(__first1));
-          return std::pair<_I1, _I2>(std::move(__reversed.second), std::move(__reversed.first));
+          return __in_out_result<_I1, _I2>(std::move(__reversed.second), std::move(__reversed.first));
         } else
           return std::__swap_ranges<_RangeAlgPolicy>(std::move(__first1), std::move(__last1), std::move(__first2));
       }();
-      return {std::move(__ret.first), std::move(__ret.second)};
+      return {std::move(__ret.__in_), std::move(__ret.__out_)};
     } else {
       while (__first1 != __last1 && __first2 != __last2) {
         ranges::iter_swap(__first1, __first2);
