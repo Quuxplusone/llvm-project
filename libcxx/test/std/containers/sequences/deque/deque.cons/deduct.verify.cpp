@@ -6,35 +6,29 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <array>
 // UNSUPPORTED: c++03, c++11, c++14
 
-// template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
-//    deque(InputIterator, InputIterator, Allocator = Allocator())
-//    -> deque<typename iterator_traits<InputIterator>::value_type, Allocator>;
-//
+// <deque>
+
+// Test CTAD on cases where deduction should fail.
 
 #include <deque>
-#include <iterator>
-#include <cassert>
-#include <cstddef>
-#include <climits> // INT_MAX
+#include <memory>
 
-struct A {};
-
-int main(int, char**)
-{
-//  Test the explicit deduction guides
-
-//  Test the implicit deduction guides
-    {
-//  deque (allocator &)
-    std::deque deq((std::allocator<int>()));  // expected-error-re {{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}deque'}}
-//  Note: The extra parens are necessary, since otherwise clang decides it is a function declaration.
-//  Also, we can't use {} instead of parens, because that constructs a
-//      deque<allocator<int>, allocator<allocator<int>>>
-    }
-
-
-  return 0;
+void test() {
+  {
+    // Cannot deduce T from nothing
+    std::deque deq;
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}deque'}}
+  }
+  {
+    // Cannot deduce T from just (Alloc)
+    auto deq = std::deque(std::allocator<int>());
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}deque'}}
+  }
+  {
+    // Cannot deduce T from just (Count)
+    auto deq = std::deque(42);
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}deque'}}
+  }
 }
