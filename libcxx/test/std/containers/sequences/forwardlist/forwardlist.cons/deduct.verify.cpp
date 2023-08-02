@@ -6,35 +6,31 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <forward_list>
 // UNSUPPORTED: c++03, c++11, c++14
 
-// template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
-//    forward_list(InputIterator, InputIterator, Allocator = Allocator())
-//    -> forward_list<typename iterator_traits<InputIterator>::value_type, Allocator>;
-//
+// <forward_list>
+
+// Test CTAD on cases where deduction should fail.
 
 #include <forward_list>
-#include <iterator>
-#include <cassert>
-#include <cstddef>
-#include <climits> // INT_MAX
+#include <memory>
 
 struct A {};
 
-int main(int, char**)
-{
-//  Test the explicit deduction guides
-
-//  Test the implicit deduction guides
-    {
-//  forward_list (allocator &)
-    std::forward_list fwl((std::allocator<int>()));  // expected-error-re {{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}forward_list'}}
-//  Note: The extra parens are necessary, since otherwise clang decides it is a function declaration.
-//  Also, we can't use {} instead of parens, because that constructs a
-//      forward_list<allocator<int>, allocator<allocator<int>>>
-    }
-
-
-  return 0;
+void test() {
+  {
+    // Cannot deduce T from nothing
+    std::forward_list fwl;
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}forward_list'}}
+  }
+  {
+    // Cannot deduce T from just (Alloc)
+    auto fwl = std::forward_list(std::allocator<int>());
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}forward_list'}}
+  }
+  {
+    // Cannot deduce T from just (Count)
+    auto fwl = std::forward_list(42);
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}forward_list'}}
+  }
 }
