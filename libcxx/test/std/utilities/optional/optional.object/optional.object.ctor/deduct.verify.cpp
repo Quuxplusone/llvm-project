@@ -10,28 +10,19 @@
 
 // <optional>
 
-// template<class T>
-//   optional(T) -> optional<T>;
+// Test CTAD on cases where deduction should fail.
 
 #include <optional>
-#include <cassert>
 
-struct A {};
-
-int main(int, char**)
-{
-//  Test the explicit deduction guides
-
-//  Test the implicit deduction guides
-    {
-//  optional()
-    std::optional opt;   // expected-error-re {{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}optional'}}
-    }
-
-    {
-//  optional(nullopt_t)
-    std::optional opt(std::nullopt);   // expected-error-re@optional:* {{static assertion failed{{.*}}instantiation of optional with nullopt_t is ill-formed}}
-    }
-
-  return 0;
+void test() {
+  {
+    // Cannot deduce T from nothing
+    std::optional opt;
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}optional'}}
+  }
+  {
+    // Reject optional<nullopt_t> as ill-formed
+    auto opt = std::optional(std::nullopt);
+      // expected-error-re@optional:* {{static assertion failed{{.*}}instantiation of optional with nullopt_t is ill-formed}}
+  }
 }
