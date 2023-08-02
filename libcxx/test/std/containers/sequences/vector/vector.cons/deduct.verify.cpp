@@ -6,28 +6,29 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <vector>
 // UNSUPPORTED: c++03, c++11, c++14
 
-// template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
-//    vector(InputIterator, InputIterator, Allocator = Allocator())
-//    -> vector<typename iterator_traits<InputIterator>::value_type, Allocator>;
-//
+// <vector>
 
-#include <cassert>
-#include <cstddef>
+// Test CTAD on cases where deduction should fail.
+
 #include <vector>
+#include <memory>
 
-int main(int, char**) {
-  //  Test the explicit deduction guides
-  // TODO: Should there be tests for explicit deduction guides?
-
-  //  Test the implicit deduction guides
+void test() {
   {
-    //  vector (allocator &)
-    // expected-error-re@+1 {{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}vector'}}
-    std::vector vec(std::allocator< int>{});
+    // Cannot deduce T from nothing
+    std::vector vec;
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}vector'}}
   }
-
-  return 0;
+  {
+    // Cannot deduce T from just (Alloc)
+    auto vec = std::vector(std::allocator<int>());
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}vector'}}
+  }
+  {
+    // Cannot deduce T from just (Count)
+    auto vec = std::vector(42);
+      // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}vector'}}
+  }
 }
