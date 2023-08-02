@@ -10,60 +10,42 @@
 
 // <set>
 
-// template<class InputIterator,
-//          class Compare = less<iter-value-type<InputIterator>>,
-//          class Allocator = allocator<iter-value-type<InputIterator>>>
-// set(InputIterator, InputIterator,
-//     Compare = Compare(), Allocator = Allocator())
-//   -> set<iter-value-type<InputIterator>, Compare, Allocator>;
-// template<class Key, class Compare = less<Key>,
-//          class Allocator = allocator<Key>>
-// set(initializer_list<Key>, Compare = Compare(), Allocator = Allocator())
-//   -> set<Key, Compare, Allocator>;
-// template<class InputIterator, class Allocator>
-// set(InputIterator, InputIterator, Allocator)
-//   -> set<iter-value-type<InputIterator>,
-//          less<iter-value-type<InputIterator>>, Allocator>;
-// template<class Key, class Allocator>
-// set(initializer_list<Key>, Allocator)
-//   -> set<Key, less<Key>, Allocator>;
+// Test CTAD on cases where deduction should fail.
 
-#include <functional>
 #include <set>
-#include <type_traits>
+#include <functional>
+#include <memory>
 
 struct NotAnAllocator {
   friend bool operator<(NotAnAllocator, NotAnAllocator) { return false; }
 };
 
-int main(int, char **) {
+void test() {
   {
     // cannot deduce Key from nothing
     std::set s;
-    // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
   }
   {
     // cannot deduce Key from just (Compare)
     std::set s(std::less<int>{});
-    // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
   }
   {
     // cannot deduce Key from just (Compare, Allocator)
     std::set s(std::less<int>{}, std::allocator<int>{});
-    // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
   }
   {
     // cannot deduce Key from just (Allocator)
     std::set s(std::allocator<int>{});
-    // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
   }
   {
     // since we have parens, not braces, this deliberately does not find the
     // initializer_list constructor
     NotAnAllocator a;
     std::set s(a);
-    // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'set'}}
   }
-
-  return 0;
 }
