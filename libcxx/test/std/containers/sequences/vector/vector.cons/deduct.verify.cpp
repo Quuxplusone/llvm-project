@@ -6,33 +6,29 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <vector>
 // UNSUPPORTED: c++03, c++11, c++14
 
-// template <class InputIterator, class Allocator = allocator<typename iterator_traits<InputIterator>::value_type>>
-//    vector(InputIterator, InputIterator, Allocator = Allocator())
-//    -> vector<typename iterator_traits<InputIterator>::value_type, Allocator>;
-//
+// <vector>
 
-#include <deque>
-#include <iterator>
-#include <cassert>
-#include <cstddef>
+// Test CTAD on cases where deduction should fail.
 
+#include <vector>
+#include <memory>
 
-int main(int, char**)
-{
-//  Test the explicit deduction guides
-
-//  Test the implicit deduction guides
-    {
-//  vector (allocator &)
-    std::vector vec((std::allocator<int>()));  // expected-error {{no viable constructor or deduction guide for deduction of template arguments of 'vector'}}
-//  Note: The extra parens are necessary, since otherwise clang decides it is a function declaration.
-//  Also, we can't use {} instead of parens, because that constructs a
-//      deque<allocator<int>, allocator<allocator<int>>>
-    }
-
-
-  return 0;
+void test() {
+  {
+    // Cannot deduce T from nothing
+    std::vector vec;
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'vector'}}
+  }
+  {
+    // Cannot deduce T from just (Alloc)
+    auto vec = std::vector(std::allocator<int>());
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'vector'}}
+  }
+  {
+    // Cannot deduce T from just (Count)
+    auto vec = std::vector(42);
+        // expected-error@-1{{no viable constructor or deduction guide for deduction of template arguments of 'vector'}}
+  }
 }
