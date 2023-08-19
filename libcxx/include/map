@@ -2412,7 +2412,7 @@ multimap<_Key, _Tp, _Compare, _Allocator>::multimap(multimap&& __m, const alloca
         const_iterator __e = cend();
         while (!__m.empty())
             __tree_.__insert_multi(__e.__i_,
-                    _VSTD::move(__m.__tree_.remove(__m.begin().__i_)->__value_.__move()));
+                    __m.__tree_.remove(__m.begin().__i_)->__value_.__move());
     }
 }
 #endif
