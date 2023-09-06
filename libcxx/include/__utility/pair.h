@@ -193,7 +193,7 @@ struct pair
   _LIBCPP_CONSTEXPR_SINCE_CXX14 explicit(!__check_pair_construction<_T1, _T2>::template __is_implicit<_U1, _U2>())
       pair(pair<_U1, _U2>&& __p) noexcept(is_nothrow_constructible<first_type, _U1&&>::value &&
                                           is_nothrow_constructible<second_type, _U2&&>::value)
-      : first(std::forward<_U1>(__p.first)), second(std::forward<_U2>(__p.second)) {}
+      : first(static_cast<_U1&&>(__p.first)), second(static_cast<_U2&&>(__p.second)) {}
 
 #  if _LIBCPP_STD_VER >= 23
   template <
@@ -242,8 +242,8 @@ struct pair
       __conditional_t<is_move_assignable<first_type>::value && is_move_assignable<second_type>::value, pair, __nat>&&
           __p) noexcept(is_nothrow_move_assignable<first_type>::value &&
                         is_nothrow_move_assignable<second_type>::value) {
-    first  = std::forward<first_type>(__p.first);
-    second = std::forward<second_type>(__p.second);
+    first  = static_cast<first_type&&>(__p.first);
+    second = static_cast<second_type&&>(__p.second);
     return *this;
   }
 
@@ -262,8 +262,8 @@ struct pair
             class _U2,
             __enable_if_t<is_assignable<first_type&, _U1>::value && is_assignable<second_type&, _U2>::value, int> = 0>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 pair& operator=(pair<_U1, _U2>&& __p) {
-    first  = std::forward<_U1>(__p.first);
-    second = std::forward<_U2>(__p.second);
+    first  = static_cast<_U1&&>(__p.first);
+    second = static_cast<_U2&&>(__p.second);
     return *this;
   }
 
@@ -284,8 +284,8 @@ struct pair
                is_nothrow_assignable_v<const second_type&, second_type>)
     requires(is_assignable_v<const first_type&, first_type> && is_assignable_v<const second_type&, second_type>)
   {
-    first  = std::forward<first_type>(__p.first);
-    second = std::forward<second_type>(__p.second);
+    first  = static_cast<first_type&&>(__p.first);
+    second = static_cast<second_type&&>(__p.second);
     return *this;
   }
 
@@ -302,8 +302,8 @@ struct pair
   _LIBCPP_HIDE_FROM_ABI constexpr const pair& operator=(pair<_U1, _U2>&& __p) const
     requires(is_assignable_v<const first_type&, _U1> && is_assignable_v<const second_type&, _U2>)
   {
-    first  = std::forward<_U1>(__p.first);
-    second = std::forward<_U2>(__p.second);
+    first  = static_cast<_U1&&>(__p.first);
+    second = static_cast<_U2&&>(__p.second);
     return *this;
   }
 
@@ -586,12 +586,12 @@ struct __get_pair<0> {
 
   template <class _T1, class _T2>
   static _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 _T1&& get(pair<_T1, _T2>&& __p) _NOEXCEPT {
-    return std::forward<_T1>(__p.first);
+    return static_cast<_T1&&>(__p.first);
   }
 
   template <class _T1, class _T2>
   static _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _T1&& get(const pair<_T1, _T2>&& __p) _NOEXCEPT {
-    return std::forward<const _T1>(__p.first);
+    return static_cast<const _T1&&>(__p.first);
   }
 };
 
@@ -609,12 +609,12 @@ struct __get_pair<1> {
 
   template <class _T1, class _T2>
   static _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 _T2&& get(pair<_T1, _T2>&& __p) _NOEXCEPT {
-    return std::forward<_T2>(__p.second);
+    return static_cast<_T2&&>(__p.second);
   }
 
   template <class _T1, class _T2>
   static _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _T2&& get(const pair<_T1, _T2>&& __p) _NOEXCEPT {
-    return std::forward<const _T2>(__p.second);
+    return static_cast<const _T2&&>(__p.second);
   }
 };
 
