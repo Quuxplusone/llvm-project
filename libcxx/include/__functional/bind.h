@@ -85,7 +85,7 @@ template <class _Ti, class... _Uj, __enable_if_t<is_bind_expression<_Ti>::value,
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 __invoke_result_t<_Ti&, _Uj...>
 __mu(_Ti& __ti, tuple<_Uj...>& __uj) {
   return [&]<size_t... _Indices>(__index_sequence<_Indices...>) -> __invoke_result_t<_Ti&, _Uj...> {
-    return __ti(std::forward<_Uj>(std::get<_Indices>(__uj))...);
+    return __ti(static_cast<_Uj&&>(std::get<_Indices>(__uj))...);
   }(__index_sequence_for<_Uj...>{});
 }
 
@@ -102,7 +102,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
 typename __mu_return2<0 < is_placeholder<_Ti>::value, _Ti, _Uj>::type
 __mu(_Ti&, _Uj& __uj) {
   const size_t __indx = is_placeholder<_Ti>::value - 1;
-  return std::forward<typename tuple_element<__indx, _Uj>::type>(std::get<__indx>(__uj));
+  return static_cast<typename tuple_element<__indx, _Uj>::type&&>(std::get<__indx>(__uj));
 }
 
 template <class _Ti,
