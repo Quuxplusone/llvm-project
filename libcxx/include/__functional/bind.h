@@ -95,7 +95,7 @@ inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_SINCE_CXX20
 typename __invoke_of<_Ti&, _Uj...>::type
 __mu_expand(_Ti& __ti, tuple<_Uj...>& __uj, __tuple_indices<_Indx...>)
 {
-    return __ti(_VSTD::forward<_Uj>(_VSTD::get<_Indx>(__uj))...);
+    return __ti(static_cast<_Uj&&>(_VSTD::get<_Indx>(__uj))...);
 }
 
 template <class _Ti, class ..._Uj, __enable_if_t<is_bind_expression<_Ti>::value, int> = 0>
@@ -122,7 +122,7 @@ typename __mu_return2<0 < is_placeholder<_Ti>::value, _Ti, _Uj>::type
 __mu(_Ti&, _Uj& __uj)
 {
     const size_t __indx = is_placeholder<_Ti>::value - 1;
-    return _VSTD::forward<typename tuple_element<__indx, _Uj>::type>(_VSTD::get<__indx>(__uj));
+    return static_cast<typename tuple_element<__indx, _Uj>::type&&>(_VSTD::get<__indx>(__uj));
 }
 
 template <class _Ti, class _Uj, __enable_if_t<!is_bind_expression<_Ti>::value &&
