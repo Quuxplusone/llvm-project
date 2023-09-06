@@ -57,7 +57,7 @@ struct __compressed_pair_elem {
   template <class... _Args, size_t... _Indices>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17
   explicit __compressed_pair_elem(piecewise_construct_t, tuple<_Args...> __args, __tuple_indices<_Indices...>)
-      : __value_(std::forward<_Args>(std::get<_Indices>(__args))...) {}
+      : __value_(std::get<_Indices>(std::move(__args))...) {}
 #endif
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 reference __get() _NOEXCEPT { return __value_; }
@@ -86,7 +86,7 @@ struct __compressed_pair_elem<_Tp, _Idx, true> : private _Tp {
   template <class... _Args, size_t... _Indices>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX17
   __compressed_pair_elem(piecewise_construct_t, tuple<_Args...> __args, __tuple_indices<_Indices...>)
-      : __value_type(std::forward<_Args>(std::get<_Indices>(__args))...) {}
+      : __value_type(std::get<_Indices>(std::move(__args))...) {}
 #endif
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 reference __get() _NOEXCEPT { return *this; }
