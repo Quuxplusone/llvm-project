@@ -183,7 +183,7 @@ public:
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23
   unique_ptr(_If<is_move_constructible<_Dp>::value, unique_ptr&&, __nat> __u) _NOEXCEPT
       : __ptr_(__u.release()),
-        __deleter_(std::forward<deleter_type>(__u.get_deleter())) {}
+        __deleter_(static_cast<deleter_type&&>(__u.get_deleter())) {}
 
   template <class _Up,
             class _Ep,
@@ -191,7 +191,7 @@ public:
             class = _EnableIfDeleterConvertible<_Ep> >
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr<_Up, _Ep>&& __u) _NOEXCEPT
       : __ptr_(__u.release()),
-        __deleter_(std::forward<_Ep>(__u.get_deleter())) {}
+        __deleter_(static_cast<_Ep&&>(__u.get_deleter())) {}
 
 #if _LIBCPP_STD_VER <= 14 || defined(_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR)
   template <class _Up,
@@ -202,7 +202,7 @@ public:
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr&
   operator=(_If<is_move_assignable<_Dp>::value, unique_ptr&&, __nat> __u) _NOEXCEPT {
     reset(__u.release()); // NOLINT(misc-uniqueptr-reset-release)
-    __deleter_ = std::forward<deleter_type>(__u.get_deleter());
+    __deleter_ = static_cast<deleter_type&&>(__u.get_deleter());
     return *this;
   }
 
@@ -212,7 +212,7 @@ public:
             class = _EnableIfDeleterAssignable<_Ep> >
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr<_Up, _Ep>&& __u) _NOEXCEPT {
     reset(__u.release());
-    __deleter_ = std::forward<_Ep>(__u.get_deleter());
+    __deleter_ = static_cast<_Ep&&>(__u.get_deleter());
     return *this;
   }
 
@@ -488,13 +488,13 @@ public:
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23
   unique_ptr(_If<is_move_constructible<_Dp>::value, unique_ptr&&, __nat> __u) _NOEXCEPT
       : __ptr_(__u.release()),
-        __deleter_(std::forward<deleter_type>(__u.get_deleter())),
+        __deleter_(static_cast<deleter_type&&>(__u.get_deleter())),
         __checker_(std::move(__u.__checker_)) {}
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr&
   operator=(_If<is_move_assignable<_Dp>::value, unique_ptr&&, __nat> __u) _NOEXCEPT {
     reset(__u.release()); // NOLINT(misc-uniqueptr-reset-release)
-    __deleter_ = std::forward<deleter_type>(__u.get_deleter());
+    __deleter_ = static_cast<deleter_type&&>(__u.get_deleter());
     __checker_ = std::move(__u.__checker_);
     return *this;
   }
@@ -505,7 +505,7 @@ public:
             class = _EnableIfDeleterConvertible<_Ep> >
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr<_Up, _Ep>&& __u) _NOEXCEPT
       : __ptr_(__u.release()),
-        __deleter_(std::forward<_Ep>(__u.get_deleter())),
+        __deleter_(static_cast<_Ep&&>(__u.get_deleter())),
         __checker_(std::move(__u.__checker_)) {}
 
   template <class _Up,
@@ -514,7 +514,7 @@ public:
             class = _EnableIfDeleterAssignable<_Ep> >
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr<_Up, _Ep>&& __u) _NOEXCEPT {
     reset(__u.release());
-    __deleter_ = std::forward<_Ep>(__u.get_deleter());
+    __deleter_ = static_cast<_Ep&&>(__u.get_deleter());
     __checker_ = std::move(__u.__checker_);
     return *this;
   }
