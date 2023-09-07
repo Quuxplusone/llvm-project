@@ -16,6 +16,7 @@ struct non_const_copy {
 non_const_copy::non_const_copy(non_const_copy&) = default; // expected-note {{not viable}}
 non_const_copy& non_const_copy::operator = (non_const_copy&) & = default; // expected-note {{not viable}}
 non_const_copy& non_const_copy::operator = (non_const_copy&) && = default; // expected-note {{not viable}}
+// expected-error@-1 {{an explicitly-defaulted copy assignment operator may not have an rvalue reference qualifier}}
 
 void fn1 () {
   non_copiable nc;
