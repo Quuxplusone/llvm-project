@@ -283,6 +283,7 @@ struct X {
   X& operator=(this X&, const X&) = default;
   X& operator=(this X&, X&) = default;
   X& operator=(this X&&, X&&) = default;
+  // expected-error@-1 {{an explicitly-defaulted move assignment operator may not have an rvalue reference qualifier}}
   // FIXME: The notes could be clearer on *how* the type differs
   // e.g., "if an explicit object parameter is used it must be of type reference to 'X'"
   X& operator=(this int, const X&) = default;
