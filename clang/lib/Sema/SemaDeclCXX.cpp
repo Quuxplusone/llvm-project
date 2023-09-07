@@ -7943,11 +7943,9 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
       HadError = true;
     }
 
-    // A defaulted special member cannot have cv-qualifiers.
+    // A defaulted special member cannot have cv-qualifiers nor an rvalue-ref-qualifier.
     if (ThisType.isConstQualified() || ThisType.isVolatileQualified()) {
-      if (DeleteOnTypeMismatch)
-        ShouldDeleteForTypeMismatch = true;
-      else {
+      {
         Diag(MD->getLocation(), diag::err_defaulted_special_member_quals)
             << (CSM == CXXSpecialMemberKind::MoveAssignment)
             << getLangOpts().CPlusPlus14;
@@ -7977,6 +7975,11 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
         HadError = true;
       }
     }
+    if (!HadError && MD->getFunctionObjectParameterReferenceType()->isRValueReferenceType()) {
+      Diag(MD->getLocation(), diag::err_defaulted_special_member_rref_qual)
+          << (CSM == CXXSpecialMemberKind::MoveAssignment);
+        HadError = true;
+    }
   }
 
   // Check for parameter type matching.
@@ -7991,9 +7994,7 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
     HasConstParam = ReferentType.isConstQualified();
 
     if (ReferentType.isVolatileQualified()) {
-      if (DeleteOnTypeMismatch)
-        ShouldDeleteForTypeMismatch = true;
-      else {
+      {
         Diag(MD->getLocation(),
              diag::err_defaulted_special_member_volatile_param)
             << CSM;
@@ -8002,7 +8003,7 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
     }
 
     if (HasConstParam && !CanHaveConstParam) {
-      if (DeleteOnTypeMismatch)
+      if (DeleteOnTypeMismatch && (CSM == CXXSpecialMemberKind::CopyConstructor || CSM == CXXSpecialMemberKind::CopyAssignment))
         ShouldDeleteForTypeMismatch = true;
       else if (CSM == CXXSpecialMemberKind::CopyConstructor ||
                CSM == CXXSpecialMemberKind::CopyAssignment) {

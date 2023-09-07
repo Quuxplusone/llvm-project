@@ -3863,8 +3863,8 @@ static_assert(__has_unique_object_representations(Bar[])); // expected-error {{i
 namespace PR46209 {
   // Foo has both a trivial assignment operator and a non-trivial one.
   struct Foo {
-    Foo &operator=(const Foo &) & { return *this; }
-    Foo &operator=(const Foo &) && = default;
+    Foo &operator=(Foo &) = default;
+    Foo &operator=(const Foo &) { return *this; }
   };
 
   // Bar's copy assignment calls Foo's non-trivial assignment.

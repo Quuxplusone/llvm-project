@@ -39,7 +39,8 @@ struct A {
 #else
   // expected-warning@-10 {{implicitly deleted}} expected-note@-10 {{declared type does not match the type of an implicit default constructor}}
   // expected-warning@-10 {{implicitly deleted}} expected-note@-10 {{declared type does not match the type of an implicit copy constructor}}
-  // expected-warning@-10 {{implicitly deleted}} expected-note@-10 {{declared type does not match the type of an implicit copy assignment}}
+  // expected-error@-10 {{may not have 'const'}}
+  // expected-error@-10 {{may not have 'const'}}
 #endif
 
   //    (except for possibly differing ref-qualifiers

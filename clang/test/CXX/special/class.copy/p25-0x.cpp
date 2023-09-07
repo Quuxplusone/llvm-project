@@ -16,9 +16,9 @@ template<typename T, bool B> struct trivially_assignable_check {
   static_assert(B == __is_trivially_assignable(T&, T), "");
   static_assert(B == __is_trivially_assignable(T&, const T &), "");
   static_assert(B == __is_trivially_assignable(T&, T &&), "");
-  static_assert(B == __is_trivially_assignable(T&&, T), "");
-  static_assert(B == __is_trivially_assignable(T&&, const T &), "");
-  static_assert(B == __is_trivially_assignable(T&&, T &&), "");
+  static_assert((__is_assignable(T&&, T) && B) == __is_trivially_assignable(T&&, T), "");
+  static_assert((__is_assignable(T&&, const T&) && B) == __is_trivially_assignable(T&&, const T &), "");
+  static_assert((__is_assignable(T&&, T&&) && B) == __is_trivially_assignable(T&&, T &&), "");
   typedef void type;
 };
 template<typename T> using trivially_assignable =
@@ -40,9 +40,6 @@ using _ = not_trivially_assignable<UserProvided>;
 // declared,
 struct NonConstCopy {
   NonConstCopy &operator=(EXPLICIT_PARAMETER(NonConstCopy&) NonConstCopy &) = default;
-#if DEDUCING_THIS
-  NonConstCopy &operator=(EXPLICIT_PARAMETER(NonConstCopy&&) NonConstCopy &) = default;
-#endif
 };
 #if defined(CLANG_ABI_COMPAT) && CLANG_ABI_COMPAT <= 14
 // Up until (and including) Clang 14, non-const copy assignment operators were not trivial because
@@ -56,7 +53,11 @@ static_assert(__is_trivially_assignable(NonConstCopy &, NonConstCopy &), "");
 static_assert(!__is_trivially_assignable(NonConstCopy &, const NonConstCopy &), "");
 static_assert(!__is_trivially_assignable(NonConstCopy &, NonConstCopy), "");
 static_assert(!__is_trivially_assignable(NonConstCopy &, NonConstCopy &&), "");
+#if defined(DEDUCING_THIS)
+static_assert(!__is_trivially_assignable(NonConstCopy &&, NonConstCopy &), "");
+#else
 static_assert(__is_trivially_assignable(NonConstCopy &&, NonConstCopy &), "");
+#endif
 static_assert(!__is_trivially_assignable(NonConstCopy &&, const NonConstCopy &), "");
 static_assert(!__is_trivially_assignable(NonConstCopy &&, NonConstCopy), "");
 static_assert(!__is_trivially_assignable(NonConstCopy &&, NonConstCopy &&), "");
@@ -68,14 +69,6 @@ struct DefaultedSpecialMembers {
                                      DefaultedSpecialMembers &) = default;
   DefaultedSpecialMembers &operator=(EXPLICIT_PARAMETER(DefaultedSpecialMembers&)
                                      DefaultedSpecialMembers &&) = default;
-#if DEDUCING_THIS
-  DefaultedSpecialMembers &operator=(EXPLICIT_PARAMETER(DefaultedSpecialMembers&&)
-                                     const DefaultedSpecialMembers &) = default;
-  DefaultedSpecialMembers &operator=(EXPLICIT_PARAMETER(DefaultedSpecialMembers&&)
-                                     DefaultedSpecialMembers &) = default;
-  DefaultedSpecialMembers &operator=(EXPLICIT_PARAMETER(DefaultedSpecialMembers&&)
-                                     DefaultedSpecialMembers &&) = default;
-#endif
 };
 using _ = trivially_assignable<DefaultedSpecialMembers>;
 #endif
@@ -111,20 +104,20 @@ struct TNT {
   TNT &operator=(EXPLICIT_PARAMETER(TNT&) TNT &); // non-trivial
   TNT &operator=(EXPLICIT_PARAMETER(TNT&) TNT &&) = default; // trivial
   TNT &operator=(EXPLICIT_PARAMETER(TNT&) const TNT &&); // non-trivial
-#if DEDUCING_THIS
-  TNT &operator=(this TNT&&, const TNT &) = default; // trivial
-  TNT &operator=(this TNT&&, TNT &); // non-trivial
-  TNT &operator=(this TNT&&, TNT &&) = default; // trivial
-  TNT &operator=(this TNT&&, const TNT &&); // non-trivial
-#endif
 };
 
 static_assert(!__has_trivial_assign(TNT), "lie deliberately for gcc compatibility");
+#ifdef DEDUCING_THIS
+static_assert(!__is_trivially_assignable(TNT, TNT), "");
+static_assert(!__is_trivially_assignable(TNT, const TNT &), "");
+static_assert(!__is_trivially_assignable(TNT, TNT &&), "");
+#else
 static_assert(__is_trivially_assignable(TNT, TNT), "");
-static_assert(!__is_trivially_assignable(TNT, TNT &), "");
 static_assert(__is_trivially_assignable(TNT, const TNT &), "");
-static_assert(!__is_trivially_assignable(TNT, volatile TNT &), "");
 static_assert(__is_trivially_assignable(TNT, TNT &&), "");
+#endif
+static_assert(!__is_trivially_assignable(TNT, TNT &), "");
+static_assert(!__is_trivially_assignable(TNT, volatile TNT &), "");
 static_assert(!__is_trivially_assignable(TNT, const TNT &&), "");
 static_assert(!__is_trivially_assignable(TNT, volatile TNT &&), "");
 
@@ -168,29 +161,23 @@ static_assert(!__is_trivially_assignable(NCCTNT, volatile NCCTNT &&), "");
 struct MultipleTrivial {
   // All four of these are trivial.
   MultipleTrivial &operator=(const MultipleTrivial &) & = default;
-  MultipleTrivial &operator=(const MultipleTrivial &) && = default;
   MultipleTrivial &operator=(MultipleTrivial &&) & = default;
-  MultipleTrivial &operator=(MultipleTrivial &&) && = default;
 };
 
 using _ = trivially_assignable<MultipleTrivial>;
 
 struct RefQualifier {
   RefQualifier &operator=(const RefQualifier &) & = default;
-  RefQualifier &operator=(const RefQualifier &) &&;
   RefQualifier &operator=(RefQualifier &&) &;
-  RefQualifier &operator=(RefQualifier &&) && = default;
 };
 struct DerivedFromRefQualifier : RefQualifier {
   // Both of these call the trivial copy operation.
   DerivedFromRefQualifier &operator=(const DerivedFromRefQualifier &) & = default;
-  DerivedFromRefQualifier &operator=(const DerivedFromRefQualifier &) && = default;
   // Both of these call the non-trivial move operation.
   DerivedFromRefQualifier &operator=(DerivedFromRefQualifier &&) & = default;
-  DerivedFromRefQualifier &operator=(DerivedFromRefQualifier &&) && = default;
 };
 static_assert(__is_trivially_assignable(DerivedFromRefQualifier&, const DerivedFromRefQualifier&), "");
-static_assert(__is_trivially_assignable(DerivedFromRefQualifier&&, const DerivedFromRefQualifier&), "");
+static_assert(!__is_trivially_assignable(DerivedFromRefQualifier&&, const DerivedFromRefQualifier&), "");
 static_assert(!__is_trivially_assignable(DerivedFromRefQualifier&, DerivedFromRefQualifier&&), "");
 static_assert(!__is_trivially_assignable(DerivedFromRefQualifier&&, DerivedFromRefQualifier&&), "");
 
