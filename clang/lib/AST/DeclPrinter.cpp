@@ -979,6 +979,10 @@ void DeclPrinter::VisitVarDecl(VarDecl *D) {
 
   Out << LeftSide;
 
+  if (const auto *Param = dyn_cast<ParmVarDecl>(D);
+      Param && Param->isExplicitObjectParameter())
+    Out << "this ";
+
   QualType T = D->getTypeSourceInfo()
     ? D->getTypeSourceInfo()->getType()
     : D->getASTContext().getUnqualifiedObjCPointerType(D->getType());
