@@ -76,9 +76,7 @@ struct T2 {
   constexpr T2 &operator=(const T2&) = default; // ok
 };
 struct T3 {
-  constexpr T3 &operator=(const T3 &) const = default; // beforecxx20-error {{an explicitly-defaulted copy assignment operator may not have 'const' or 'volatile' qualifiers}} \
-                                                       // aftercxx20-warning {{explicitly defaulted copy assignment operator is implicitly deleted}} \
-                                                       // aftercxx20-note {{function is implicitly deleted because its declared type does not match the type of an implicit copy assignment operator}}
+  constexpr T3 &operator=(const T3 &) const = default; // expected-error {{an explicitly-defaulted copy assignment operator may not have 'const' or 'volatile' qualifiers}}
 };
 #endif
 struct U {
