@@ -7744,7 +7744,7 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
       HadError = true;
     }
 
-    // A defaulted special member cannot have cv-qualifiers.
+    // A defaulted special member cannot have cv-qualifiers nor an rvalue-ref-qualifier.
     if (ThisType.isConstQualified() || ThisType.isVolatileQualified()) {
       if (DeleteOnTypeMismatch)
         ShouldDeleteForTypeMismatch = true;
@@ -7771,6 +7771,11 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
             << (CSM == CXXMoveAssignment) << RD << MD->getSourceRange();
         HadError = true;
       }
+    }
+    if (!HadError && MD->getFunctionObjectParameterReferenceType()->isRValueReferenceType()) {
+      Diag(MD->getLocation(), diag::err_defaulted_special_member_rref_qual)
+          << (CSM == CXXMoveAssignment);
+        HadError = true;
     }
   }
 
