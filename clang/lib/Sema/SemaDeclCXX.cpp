@@ -7683,7 +7683,7 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
   // C++2a changes the second bullet to instead delete the function if it's
   // defaulted on its first declaration, unless it's "an assignment operator,
   // and its return type differs or its parameter type is not a reference".
-  bool DeleteOnTypeMismatch = getLangOpts().CPlusPlus20 && First;
+  bool DeleteOnTypeMismatch = false;
   bool ShouldDeleteForTypeMismatch = false;
   unsigned ExpectedParams = 1;
   if (CSM == CXXDefaultConstructor || CSM == CXXDestructor)
@@ -7731,8 +7731,8 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
       HadError = true;
     }
 
-    // A defaulted special member cannot have cv-qualifiers.
-    if (ThisType.isConstQualified() || ThisType.isVolatileQualified()) {
+    // A defaulted special member cannot have cv-qualifiers nor an rvalue-ref-qualifier.
+    if (Type->getMethodQuals().hasConst() || Type->getMethodQuals().hasVolatile()) {
       if (DeleteOnTypeMismatch)
         ShouldDeleteForTypeMismatch = true;
       else {
@@ -7740,6 +7740,10 @@ bool Sema::CheckExplicitlyDefaultedSpecialMember(CXXMethodDecl *MD,
           << (CSM == CXXMoveAssignment) << getLangOpts().CPlusPlus14;
         HadError = true;
       }
+    } else if (MD->getFunctionObjectParameterReferenceType()->isRValueReferenceType()) {
+      Diag(MD->getLocation(), diag::err_defaulted_special_member_rref_qual)
+          << (CSM == CXXMoveAssignment);
+        HadError = true;
     }
   }
 
