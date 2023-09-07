@@ -3566,7 +3566,7 @@ namespace PR46209 {
   // Foo has both a trivial assignment operator and a non-trivial one.
   struct Foo {
     Foo &operator=(const Foo &) & { return *this; }
-    Foo &operator=(const Foo &) && = default;
+    Foo &operator=(const Foo &) && = default; //expected-error{{an explicitly-defaulted copy assignment operator may not have an rvalue reference qualifier}}
   };
 
   // Bar's copy assignment calls Foo's non-trivial assignment.
