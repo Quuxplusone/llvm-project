@@ -16,13 +16,14 @@
 #include <array>
 #include <cassert>
 #include <concepts>
+#include <utility>
 
 #include "test_iterators.h"
 #include "test_macros.h"
 
 template <class T>
-concept HasSize = requires (T t) {
-  t.size();
+concept HasSize = requires {
+  std::declval<T>().size();
 };
 
 constexpr bool test()

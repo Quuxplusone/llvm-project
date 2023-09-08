@@ -8,7 +8,6 @@
 
 // UNSUPPORTED: c++03, c++11, c++14, c++17
 
-
 // constexpr iterator_t<R> begin();
 // constexpr sentinel_t<R> end();
 // constexpr auto begin() const requires range<const R>;
@@ -20,6 +19,7 @@
 #include <cassert>
 #include <concepts>
 #include <memory>
+#include <utility>
 
 #include "test_iterators.h"
 #include "test_macros.h"
@@ -46,13 +46,13 @@ struct DecayChecker {
 };
 
 template <class T>
-concept HasBegin = requires (T t) {
-  t.begin();
+concept HasBegin = requires {
+  std::declval<T>().begin();
 };
 
 template <class T>
-concept HasEnd = requires (T t) {
-  t.end();
+concept HasEnd = requires {
+  std::declval<T>().end();
 };
 
 constexpr bool test()

@@ -16,13 +16,14 @@
 #include <array>
 #include <cassert>
 #include <concepts>
+#include <utility>
 
 #include "test_iterators.h"
 #include "test_macros.h"
 
 template <class T>
-concept HasEmpty = requires (T t) {
-  t.empty();
+concept HasEmpty = requires {
+  std::declval<T>().empty();
 };
 
 constexpr bool test()
