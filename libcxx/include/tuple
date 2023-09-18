@@ -1316,7 +1316,6 @@ tie(_Tp&... __t) _NOEXCEPT
     return tuple<_Tp&...>(__t...);
 }
 
-template <class _Up>
 struct __ignore_t
 {
     template <class _Tp>
@@ -1325,11 +1324,9 @@ struct __ignore_t
 };
 
 #  if _LIBCPP_STD_VER >= 17
-inline constexpr __ignore_t<unsigned char> ignore = __ignore_t<unsigned char>();
+inline constexpr __ignore_t ignore = __ignore_t();
 #  else
-namespace {
-  constexpr __ignore_t<unsigned char> ignore = __ignore_t<unsigned char>();
-} // namespace
+static constexpr __ignore_t ignore = __ignore_t();
 #  endif
 
 template <class... _Tp>
