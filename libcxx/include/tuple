@@ -1108,19 +1108,18 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 tuple<_Tp&...> tie(_T
   return tuple<_Tp&...>(__t...);
 }
 
-template <class _Up>
 struct __ignore_t {
   template <class _Tp>
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const __ignore_t& operator=(_Tp&&) const {
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const __ignore_t& operator=(const _Tp&) const _NOEXCEPT {
     return *this;
   }
 };
 
 #  if _LIBCPP_STD_VER >= 17
-inline constexpr __ignore_t<unsigned char> ignore = __ignore_t<unsigned char>();
+inline constexpr __ignore_t ignore = __ignore_t();
 #  else
 namespace {
-constexpr __ignore_t<unsigned char> ignore = __ignore_t<unsigned char>();
+constexpr __ignore_t ignore = __ignore_t();
 } // namespace
 #  endif
 
