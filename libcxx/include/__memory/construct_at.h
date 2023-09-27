@@ -52,8 +52,7 @@ _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _Tp* __construct_at(_Tp* __l
 
 // destroy_at
 
-// The internal functions are available regardless of the language version (with the exception of the `__destroy_at`
-// taking an array).
+// The internal functions are available regardless of the language version.
 
 template <class _Tp, __enable_if_t<!is_array<_Tp>::value, int> = 0>
 _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __destroy_at(_Tp* __loc) {
@@ -61,14 +60,12 @@ _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __destroy_at(_Tp* __loc
   __loc->~_Tp();
 }
 
-#if _LIBCPP_STD_VER >= 20
 template <class _Tp, __enable_if_t<is_array<_Tp>::value, int> = 0>
-_LIBCPP_HIDE_FROM_ABI constexpr void __destroy_at(_Tp* __loc) {
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __destroy_at(_Tp* __loc) {
   _LIBCPP_ASSERT_NON_NULL(__loc != nullptr, "null pointer given to destroy_at");
   for (auto&& __val : *__loc)
     std::__destroy_at(std::addressof(__val));
 }
-#endif
 
 #if _LIBCPP_STD_VER >= 17
 
