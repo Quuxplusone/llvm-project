@@ -28,6 +28,7 @@
 #include "clang/AST/Mangle.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/ABI.h"
+#include "clang/Basic/DiagnosticAST.h"
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
@@ -5111,19 +5112,19 @@ recurse:
       Out << 'a';
       MangleAlignofSizeofArg();
       break;
+    case UETT_DataSizeOf: {
+      Context.getDiags().Report(diag::err_cannot_mangle_expression)
+          << "__datasizeof";
+      return;
+    }
     case UETT_VecStep: {
-      DiagnosticsEngine &Diags = Context.getDiags();
-      unsigned DiagID = Diags.getCustomDiagID(DiagnosticsEngine::Error,
-                                     "cannot yet mangle vec_step expression");
-      Diags.Report(DiagID);
+      Context.getDiags().Report(diag::err_cannot_mangle_expression)
+          << "vec_step";
       return;
     }
     case UETT_OpenMPRequiredSimdAlign: {
-      DiagnosticsEngine &Diags = Context.getDiags();
-      unsigned DiagID = Diags.getCustomDiagID(
-          DiagnosticsEngine::Error,
-          "cannot yet mangle __builtin_omp_required_simd_align expression");
-      Diags.Report(DiagID);
+      Context.getDiags().Report(diag::err_cannot_mangle_expression)
+          << "__builtin_omp_required_simd_align";
       return;
     }
     }
