@@ -170,6 +170,9 @@ C23 Feature Support
 Non-comprehensive list of changes in this release
 -------------------------------------------------
 
+- The ``__datasizeof`` keyword has been added. It is similar to ``sizeof``
+  except that it returns the size of a type ignoring tail padding.
+
 New Compiler Flags
 ------------------
 
