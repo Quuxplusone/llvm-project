@@ -26,6 +26,15 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#if __has_extension(datasizeof)
+
+template <class _Tp>
+struct __libcpp_datasizeof {
+  static const size_t value = __datasizeof(_Tp);
+};
+
+#else
+
 template <class _Tp>
 struct __libcpp_datasizeof {
 #if __has_extension(datasizeof)
@@ -59,6 +68,8 @@ struct __libcpp_datasizeof {
   _LIBCPP_DIAGNOSTIC_POP
 #endif   // __has_extension(datasizeof)
 };
+
+#endif
 
 _LIBCPP_END_NAMESPACE_STD
 
