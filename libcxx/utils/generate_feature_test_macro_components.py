@@ -1077,6 +1077,11 @@ feature_test_macros = [
             "headers": ["functional", "memory"],
         },
         {
+            "name": "__cpp_lib_trivially_relocatable",
+            "values": {"c++14": 202401},
+            "headers": ["memory", "type_traits"],
+        },
+        {
             "name": "__cpp_lib_tuple_element_t",
             "values": {"c++14": 201402},
             "headers": ["tuple"],
