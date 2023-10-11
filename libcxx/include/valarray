@@ -21,6 +21,8 @@ class valarray
 {
 public:
     typedef T value_type;
+    typedef unspecified iterator;
+    typedef unspecified const_iterator;
 
     // construct/destroy:
     valarray();
@@ -49,6 +51,11 @@ public:
     // element access:
     const value_type& operator[](size_t i) const;
     value_type&       operator[](size_t i);
+
+    iterator begin();
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
 
     // subset operations:
     valarray                   operator[](slice s) const;
@@ -334,11 +341,6 @@ template<class T> valarray<T> sqrt (const valarray<T>& x);
 template<class T> valarray<T> tan (const valarray<T>& x);
 template<class T> valarray<T> tanh (const valarray<T>& x);
 
-template <class T> unspecified1 begin(valarray<T>& v);
-template <class T> unspecified2 begin(const valarray<T>& v);
-template <class T> unspecified1 end(valarray<T>& v);
-template <class T> unspecified2 end(const valarray<T>& v);
-
 }  // std
 
 */
@@ -419,26 +421,6 @@ class _LIBCPP_EXPORTED_FROM_ABI gslice;
 template <class _Tp> class _LIBCPP_TEMPLATE_VIS gslice_array;
 template <class _Tp> class _LIBCPP_TEMPLATE_VIS mask_array;
 template <class _Tp> class _LIBCPP_TEMPLATE_VIS indirect_array;
-
-template <class _Tp>
-_LIBCPP_INLINE_VISIBILITY
-_Tp*
-begin(valarray<_Tp>& __v);
-
-template <class _Tp>
-_LIBCPP_INLINE_VISIBILITY
-const _Tp*
-begin(const valarray<_Tp>& __v);
-
-template <class _Tp>
-_LIBCPP_INLINE_VISIBILITY
-_Tp*
-end(valarray<_Tp>& __v);
-
-template <class _Tp>
-_LIBCPP_INLINE_VISIBILITY
-const _Tp*
-end(const valarray<_Tp>& __v);
 
 template <class _Op, class _A0>
 struct _UnaryOp
@@ -847,6 +829,8 @@ class _LIBCPP_TEMPLATE_VIS valarray
 public:
     typedef _Tp value_type;
     typedef _Tp __result_type;
+    typedef _Tp* iterator;
+    typedef const _Tp* const_iterator;
 
 private:
     value_type* __begin_;
@@ -902,6 +886,11 @@ public:
 
     _LIBCPP_INLINE_VISIBILITY
     value_type&       operator[](size_t __i)       {return __begin_[__i];}
+
+    _LIBCPP_HIDE_FROM_ABI iterator begin() { return __begin_; }
+    _LIBCPP_HIDE_FROM_ABI const_iterator begin() const { return __begin_; }
+    _LIBCPP_HIDE_FROM_ABI iterator end() { return __end_; }
+    _LIBCPP_HIDE_FROM_ABI const_iterator end() const { return __end_; }
 
     // subset operations:
     _LIBCPP_INLINE_VISIBILITY
@@ -1040,26 +1029,6 @@ private:
     template <class> friend class _LIBCPP_TEMPLATE_VIS indirect_array;
     template <class> friend class __indirect_expr;
     template <class> friend class __val_expr;
-
-    template <class _Up>
-    friend
-    _Up*
-    begin(valarray<_Up>& __v);
-
-    template <class _Up>
-    friend
-    const _Up*
-    begin(const valarray<_Up>& __v);
-
-    template <class _Up>
-    friend
-    _Up*
-    end(valarray<_Up>& __v);
-
-    template <class _Up>
-    friend
-    const _Up*
-    end(const valarray<_Up>& __v);
 
     _LIBCPP_INLINE_VISIBILITY
     void __clear(size_t __capacity);
@@ -4165,38 +4134,6 @@ tanh(const _Expr& __x)
     typedef typename _Expr::value_type value_type;
     typedef _UnaryOp<__tanh_expr<value_type>, _Expr> _Op;
     return __val_expr<_Op>(_Op(__tanh_expr<value_type>(), __x));
-}
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY
-_Tp*
-begin(valarray<_Tp>& __v)
-{
-    return __v.__begin_;
-}
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY
-const _Tp*
-begin(const valarray<_Tp>& __v)
-{
-    return __v.__begin_;
-}
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY
-_Tp*
-end(valarray<_Tp>& __v)
-{
-    return __v.__end_;
-}
-
-template <class _Tp>
-inline _LIBCPP_INLINE_VISIBILITY
-const _Tp*
-end(const valarray<_Tp>& __v)
-{
-    return __v.__end_;
 }
 
 _LIBCPP_END_NAMESPACE_STD
