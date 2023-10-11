@@ -37,6 +37,9 @@ public:
     const E* end()   const noexcept; // constexpr in C++14
 };
 
+template<class E> const E* begin(initializer_list<E> il) noexcept; // constexpr in C++14, removed in C++26
+template<class E> const E* end(initializer_list<E> il) noexcept; // constexpr in C++14, removed in C++26
+
 }  // std
 
 */
@@ -94,6 +97,18 @@ public:
     return __begin_ + __size_;
   }
 };
+
+#if _LIBCPP_STD_VER <= 23
+template <class _Ep>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* begin(initializer_list<_Ep> __il) _NOEXCEPT {
+  return __il.begin();
+}
+
+template <class _Ep>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* end(initializer_list<_Ep> __il) _NOEXCEPT {
+  return __il.end();
+}
+#endif
 
 } // namespace std
 
