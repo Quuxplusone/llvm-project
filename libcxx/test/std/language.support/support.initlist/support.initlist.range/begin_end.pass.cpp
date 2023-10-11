@@ -16,6 +16,7 @@
 #include <initializer_list>
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 
 #include "test_macros.h"
 
@@ -54,6 +55,26 @@ TEST_CONSTEXPR_CXX14 bool test() {
     assert(std::begin(cil) == il.begin());
     assert(std::end(cil) == il.end());
   }
+
+#if TEST_STD_VER >= 20
+  {
+    std::initializer_list<int> il = {1, 2, 3};
+    ASSERT_NOEXCEPT(std::ranges::begin(il));
+    ASSERT_NOEXCEPT(std::ranges::end(il));
+    ASSERT_SAME_TYPE(decltype(std::ranges::begin(il)), const int*);
+    ASSERT_SAME_TYPE(decltype(std::ranges::end(il)), const int*);
+    assert(std::ranges::begin(il) == il.begin());
+    assert(std::ranges::end(il) == il.end());
+
+    const auto& cil = il;
+    ASSERT_NOEXCEPT(std::ranges::begin(cil));
+    ASSERT_NOEXCEPT(std::ranges::end(cil));
+    ASSERT_SAME_TYPE(decltype(std::ranges::begin(cil)), const int*);
+    ASSERT_SAME_TYPE(decltype(std::ranges::end(cil)), const int*);
+    assert(std::ranges::begin(cil) == il.begin());
+    assert(std::ranges::end(cil) == il.end());
+  }
+#endif
 
   return true;
 }
