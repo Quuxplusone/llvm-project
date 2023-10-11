@@ -35,8 +35,8 @@ public:
     const E* end()   const noexcept; // constexpr in C++14
 };
 
-template<class E> const E* begin(initializer_list<E> il) noexcept; // constexpr in C++14
-template<class E> const E* end(initializer_list<E> il) noexcept; // constexpr in C++14
+template<class E> const E* begin(initializer_list<E> il) noexcept; // constexpr in C++14, removed in C++26
+template<class E> const E* end(initializer_list<E> il) noexcept; // constexpr in C++14, removed in C++26
 
 }  // std
 
@@ -79,8 +79,13 @@ public:
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* begin() const _NOEXCEPT { return __begin_; }
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* end() const _NOEXCEPT { return __begin_ + __size_; }
+
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* data() const _NOEXCEPT { return __begin_; }
+
+  _LIBCPP_NODISCARD _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 bool empty() const _NOEXCEPT { return __size_ == 0; }
 };
 
+#if _LIBCPP_STD_VER <= 23
 template <class _Ep>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* begin(initializer_list<_Ep> __il) _NOEXCEPT {
   return __il.begin();
@@ -90,6 +95,7 @@ template <class _Ep>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 const _Ep* end(initializer_list<_Ep> __il) _NOEXCEPT {
   return __il.end();
 }
+#endif
 
 #endif // !defined(_LIBCPP_CXX03_LANG)
 
