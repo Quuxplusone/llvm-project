@@ -16,6 +16,7 @@
 #include <initializer_list>
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 
 #include "test_macros.h"
 
@@ -23,8 +24,8 @@ TEST_CONSTEXPR_CXX14 bool test() {
   // unqualified begin/end
   {
     std::initializer_list<int> il = {3, 2, 1};
-    ASSERT_NOEXCEPT(begin(il));
-    ASSERT_NOEXCEPT(end(il));
+    ASSERT_NOT_NOEXCEPT(begin(il));
+    ASSERT_NOT_NOEXCEPT(end(il));
     ASSERT_SAME_TYPE(decltype(begin(il)), const int*);
     ASSERT_SAME_TYPE(decltype(end(il)), const int*);
     const int* b = begin(il);
@@ -39,21 +40,41 @@ TEST_CONSTEXPR_CXX14 bool test() {
   // qualified begin/end
   {
     std::initializer_list<int> il = {1, 2, 3};
-    ASSERT_NOEXCEPT(std::begin(il));
-    ASSERT_NOEXCEPT(std::end(il));
+    ASSERT_NOT_NOEXCEPT(std::begin(il));
+    ASSERT_NOT_NOEXCEPT(std::end(il));
     ASSERT_SAME_TYPE(decltype(std::begin(il)), const int*);
     ASSERT_SAME_TYPE(decltype(std::end(il)), const int*);
     assert(std::begin(il) == il.begin());
     assert(std::end(il) == il.end());
 
     const auto& cil = il;
-    ASSERT_NOEXCEPT(std::begin(cil));
-    ASSERT_NOEXCEPT(std::end(cil));
+    ASSERT_NOT_NOEXCEPT(std::begin(cil));
+    ASSERT_NOT_NOEXCEPT(std::end(cil));
     ASSERT_SAME_TYPE(decltype(std::begin(cil)), const int*);
     ASSERT_SAME_TYPE(decltype(std::end(cil)), const int*);
     assert(std::begin(cil) == il.begin());
     assert(std::end(cil) == il.end());
   }
+
+#if TEST_STD_VER >= 20
+  {
+    std::initializer_list<int> il = {1, 2, 3};
+    ASSERT_NOEXCEPT(std::ranges::begin(il));
+    ASSERT_NOEXCEPT(std::ranges::end(il));
+    ASSERT_SAME_TYPE(decltype(std::ranges::begin(il)), const int*);
+    ASSERT_SAME_TYPE(decltype(std::ranges::end(il)), const int*);
+    assert(std::ranges::begin(il) == il.begin());
+    assert(std::ranges::end(il) == il.end());
+
+    const auto& cil = il;
+    ASSERT_NOEXCEPT(std::ranges::begin(cil));
+    ASSERT_NOEXCEPT(std::ranges::end(cil));
+    ASSERT_SAME_TYPE(decltype(std::ranges::begin(cil)), const int*);
+    ASSERT_SAME_TYPE(decltype(std::ranges::end(cil)), const int*);
+    assert(std::ranges::begin(cil) == il.begin());
+    assert(std::ranges::end(cil) == il.end());
+  }
+#endif
 
   return true;
 }
