@@ -44,91 +44,10 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-// stable, 2-3 compares, 0-2 swaps
-
-template <class _AlgPolicy, class _Compare, class _ForwardIterator>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 unsigned
-__sort3(_ForwardIterator __x, _ForwardIterator __y, _ForwardIterator __z, _Compare __c) {
-  using _Ops = _IterOps<_AlgPolicy>;
-
-  unsigned __r = 0;
-  if (!__c(*__y, *__x)) // if x <= y
-  {
-    if (!__c(*__z, *__y))      // if y <= z
-      return __r;              // x <= y && y <= z
-                               // x <= y && y > z
-    _Ops::iter_swap(__y, __z); // x <= z && y < z
-    __r = 1;
-    if (__c(*__y, *__x)) // if x > y
-    {
-      _Ops::iter_swap(__x, __y); // x < y && y <= z
-      __r = 2;
-    }
-    return __r; // x <= y && y < z
-  }
-  if (__c(*__z, *__y)) // x > y, if y > z
-  {
-    _Ops::iter_swap(__x, __z); // x < y && y < z
-    __r = 1;
-    return __r;
-  }
-  _Ops::iter_swap(__x, __y); // x > y && y <= z
-  __r = 1;                   // x < y && x <= z
-  if (__c(*__z, *__y))       // if y > z
-  {
-    _Ops::iter_swap(__y, __z); // x <= y && y < z
-    __r = 2;
-  }
-  return __r;
-} // x <= y && y <= z
-
-// stable, 3-6 compares, 0-5 swaps
-
-template <class _AlgPolicy, class _Compare, class _ForwardIterator>
-_LIBCPP_HIDE_FROM_ABI void
-__sort4(_ForwardIterator __x1, _ForwardIterator __x2, _ForwardIterator __x3, _ForwardIterator __x4, _Compare __c) {
-  using _Ops = _IterOps<_AlgPolicy>;
-  std::__sort3<_AlgPolicy, _Compare>(__x1, __x2, __x3, __c);
-  if (__c(*__x4, *__x3)) {
-    _Ops::iter_swap(__x3, __x4);
-    if (__c(*__x3, *__x2)) {
-      _Ops::iter_swap(__x2, __x3);
-      if (__c(*__x2, *__x1)) {
-        _Ops::iter_swap(__x1, __x2);
-      }
-    }
-  }
-}
-
-// stable, 4-10 compares, 0-9 swaps
-
-template <class _AlgPolicy, class _Comp, class _ForwardIterator>
-_LIBCPP_HIDE_FROM_ABI void
-__sort5(_ForwardIterator __x1,
-        _ForwardIterator __x2,
-        _ForwardIterator __x3,
-        _ForwardIterator __x4,
-        _ForwardIterator __x5,
-        _Comp __comp) {
-  using _Ops = _IterOps<_AlgPolicy>;
-
-  std::__sort4<_AlgPolicy, _Comp>(__x1, __x2, __x3, __x4, __comp);
-  if (__comp(*__x5, *__x4)) {
-    _Ops::iter_swap(__x4, __x5);
-    if (__comp(*__x4, *__x3)) {
-      _Ops::iter_swap(__x3, __x4);
-      if (__comp(*__x3, *__x2)) {
-        _Ops::iter_swap(__x2, __x3);
-        if (__comp(*__x2, *__x1)) {
-          _Ops::iter_swap(__x1, __x2);
-        }
-      }
-    }
-  }
-}
-
 // The comparator being simple is a prerequisite for using the branchless optimization.
-template <class _Tp>
+// It's not clear why; we invoke the comparator only 0.1% more often when we do the
+// branchless thing, and we save lots more time than that by being branchless.
+template <class>
 struct __is_simple_comparator : false_type {};
 template <>
 struct __is_simple_comparator<__less<>&> : true_type {};
@@ -156,9 +75,39 @@ enum { __block_size = sizeof(uint64_t) * 8 };
 
 } // namespace __detail
 
+template <class _AlgPolicy, class _Compare, class _RandomAccessIterator>
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 unsigned
+__sort3_did_swap(_RandomAccessIterator __x1, _RandomAccessIterator __x2, _RandomAccessIterator __x3, _Compare __c) {
+  // stable, 2-3 compares, 0-2 swaps
+  // Returns zero if the elements were already sorted, or non-zero otherwise;
+  // this is for the benefit of std::nth_element.
+  using _Ops = _IterOps<_AlgPolicy>;
+  if (__c(*__x2, *__x1)) {
+    if (__c(*__x3, *__x2)) {
+      _Ops::iter_swap(__x1, __x3); // 3 2 1 => 1 2 3
+    } else {
+      _Ops::iter_swap(__x1, __x2); // x 1 x => 1 x x
+      if (__c(*__x3, *__x2)) {
+        _Ops::iter_swap(__x2, __x3); // 1 3 2 => 1 2 3
+      }
+    }
+  } else {
+    if (__c(*__x3, *__x2)) {
+      _Ops::iter_swap(__x2, __x3); // x 3 x => x x 3
+      if (__c(*__x2, *__x1)) {
+        _Ops::iter_swap(__x1, __x2); // 2 1 3 => 1 2 3
+      }
+    } else {
+      return 0; // did no swaps
+    }
+  }
+  return 1; // did one or more swaps
+}
+
 // Ensures that __c(*__x, *__y) is true by swapping *__x and *__y if necessary.
 template <class _Compare, class _RandomAccessIterator>
-inline _LIBCPP_HIDE_FROM_ABI void __cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) {
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
+__cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
   bool __r         = __c(*__x, *__y);
@@ -170,7 +119,7 @@ inline _LIBCPP_HIDE_FROM_ABI void __cond_swap(_RandomAccessIterator __x, _Random
 // Ensures that *__x, *__y and *__z are ordered according to the comparator __c,
 // under the assumption that *__y and *__z are already ordered.
 template <class _Compare, class _RandomAccessIterator>
-inline _LIBCPP_HIDE_FROM_ABI void
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
 __partially_sorted_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _RandomAccessIterator __z, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
@@ -186,7 +135,7 @@ template <class,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort3_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort3(
     _RandomAccessIterator __x1, _RandomAccessIterator __x2, _RandomAccessIterator __x3, _Compare __c) {
   std::__cond_swap<_Compare>(__x2, __x3, __c);
   std::__partially_sorted_swap<_Compare>(__x1, __x2, __x3, __c);
@@ -196,16 +145,16 @@ template <class _AlgPolicy,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<!__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort3_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort3(
     _RandomAccessIterator __x1, _RandomAccessIterator __x2, _RandomAccessIterator __x3, _Compare __c) {
-  std::__sort3<_AlgPolicy, _Compare>(__x1, __x2, __x3, __c);
+  (void)std::__sort3_did_swap<_AlgPolicy, _Compare>(__x1, __x2, __x3, __c);
 }
 
 template <class,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort4_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort4(
     _RandomAccessIterator __x1,
     _RandomAccessIterator __x2,
     _RandomAccessIterator __x3,
@@ -222,20 +171,31 @@ template <class _AlgPolicy,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<!__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort4_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort4(
     _RandomAccessIterator __x1,
     _RandomAccessIterator __x2,
     _RandomAccessIterator __x3,
     _RandomAccessIterator __x4,
     _Compare __c) {
-  std::__sort4<_AlgPolicy, _Compare>(__x1, __x2, __x3, __x4, __c);
+  // stable, 3-6 compares, 0-5 swaps
+  using _Ops = _IterOps<_AlgPolicy>;
+  std::__sort3<_AlgPolicy, _Compare>(__x1, __x2, __x3, __c);
+  if (__c(*__x4, *__x3)) {
+    _Ops::iter_swap(__x3, __x4);
+    if (__c(*__x3, *__x2)) {
+      _Ops::iter_swap(__x2, __x3);
+      if (__c(*__x2, *__x1)) {
+        _Ops::iter_swap(__x1, __x2);
+      }
+    }
+  }
 }
 
 template <class _AlgPolicy,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort5_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort5(
     _RandomAccessIterator __x1,
     _RandomAccessIterator __x2,
     _RandomAccessIterator __x3,
@@ -254,15 +214,28 @@ template <class _AlgPolicy,
           class _Compare,
           class _RandomAccessIterator,
           __enable_if_t<!__use_branchless_sort<_Compare, _RandomAccessIterator>::value, int> = 0>
-inline _LIBCPP_HIDE_FROM_ABI void __sort5_maybe_branchless(
+inline _LIBCPP_HIDE_FROM_ABI void _LIBCPP_CONSTEXPR_SINCE_CXX14 __sort5(
     _RandomAccessIterator __x1,
     _RandomAccessIterator __x2,
     _RandomAccessIterator __x3,
     _RandomAccessIterator __x4,
     _RandomAccessIterator __x5,
     _Compare __c) {
-  std::__sort5<_AlgPolicy, _Compare, _RandomAccessIterator>(
-      std::move(__x1), std::move(__x2), std::move(__x3), std::move(__x4), std::move(__x5), __c);
+  // stable, 4-10 compares, 0-9 swaps
+  using _Ops = _IterOps<_AlgPolicy>;
+  std::__sort4<_AlgPolicy, _Compare>(__x1, __x2, __x3, __x4, __c);
+  if (__c(*__x5, *__x4)) {
+    _Ops::iter_swap(__x4, __x5);
+    if (__c(*__x4, *__x3)) {
+      _Ops::iter_swap(__x3, __x4);
+      if (__c(*__x3, *__x2)) {
+        _Ops::iter_swap(__x2, __x3);
+        if (__c(*__x2, *__x1)) {
+          _Ops::iter_swap(__x1, __x2);
+        }
+      }
+    }
+  }
 }
 
 // Assumes size > 0
@@ -352,14 +325,14 @@ __insertion_sort_incomplete(_RandomAccessIterator __first, _RandomAccessIterator
       _Ops::iter_swap(__first, __last);
     return true;
   case 3:
-    std::__sort3_maybe_branchless<_AlgPolicy, _Comp>(__first, __first + difference_type(1), --__last, __comp);
+    std::__sort3<_AlgPolicy, _Comp>(__first, __first + difference_type(1), --__last, __comp);
     return true;
   case 4:
-    std::__sort4_maybe_branchless<_AlgPolicy, _Comp>(
+    std::__sort4<_AlgPolicy, _Comp>(
         __first, __first + difference_type(1), __first + difference_type(2), --__last, __comp);
     return true;
   case 5:
-    std::__sort5_maybe_branchless<_AlgPolicy, _Comp>(
+    std::__sort5<_AlgPolicy, _Comp>(
         __first,
         __first + difference_type(1),
         __first + difference_type(2),
@@ -370,7 +343,7 @@ __insertion_sort_incomplete(_RandomAccessIterator __first, _RandomAccessIterator
   }
   typedef typename iterator_traits<_RandomAccessIterator>::value_type value_type;
   _RandomAccessIterator __j = __first + difference_type(2);
-  std::__sort3_maybe_branchless<_AlgPolicy, _Comp>(__first, __first + difference_type(1), __j, __comp);
+  std::__sort3<_AlgPolicy, _Comp>(__first, __first + difference_type(1), __j, __comp);
   const unsigned __limit = 8;
   unsigned __count       = 0;
   for (_RandomAccessIterator __i = __j + difference_type(1); __i != __last; ++__i) {
@@ -777,14 +750,14 @@ void __introsort(_RandomAccessIterator __first,
         _Ops::iter_swap(__first, __last);
       return;
     case 3:
-      std::__sort3_maybe_branchless<_AlgPolicy, _Compare>(__first, __first + difference_type(1), --__last, __comp);
+      std::__sort3<_AlgPolicy, _Compare>(__first, __first + difference_type(1), --__last, __comp);
       return;
     case 4:
-      std::__sort4_maybe_branchless<_AlgPolicy, _Compare>(
+      std::__sort4<_AlgPolicy, _Compare>(
           __first, __first + difference_type(1), __first + difference_type(2), --__last, __comp);
       return;
     case 5:
-      std::__sort5_maybe_branchless<_AlgPolicy, _Compare>(
+      std::__sort5<_AlgPolicy, _Compare>(
           __first,
           __first + difference_type(1),
           __first + difference_type(2),
