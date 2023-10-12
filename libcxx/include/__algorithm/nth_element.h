@@ -80,7 +80,7 @@ __nth_element(_RandomAccessIterator __first, _RandomAccessIterator __nth, _Rando
         // __len > __limit >= 3
         _RandomAccessIterator __m = __first + __len/2;
         _RandomAccessIterator __lm1 = __last;
-        unsigned __n_swaps = std::__sort3<_AlgPolicy, _Compare>(__first, __m, --__lm1, __comp);
+        unsigned __n_swaps = std::__sort3_did_swap<_AlgPolicy, _Compare>(__first, __m, --__lm1, __comp);
         // *__m is median
         // partition [__first, __m) < *__m and *__m <= [__m, __last)
         // (this inhibits tossing elements equivalent to __m around unnecessarily)
