@@ -88,6 +88,14 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     _LIBCPP_CONSTEXPR_SINCE_CXX14
     const _Ep* end()   const _NOEXCEPT {return __begin_ + __size_;}
+
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    const _Ep* data() const _NOEXCEPT {return __begin_;}
+
+    _LIBCPP_NODISCARD_AFTER_CXX17 _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    bool empty() const _NOEXCEPT {return __size_ == 0;}
 };
 
 #endif // !defined(_LIBCPP_CXX03_LANG)
