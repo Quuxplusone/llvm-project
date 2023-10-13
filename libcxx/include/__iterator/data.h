@@ -12,7 +12,6 @@
 
 #include <__config>
 #include <cstddef>
-#include <initializer_list>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -39,10 +38,6 @@ _NOEXCEPT_(noexcept(__c.data()))
 template <class _Tp, size_t _Sz>
 _LIBCPP_INLINE_VISIBILITY
 constexpr _Tp* data(_Tp (&__array)[_Sz]) noexcept { return __array; }
-
-template <class _Ep>
-_LIBCPP_INLINE_VISIBILITY
-constexpr const _Ep* data(initializer_list<_Ep> __il) noexcept { return __il.begin(); }
 
 #endif
 
