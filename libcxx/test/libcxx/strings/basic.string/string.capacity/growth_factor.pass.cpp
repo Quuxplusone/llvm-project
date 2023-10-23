@@ -27,10 +27,10 @@ int main(int, char**) {
   assert(capacity_after_assign_from_c_string_of_length<std::string>(1) == 22);
   assert(capacity_after_assign_from_c_string_of_length<std::string>(21) == 22);
   assert(capacity_after_assign_from_c_string_of_length<std::string>(22) == 22);
-  assert(capacity_after_assign_from_c_string_of_length<std::string>(23) == 47);
-  assert(capacity_after_assign_from_c_string_of_length<std::string>(24) == 47);
-  assert(capacity_after_assign_from_c_string_of_length<std::string>(25) == 47);
-  assert(capacity_after_assign_from_c_string_of_length<std::string>(30) == 47);
+  assert(capacity_after_assign_from_c_string_of_length<std::string>(23) == 31);
+  assert(capacity_after_assign_from_c_string_of_length<std::string>(24) == 31);
+  assert(capacity_after_assign_from_c_string_of_length<std::string>(25) == 31);
+  assert(capacity_after_assign_from_c_string_of_length<std::string>(30) == 31);
   assert(capacity_after_assign_from_c_string_of_length<std::string>(46) == 47);
   assert(capacity_after_assign_from_c_string_of_length<std::string>(47) == 47);
   assert(capacity_after_assign_from_c_string_of_length<std::string>(48) == 63);
@@ -41,9 +41,9 @@ int main(int, char**) {
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(1) == 4);
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(3) == 4);
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(4) == 4);
-  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(5) == 11);
-  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(6) == 11);
-  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(7) == 11);
+  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(5) == 7);
+  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(6) == 7);
+  assert(capacity_after_assign_from_c_string_of_length<std::wstring>(7) == 7);
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(8) == 11);
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(9) == 11);
   assert(capacity_after_assign_from_c_string_of_length<std::wstring>(10) == 11);
