@@ -401,6 +401,7 @@ Bug Fixes to C++ Support
 - Fix a crash when specializing an out-of-line member function with a default
   parameter where we did an incorrect specialization of the initialization of
   the default parameter. (#GH68490)
+- Fix a crash when inheriting from a cv-qualified type. (#GH35603)
 - Fix a crash when trying to call a varargs function that also has an explicit object parameter.
   Fixes (#GH80971)
 - Reject explicit object parameters on `new` and `delete` operators. (#GH82249)
