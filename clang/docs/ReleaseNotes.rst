@@ -201,6 +201,8 @@ Bug Fixes to C++ Support
   parameter where we did an incorrect specialization of the initialization of
   the default parameter.
   Fixes (`#68490 <https://github.com/llvm/llvm-project/issues/68490>`_)
+- Fix crash when inheriting from a cv-qualified type.
+  Fixes (`#35603 <https://github.com/llvm/llvm-project/issues/35603>`_)
 
 Bug Fixes to AST Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^
