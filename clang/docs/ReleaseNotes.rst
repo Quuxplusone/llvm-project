@@ -864,6 +864,9 @@ Bug Fixes to C++ Support
 - Fix crash when parsing nested requirement. Fixes:
   (`#73112 <https://github.com/llvm/llvm-project/issues/73112>`_)
 
+- Fix crash when inheriting from a cv-qualified type. Fixes:
+  (`#35603 <https://github.com/llvm/llvm-project/issues/35603>`_)
+
 - Fixed a crash caused by using return type requirement in a lambda. Fixes:
   (`#63808 <https://github.com/llvm/llvm-project/issues/63808>`_)
   (`#64607 <https://github.com/llvm/llvm-project/issues/64607>`_)
