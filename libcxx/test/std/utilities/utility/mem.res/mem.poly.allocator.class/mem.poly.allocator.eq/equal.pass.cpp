@@ -18,9 +18,10 @@
 // template <class T> class polymorphic_allocator;
 
 // template <class T, class U>
-// bool operator==(
-//      polymorphic_allocator<T> const &
-//    , polymorphic_allocator<U> const &) noexcept
+// bool operator==(const polymorphic_allocator<T>&,
+//                 const polymorphic_allocator<U>&) noexcept;
+// friend bool operator==(const polymorphic_allocator&,
+//                        const polymorphic_allocator&) noexcept;
 
 #include <memory_resource>
 #include <cassert>
@@ -54,6 +55,10 @@ int main(int, char**) {
     assert(a2 == a1);
     assert(d1.checkIsEqualCalledEq(0));
     assert(d2.checkIsEqualCalledEq(1));
+
+    // also check comparison against memory_resource* (LWG3683)
+    assert(a1 == &d1);
+    assert(&d1 == a1);
   }
   // equal same type (same resource)
   {
