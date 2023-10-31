@@ -173,6 +173,18 @@ public:
 
   _LIBCPP_HIDE_FROM_ABI memory_resource* resource() const noexcept { return __res_; }
 
+  friend _LIBCPP_HIDE_FROM_ABI bool
+  operator==(const polymorphic_allocator& a, const polymorphic_allocator& b) noexcept {
+    return *a.resource() == *b.resource();
+  }
+
+#  if _LIBCPP_STD_VER <= 17
+  friend _LIBCPP_HIDE_FROM_ABI bool
+  operator!=(const polymorphic_allocator& a, const polymorphic_allocator& b) noexcept {
+    return *a.resource() != *b.resource();
+  }
+#  endif
+
 private:
   template <class... _Args, size_t... _Is>
   _LIBCPP_HIDE_FROM_ABI tuple<_Args&&...>
