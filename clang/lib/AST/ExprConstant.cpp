@@ -9033,6 +9033,11 @@ public:
     return true;
   }
 
+  bool VisitPPEmbedExpr(const PPEmbedExpr *E) {
+    llvm_unreachable("Not yet implemented for ExprConstant.cpp");
+    return true;
+  }
+
   bool VisitSYCLUniqueStableNameExpr(const SYCLUniqueStableNameExpr *E) {
     std::string ResultStr = E->ComputeName(Info.Ctx);
 
@@ -16292,6 +16297,9 @@ static ICEDiag CheckICE(const Expr* E, const ASTContext &Ctx) {
     if (!checkBitCastConstexprEligibility(nullptr, Ctx, cast<CastExpr>(E)))
       return ICEDiag(IK_NotICE, E->getBeginLoc());
     return CheckICE(cast<CastExpr>(E)->getSubExpr(), Ctx);
+  }
+  case Expr::PPEmbedExprClass: {
+    return ICEDiag(IK_ICE, E->getBeginLoc());
   }
   }
 

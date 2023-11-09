@@ -498,6 +498,14 @@ static void InitializeStandardPredefinedMacros(const TargetInfo &TI,
   Builder.defineMacro("__STDC_UTF_16__", "1");
   Builder.defineMacro("__STDC_UTF_32__", "1");
 
+  // __has_embed definitions
+  Builder.defineMacro("__STDC_EMBED_NOT_FOUND__",
+                      llvm::itostr(static_cast<int>(EmbedResult::NotFound)));
+  Builder.defineMacro("__STDC_EMBED_FOUND__",
+                      llvm::itostr(static_cast<int>(EmbedResult::Found)));
+  Builder.defineMacro("__STDC_EMBED_EMPTY__",
+                      llvm::itostr(static_cast<int>(EmbedResult::Empty)));
+
   if (LangOpts.ObjC)
     Builder.defineMacro("__OBJC__");
 
@@ -729,6 +737,8 @@ static void InitializeCPlusPlusFeatureTestMacros(const LangOptions &LangOpts,
   if (LangOpts.Char8)
     Builder.defineMacro("__cpp_char8_t", "202207L");
   Builder.defineMacro("__cpp_impl_destroying_delete", "201806L");
+
+  Builder.defineMacro("__cpp_pp_embed", "202403L");
 }
 
 /// InitializeOpenCLFeatureTestMacros - Define OpenCL macros based on target

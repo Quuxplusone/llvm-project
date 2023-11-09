@@ -1400,6 +1400,8 @@ private:
       if (Tok->isOneOf(Keywords.kw___has_include,
                        Keywords.kw___has_include_next)) {
         parseHasInclude();
+      } else if (Tok->is(Keywords.kw___has_embed)) {
+        parseHasEmbed();
       }
       if (Style.isCSharp() && Tok->is(Keywords.kw_where) && Tok->Next &&
           Tok->Next->isNot(tok::l_paren)) {
@@ -1463,6 +1465,21 @@ private:
     }
   }
 
+  void parseEmbedDirective() {
+    if (CurrentToken && CurrentToken->is(tok::less)) {
+      next();
+      while (CurrentToken) {
+        // Mark tokens up to the trailing line comments as implicit string
+        // literals.
+        if (CurrentToken->isNot(tok::comment) &&
+            !CurrentToken->TokenText.startswith("//")) {
+          CurrentToken->setType(TT_ImplicitStringLiteral);
+        }
+        next();
+      }
+    }
+  }
+
   void parseWarningOrError() {
     next();
     // We still want to format the whitespace left of the first token of the
@@ -1496,6 +1513,14 @@ private:
       return;
     next(); // '('
     parseIncludeDirective();
+    next(); // ')'
+  }
+
+  void parseHasEmbed() {
+    if (!CurrentToken || CurrentToken->isNot(tok::l_paren))
+      return;
+    next(); // '('
+    parseEmbedDirective();
     next(); // ')'
   }
 
@@ -1562,6 +1587,8 @@ private:
       } else if (Tok->isOneOf(Keywords.kw___has_include,
                               Keywords.kw___has_include_next)) {
         parseHasInclude();
+      } else if (Tok->is(Keywords.kw___has_embed)) {
+        parseHasEmbed();
       }
     }
     return Type;

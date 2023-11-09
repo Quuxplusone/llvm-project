@@ -126,6 +126,9 @@ PPKEYWORD(error)
 // C99 6.10.6 - Pragma Directive.
 PPKEYWORD(pragma)
 
+// C23 & C++26 #embed
+PPKEYWORD(embed)
+
 // GNU Extensions.
 PPKEYWORD(import)
 PPKEYWORD(include_next)
@@ -752,6 +755,7 @@ ALIAS("__char32_t"   , char32_t          , KEYCXX)
 KEYWORD(__builtin_bit_cast               , KEYALL)
 KEYWORD(__builtin_available              , KEYALL)
 KEYWORD(__builtin_sycl_unique_stable_name, KEYSYCL)
+KEYWORD(__builtin_pp_embed               , KEYALL)
 
 // Keywords defined by Attr.td.
 #ifndef KEYWORD_ATTRIBUTE
