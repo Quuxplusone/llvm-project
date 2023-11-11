@@ -2825,6 +2825,41 @@ Parser::ParseCXXClassMemberDeclaration(AccessSpecifier AS,
   if (MalformedTypeSpec)
     DS.SetTypeSpecError();
 
+  if (Tok.is(tok::kw_friend)) {
+    // if we have variadic friends enabled, and we have something that looks
+    // like it could be a variadic friend decl, then try to parse it out early,
+    // rather than pretend it's a decl spec and clean it up later.
+    if (
+        GetLookAheadToken(1).is(tok::identifier) and
+        GetLookAheadToken(2).is(tok::ellipsis))
+    {
+      auto FriendLoc = ConsumeToken(); // friend
+
+      SourceRange Range;
+      TypeResult Res(ParseTypeName(&Range));
+      assert(Tok.is(tok::ellipsis) && "ellipsis no longer next?");
+
+      SourceLocation Ellipsis = ConsumeToken();
+      Range.setEnd(Ellipsis);
+      if (!Res.isInvalid())
+        Res = Actions.ActOnPackExpansion(Res.get(), Ellipsis);
+
+      unsigned PrevDiag = 0;
+      const char *PrevSpec = nullptr;
+      DS.SetRangeStart(FriendLoc);
+      DS.SetFriendSpec(FriendLoc, PrevSpec, PrevDiag);
+      DS.SetTypeSpecType(DeclSpec::TST_typename, Range.getBegin(), PrevSpec,
+                         PrevDiag, Res.get(), Actions.getPrintingPolicy());
+
+      auto *Decl = Actions.ActOnFriendTypeDecl(getCurScope(), DS,
+                                               MultiTemplateParamsArg());
+      DS.complete(Decl);
+      ExpectAndConsume(tok::semi, diag::err_expected_semi_declaration);
+
+      return Actions.ConvertDeclToDeclGroup(Decl);
+    }
+  }
+
   // Turn off usual access checking for templates explicit specialization
   // and instantiation.
   // C++20 [temp.spec] 13.9/6.
