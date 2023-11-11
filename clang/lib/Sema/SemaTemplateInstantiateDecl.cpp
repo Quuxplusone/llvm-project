@@ -1414,10 +1414,67 @@ Decl *TemplateDeclInstantiator::VisitFriendDecl(FriendDecl *D) {
     // same info for the instantiated friend.
     if (D->isUnsupportedFriend()) {
       InstTy = Ty;
+    }
+
+    // todo: this doesn't seem to be canonical; decls that contain packs that
+    //       need to be expanded tend to have a boolean getter for this, but it
+    //       seems to work for my completely exhaustive test cases.
+    else if (Ty->getType()->getAs<PackExpansionType>()) {
+      auto Expansion = Ty->getTypeLoc().castAs<PackExpansionTypeLoc>();
+      TypeLoc Pattern = Expansion.getPatternLoc();
+      SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+      SemaRef.collectUnexpandedParameterPacks(Pattern, Unexpanded);
+
+      // Determine whether the set of unexpanded parameter packs can and should
+      // be expanded.
+      bool Expand = true;
+      bool RetainExpansion = false;
+      std::optional<unsigned> OrigNumExpansions
+          = Expansion.getTypePtr()->getNumExpansions();
+      std::optional<unsigned> NumExpansions = OrigNumExpansions;
+
+      // todo: get the source location and range for the pack? i'm sure the
+      //       error reporting will be nicer or something
+      if (SemaRef.CheckParameterPacksForExpansion(SourceLocation(),
+                                                  SourceRange(), Unexpanded,
+                                                  TemplateArgs, Expand,
+                                                  RetainExpansion,
+                                                  NumExpansions))
+        return nullptr;
+
+      if (Expand) {
+        // we have a list of expansions - iterate over the substitutions, and
+        // add them as a single friend decl as normal.
+        for (unsigned I = 0; I != *NumExpansions; ++I) {
+          Sema::ArgumentPackSubstitutionIndexRAII SubstIndex(SemaRef, I);
+          TypeSourceInfo *NewDI = SemaRef.SubstType(Pattern, TemplateArgs,
+                                                    D->getLocation(),
+                                                    DeclarationName());
+          if (nullptr == NewDI)
+            return nullptr;
+
+          FriendDecl *FD = SemaRef.CheckFriendTypeDecl(D->getBeginLoc(),
+                                                       D->getFriendLoc(),
+                                                       NewDI);
+          if (!FD)
+            return nullptr;
+
+          FD->setAccess(AS_public);
+          FD->setUnsupportedFriend(D->isUnsupportedFriend());
+          Owner->addDecl(FD);
+        }
+      }
+
+      // todo: the callee says this may explode one day, but that was in 2009,
+      //       so i expect it might be safe. we could return one of the decls
+      //       here if that's an issue - nothing is actually done with it, in
+      //       the case of a friend decl..
+      return nullptr;
     } else {
       InstTy = SemaRef.SubstType(Ty, TemplateArgs,
                                  D->getLocation(), DeclarationName());
     }
+
     if (!InstTy)
       return nullptr;
 
