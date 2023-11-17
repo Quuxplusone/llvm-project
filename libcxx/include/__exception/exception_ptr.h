@@ -12,6 +12,10 @@
 #include <__config>
 #include <__exception/operations.h>
 #include <__memory/addressof.h>
+#include <__type_traits/is_array.h>
+#include <__type_traits/is_object.h>
+#include <__type_traits/is_same.h>
+#include <__type_traits/remove_cvref.h>
 #include <cstddef>
 #include <cstdlib>
 
@@ -109,6 +113,35 @@ _LIBCPP_HIDE_FROM_ABI exception_ptr make_exception_ptr(_Ep __e) _NOEXCEPT {
 }
 
 #endif // _LIBCPP_ABI_MICROSOFT
+
+template <class _Ep>
+_LIBCPP_HIDE_FROM_ABI const __remove_cvref_t<_Ep>* try_cast(const exception_ptr& __p) _NOEXCEPT {
+  static_assert(is_object<_Ep>::value && is_same<__remove_cvref_t<_Ep>, _Ep>::value &&
+                !is_array<_Ep>::value && sizeof(_Ep) >= 0,
+                "E must be a complete cv-unqualified object type, and not an array type");
+  // E must also not be a pointer to an incomplete type; this is caught by the core language below.
+  if (__p == nullptr) {
+    return nullptr;
+  }
+#  ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+  try {
+    std::rethrow_exception(__p);
+  } catch (const _Ep& __ex) {
+    try {
+      std::rethrow_exception(__p);
+    } catch (const _Ep& __also_ex) {
+      _LIBCPP_ASSERT(&__ex == &__also_ex, "try_cast must be specially implemented on platforms where rethrowing copies the exception");
+    }
+    return std::addressof(__ex);
+  } catch (...) {
+    return nullptr;
+  }
+#  else
+  ((void)__p);
+  std::abort();
+#  endif
+}
+
 } // namespace std
 
 #endif // _LIBCPP___EXCEPTION_EXCEPTION_PTR_H
