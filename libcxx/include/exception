@@ -55,6 +55,7 @@ typedef unspecified exception_ptr;
 exception_ptr current_exception() noexcept;
 void rethrow_exception [[noreturn]] (exception_ptr p);
 template<class E> exception_ptr make_exception_ptr(E e) noexcept;
+template<class E> const E* try_cast(const exception_ptr& p) noexcept; // P2927R1
 
 class nested_exception
 {
