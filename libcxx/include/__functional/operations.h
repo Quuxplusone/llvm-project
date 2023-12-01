@@ -373,6 +373,15 @@ struct _LIBCPP_TEMPLATE_VIS less<void> {
 };
 #endif
 
+// The non-transparent std::less specialization is only equivalent to a raw less-than
+// comparison when we don't perform an implicit conversion when calling it.
+template <class _Tp>
+struct __desugars_to<__less_tag, less<_Tp>, _Tp, _Tp> : true_type {};
+
+// In the transparent case, we do not enforce that
+template <class _Tp, class _Up>
+struct __desugars_to<__less_tag, less<void>, _Tp, _Up> : true_type {};
+
 #if _LIBCPP_STD_VER >= 14
 template <class _Tp = void>
 #else
