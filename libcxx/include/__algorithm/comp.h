@@ -42,6 +42,9 @@ struct __less<void, void> {
   }
 };
 
+template <class _Tp, class _Up>
+struct __desugars_to<__less_tag, __less<>, _Tp, _Up> : true_type {};
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif // _LIBCPP___ALGORITHM_COMP_H

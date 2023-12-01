@@ -20,6 +20,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 // Tags to represent the canonical operations
 struct __equal_tag {};
+struct __less_tag {};
 struct __plus_tag {};
 
 // This class template is used to determine whether an operation "desugars"
