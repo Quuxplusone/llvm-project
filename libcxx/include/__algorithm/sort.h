@@ -114,9 +114,9 @@ __cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) 
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
   static_assert(is_trivially_copyable<value_type>::value, "");
-  bool __r         = __c(*__x, *__y);
-  value_type __tmp = __r ? *__x : *__y;
-  *__y             = __r ? *__y : *__x;
+  bool __r         = __c(*__y, *__x);
+  value_type __tmp = __r ? *__y : *__x;
+  *__y             = __r ? *__x : *__y;
   *__x             = __tmp;
 }
 
