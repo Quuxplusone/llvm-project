@@ -31,9 +31,10 @@
 #include <__type_traits/desugars_to.h>
 #include <__type_traits/disjunction.h>
 #include <__type_traits/enable_if.h>
-#include <__type_traits/is_arithmetic.h>
+#include <__type_traits/is_assignable.h>
 #include <__type_traits/is_cheap_to_copy.h>
 #include <__type_traits/is_constant_evaluated.h>
+#include <__type_traits/is_constructible.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/make_unsigned.h>
 #include <__utility/move.h>
@@ -52,7 +53,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Compare, class _Iter, class _Tp = typename iterator_traits<_Iter>::value_type>
 inline const bool __use_branchless_sort =
-    __libcpp_is_contiguous_iterator<_Iter>::value && __is_cheap_to_copy<_Tp> && is_arithmetic<_Tp>::value &&
+    __libcpp_is_contiguous_iterator<_Iter>::value && __is_cheap_to_copy<_Tp> &&
+    is_copy_constructible<_Tp>::value && is_copy_assignable<_Tp>::value &&
     (__desugars_to_v<__less_tag, _Compare, _Tp, _Tp> || __desugars_to_v<__greater_tag, _Compare, _Tp, _Tp>);
 
 namespace __detail {
