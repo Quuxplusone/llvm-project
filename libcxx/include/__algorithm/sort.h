@@ -30,6 +30,7 @@
 #include <__type_traits/disjunction.h>
 #include <__type_traits/is_arithmetic.h>
 #include <__type_traits/is_constant_evaluated.h>
+#include <__type_traits/is_trivially_copyable.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
 #include <climits>
@@ -110,6 +111,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
 __cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
+  static_assert(is_trivially_copyable<value_type>::value, "");
   bool __r         = __c(*__x, *__y);
   value_type __tmp = __r ? *__x : *__y;
   *__y             = __r ? *__y : *__x;
@@ -123,6 +125,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
 __partially_sorted_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _RandomAccessIterator __z, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
+  static_assert(is_trivially_copyable<value_type>::value, "");
   bool __r         = __c(*__z, *__x);
   value_type __tmp = __r ? *__z : *__x;
   *__z             = __r ? *__x : *__z;
