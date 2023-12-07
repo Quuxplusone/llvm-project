@@ -65,6 +65,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 bool
 __cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
+  static_assert(is_trivially_copyable<value_type>::value, "");
   bool __r         = __c(*__x, *__y);
   value_type __tmp = __r ? *__x : *__y;
   *__y             = __r ? *__y : *__x;
@@ -79,6 +80,7 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 bool
 __partially_sorted_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _RandomAccessIterator __z, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
+  static_assert(is_trivially_copyable<value_type>::value, "");
   bool __r1        = __c(*__z, *__x);
   value_type __tmp = __r1 ? *__z : *__x;
   *__z             = __r1 ? *__x : *__z;
