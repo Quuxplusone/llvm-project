@@ -28,7 +28,6 @@
 #include <__iterator/iterator_traits.h>
 #include <__type_traits/conditional.h>
 #include <__type_traits/disjunction.h>
-#include <__type_traits/is_arithmetic.h>
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_trivially_copyable.h>
 #include <__utility/move.h>
@@ -63,7 +62,7 @@ struct __is_simple_comparator<ranges::greater&> : true_type {};
 template <class _Compare, class _Iter, class _Tp = typename iterator_traits<_Iter>::value_type>
 using __use_branchless_sort =
     integral_constant<bool, __libcpp_is_contiguous_iterator<_Iter>::value && sizeof(_Tp) <= sizeof(void*) &&
-                                is_arithmetic<_Tp>::value && __is_simple_comparator<_Compare>::value>;
+                                is_trivially_copyable<_Tp>::value && __is_simple_comparator<_Compare>::value>;
 
 namespace __detail {
 
