@@ -3092,6 +3092,8 @@ namespace is_trivially_relocatable {
 static_assert(!__is_trivially_relocatable(void), "");
 static_assert(__is_trivially_relocatable(int), "");
 static_assert(__is_trivially_relocatable(int[]), "");
+static_assert(__is_trivially_relocatable(const int), "");
+static_assert(!__is_trivially_relocatable(volatile int), "");
 
 enum Enum {};
 static_assert(__is_trivially_relocatable(Enum), "");
@@ -3104,6 +3106,8 @@ static_assert(__is_trivially_relocatable(Union[]), "");
 struct Trivial {};
 static_assert(__is_trivially_relocatable(Trivial), "");
 static_assert(__is_trivially_relocatable(Trivial[]), "");
+static_assert(__is_trivially_relocatable(const Trivial), "");
+static_assert(__is_trivially_relocatable(volatile Trivial), "");
 
 struct Incomplete; // expected-note {{forward declaration of 'is_trivially_relocatable::Incomplete'}}
 bool unused = __is_trivially_relocatable(Incomplete); // expected-error {{incomplete type}}
@@ -3113,6 +3117,8 @@ struct NontrivialDtor {
 };
 static_assert(!__is_trivially_relocatable(NontrivialDtor), "");
 static_assert(!__is_trivially_relocatable(NontrivialDtor[]), "");
+static_assert(!__is_trivially_relocatable(const NontrivialDtor), "");
+static_assert(!__is_trivially_relocatable(volatile NontrivialDtor), "");
 
 struct NontrivialCopyCtor {
   NontrivialCopyCtor(const NontrivialCopyCtor&) {}
@@ -3131,12 +3137,16 @@ struct [[clang::trivial_abi]] TrivialAbiNontrivialDtor {
 };
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialDtor), "");
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialDtor[]), "");
+static_assert(__is_trivially_relocatable(const TrivialAbiNontrivialDtor), "");
+static_assert(__is_trivially_relocatable(volatile TrivialAbiNontrivialDtor), "");
 
 struct [[clang::trivial_abi]] TrivialAbiNontrivialCopyCtor {
   TrivialAbiNontrivialCopyCtor(const TrivialAbiNontrivialCopyCtor&) {}
 };
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialCopyCtor), "");
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialCopyCtor[]), "");
+static_assert(__is_trivially_relocatable(const TrivialAbiNontrivialCopyCtor), "");
+static_assert(__is_trivially_relocatable(volatile TrivialAbiNontrivialCopyCtor), "");
 
 // A more complete set of tests for the behavior of trivial_abi can be found in
 // clang/test/SemaCXX/attr-trivial-abi.cpp
@@ -3145,6 +3155,8 @@ struct [[clang::trivial_abi]] TrivialAbiNontrivialMoveCtor {
 };
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialMoveCtor), "");
 static_assert(__is_trivially_relocatable(TrivialAbiNontrivialMoveCtor[]), "");
+static_assert(__is_trivially_relocatable(const TrivialAbiNontrivialMoveCtor), "");
+static_assert(__is_trivially_relocatable(volatile TrivialAbiNontrivialMoveCtor), "");
 
 } // namespace is_trivially_relocatable
 
