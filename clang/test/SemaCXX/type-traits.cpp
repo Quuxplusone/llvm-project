@@ -3105,7 +3105,7 @@ static_assert(!__is_trivially_relocatable(void), "");
 static_assert(__is_trivially_relocatable(int), "");
 static_assert(__is_trivially_relocatable(int[]), "");
 static_assert(__is_trivially_relocatable(const int), "");
-static_assert(!__is_trivially_relocatable(volatile int), "");
+static_assert(__is_trivially_relocatable(volatile int), "");
 
 enum Enum {};
 static_assert(__is_trivially_relocatable(Enum), "");
