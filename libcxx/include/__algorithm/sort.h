@@ -172,11 +172,30 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __sort4(
     _RandomAccessIterator __x3,
     _RandomAccessIterator __x4,
     _Compare __c) {
+#if !defined(_LIBCPP_S4) || _LIBCPP_S4 == 0
   std::__cond_swap<_Compare>(__x1, __x3, __c);
   std::__cond_swap<_Compare>(__x2, __x4, __c);
   std::__cond_swap<_Compare>(__x1, __x2, __c);
   std::__cond_swap<_Compare>(__x3, __x4, __c);
   std::__cond_swap<_Compare>(__x2, __x3, __c);
+#elif _LIBCPP_S4 == 1
+  std::__cond_swap<_Compare>(__x3, __x4, __c);
+  std::__partially_sorted_swap<_Compare>(__x2, __x3, __x4, __c);
+  std::__cond_swap<_Compare>(__x1, __x2, __c);
+  std::__partially_sorted_swap<_Compare>(__x2, __x3, __x4, __c);
+#elif _LIBCPP_S4 == 2
+  std::__cond_swap<_Compare>(__x1, __x2, __c);
+  std::__cond_swap<_Compare>(__x3, __x4, __c);
+  std::__partially_sorted_swap<_Compare>(__x2, __x3, __x4, __c);
+  std::__partially_sorted_swap<_Compare>(__x1, __x2, __x3, __c);
+#elif _LIBCPP_S4 == 3
+  std::__cond_swap<_Compare>(__x1, __x2, __c);
+  std::__cond_swap<_Compare>(__x2, __x3, __c);
+  std::__cond_swap<_Compare>(__x3, __x4, __c);
+  std::__cond_swap<_Compare>(__x1, __x2, __c);
+  std::__cond_swap<_Compare>(__x2, __x3, __c);
+  std::__cond_swap<_Compare>(__x1, __x2, __c);
+#endif
 }
 
 template <class _AlgPolicy,
