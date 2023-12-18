@@ -1,3 +1,10 @@
+[![Status](https://github.com/compiler-explorer/compiler-workflows/actions/workflows//build-daily-clang_relocatable.yml/badge.svg)](https://github.com/compiler-explorer/compiler-workflows/actions/workflows//build-daily-clang_relocatable.yml)![Last success](https://img.shields.io/badge/dynamic/json?color=success&label=Last+OK&query=%24.last_success.timestamp&url=https%3A%2F%2Flambda.compiler-explorer.com%2Fcompiler-build%2Fclang_relocatable)![Last build](https://img.shields.io/badge/dynamic/json?color=yellow&label=Last+build&query=%24.last_build.timestamp&url=https%3A%2F%2Flambda.compiler-explorer.com%2Fcompiler-build%2Fclang_relocatable)
+
+This fork of clang/libc++ feeds the P1144 branch on [godbolt.org](https://godbolt.org/z/qT7fYr95Y).
+For libstdc++, see https://github.com/Quuxplusone/gcc/tree/trivially-relocatable
+
+----
+
 # The LLVM Compiler Infrastructure
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/llvm/llvm-project/badge)](https://securityscorecards.dev/viewer/?uri=github.com/llvm/llvm-project)
