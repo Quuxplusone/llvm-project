@@ -8174,7 +8174,7 @@ void Sema::checkInitializerLifetime(const InitializedEntity &Entity,
       auto *DRE = dyn_cast<DeclRefExpr>(L);
       auto *VD = DRE ? dyn_cast<VarDecl>(DRE->getDecl()) : nullptr;
       bool IsBackingArray = isa<MaterializeTemporaryExpr>(L) ||
-          (VD && VD->getName().startswith("__il"));
+          (VD && VD->getName().starts_with("__il"));
       if (IsBackingArray) {
         // Under C++ DR1696, if a mem-initializer (or a default member
         // initializer used by the absence of one) would lifetime-extend a
