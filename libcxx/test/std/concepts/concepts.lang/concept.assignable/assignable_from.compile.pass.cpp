@@ -93,9 +93,15 @@ static_assert( std::assignable_from<int&, int&&>);
 static_assert(!std::assignable_from<const int&, int>);
 static_assert(!std::assignable_from<const int&, int&>);
 static_assert(!std::assignable_from<const int&, int&&>);
+#if TEST_STD_VER >= 26
+static_assert(!std::assignable_from<volatile int&, int>);
+static_assert(!std::assignable_from<volatile int&, int&>);
+static_assert(!std::assignable_from<volatile int&, int&&>);
+#else
 static_assert( std::assignable_from<volatile int&, int>);
 static_assert( std::assignable_from<volatile int&, int&>);
 static_assert( std::assignable_from<volatile int&, int&&>);
+#endif
 static_assert(!std::assignable_from<int(&)[10], int>);
 static_assert(!std::assignable_from<int(&)[10], int(&)[10]>);
 static_assert( std::assignable_from<MoveOnly&, MoveOnly>);

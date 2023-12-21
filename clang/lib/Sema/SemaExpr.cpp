@@ -14701,6 +14701,13 @@ QualType Sema::CheckAssignmentOperands(Expr *LHSExpr, ExprResult &RHS,
 
   CheckForNullPointerDereference(*this, LHSExpr);
 
+  if (getLangOpts().CPlusPlus26 && LHSType.isVolatileQualified()) {
+    // [P2866] "Remove deprecated volatile features for C++26"
+    // Since the return value can't be used in any event,
+    // don't bother to push it onto VolatileAssignmentLHSs.
+    return Context.VoidTy;
+  }
+
   if (getLangOpts().CPlusPlus20 && LHSType.isVolatileQualified()) {
     if (CompoundType.isNull()) {
       // C++2a [expr.ass]p5:

@@ -32,7 +32,11 @@
 
 // Movable types
 static_assert(std::movable<int>);
+#if TEST_STD_VER >= 26
+static_assert(!std::movable<int volatile>);
+#else
 static_assert(std::movable<int volatile>);
+#endif
 static_assert(std::movable<int*>);
 static_assert(std::movable<int const*>);
 static_assert(std::movable<int volatile*>);

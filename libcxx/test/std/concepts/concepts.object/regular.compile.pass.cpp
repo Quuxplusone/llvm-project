@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "test_macros.h"
 #include "type_classification/moveconstructible.h"
 #include "type_classification/semiregular.h"
 
@@ -31,7 +32,11 @@ static_assert(std::regular<int>);
 static_assert(std::regular<float>);
 static_assert(std::regular<double>);
 static_assert(std::regular<long double>);
+#if TEST_STD_VER >= 26
+static_assert(!std::regular<int volatile>);
+#else
 static_assert(std::regular<int volatile>);
+#endif
 static_assert(std::regular<void*>);
 static_assert(std::regular<int*>);
 static_assert(std::regular<int const*>);

@@ -26,6 +26,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "test_macros.h"
 #include "type_classification/moveconstructible.h"
 #include "type_classification/swappable.h"
 
@@ -153,8 +154,13 @@ constexpr bool check_swappable_with() {
 template <class T, class U>
 constexpr bool check_swappable_with_including_lvalue_ref_to_volatile() {
   constexpr auto result = check_swappable_with<T, U>();
+#if TEST_STD_VER >= 26
+  static_assert(check_swappable_with_impl<T volatile&, U volatile&>() ==
+                false);
+#else
   static_assert(check_swappable_with_impl<T volatile&, U volatile&>() ==
                 result);
+#endif
   return result;
 }
 

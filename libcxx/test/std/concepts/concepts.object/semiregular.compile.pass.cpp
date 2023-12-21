@@ -24,10 +24,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "test_macros.h"
 #include "type_classification/semiregular.h"
 
 static_assert(std::semiregular<int>);
+#if TEST_STD_VER >= 26
+static_assert(!std::semiregular<int volatile>);
+#else
 static_assert(std::semiregular<int volatile>);
+#endif
 static_assert(std::semiregular<int*>);
 static_assert(std::semiregular<int const*>);
 static_assert(std::semiregular<int volatile*>);

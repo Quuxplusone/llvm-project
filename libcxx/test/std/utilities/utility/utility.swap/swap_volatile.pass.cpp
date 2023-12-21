@@ -49,7 +49,12 @@ bool test_swap() {
   assert(a[0] == 2 && a[1] == 1);
   assert(b[0] == 3 && b[1] == 4);
 
-#if TEST_STD_VER >= 20
+#if TEST_STD_VER >= 26
+  static_assert(std::is_swappable_with_v<volatile int&, volatile int&>);
+  static_assert(std::is_swappable_with_v<volatile int(&)[2], volatile int(&)[2]>);
+  static_assert(!std::swappable_with<volatile int&, volatile int&>);
+  static_assert(!std::swappable_with<volatile int(&)[2], volatile int(&)[2]>);
+#elif TEST_STD_VER >= 20
   std::ranges::swap(a[0], a[1]);
   assert(a[0] == 1 && a[1] == 2);
 

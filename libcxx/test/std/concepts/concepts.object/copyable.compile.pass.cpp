@@ -22,10 +22,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "test_macros.h"
 #include "type_classification/copyable.h"
 
 static_assert(std::copyable<int>);
+#if TEST_STD_VER >= 26
+static_assert(!std::copyable<int volatile>);
+#else
 static_assert(std::copyable<int volatile>);
+#endif
 static_assert(std::copyable<int*>);
 static_assert(std::copyable<int const*>);
 static_assert(std::copyable<int volatile*>);
