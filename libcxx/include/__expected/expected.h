@@ -90,8 +90,12 @@ _LIBCPP_HIDE_FROM_ABI void __throw_bad_expected_access(_Arg&& __arg) {
 }
 
 template <class _Tp, class _Err>
-class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Tp>::value && __libcpp_is_trivially_relocatable<_Err>::value))
-      expected {
+inline constexpr bool __expected_be_trivially_relocatable_v =
+  __libcpp_is_trivially_relocatable<_Err>::value &&
+  (__libcpp_is_trivially_relocatable<_Tp>::value || is_void_v<_Tp>);
+
+template <class _Tp, class _Err>
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__expected_be_trivially_relocatable_v<_Tp, _Err>)) expected {
   static_assert(!is_reference_v<_Tp> && !is_function_v<_Tp> && !is_same_v<remove_cv_t<_Tp>, in_place_t> &&
                     !is_same_v<remove_cv_t<_Tp>, unexpect_t> && !__is_std_unexpected<remove_cv_t<_Tp>>::value &&
                     __valid_std_unexpected<_Err>::value,
