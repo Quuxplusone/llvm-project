@@ -189,6 +189,7 @@ namespace std {
 #include <__fwd/functional.h>
 #include <__memory/addressof.h>
 #include <__memory/construct_at.h>
+#include <__memory/relocate_at.h>
 #include <__tuple/sfinae_helpers.h>
 #include <__type_traits/add_pointer.h>
 #include <__type_traits/conditional.h>
@@ -363,6 +364,17 @@ struct __optional_storage_base : __optional_destruct_base<_Tp> {
     std::__construct_at(std::addressof(this->__val_), std::forward<_Args>(__args)...);
     this->__engaged_ = true;
   }
+
+#if defined(_LIBCPP_NONCONFORMING_OPTIONAL_MOVE_CTOR) && _LIBCPP_NONCONFORMING_OPTIONAL_MOVE_CTOR
+  template <template<class, bool> class _OptionalMoveBase, bool _Bp, __enable_if_t<__libcpp_is_trivially_relocatable<_Tp>::value, int> = 0>
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __construct_from(_OptionalMoveBase<_Tp, _Bp>&& __opt) {
+    if (__opt.has_value()) {
+      __opt.__engaged_ = false;
+      std::relocate_at(std::addressof(__opt.__get()), std::addressof(this->__val_));
+      this->__engaged_ = true;
+    }
+  }
+#endif // _LIBCPP_NONCONFORMING_OPTIONAL_MOVE_CTOR
 
   template <class _That>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __construct_from(_That&& __opt) {
