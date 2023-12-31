@@ -26,12 +26,15 @@
 #include <__functional/operations.h>
 #include <__functional/ranges_operations.h>
 #include <__iterator/iterator_traits.h>
+#include <__memory/addressof.h>
 #include <__type_traits/conditional.h>
 #include <__type_traits/disjunction.h>
 #include <__type_traits/is_assignable.h>
 #include <__type_traits/is_constant_evaluated.h>
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_trivially_relocatable.h>
+#include <__type_traits/remove_cvref.h>
 #include <__utility/move.h>
 #include <__utility/pair.h>
 #include <climits>
@@ -68,7 +71,7 @@ template <class _Compare, class _Iter, class _Tp = typename iterator_traits<_Ite
 using __use_branchless_sort =
     integral_constant<bool,
                       __libcpp_is_contiguous_iterator<_Iter>::value && sizeof(_Tp) <= sizeof(void*) &&
-                          is_trivially_copyable<_Tp>::value && is_copy_constructible<_Tp>::value &&
+                          __libcpp_is_trivially_relocatable<_Tp>::value && is_copy_constructible<_Tp>::value &&
                           is_copy_assignable<_Tp>::value && __is_simple_comparator<_Compare>::value>;
 
 namespace __detail {
@@ -107,17 +110,35 @@ __sort3_did_swap(_RandomAccessIterator __x1, _RandomAccessIterator __x2, _Random
   return 1; // did one or more swaps
 }
 
+template <class _Tp, __enable_if_t<is_trivially_copyable<_Tp>::value, int> = 0>
+void __libcpp_rehydrate_at(_Tp *__source, _Tp *__dest) {
+  *__dest = *__source;
+}
+template <class _Tp, __enable_if_t<__libcpp_is_trivially_relocatable<_Tp>::value && !is_trivially_copyable<_Tp>::value, int> = 0>
+void __libcpp_rehydrate_at(_Tp *__source, _Tp *__dest) {
+  ::__builtin_memmove(__dest, __source, sizeof(_Tp));
+}
+
 // Ensures that __c(*__x, *__y) is true by swapping *__x and *__y if necessary.
 template <class _Compare, class _RandomAccessIterator>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
 __cond_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
-  static_assert(is_trivially_copyable<value_type>::value, "");
-  bool __r         = __c(*__y, *__x);
-  value_type __tmp = __r ? *__y : *__x;
-  *__y             = __r ? *__x : *__y;
-  *__x             = __tmp;
+  static_assert(__libcpp_is_trivially_relocatable<value_type>::value, "");
+  if (__libcpp_is_constant_evaluated() || !__is_same_uncvref<typename iterator_traits<_RandomAccessIterator>::reference, value_type>::value) {
+    using std::swap;
+    if (__c(*__y, *__x)) {
+      swap(*__x, *__y);
+    }
+  } else {
+    bool __r         = __c(*__y, *__x);
+    _ALIGNAS_TYPE(value_type) char __tmp_buffer[sizeof(value_type)];
+    value_type& __tmp = *reinterpret_cast<value_type*>(__tmp_buffer);
+    std::__libcpp_rehydrate_at(std::addressof(__r ? *__y : *__x), std::addressof(__tmp));
+    std::__libcpp_rehydrate_at(std::addressof(__r ? *__x : *__y), std::addressof(*__y));
+    std::__libcpp_rehydrate_at(std::addressof(__tmp), std::addressof(*__x));
+  }
 }
 
 // Ensures that *__x, *__y and *__z are ordered according to the comparator __c,
@@ -127,20 +148,38 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void
 __partially_sorted_swap(_RandomAccessIterator __x, _RandomAccessIterator __y, _RandomAccessIterator __z, _Compare __c) {
   // Note: this function behaves correctly even with proxy iterators (because it relies on `value_type`).
   using value_type = typename iterator_traits<_RandomAccessIterator>::value_type;
-  static_assert(is_trivially_copyable<value_type>::value, "");
-  value_type __t      = *__x;
-  value_type __u      = *__y;
-  value_type __v      = *__z;
-  value_type __orig_t = __t;
-  bool __r            = __c(__u, __t);
-  __t                 = __r ? __u : __t;
-  __u                 = __r ? __orig_t : __u;
-  __r                 = __c(__v, __orig_t);
-  __u                 = __r ? __v : __u;
-  __v                 = __r ? __orig_t : __v;
-  *__x                = __t;
-  *__y                = __u;
-  *__z                = __v;
+  static_assert(__libcpp_is_trivially_relocatable<value_type>::value, "");
+  if (__libcpp_is_constant_evaluated() || !__is_same_uncvref<typename iterator_traits<_RandomAccessIterator>::reference, value_type>::value) {
+    using std::swap;
+    if (__c(*__y, *__x)) {
+      swap(*__x, *__y);
+      if (__c(*__z, *__y)) {
+        swap(*__y, *__z);
+      }
+    }
+  } else {
+    _ALIGNAS_TYPE(value_type) char __t_buffer[sizeof(value_type)];
+    _ALIGNAS_TYPE(value_type) char __u_buffer[sizeof(value_type)];
+    _ALIGNAS_TYPE(value_type) char __v_buffer[sizeof(value_type)];
+    _ALIGNAS_TYPE(value_type) char __orig_t_buffer[sizeof(value_type)];
+    value_type& __t = *reinterpret_cast<value_type*>(__t_buffer);
+    value_type& __u = *reinterpret_cast<value_type*>(__u_buffer);
+    value_type& __v = *reinterpret_cast<value_type*>(__v_buffer);
+    value_type& __orig_t = *reinterpret_cast<value_type*>(__orig_t_buffer);
+    std::__libcpp_rehydrate_at(std::addressof(*__x), std::addressof(__t));
+    std::__libcpp_rehydrate_at(std::addressof(*__y), std::addressof(__u));
+    std::__libcpp_rehydrate_at(std::addressof(*__z), std::addressof(__v));
+    std::__libcpp_rehydrate_at(std::addressof(__t), std::addressof(__orig_t));
+    bool __r            = __c(__u, __t);
+    std::__libcpp_rehydrate_at(std::addressof(__r ? __u : __t), std::addressof(__t));
+    std::__libcpp_rehydrate_at(std::addressof(__r ? __orig_t : __u), std::addressof(__u));
+    __r = __c(__v, __orig_t);
+    std::__libcpp_rehydrate_at(std::addressof(__r ? __v : __u), std::addressof(__u));
+    std::__libcpp_rehydrate_at(std::addressof(__r ? __orig_t : __v), std::addressof(__v));
+    std::__libcpp_rehydrate_at(std::addressof(__t), std::addressof(*__x));
+    std::__libcpp_rehydrate_at(std::addressof(__u), std::addressof(*__y));
+    std::__libcpp_rehydrate_at(std::addressof(__v), std::addressof(*__z));
+  }
 }
 
 template <class,
