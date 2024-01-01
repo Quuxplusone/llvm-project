@@ -26,38 +26,59 @@
 #include <vector>
 #include <deque>
 #include <utility>
+#include <stdio.h>
 
 #include "test_macros.h"
+#include "../../sortable_helpers.h"
 
 std::mt19937 randomness;
+
+
+template<class Compare>
+struct InducedEquivalence {
+    template<class T>
+    TEST_CONSTEXPR_CXX20 bool operator()(const T& a, const T& b) const {
+        return !Compare()(a, b) && !Compare()(b, a);
+    }
+};
+
+template<class T>
+TEST_CONSTEXPR_CXX20 void set_value(T& dest, int value) {
+    dest = T(value);
+}
+
+TEST_CONSTEXPR_CXX20 void set_value(std::pair<int, int>& dest, int value) {
+    dest.first = value;
+    dest.second = value;
+}
+
+TEST_CONSTEXPR_CXX20 void set_value(std::vector<bool>::reference dest, int value) {
+    dest = (value % 2);
+}
 
 template <class Container, class RI>
 void
 test_sort_helper(RI f, RI l)
 {
+    InducedEquivalence<std::less<typename Container::value_type> > equiv;
+
     if (f != l)
     {
-        Container save(l - f);
+        Container array(l - f);
+        Container original(l - f);
         do
         {
-            std::copy(f, l, save.begin());
-            std::sort(save.begin(), save.end());
-            assert(std::is_sorted(save.begin(), save.end()));
-            assert(std::is_permutation(save.begin(), save.end(), f));
+            int i = 0;
+            for (RI it = f; it != l; ++it) {
+                set_value(array[i], *it);
+                set_value(original[i], *it);
+                ++i;
+            }
+            std::sort(array.begin(), array.end());
+            assert(std::is_sorted(array.begin(), array.end()));
+            assert(std::is_permutation(array.begin(), array.end(), original.begin(), equiv));
         } while (std::next_permutation(f, l));
     }
-}
-
-template <class T>
-void set_value(T& dest, int value)
-{
-    dest = value;
-}
-
-inline void set_value(std::pair<int, int>& dest, int value)
-{
-    dest.first = value;
-    dest.second = value;
 }
 
 template <class Container, class RI>
@@ -66,7 +87,7 @@ test_sort_driver_driver(RI f, RI l, int start, RI real_last)
 {
     for (RI i = l; i > f + start;)
     {
-        set_value(*--i, start);
+        *--i = start;
         if (f == i)
         {
             test_sort_helper<Container>(f, real_last);
@@ -87,28 +108,11 @@ template <class Container, int sa>
 void
 test_sort_()
 {
-    Container ia(sa);
+    std::vector<int> ia(sa);
     for (int i = 0; i < sa; ++i)
     {
         test_sort_driver<Container>(ia.begin(), ia.end(), i);
     }
-}
-
-template <class T>
-T increment_or_reset(T value, int max_value)
-{
-    return value == max_value - 1 ? 0 : value + 1;
-}
-
-inline std::pair<int, int> increment_or_reset(std::pair<int, int> value,
-                                              int max_value)
-{
-    int new_value = value.first + 1;
-    if (new_value == max_value)
-    {
-        new_value = 0;
-    }
-    return std::make_pair(new_value, new_value);
 }
 
 template <class Container>
@@ -117,49 +121,50 @@ test_larger_sorts(int N, int M)
 {
     using Iter = typename Container::iterator;
     using ValueType = typename Container::value_type;
+    InducedEquivalence<std::less<ValueType> > equiv;
     assert(N != 0);
     assert(M != 0);
     // create container of length N filled with M different objects
     Container array(N);
-    ValueType x = ValueType();
-    for (int i = 0; i < N; ++i)
-    {
-        array[i] = x;
-        x = increment_or_reset(x, M);
+    Container original(N);
+    int x = 0;
+    for (int i = 0; i < N; ++i) {
+        set_value(array[i], x);
+        set_value(original[i], x);
+        x = (x + 1) % M;
     }
-    Container original = array;
     Iter iter = array.begin();
     Iter original_iter = original.begin();
 
     // test saw tooth pattern
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
     // test random pattern
     std::shuffle(iter, iter+N, randomness);
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
     // test sorted pattern
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
     // test reverse sorted pattern
     std::reverse(iter, iter+N);
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
     // test swap ranges 2 pattern
     std::swap_ranges(iter, iter+N/2, iter+N/2);
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
     // test reverse swap ranges 2 pattern
     std::reverse(iter, iter+N);
     std::swap_ranges(iter, iter+N/2, iter+N/2);
     std::sort(iter, iter+N);
     assert(std::is_sorted(iter, iter+N));
-    assert(std::is_permutation(iter, iter+N, original_iter));
+    assert(std::is_permutation(iter, iter+N, original_iter, equiv));
 }
 
 template <class Container>
@@ -283,6 +288,10 @@ int main(int, char**)
     run_sort_tests<std::vector<int> >();
     run_sort_tests<std::deque<int> >();
     run_sort_tests<std::vector<std::pair<int, int> > >();
+
+    run_sort_tests<std::vector<TrivialSortable> >();
+    run_sort_tests<std::vector<TrivialMoveOnlySortable> >();
+    run_sort_tests<std::vector<bool> >();
 
     test_pointer_sort();
     test_adversarial_quicksort(1 << 20);
