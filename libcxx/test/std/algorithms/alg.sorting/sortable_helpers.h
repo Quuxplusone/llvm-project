@@ -32,6 +32,25 @@ struct TrivialSortable {
     }
 };
 
+struct TrivialMoveOnlySortable {
+    int value;
+    TEST_CONSTEXPR TrivialMoveOnlySortable() : value(0) {}
+    TEST_CONSTEXPR TrivialMoveOnlySortable(int v) : value(v) {}
+    TrivialMoveOnlySortable(TrivialMoveOnlySortable&&) = default;
+    TrivialMoveOnlySortable& operator=(TrivialMoveOnlySortable&&) = default;
+    TrivialMoveOnlySortable(const TrivialMoveOnlySortable&) = delete;
+    TrivialMoveOnlySortable& operator=(const TrivialMoveOnlySortable&) = delete;
+    void assign(const TrivialMoveOnlySortable& rhs) {
+        value = rhs.value;
+    }
+    friend TEST_CONSTEXPR bool operator<(const TrivialMoveOnlySortable& a, const TrivialMoveOnlySortable& b) {
+        return a.value / 10 < b.value / 10;
+    }
+    static TEST_CONSTEXPR bool less(const TrivialMoveOnlySortable& a, const TrivialMoveOnlySortable& b) {
+        return a.value < b.value;
+    }
+};
+
 struct NonTrivialSortable {
     int value;
     TEST_CONSTEXPR NonTrivialSortable() : value(0) {}
@@ -78,6 +97,9 @@ struct NonTrivialSortableWithComp {
 };
 
 static_assert(std::is_trivially_copyable<TrivialSortable>::value, "");
+static_assert(std::is_trivially_copyable<TrivialMoveOnlySortable>::value, "");
+static_assert(!std::is_copy_constructible<TrivialMoveOnlySortable>::value, "");
+static_assert(!std::is_copy_assignable<TrivialMoveOnlySortable>::value, "");
 static_assert(std::is_trivially_copyable<TrivialSortableWithComp>::value, "");
 static_assert(!std::is_trivially_copyable<NonTrivialSortable>::value, "");
 static_assert(!std::is_trivially_copyable<NonTrivialSortableWithComp>::value, "");
