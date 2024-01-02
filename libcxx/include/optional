@@ -212,6 +212,7 @@ namespace std {
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/negation.h>
+#include <__type_traits/reference_constructs_from_temporary.h>
 #include <__type_traits/remove_const.h>
 #include <__type_traits/remove_cvref.h>
 #include <__type_traits/remove_reference.h>
@@ -405,30 +406,14 @@ struct __optional_storage_base<_Tp, true> {
   using __raw_type = remove_reference_t<_Tp>;
   __raw_type* __value_;
 
-  template <class _Up>
-  static _LIBCPP_HIDE_FROM_ABI constexpr bool __can_bind_reference() {
-    using _RawUp = __libcpp_remove_reference_t<_Up>;
-    using _UpPtr = _RawUp*;
-    using _RawTp = __libcpp_remove_reference_t<_Tp>;
-    using _TpPtr = _RawTp*;
-    using _CheckLValueArg =
-        integral_constant<bool,
-                          (is_lvalue_reference<_Up>::value && is_convertible<_UpPtr, _TpPtr>::value) ||
-                              is_same<_RawUp, reference_wrapper<_RawTp>>::value ||
-                              is_same<_RawUp, reference_wrapper<__remove_const_t<_RawTp>>>::value >;
-    return (is_lvalue_reference<_Tp>::value && _CheckLValueArg::value) ||
-           (is_rvalue_reference<_Tp>::value && !is_lvalue_reference<_Up>::value &&
-            is_convertible<_UpPtr, _TpPtr>::value);
-  }
-
   _LIBCPP_HIDE_FROM_ABI constexpr __optional_storage_base() noexcept : __value_(nullptr) {}
 
-  template <class _UArg>
+  template<class _UArg>
   _LIBCPP_HIDE_FROM_ABI constexpr explicit __optional_storage_base(in_place_t, _UArg&& __uarg)
-      : __value_(std::addressof(__uarg)) {
-    static_assert(__can_bind_reference<_UArg>(),
-                  "Attempted to construct a reference element in tuple from a "
-                  "possible temporary");
+      : __value_(std::addressof(_Tp(__uarg))) {
+#if _LIBCPP_STD_VER >= 26
+    static_assert(!std::reference_constructs_from_temporary_v<_Tp, _UArg&&>);
+#endif // _LIBCPP_STD_VER >= 26
   }
 
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void reset() noexcept { __value_ = nullptr; }
@@ -437,34 +422,29 @@ struct __optional_storage_base<_Tp, true> {
 
   _LIBCPP_HIDE_FROM_ABI constexpr value_type& __get() const& noexcept { return *__value_; }
 
-  _LIBCPP_HIDE_FROM_ABI constexpr value_type&& __get() const&& noexcept { return std::forward<value_type>(*__value_); }
-
-  template <class _UArg>
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __construct(_UArg&& __val) {
+  template<class _UArg>
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __construct(_UArg&& __uarg) {
     _LIBCPP_ASSERT_INTERNAL(!has_value(), "__construct called for engaged __optional_storage");
-    static_assert(__can_bind_reference<_UArg>(),
-                  "Attempted to construct a reference element in tuple from a "
-                  "possible temporary");
-    __value_ = std::addressof(__val);
+#if _LIBCPP_STD_VER >= 26
+    static_assert(!std::reference_constructs_from_temporary_v<_Tp, _UArg&&>);
+#endif // _LIBCPP_STD_VER >= 26
+    __value_ = std::addressof(_Tp(__uarg));
   }
 
   template <class _That>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __construct_from(_That&& __opt) {
     if (__opt.has_value())
       __construct(std::forward<_That>(__opt).__get());
+    else
+      __value_ = nullptr;
   }
 
   template <class _That>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void __assign_from(_That&& __opt) {
-    if (has_value() == __opt.has_value()) {
-      if (has_value())
-        *__value_ = std::forward<_That>(__opt).__get();
-    } else {
-      if (has_value())
-        reset();
-      else
-        __construct(std::forward<_That>(__opt).__get());
-    }
+    if (__opt.has_value())
+      __value_ = std::addressof(std::forward<_That>(__opt).__get());
+    else
+      __value_ = nullptr;
   }
 };
 
@@ -603,7 +583,9 @@ private:
                 "instantiation of optional with in_place_t is ill-formed");
   static_assert(!is_same_v<__remove_cvref_t<value_type>, nullopt_t>,
                 "instantiation of optional with nullopt_t is ill-formed");
+#if _LIBCPP_STD_VER <= 23
   static_assert(!is_reference_v<value_type>, "instantiation of optional with a reference type is ill-formed");
+#endif
   static_assert(is_destructible_v<value_type>, "instantiation of optional with a non-destructible type is ill-formed");
   static_assert(!is_array_v<value_type>, "instantiation of optional with an array type is ill-formed");
 
@@ -646,11 +628,17 @@ private:
     template <class _Up, class _QUp = _QualUp>
     _LIBCPP_HIDE_FROM_ABI static constexpr bool __enable_implicit() {
       return is_convertible<_QUp, _Tp>::value &&
+#if _LIBCPP_STD_VER >= 26
+             !(is_reference_v<_Tp> && reference_converts_from_temporary_v<_Tp, _QUp>) &&
+#endif
              (is_same_v<remove_cv_t<_Tp>, bool> || !__check_constructible_from_opt<_Up>::value);
     }
     template <class _Up, class _QUp = _QualUp>
     _LIBCPP_HIDE_FROM_ABI static constexpr bool __enable_explicit() {
       return !is_convertible<_QUp, _Tp>::value &&
+#if _LIBCPP_STD_VER >= 26
+             !(is_reference_v<_Tp> && reference_constructs_from_temporary_v<_Tp, _QUp>) &&
+#endif
              (is_same_v<remove_cv_t<_Tp>, bool> || !__check_constructible_from_opt<_Up>::value);
     }
     template <class _Up, class _QUp = _QualUp>
