@@ -298,3 +298,14 @@ static_assert(std::is_trivially_relocatable_v<std::flat_set<bool>>);
 static_assert(std::is_trivially_relocatable_v<std::move_only_function<T(T)>>);
 static_assert(std::is_trivially_relocatable_v<std::move_only_function<void()>>);
 #endif
+
+#if TEST_STD_VER >= 26
+static_assert(std::is_trivially_relocatable_v<std::optional<R&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<T&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<const R&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<const T&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<R&&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<T&&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<const R&&>>);
+static_assert(std::is_trivially_relocatable_v<std::optional<const T&&>>);
+#endif
