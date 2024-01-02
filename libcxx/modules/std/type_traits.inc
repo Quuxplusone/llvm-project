@@ -284,8 +284,8 @@ export namespace std {
   using std::is_unbounded_array_v;
   using std::is_unsigned_v;
   using std::is_volatile_v;
-  // using std::reference_constructs_from_temporary_v;
-  // using std::reference_converts_from_temporary_v;
+  using std::reference_constructs_from_temporary_v;
+  using std::reference_converts_from_temporary_v;
 
   // [meta.unary.prop.query], type property queries
   using std::alignment_of_v;
