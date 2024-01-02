@@ -843,6 +843,7 @@ set(files
   __type_traits/noexcept_move_assign_container.h
   __type_traits/promote.h
   __type_traits/rank.h
+  __type_traits/reference_constructs_from_temporary.h
   __type_traits/remove_all_extents.h
   __type_traits/remove_const.h
   __type_traits/remove_const_ref.h
