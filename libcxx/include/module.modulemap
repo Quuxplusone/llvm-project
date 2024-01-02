@@ -2086,6 +2086,7 @@ module std_private_type_traits_negation                                  [system
 module std_private_type_traits_noexcept_move_assign_container            [system] { header "__type_traits/noexcept_move_assign_container.h" }
 module std_private_type_traits_promote                                   [system] { header "__type_traits/promote.h" }
 module std_private_type_traits_rank                                      [system] { header "__type_traits/rank.h" }
+module std_private_type_traits_reference_constructs_from_temporary       [system] { header "__type_traits/reference_constructs_from_temporary.h"}
 module std_private_type_traits_remove_all_extents                        [system] { header "__type_traits/remove_all_extents.h" }
 module std_private_type_traits_remove_const                              [system] { header "__type_traits/remove_const.h" }
 module std_private_type_traits_remove_const_ref                          [system] { header "__type_traits/remove_const_ref.h" }
