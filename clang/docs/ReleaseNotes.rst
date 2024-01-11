@@ -159,6 +159,9 @@ C++23 Feature Support
 - Added a separate warning to warn the use of attributes on lambdas as a C++23 extension
   in previous language versions: ``-Wc++23-lambda-attributes``.
 
+- Implemented `P2718R0: Lifetime extension in range-based for loops <https://wg21.link/P2718R0>`_. Also
+  materialize temporary object which is a prvalue in discarded-value expression.
+
 C++2c Feature Support
 ^^^^^^^^^^^^^^^^^^^^^
 

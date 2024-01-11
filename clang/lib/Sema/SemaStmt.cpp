@@ -2483,11 +2483,11 @@ static bool ObjCEnumerationCollection(Expr *Collection) {
 ///
 /// The body of the loop is not available yet, since it cannot be analysed until
 /// we have determined the type of the for-range-declaration.
-StmtResult Sema::ActOnCXXForRangeStmt(Scope *S, SourceLocation ForLoc,
-                                      SourceLocation CoawaitLoc, Stmt *InitStmt,
-                                      Stmt *First, SourceLocation ColonLoc,
-                                      Expr *Range, SourceLocation RParenLoc,
-                                      BuildForRangeKind Kind) {
+StmtResult Sema::ActOnCXXForRangeStmt(
+    Scope *S, SourceLocation ForLoc, SourceLocation CoawaitLoc, Stmt *InitStmt,
+    Stmt *First, SourceLocation ColonLoc, Expr *Range, SourceLocation RParenLoc,
+    BuildForRangeKind Kind,
+    ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps) {
   // FIXME: recover in order to allow the body to be parsed.
   if (!First)
     return StmtError();
@@ -2537,6 +2537,13 @@ StmtResult Sema::ActOnCXXForRangeStmt(Scope *S, SourceLocation ForLoc,
                             diag::err_for_range_deduction_failure)) {
     ActOnInitializerError(LoopVar);
     return StmtError();
+  }
+
+  // P2718R0 - Lifetime extension in range-based for loops.
+  if (getLangOpts().CPlusPlus23 && !LifetimeExtendTemps.empty()) {
+    InitializedEntity Entity = InitializedEntity::InitializeVariable(RangeVar);
+    for (auto *MTE : LifetimeExtendTemps)
+      MTE->setExtendingDecl(RangeVar, Entity.allocateManglingNumber());
   }
 
   // Claim the type doesn't contain auto: we've already done the checking.
