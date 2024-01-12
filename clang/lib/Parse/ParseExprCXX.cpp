@@ -3833,7 +3833,14 @@ ExprResult Parser::ParseTypeTrait() {
   SmallVector<ParsedType, 2> Args;
   do {
     // Parse the next type.
-    TypeResult Ty = ParseTypeName();
+    // In C++, builtin type traits mimic templates; we want to parse
+    // `__is_trivial(int()&)` successfully.
+    // Outside C++, we probably don't want to encounter TemplateArg,
+    // and we also want to parse `__builtin_types_compatible_p(struct S {},
+    // int)` successfully.
+    TypeResult Ty = ParseTypeName(nullptr, getLangOpts().CPlusPlus
+                                               ? DeclaratorContext::TemplateArg
+                                               : DeclaratorContext::TypeName);
     if (Ty.isInvalid()) {
       Parens.skipToEnd();
       return ExprError();
@@ -3875,7 +3882,7 @@ ExprResult Parser::ParseArrayTypeTrait() {
   if (T.expectAndConsume())
     return ExprError();
 
-  TypeResult Ty = ParseTypeName();
+  TypeResult Ty = ParseTypeName(nullptr, DeclaratorContext::TemplateArg);
   if (Ty.isInvalid()) {
     SkipUntil(tok::comma, StopAtSemi);
     SkipUntil(tok::r_paren, StopAtSemi);
