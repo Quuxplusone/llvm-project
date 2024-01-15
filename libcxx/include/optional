@@ -575,6 +575,8 @@ class _LIBCPP_DECLSPEC_EMPTY_BASES
 public:
   using value_type = _Tp;
 
+  using __trivially_relocatable = conditional_t<__libcpp_is_trivially_relocatable<_Tp>::value, optional, void>;
+
 private:
   // Disable the reference extension using this static assert.
   static_assert(!is_same_v<__remove_cvref_t<value_type>, in_place_t>,

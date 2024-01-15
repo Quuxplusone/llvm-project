@@ -73,6 +73,11 @@ struct _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivia
   _T1 first;
   _T2 second;
 
+  using __trivially_relocatable =
+      __conditional_t<__libcpp_is_trivially_relocatable<_T1>::value && __libcpp_is_trivially_relocatable<_T2>::value,
+                      pair,
+                      void>;
+
   _LIBCPP_HIDE_FROM_ABI pair(pair const&) = default;
   _LIBCPP_HIDE_FROM_ABI pair(pair&&)      = default;
 
