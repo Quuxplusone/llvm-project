@@ -538,6 +538,8 @@ class _LIBCPP_TEMPLATE_VIS _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__all<__libcpp_is_t
   get(const tuple<_Up...>&&) _NOEXCEPT;
 
 public:
+  using __trivially_relocatable = __conditional_t<_And<__libcpp_is_trivially_relocatable<_Tp>...>::value, tuple, void>;
+
   // [tuple.cnstr]
 
   // tuple() constructors (including allocator_arg_t variants)
