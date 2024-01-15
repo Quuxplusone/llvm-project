@@ -469,6 +469,11 @@ public:
   using error_type      = _Err;
   using unexpected_type = unexpected<_Err>;
 
+  using __trivially_relocatable =
+      __conditional_t<__libcpp_is_trivially_relocatable<_Tp>::value && __libcpp_is_trivially_relocatable<_Err>::value,
+                      expected,
+                      void>;
+
   template <class _Up>
   using rebind = expected<_Up, error_type>;
 

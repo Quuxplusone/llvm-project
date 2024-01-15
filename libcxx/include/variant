@@ -1182,6 +1182,9 @@ class _LIBCPP_TEMPLATE_VIS _LIBCPP_DECLSPEC_EMPTY_BASES _LIBCPP_TRIVIALLY_RELOCA
   using __first_type = variant_alternative_t<0, variant>;
 
 public:
+  using __trivially_relocatable =
+      conditional_t<_And<__libcpp_is_trivially_relocatable<_Types>...>::value, variant, void>;
+
   template <bool _Dummy                                                                               = true,
             enable_if_t<__dependent_type<is_default_constructible<__first_type>, _Dummy>::value, int> = 0>
   _LIBCPP_HIDE_FROM_ABI constexpr variant() noexcept(is_nothrow_default_constructible_v<__first_type>)
