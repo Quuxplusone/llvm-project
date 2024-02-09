@@ -45,9 +45,9 @@ void test_reallocate()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "1", "2" }));
-  assert(v[0].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
+  assert(v[0].get_allocator().resource() == (PmrIsTrivial ? &mr[0] : &mr[3]));
+  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[1] : &mr[3]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[3]));
 }
 
 void test_insert_one()
@@ -62,10 +62,10 @@ void test_insert_one()
   assert((v == decltype(v){ "0", "1", "a", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[2]));
-  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[4]));
-  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[5] : &mr[5]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[5] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[3]));
+  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[4]));
+  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[5]));
 }
 
 void test_insert_range()
@@ -85,11 +85,11 @@ void test_insert_range()
   assert((v == decltype(v){ "0", "1", "a", "b", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[2]));
-  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
-  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[4]));
-  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[7]));
-  assert(v[6].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[7]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[3]));
+  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[4]));
+  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[7]));
+  assert(v[6].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[7]));
 }
 
 void test_erase_one()
@@ -103,8 +103,8 @@ void test_erase_one()
   assert((v == decltype(v){ "0", "1", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[2]));
-  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[3]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[3]));
 }
 
 void test_erase_range()
@@ -117,8 +117,8 @@ void test_erase_range()
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
-  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[1] : &mr[1]));
-  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[2]));
+  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[1]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[2]));
 }
 
 int main(int, char**)
