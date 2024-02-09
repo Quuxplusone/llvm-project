@@ -10,7 +10,8 @@
 
 // <vector>
 
-// Reallocating, inserting, and erasing in a pmr::vector does not use memcpy.
+// Reallocating, inserting, and erasing in a pmr::vector will use memcpy
+// when it can. This is controlled by _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS.
 
 #include <cassert>
 #include <list>
@@ -19,7 +20,7 @@
 #include <string>
 #include <vector>
 
-[[maybe_unused]] static constexpr bool PmrIsTrivial =
+static constexpr bool PmrIsTrivial =
 #if defined(_LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS) && _LIBCPP_TRIVIALLY_RELOCATABLE_PMR_CONTAINERS
   true;
 #else
@@ -94,13 +95,16 @@ void test_insert_one()
   assert((v == decltype(v){ "0", "1", "a", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  // Breaking the PMR invariant causes UB.
-  // The allocators don't shift
+  // Breaking the PMR invariant causes UB. Here, when pmr::string is
+  // advertised as trivially relocatable in the Rule-of-Five sense, we
+  // can use memmove to shift them up in the vector and observe that
+  // the allocators shift along with the elements' values. When it's
+  // not advertised as trivially relocatable, the allocators don't shift
   // along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[5]);
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[5] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[3]));
+  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[4]));
+  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[5]));
 }
 
 void test_insert_range()
@@ -120,11 +124,11 @@ void test_insert_range()
   assert((v == decltype(v){ "0", "1", "a", "b", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[7]);
-  assert(v[6].get_allocator().resource() == &mr[7]);
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[7] : &mr[3]));
+  assert(v[4].get_allocator().resource() == (PmrIsTrivial ? &mr[2] : &mr[4]));
+  assert(v[5].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[7]));
+  assert(v[6].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[7]));
 }
 
 void test_erase_one()
@@ -138,11 +142,14 @@ void test_erase_one()
   assert((v == decltype(v){ "0", "1", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  // Breaking the PMR invariant causes UB.
-  // The allocators don't shift
+  // Breaking the PMR invariant causes UB. Here, when pmr::string is
+  // advertised as trivially relocatable in the Rule-of-Five sense, we
+  // can use memmove to shift them down in the vector and observe that
+  // the allocators shift along with the elements' values. When it's
+  // not advertised as trivially relocatable, the allocators don't shift
   // along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[2]));
+  assert(v[3].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[3]));
 }
 
 void test_erase_range()
@@ -155,8 +162,8 @@ void test_erase_range()
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
-  assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
+  assert(v[1].get_allocator().resource() == (PmrIsTrivial ? &mr[3] : &mr[1]));
+  assert(v[2].get_allocator().resource() == (PmrIsTrivial ? &mr[4] : &mr[2]));
 }
 
 int main(int, char**)
