@@ -338,6 +338,7 @@ template<class T, class charT> requires is-vector-bool-reference<T> // Since C++
 #include <__memory/swap_allocator.h>
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
+#include <__memory/uninitialized_relocate.h>
 #include <__memory_resource/polymorphic_allocator.h>
 #include <__ranges/access.h>
 #include <__ranges/concepts.h>
@@ -384,6 +385,13 @@ _LIBCPP_PUSH_MACROS
 #include <__undef_macros>
 
 _LIBCPP_BEGIN_NAMESPACE_STD
+
+template<class _Tp, class _Allocator>
+struct __vector_relocate_elements_via_memcpy : integral_constant<bool,
+  __libcpp_is_trivially_relocatable<_Tp>::value &&
+  __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
+  __allocator_has_trivial_destroy<_Allocator, _Tp>::value
+> {};
 
 template <class _Allocator>
 struct __vector_be_trivially_relocatable {
@@ -886,13 +894,24 @@ private:
   __swap_out_circular_buffer(__split_buffer<value_type, allocator_type&>& __v, pointer __p);
   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void
   __move_range(pointer __from_s, pointer __from_e, pointer __to);
+  template <class _Up>
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI
+  void __relocate_upward_and_insert_single(pointer __from_s, pointer __from_e, _Up&& __elt);
+  template <class _ForwardIterator>
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI
+  void __relocate_upward_and_insert_range(pointer __from_s, pointer __from_e, size_type __upward, _ForwardIterator __first, _ForwardIterator __last);
   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, true_type)
       _NOEXCEPT_(is_nothrow_move_assignable<allocator_type>::value);
   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __move_assign(vector& __c, false_type)
       _NOEXCEPT_(__alloc_traits::is_always_equal::value);
-  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __destruct_at_end(pointer __new_last) _NOEXCEPT {
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __destruct_at_end(pointer __new_last, false_type = false_type()) _NOEXCEPT {
     size_type __old_size = size();
     __base_destruct_at_end(__new_last);
+    __annotate_shrink(__old_size);
+  }
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void __destruct_at_end(pointer __new_last, true_type) _NOEXCEPT {
+    size_type __old_size = size();
+    this->__end_ = __new_last;
     __annotate_shrink(__old_size);
   }
 
@@ -1588,7 +1607,13 @@ vector<_Tp, _Allocator>::erase(const_iterator __position) {
       __position != end(), "vector::erase(iterator) called with a non-dereferenceable iterator");
   difference_type __ps = __position - cbegin();
   pointer __p          = this->__begin_ + __ps;
-  this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
+  if (__vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
+    __alloc_traits::destroy(__alloc(), std::__to_address(__p));
+    std::uninitialized_relocate(__p + 1, this->__end_, __p);
+    this->__destruct_at_end(this->__end_ - 1, true_type()); // destroy_via_noop
+  } else {
+    this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
+  }
   return __make_iter(__p);
 }
 
@@ -1598,11 +1623,87 @@ vector<_Tp, _Allocator>::erase(const_iterator __first, const_iterator __last) {
   _LIBCPP_ASSERT_VALID_INPUT_RANGE(__first <= __last, "vector::erase(first, last) called with invalid range");
   pointer __p = this->__begin_ + (__first - begin());
   if (__first != __last) {
-    this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
+    if (__vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
+      pointer __endp = __p + (__last - __first);
+      for (pointer __q = __p; __q != __endp; ++__q) {
+        __alloc_traits::destroy(__alloc(), std::__to_address(__q));
+      }
+      std::uninitialized_relocate(__endp, this->__end_, __p);
+      this->__destruct_at_end(this->__end_ - (__last - __first), true_type()); // destroy_via_noop
+    } else {
+      this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
+    }
   }
   return __make_iter(__p);
 }
 
+template<class _Tp, class _Allocator>
+template<class _Up>
+_LIBCPP_CONSTEXPR_SINCE_CXX20 void
+vector<_Tp, _Allocator>::__relocate_upward_and_insert_single(pointer __from_s, pointer __from_e, _Up&& __elt)
+{
+    if (!__libcpp_is_constant_evaluated() && __vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value) {
+        ::__builtin_memmove(std::__to_address(__from_s + 1), std::__to_address(__from_s), (__from_e - __from_s) * sizeof(_Tp));
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+        try {
+#endif // _LIBCPP_HAS_NO_EXCEPTIONS
+            __alloc_traits::construct(this->__alloc(),
+                                      std::__to_address(__from_s),
+                                      static_cast<_Up&&>(__elt));
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+        } catch (...) {
+            // We've opened a "window" of unconstructed elements; if construction throws,
+            // then we must close that window again.
+            ::__builtin_memmove(std::__to_address(__from_s), std::__to_address(__from_s + 1), (__from_e - __from_s) * sizeof(_Tp));
+            throw;
+        }
+#endif // _LIBCPP_HAS_NO_EXCEPTIONS
+        ++this->__end_;
+    } else {
+        __move_range(__from_s, __from_e, __from_s + 1);
+        *__from_s = static_cast<_Up&&>(__elt);
+    }
+}
+
+template<class _Tp, class _Allocator>
+template<class _ForwardIterator>
+_LIBCPP_CONSTEXPR_SINCE_CXX20 void
+vector<_Tp, _Allocator>::__relocate_upward_and_insert_range(pointer __from_s, pointer __from_e, size_type __upward,
+                                                            _ForwardIterator __first, _ForwardIterator __last)
+{
+    if (!__libcpp_is_constant_evaluated() && __vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value) {
+        size_type __from_n = __from_e - __from_s;
+        // When __upward exceeds __from_n, the relocated elements leapfrog over
+        // already-constructed elements and the bottom of the window (that we'll
+        // lower back down in case of exception) becomes __from_n, not __upward.
+        auto *__window_sill = std::__to_address(__from_s);
+        size_type __window_bottom = std::min(__from_n, __upward);
+        size_type __window_height = (__from_n + __upward) - __window_bottom;
+        ::__builtin_memmove(__window_sill + __upward, __window_sill, __from_n * sizeof(_Tp));
+        size_type __i = 0;
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+        try {
+#endif // _LIBCPP_HAS_NO_EXCEPTIONS
+            while (__first != __last) {
+                __alloc_traits::construct(this->__alloc(),
+                                          std::__to_address(__from_s) + __i,
+                                          *__first);
+                ++__i; // the element is now constructed
+                ++this->__end_;
+                ++__first;
+            }
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+        } catch (...) {
+            // Lower the window back down to the last successfully constructed element.
+            ::__builtin_memmove(__window_sill + __i, __window_sill + __window_bottom, __window_height * sizeof(_Tp));
+            throw;
+        }
+#endif // _LIBCPP_HAS_NO_EXCEPTIONS
+    } else {
+        __move_range(__from_s, __from_e, __from_s + __upward);
+        std::copy(__first, __last, __from_s);
+    }
+}
 template <class _Tp, class _Allocator>
 _LIBCPP_CONSTEXPR_SINCE_CXX20 void
 vector<_Tp, _Allocator>::__move_range(pointer __from_s, pointer __from_e, pointer __to) {
@@ -1626,11 +1727,10 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, const_reference __x) 
     if (__p == this->__end_) {
       __construct_one_at_end(__x);
     } else {
-      __move_range(__p, this->__end_, __p + 1);
       const_pointer __xr = pointer_traits<const_pointer>::pointer_to(__x);
       if (std::__is_pointer_in_range(std::__to_address(__p), std::__to_address(__end_), std::addressof(__x)))
         ++__xr;
-      *__p = *__xr;
+      __relocate_upward_and_insert_single(__p, this->__end_, *__xr);
     }
   } else {
     allocator_type& __a = this->__alloc();
@@ -1649,8 +1749,7 @@ vector<_Tp, _Allocator>::insert(const_iterator __position, value_type&& __x) {
     if (__p == this->__end_) {
       __construct_one_at_end(std::move(__x));
     } else {
-      __move_range(__p, this->__end_, __p + 1);
-      *__p = std::move(__x);
+      __relocate_upward_and_insert_single(__p, this->__end_, std::move(__x));
     }
   } else {
     allocator_type& __a = this->__alloc();
@@ -1671,8 +1770,7 @@ vector<_Tp, _Allocator>::emplace(const_iterator __position, _Args&&... __args) {
       __construct_one_at_end(std::forward<_Args>(__args)...);
     } else {
       __temp_value<value_type, _Allocator> __tmp(this->__alloc(), std::forward<_Args>(__args)...);
-      __move_range(__p, this->__end_, __p + 1);
-      *__p = std::move(__tmp.get());
+      __relocate_upward_and_insert_single(__p, this->__end_, std::move(__tmp.get()));
     }
   } else {
     allocator_type& __a = this->__alloc();
@@ -1788,8 +1886,7 @@ vector<_Tp, _Allocator>::__insert_with_size(
         __n = __dx;
       }
       if (__n > 0) {
-        __move_range(__p, __old_last, __p + __old_n);
-        std::copy(__first, __m, __p);
+        __relocate_upward_and_insert_range(__p, __old_last, __old_n, __first, __m);
       }
     } else {
       allocator_type& __a = this->__alloc();
