@@ -7282,6 +7282,23 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
     else if (Record->hasAttr<CUDADeviceBuiltinTextureTypeAttr>())
       checkCUDADeviceBuiltinTextureClassTemplate(*this, Record);
   }
+
+  if (!Record->isDependentContext()) {
+    // Deal with [[trivially_relocatable(condition)]].
+    if (auto *TRA = Record->getAttr<TriviallyRelocatableAttr>()) {
+      if (Expr *Arg = TRA->getCond()) {
+        // Evaluate the condition. If it's ill-formed, ignore the attribute.
+        // If it's well-formed and true, render this type trivially relocatable.
+        SFINAETrap Trap(*this);
+        bool Result = false;
+        if (!Arg->EvaluateAsBooleanCondition(Result, Context) || !Result) {
+          // An ill-formed, non-constant, non-boolean, or false expression drops
+          // the attribute.
+          Record->dropAttr<TriviallyRelocatableAttr>();
+        }
+      }
+    }
+  }
 }
 
 /// Look up the special member function that would be called by a special
