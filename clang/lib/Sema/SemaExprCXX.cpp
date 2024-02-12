@@ -5443,7 +5443,7 @@ static bool CheckUnaryTypeTraitTypeCompleteness(Sema &S, TypeTrait UTT,
   case UTT_IsBitwiseCloneable:
   // By analogy, is_trivially_relocatable and is_trivially_equality_comparable
   // impose the same constraints.
-  case UTT_IsTriviallyRelocatable:
+  case UTT_IsP1144TriviallyRelocatable:
   case UTT_IsTriviallyEqualityComparable:
   case UTT_IsCppTriviallyRelocatable:
   case UTT_IsReplaceable:
@@ -5652,37 +5652,6 @@ bool Sema::IsCXXReplaceableType(QualType Type) {
   if (const auto *RD = BaseElementType->getAsCXXRecordDecl())
     return ::IsCXXReplaceableType(*this, RD);
   return false;
-}
-
-static bool IsTriviallyRelocatableType(Sema &SemaRef, QualType T) {
-  QualType BaseElementType = SemaRef.getASTContext().getBaseElementType(T);
-
-  if (BaseElementType->isIncompleteType())
-    return false;
-  if (!BaseElementType->isObjectType())
-    return false;
-
-  if (T.hasAddressDiscriminatedPointerAuth())
-    return false;
-
-  if (const auto *RD = BaseElementType->getAsCXXRecordDecl();
-      RD && !RD->isPolymorphic() && IsCXXTriviallyRelocatableType(SemaRef, RD))
-    return true;
-
-  if (const auto *RD = BaseElementType->getAsRecordDecl())
-    return RD->canPassInRegisters();
-
-  if (BaseElementType.isTriviallyCopyableType(SemaRef.getASTContext()))
-    return true;
-
-  switch (T.isNonTrivialToPrimitiveDestructiveMove()) {
-  case QualType::PCK_Trivial:
-    return !T.isDestructedType();
-  case QualType::PCK_ARCStrong:
-    return true;
-  default:
-    return false;
-  }
 }
 
 static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
@@ -6103,8 +6072,8 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
     return !T->isIncompleteType();
   case UTT_HasUniqueObjectRepresentations:
     return C.hasUniqueObjectRepresentations(T);
-  case UTT_IsTriviallyRelocatable:
-    return IsTriviallyRelocatableType(Self, T);
+  case UTT_IsP1144TriviallyRelocatable:
+    return T.isP1144TriviallyRelocatableType(C);
   case UTT_IsBitwiseCloneable:
     return T.isBitwiseCloneableType(C);
   case UTT_IsCppTriviallyRelocatable:
