@@ -5573,6 +5573,23 @@ static void handleLayoutVersion(Sema &S, Decl *D, const ParsedAttr &AL) {
   D->addAttr(::new (S.Context) LayoutVersionAttr(S.Context, AL, Version));
 }
 
+static void handleTriviallyRelocatableAttr(Sema &S, Decl *D,
+                                           const ParsedAttr &AL) {
+  Expr *Cond = nullptr;
+  if (AL.getNumArgs() == 1) {
+    Cond = AL.getArgAsExpr(0);
+    if (!Cond->isTypeDependent()) {
+      ExprResult Converted = S.PerformContextuallyConvertToBool(Cond);
+      if (Converted.isInvalid()) {
+        return;
+      }
+      Cond = Converted.get();
+    }
+  }
+
+  D->addAttr(::new (S.Context) TriviallyRelocatableAttr(S.Context, AL, Cond));
+}
+
 DLLImportAttr *Sema::mergeDLLImportAttr(Decl *D,
                                         const AttributeCommonInfo &CI) {
   if (D->hasAttr<DLLExportAttr>()) {
@@ -7040,6 +7057,10 @@ ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D, const ParsedAttr &AL,
 
   case ParsedAttr::AT_PatchableFunctionEntry:
     handlePatchableFunctionEntryAttr(S, D, AL);
+    break;
+
+  case ParsedAttr::AT_TriviallyRelocatable:
+    handleTriviallyRelocatableAttr(S, D, AL);
     break;
 
   case ParsedAttr::AT_AlwaysDestroy:
