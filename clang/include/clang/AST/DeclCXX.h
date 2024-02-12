@@ -1393,6 +1393,14 @@ public:
     data().IsNaturallyTriviallyRelocatable = false;
   }
 
+  bool hasNonTriviallyRelocatableSubobject() const {
+    return data().HasNonTriviallyRelocatableSubobject;
+  }
+
+  void setHasNonTriviallyRelocatableSubobject() {
+    data().HasNonTriviallyRelocatableSubobject = true;
+  }
+
   /// Determine whether declaring a const variable with this type is ok
   /// per core issue 253.
   bool allowConstDefaultInit() const {

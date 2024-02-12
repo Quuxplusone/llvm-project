@@ -96,7 +96,9 @@ CXXRecordDecl::DefinitionData::DefinitionData(CXXRecordDecl *D)
       HasTrivialSpecialMembersForCall(SMF_All),
       DeclaredNonTrivialSpecialMembers(0),
       DeclaredNonTrivialSpecialMembersForCall(0),
-      IsNaturallyTriviallyRelocatable(true), HasIrrelevantDestructor(true),
+      IsNaturallyTriviallyRelocatable(true),
+      HasNonTriviallyRelocatableSubobject(false),
+      HasIrrelevantDestructor(true),
       HasConstexprNonCopyMoveConstructor(false),
       HasDefaultedDefaultConstructor(false),
       DefaultedDefaultConstructorIsConstexpr(true),
@@ -285,6 +287,7 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
       // -- a (possibly cv-qualified) class type which: [...]
       //    -- has no virtual member functions
       data().IsNaturallyTriviallyRelocatable = false;
+      setHasNonTriviallyRelocatableSubobject();
     }
 
     // C++0x [class]p7:
@@ -299,8 +302,10 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
     if (!hasNonLiteralTypeFieldsOrBases() && !BaseType->isLiteralType(C))
       data().HasNonLiteralTypeFieldsOrBases = true;
 
-    if (Base->isVirtual() || !BaseClassDecl->isTriviallyRelocatable())
+    if (Base->isVirtual() || !BaseClassDecl->isTriviallyRelocatable()) {
       data().IsNaturallyTriviallyRelocatable = false;
+      setHasNonTriviallyRelocatableSubobject();
+    }
 
     // Now go through all virtual bases of this base and add them.
     for (const auto &VBase : BaseClassDecl->vbases()) {
@@ -581,7 +586,10 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
 
 bool CXXRecordDecl::isTriviallyRelocatable() const {
   return (data().IsNaturallyTriviallyRelocatable ||
-          hasAttr<TriviallyRelocatableAttr>() || hasAttr<TrivialABIAttr>());
+          hasAttr<TriviallyRelocatableAttr>() ||
+          hasAttr<TrivialABIAttr>() ||
+          (hasAttr<MaybeTriviallyRelocatableAttr>() &&
+           !data().HasNonTriviallyRelocatableSubobject));
 }
 
 bool CXXRecordDecl::isTriviallyCopyable() const {
@@ -777,6 +785,7 @@ void CXXRecordDecl::addedMember(Decl *D) {
       // -- a (possibly cv-qualified) class type which: [...]
       //    -- has no virtual member functions
       data().IsNaturallyTriviallyRelocatable = false;
+      setHasNonTriviallyRelocatableSubobject();
     }
   }
 
