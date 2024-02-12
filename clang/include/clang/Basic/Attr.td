@@ -3161,6 +3161,13 @@ def TriviallyRelocatable : InheritableAttr {
   let LangOpts = [CPlusPlus];
 }
 
+def MaybeTriviallyRelocatable : InheritableAttr {
+  let Spellings = [Clang<"maybe_trivially_relocatable", 0>];
+  let Subjects = SubjectList<[CXXRecord]>;
+  let Documentation = [MaybeTriviallyRelocatableDocs];
+  let LangOpts = [CPlusPlus];
+}
+
 def Unused : InheritableAttr {
   let Spellings = [CXX11<"", "maybe_unused", 201603>, GCC<"unused">,
                    C23<"", "maybe_unused", 202106>];
