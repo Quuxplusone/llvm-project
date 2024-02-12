@@ -19421,6 +19421,13 @@ void Sema::ActOnFields(Scope *S, SourceLocation RecLoc, Decl *EnclosingDecl,
             RecordArgPassingKind::CanNeverPassInRegs);
     }
 
+    if (CXXRecord) {
+      QualType FT = FD->getType();
+      if (!FT->isReferenceType() && !FT.isTriviallyRelocatableType(Context)) {
+        CXXRecord->setIsNotNaturallyTriviallyRelocatable();
+      }
+    }
+
     if (Record && FD->getType().isVolatileQualified())
       Record->setHasVolatileMember(true);
     // Keep track of the number of named members.
