@@ -2744,17 +2744,18 @@ bool QualType::isTriviallyRelocatableType(const ASTContext &Context) const {
     return false;
   } else if (!BaseElementType->isObjectType()) {
     return false;
-  } else if (const auto *RD = BaseElementType->getAsRecordDecl()) {
-    return RD->canPassInRegisters();
+  } else if (CXXRecordDecl *RD = BaseElementType->getAsCXXRecordDecl()) {
+    return RD->isTriviallyRelocatable();
   } else if (BaseElementType.isTriviallyCopyableType(Context)) {
     return true;
   } else {
     switch (isNonTrivialToPrimitiveDestructiveMove()) {
-    case PCK_Trivial:
-      return !isDestructedType();
     case PCK_ARCStrong:
+    case PCK_Trivial:
+    case PCK_VolatileTrivial:
       return true;
-    default:
+    case PCK_ARCWeak:
+    case PCK_Struct:
       return false;
     }
   }
