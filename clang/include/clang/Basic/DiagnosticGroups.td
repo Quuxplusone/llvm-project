@@ -1197,6 +1197,7 @@ def IgnoredAttributes : DiagGroup<"ignored-attributes",
                                   [DllexportExplicitInstantiation]>;
 def Attributes : DiagGroup<"attributes", [UnknownAttributes,
                                           IgnoredAttributes]>;
+def AttributeNRVO : DiagGroup<"attribute-nrvo">;
 def UnknownSanitizers : DiagGroup<"unknown-sanitizers">;
 def UnnamedTypeTemplateArgs : DiagGroup<"unnamed-type-template-args",
                                         [CXX98CompatUnnamedTypeTemplateArgs]>;

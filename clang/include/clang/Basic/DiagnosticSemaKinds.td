@@ -3302,6 +3302,13 @@ def warn_stmt_attribute_ignored_in_function : Warning<
   "use '%0' for functions">,
   InGroup<IgnoredAttributes>;
 
+def err_mustnrvo_needs_variable : Error<
+  "%0 attribute requires that the returned expression be the name "
+  "of an NRVO-eligible local variable">;
+def warn_mustnrvo_failed_to_elide : Warning<
+  "this return statement uses the %0 attribute, but NRVO did not happen">,
+  InGroup<AttributeNRVO>;
+
 def err_musttail_needs_trivial_args : Error<
   "tail call requires that the return value, all parameters, and any "
   "temporaries created by the expression are trivially destructible">;

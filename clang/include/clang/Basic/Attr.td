@@ -1969,6 +1969,12 @@ def MustTail : StmtAttr, TargetSpecificAttr<TargetMustTailAvailable> {
   let Subjects = SubjectList<[ReturnStmt], ErrorDiag, "return statements">;
 }
 
+def MustNrvo : StmtAttr {
+  let Spellings = [Clang<"nrvo">];
+  let Documentation = [MustNrvoDocs];
+  let Subjects = SubjectList<[ReturnStmt], ErrorDiag, "return statements">;
+}
+
 def FastCall : DeclOrTypeAttr {
   let Spellings = [GCC<"fastcall">, CustomKeyword<"__fastcall">,
                    CustomKeyword<"_fastcall">];
