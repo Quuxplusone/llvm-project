@@ -642,6 +642,17 @@ all targets, not just one.
   }];
 }
 
+def MustNrvoDocs : Documentation {
+  let Category = DocCatStmt;
+  let Content = [{
+If a ``return`` statement is marked ``clang::nrvo``, this indicates that copy
+elision must apply to that statement for the program to be correct.
+If the returned expression isn't eligible for copy elision at all,
+the program is ill-formed. If the expression is eligible but the optimizer
+fails to elide the copy (or move), then a warning will be given.
+  }];
+}
+
 def AssertCapabilityDocs : Documentation {
   let Category = DocCatFunction;
   let Heading = "assert_capability, assert_shared_capability";
