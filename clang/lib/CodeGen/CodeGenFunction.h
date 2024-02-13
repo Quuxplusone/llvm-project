@@ -3556,7 +3556,8 @@ public:
   void EmitDoStmt(const DoStmt &S, ArrayRef<const Attr *> Attrs = std::nullopt);
   void EmitForStmt(const ForStmt &S,
                    ArrayRef<const Attr *> Attrs = std::nullopt);
-  void EmitReturnStmt(const ReturnStmt &S);
+  void EmitReturnStmt(const ReturnStmt &S,
+                      ArrayRef<const Attr *> Attrs = std::nullopt);
   void EmitDeclStmt(const DeclStmt &S);
   void EmitBreakStmt(const BreakStmt &S);
   void EmitContinueStmt(const ContinueStmt &S);
