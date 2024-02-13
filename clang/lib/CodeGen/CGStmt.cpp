@@ -157,7 +157,9 @@ void CodeGenFunction::EmitStmt(const Stmt *S, ArrayRef<const Attr *> Attrs) {
   case Stmt::DoStmtClass:      EmitDoStmt(cast<DoStmt>(*S), Attrs);       break;
   case Stmt::ForStmtClass:     EmitForStmt(cast<ForStmt>(*S), Attrs);     break;
 
-  case Stmt::ReturnStmtClass:  EmitReturnStmt(cast<ReturnStmt>(*S));      break;
+  case Stmt::ReturnStmtClass:
+    EmitReturnStmt(cast<ReturnStmt>(*S), Attrs);
+    break;
 
   case Stmt::SwitchStmtClass:  EmitSwitchStmt(cast<SwitchStmt>(*S));      break;
   case Stmt::GCCAsmStmtClass:  // Intentional fall-through.
@@ -1469,7 +1471,8 @@ static bool isSwiftAsyncCallee(const CallExpr *CE) {
 /// EmitReturnStmt - Note that due to GCC extensions, this can have an operand
 /// if the function returns void, or may be missing one if the function returns
 /// non-void.  Fun stuff :).
-void CodeGenFunction::EmitReturnStmt(const ReturnStmt &S) {
+void CodeGenFunction::EmitReturnStmt(const ReturnStmt &S,
+                                     ArrayRef<const Attr *> Attrs) {
   if (requiresReturnValueCheck()) {
     llvm::Constant *SLoc = EmitCheckSourceLocation(S.getBeginLoc());
     auto *SLocPtr =
@@ -1499,6 +1502,7 @@ void CodeGenFunction::EmitReturnStmt(const ReturnStmt &S) {
   // rules about not jumping to statements following block literals with
   // non-trivial cleanups.
   SaveRetExprRAII SaveRetExpr(RV, *this);
+  bool DidApplyNRVO = false;
 
   RunCleanupsScope cleanupScope(*this);
   if (const auto *EWC = dyn_cast_or_null<ExprWithCleanups>(RV))
@@ -1531,8 +1535,10 @@ void CodeGenFunction::EmitReturnStmt(const ReturnStmt &S) {
 
     // If there is an NRVO flag for this variable, set it to 1 into indicate
     // that the cleanup code should not destroy the variable.
-    if (llvm::Value *NRVOFlag = NRVOFlags[S.getNRVOCandidate()])
+    if (llvm::Value *NRVOFlag = NRVOFlags[S.getNRVOCandidate()]) {
       Builder.CreateFlagStore(Builder.getTrue(), NRVOFlag);
+      DidApplyNRVO = true;
+    }
   } else if (!ReturnValue.isValid() || (RV && RV->getType()->isVoidType())) {
     // Make sure not to return anything, but evaluate the expression
     // for side effects.
@@ -1569,6 +1575,16 @@ void CodeGenFunction::EmitReturnStmt(const ReturnStmt &S) {
                           AggValueSlot::IsNotAliased,
                           getOverlapForReturnValue()));
       break;
+    }
+  }
+
+  if (!DidApplyNRVO) {
+    for (const Attr *A : Attrs) {
+      if (A->getKind() == attr::MustNrvo) {
+        CGM.getDiags().Report(A->getLocation(),
+                              diag::warn_mustnrvo_failed_to_elide)
+            << A << A->getRange();
+      }
     }
   }
 
