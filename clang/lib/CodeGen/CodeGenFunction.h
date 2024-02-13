@@ -3591,7 +3591,7 @@ public:
   void EmitWhileStmt(const WhileStmt &S, ArrayRef<const Attr *> Attrs = {});
   void EmitDoStmt(const DoStmt &S, ArrayRef<const Attr *> Attrs = {});
   void EmitForStmt(const ForStmt &S, ArrayRef<const Attr *> Attrs = {});
-  void EmitReturnStmt(const ReturnStmt &S);
+  void EmitReturnStmt(const ReturnStmt &S, ArrayRef<const Attr *> Attrs = {});
   void EmitDeclStmt(const DeclStmt &S);
   void EmitBreakStmt(const BreakStmt &S);
   void EmitContinueStmt(const ContinueStmt &S);
