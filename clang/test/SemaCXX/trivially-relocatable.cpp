@@ -21,16 +21,12 @@ namespace N {
   struct [[_Clang::__trivially_relocatable__]] S3 { ~S3(); };
   struct __attribute__((trivially_relocatable)) S4 { ~S4(); };
   struct __attribute__((__trivially_relocatable__)) S5 { ~S5(); };
-  struct [[trivially_relocatable]] S6 { ~S6(); };
-  struct [[__trivially_relocatable__]] S7 { ~S7(); };
   struct Control { ~Control(); };
   static_assert(__is_trivially_relocatable(S1), "");
   static_assert(__is_trivially_relocatable(S2), "");
   static_assert(__is_trivially_relocatable(S3), "");
   static_assert(__is_trivially_relocatable(S4), "");
   static_assert(__is_trivially_relocatable(S5), "");
-  static_assert(__is_trivially_relocatable(S6), "");
-  static_assert(__is_trivially_relocatable(S7), "");
   static_assert(!__is_trivially_relocatable(Control), "");
 }
 
@@ -113,6 +109,30 @@ class [[clang::trivially_relocatable]] D8 {
 
 
 // Now test specific types for trivial relocatability.
+
+static_assert(__is_trivially_relocatable(char), "");
+static_assert(__is_trivially_relocatable(int), "");
+static_assert(__is_trivially_relocatable(int*), "");
+static_assert(__is_trivially_relocatable(int(*)()), "");
+static_assert(!__is_trivially_relocatable(int&), "");
+static_assert(!__is_trivially_relocatable(int(&)()), "");
+static_assert(!__is_trivially_relocatable(int()), "");
+static_assert(__is_trivially_relocatable(float), "");
+static_assert(__is_trivially_relocatable(double), "");
+static_assert(!__is_trivially_relocatable(void), "");
+static_assert(__is_trivially_relocatable(char[1]), "");
+static_assert(__is_trivially_relocatable(char[]), "");
+static_assert(__is_trivially_relocatable(char[2][3]), "");
+static_assert(__is_trivially_relocatable(char[][3]), "");
+static_assert(__is_trivially_relocatable(const char[2][3]), "");
+static_assert(__is_trivially_relocatable(const char[][3]), "");
+static_assert(__is_trivially_relocatable(volatile char[2][3]), "");
+static_assert(__is_trivially_relocatable(volatile char[][3]), "");
+
+static_assert(__is_trivially_relocatable(const int), "");
+static_assert(__is_trivially_relocatable(volatile int), "");
+static_assert(!__is_trivially_relocatable(const int&), "");
+static_assert(!__is_trivially_relocatable(volatile int&), "");
 
 struct C1 { int x; }; static_assert(__is_trivially_relocatable(C1), "");
 struct C2 { const int x; }; static_assert(__is_trivially_relocatable(C2), "");
@@ -512,6 +532,7 @@ struct T24d : public T24 {
 T24d::T24d(const T24d&) = default;
 static_assert(!__is_trivially_relocatable(T24d), "its redefined copy constructor is not defaulted on first declaration");
 
+// Example that regressed with a version of Mark de Wever's patch.
 // T25 is analogous to unique_ptr; T25c is analogous to __compressed_pair.
 template<class T>
 struct [[clang::trivially_relocatable]] T25 {
@@ -524,53 +545,6 @@ static_assert(__is_trivially_relocatable(T25b<int>), "all its members are trivia
 static_assert(__is_trivially_relocatable(T25c<int>), "all its bases are trivially relocatable");
 static_assert(__is_trivially_relocatable(T25b<T25<int>>), "all its members are trivially relocatable");
 static_assert(__is_trivially_relocatable(T25c<T25<int>>), "all its bases are trivially relocatable");
-
-namespace AttrFalse {
-  struct [[clang::trivially_relocatable(false)]] StillTC {
-    int i;
-  };
-  static_assert(__is_trivially_copyable(StillTC), "");
-  static_assert(__is_trivially_relocatable(StillTC), "attr(false) doesn't override triviality");
-
-  struct [[clang::trivially_relocatable(true)]] TR {
-    int i;
-    TR(TR&&);
-    TR& operator=(TR&&);
-    ~TR();
-  };
-  static_assert(__is_trivially_relocatable(TR), "");
-
-  struct [[clang::trivially_relocatable(false)]] StillTR {
-    StillTC tc;
-    TR tr;
-  };
-  static_assert(!__is_trivially_copyable(StillTR), "");
-  static_assert(__is_trivially_relocatable(StillTR), "attr(false) doesn't override triviality");
-
-  template<class T>
-  struct [[clang::trivially_relocatable(false)]] NotTR {
-    T t;
-    ~NotTR();
-  };
-  static_assert(!__is_trivially_relocatable(NotTR<int>), "");
-  static_assert(!__is_trivially_relocatable(NotTR<int[2]>), "");
-
-  static_assert(sizeof(TR) == sizeof(int), "test the test");
-  static_assert(sizeof(StillTR) != sizeof(int), "test the test");
-  static_assert(sizeof(NotTR<int>) == sizeof(int), "test the test");
-  static_assert(sizeof(NotTR<int[2]>) != sizeof(int), "test the test");
-
-  template <class T>
-  struct [[clang::trivially_relocatable(sizeof(T) == sizeof(int))]] Conditional {
-    T t;
-  };
-  static_assert(__is_trivially_relocatable(Conditional<int>), "");
-  static_assert(__is_trivially_relocatable(Conditional<int[2]>), "");
-  static_assert(__is_trivially_relocatable(Conditional<TR>), "");
-  static_assert(__is_trivially_relocatable(Conditional<StillTR>), "");
-  static_assert(__is_trivially_relocatable(Conditional<NotTR<int> >), "because NotTR<int> has the right size");
-  static_assert(!__is_trivially_relocatable(Conditional<NotTR<int[2]> >), "");
-}
 
 // Example from D1144R0
 struct string {
@@ -722,18 +696,18 @@ struct [[clang::trivially_relocatable]] NL2 {
 // expected-warning@-1{{struct 'NL2' is marked 'trivially_relocatable', but it is not move-constructible}}
     NL2& operator=(NL2&&);
 };
-static_assert(__is_trivially_relocatable(NL2), "not movable, still trivial");
+static_assert(__is_trivially_relocatable(NL2), "warning doesn't remove the attribute");
 
 union [[clang::trivially_relocatable]] NL3 {
 // expected-warning@-1{{union 'NL3' is marked 'trivially_relocatable', but it is not destructible}}
-    struct String { String(String&&); ~String(); };
+    struct [[clang::trivially_relocatable]] String { String(String&&); ~String(); };
     int i;
     String s;
 };
-static_assert(__is_trivially_relocatable(NL3), "not destructible, still trivial");
+static_assert(__is_trivially_relocatable(NL3), "warning doesn't remove the attribute");
 
 union [[clang::trivially_relocatable]] NL4 {
-    struct String { String(String&&); ~String(); };
+    struct [[clang::trivially_relocatable]] String { String(String&&); ~String(); };
     int i;
     String s;
     NL4(const NL4&);
@@ -755,3 +729,17 @@ struct NL5b {
 };
 static_assert(__is_trivially_relocatable(NL5<NL5a>), "not movable, still trivial");
 static_assert(__is_trivially_relocatable(NL5<NL5b>), "");
+
+struct NL6 {
+    NL6(volatile NL6&) = delete;
+    NL6(const NL6&) = default;
+};
+static_assert(__is_trivially_constructible(NL6, NL6&&), "");
+static_assert(__is_trivially_destructible(NL6), "");
+static_assert(__is_trivially_relocatable(NL6), "it is trivially move-constructible and trivially destructible");
+
+struct CantPassInRegisters {
+  CantPassInRegisters(const CantPassInRegisters&) = delete;
+};
+static_assert(__is_trivially_copyable(CantPassInRegisters), "");
+static_assert(__is_trivially_relocatable(CantPassInRegisters), "despite not being move-constructible");
