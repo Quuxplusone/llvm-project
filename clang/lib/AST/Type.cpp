@@ -2739,7 +2739,6 @@ bool QualType::isTriviallyCopyConstructibleType(
 
 bool QualType::isTriviallyRelocatableType(const ASTContext &Context) const {
   QualType BaseElementType = Context.getBaseElementType(*this);
-
   if (BaseElementType->isIncompleteType()) {
     return false;
   } else if (!BaseElementType->isObjectType()) {

@@ -3258,10 +3258,18 @@ def ObjCRequiresPropertyDefs : InheritableAttr {
 }
 
 def TriviallyRelocatable : InheritableAttr {
-  let Spellings = [Clang<"trivially_relocatable", 0>];
+  let Spellings = [CXX11<"", "trivially_relocatable", 202401>,
+                   Clang<"trivially_relocatable", 0>];
   let Subjects = SubjectList<[CXXRecord]>;
   let Args = [ExprArgument<"Cond", 1>];
   let Documentation = [TriviallyRelocatableDocs];
+  let LangOpts = [CPlusPlus];
+}
+
+def MaybeTriviallyRelocatable : InheritableAttr {
+  let Spellings = [Clang<"maybe_trivially_relocatable", 0>];
+  let Subjects = SubjectList<[CXXRecord]>;
+  let Documentation = [MaybeTriviallyRelocatableDocs];
   let LangOpts = [CPlusPlus];
 }
 

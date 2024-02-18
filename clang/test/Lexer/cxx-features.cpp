@@ -38,6 +38,10 @@
 #error "wrong value for __cpp_deleted_function"
 #endif
 
+#if check(impl_trivially_relocatable, 202401, 202401, 202401, 202401, 202401, 202401, 202401)
+#error "wrong value for __cpp_impl_trivially_relocatable"
+#endif
+
 #if check(placeholder_variables, 202306, 202306, 202306, 202306, 202306, 202306, 202306)
 #error "wrong value for __cpp_placeholder_variables"
 #endif

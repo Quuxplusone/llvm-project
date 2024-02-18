@@ -109,6 +109,7 @@ template struct CopyConstructorCheck<1>;
 // CHECK-NEXT:          "isEmpty": true,
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 
 template struct CopyConstructorCheck<2>;
@@ -128,6 +129,7 @@ template struct CopyConstructorCheck<2>;
 // CHECK-NEXT:          "isEmpty": true,
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 
 template struct CopyConstructorCheck<3>;
@@ -168,6 +170,7 @@ template struct MoveConstructorCheck<1>;
 // CHECK-NEXT:          "isEmpty": true,
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 // CHECK-NEXT:          "moveCtor": {
 // CHECK-NEXT:            "exists": true,
@@ -185,6 +188,7 @@ template struct MoveConstructorCheck<2>;
 // CHECK-NEXT:          "isEmpty": true,
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {},
 // CHECK-NEXT:          "moveCtor": {
 // CHECK-NEXT:            "exists": true,
@@ -301,6 +305,7 @@ template struct MoveAssignmentCheck<1>;
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTrivial": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {
 // CHECK-NEXT:            "exists": true,
 // CHECK-NEXT:            "trivial": true,
@@ -321,6 +326,7 @@ template struct MoveAssignmentCheck<2>;
 // CHECK-NEXT:          "isStandardLayout": true,
 // CHECK-NEXT:          "isTrivial": true,
 // CHECK-NEXT:          "isTriviallyCopyable": true,
+// CHECK-NEXT:          "isTriviallyRelocatable": true,
 // CHECK-NEXT:          "moveAssign": {
 // CHECK-NEXT:            "exists": true,
 // CHECK-NEXT:            "trivial": true,
