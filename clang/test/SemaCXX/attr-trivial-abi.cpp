@@ -5,7 +5,15 @@ void __attribute__((trivial_abi)) foo(); // expected-warning {{'trivial_abi' att
 // Should not crash.
 template <class>
 class __attribute__((trivial_abi)) a { a(a &&); };
+#if defined(_WIN64) && !defined(__MINGW32__)
+// On Windows/MSVC, to be trivial-for-calls, an object must be trivially copyable.
+// (And it is only trivially relocatable, currently, if it is trivial for calls.)
+// In this case, it is suppressed by an explicitly defined move constructor.
+// Similar concerns apply to later tests that have #if defined(_WIN64) && !defined(__MINGW32__)
+static_assert(!__is_trivially_relocatable(a<int>), "");
+#else
 static_assert(__is_trivially_relocatable(a<int>), "");
+#endif
 
 struct [[clang::trivial_abi]] S0 {
   int a;
@@ -114,7 +122,11 @@ struct __attribute__((trivial_abi)) CopyDeleted {
   CopyDeleted(const CopyDeleted &) = delete;
   CopyDeleted(CopyDeleted &&) = default;
 };
+#if defined(_WIN64) && !defined(__MINGW32__)
+static_assert(!__is_trivially_relocatable(CopyDeleted), "");
+#else
 static_assert(__is_trivially_relocatable(CopyDeleted), "");
+#endif
 
 struct __attribute__((trivial_abi)) MoveDeleted {
   MoveDeleted(const MoveDeleted &) = default;
@@ -132,5 +144,9 @@ static_assert(__is_trivially_relocatable(S19), "");
 struct __attribute__((trivial_abi)) S20 {
   int &&a; // a member of rvalue reference type deletes the copy constructor.
 };
+#if defined(_WIN64) && !defined(__MINGW32__)
+static_assert(!__is_trivially_relocatable(S20), "");
+#else
 static_assert(__is_trivially_relocatable(S20), "");
+#endif
 } // namespace deletedCopyMoveConstructor
