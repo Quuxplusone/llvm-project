@@ -499,6 +499,7 @@ namespace test7 {
 // JSON-NEXT:       "hasUserDeclaredConstructor": true,
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
@@ -831,6 +832,7 @@ namespace test7 {
 // JSON-NEXT:       "hasUserDeclaredConstructor": true,
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
@@ -1466,6 +1468,7 @@ namespace test7 {
 // JSON-NEXT:       "hasUserDeclaredConstructor": true,
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
@@ -3074,6 +3077,7 @@ namespace test7 {
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTrivial": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
@@ -3224,6 +3228,7 @@ namespace test7 {
 // JSON-NEXT:           "isStandardLayout": true,
 // JSON-NEXT:           "isTrivial": true,
 // JSON-NEXT:           "isTriviallyCopyable": true,
+// JSON-NEXT:           "isTriviallyRelocatable": true,
 // JSON-NEXT:           "moveAssign": {
 // JSON-NEXT:            "exists": true,
 // JSON-NEXT:            "needsImplicit": true,
@@ -3866,6 +3871,7 @@ namespace test7 {
 // JSON-NEXT:         "isStandardLayout": true,
 // JSON-NEXT:         "isTrivial": true,
 // JSON-NEXT:         "isTriviallyCopyable": true,
+// JSON-NEXT:         "isTriviallyRelocatable": true,
 // JSON-NEXT:         "moveAssign": {
 // JSON-NEXT:          "exists": true,
 // JSON-NEXT:          "needsImplicit": true,
@@ -4396,6 +4402,7 @@ namespace test7 {
 // JSON-NEXT:         "isStandardLayout": true,
 // JSON-NEXT:         "isTrivial": true,
 // JSON-NEXT:         "isTriviallyCopyable": true,
+// JSON-NEXT:         "isTriviallyRelocatable": true,
 // JSON-NEXT:         "moveAssign": {
 // JSON-NEXT:          "exists": true,
 // JSON-NEXT:          "needsImplicit": true,
@@ -4528,6 +4535,7 @@ namespace test7 {
 // JSON-NEXT:         "isStandardLayout": true,
 // JSON-NEXT:         "isTrivial": true,
 // JSON-NEXT:         "isTriviallyCopyable": true,
+// JSON-NEXT:         "isTriviallyRelocatable": true,
 // JSON-NEXT:         "moveAssign": {
 // JSON-NEXT:          "exists": true,
 // JSON-NEXT:          "needsImplicit": true,
@@ -4799,6 +4807,7 @@ namespace test7 {
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTrivial": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
@@ -5853,6 +5862,7 @@ namespace test7 {
 // JSON-NEXT:         "isStandardLayout": true,
 // JSON-NEXT:         "isTrivial": true,
 // JSON-NEXT:         "isTriviallyCopyable": true,
+// JSON-NEXT:         "isTriviallyRelocatable": true,
 // JSON-NEXT:         "moveAssign": {
 // JSON-NEXT:          "exists": true,
 // JSON-NEXT:          "needsImplicit": true,
@@ -6008,6 +6018,7 @@ namespace test7 {
 // JSON-NEXT:         "isStandardLayout": true,
 // JSON-NEXT:         "isTrivial": true,
 // JSON-NEXT:         "isTriviallyCopyable": true,
+// JSON-NEXT:         "isTriviallyRelocatable": true,
 // JSON-NEXT:         "moveAssign": {
 // JSON-NEXT:          "exists": true,
 // JSON-NEXT:          "needsImplicit": true,
@@ -6113,6 +6124,7 @@ namespace test7 {
 // JSON-NEXT:       "isStandardLayout": true,
 // JSON-NEXT:       "isTrivial": true,
 // JSON-NEXT:       "isTriviallyCopyable": true,
+// JSON-NEXT:       "isTriviallyRelocatable": true,
 // JSON-NEXT:       "moveAssign": {
 // JSON-NEXT:        "exists": true,
 // JSON-NEXT:        "needsImplicit": true,
