@@ -1,3 +1,5 @@
+// RUN: %clang_cc1 -std=gnu++03 -fsyntax-only -fms-compatibility -verify %s -Wno-c++11-extensions -Wno-c++17-extensions
+// RUN: %clang_cc1 -std=gnu++11 -fsyntax-only -fms-compatibility -verify %s -Wno-c++17-extensions
 // RUN: %clang_cc1 -std=gnu++17 -fsyntax-only -fms-compatibility -verify %s
 
 void f() {
@@ -55,5 +57,5 @@ void tu() {
 [[__gnu__::__const__]] int f3() { return 12; }
 [[using __gnu__ : __const__]] int f4() { return 12; }
 
-static_assert(__has_cpp_attribute(gnu::__const__));
-static_assert(__has_cpp_attribute(__gnu__::__const__));
+_Static_assert(__has_cpp_attribute(gnu::__const__), "");
+_Static_assert(__has_cpp_attribute(__gnu__::__const__), "");

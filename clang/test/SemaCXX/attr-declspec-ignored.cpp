@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 %s -verify -fsyntax-only
+// RUN: %clang_cc1 -std=c++03 %s -verify -fsyntax-only -Wno-c++11-extensions
+// RUN: %clang_cc1 -std=c++17 %s -verify -fsyntax-only
 
 namespace test1 {
   __attribute__((visibility("hidden")))  __attribute__((aligned)) class A; // expected-warning{{attribute 'visibility' is ignored, place it after "class" to apply attribute to type declaration}} \
