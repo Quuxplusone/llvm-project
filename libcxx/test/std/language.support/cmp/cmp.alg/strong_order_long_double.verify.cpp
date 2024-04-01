@@ -10,7 +10,7 @@
 
 // The following platforms have sizeof(long double) == sizeof(double), so this test doesn't apply to them.
 // This test does apply to aarch64 where Arm's AAPCS64 is followed. There they are different sizes.
-// XFAIL: target={{arm64|arm64e|armv(7|8)(l|m)?|powerpc|powerpc64}}-{{.+}}
+// XFAIL: target={{arm64|arm64e|armv(7|8)(l|m)?|powerpc|powerpc64}}-{{.+}} && !(target=arm64-apple-darwin{{.+}})
 
 // MSVC configurations have long double equal to regular double on all
 // architectures.
