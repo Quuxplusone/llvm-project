@@ -105,6 +105,49 @@ static_assert(!__is_trivially_relocatable(Mut<NonTrivialMoveAssign>));
 static_assert(!__is_trivially_relocatable(Non<NonTrivialMoveAssign>));
 #endif
 
+struct ImplicitlyDeletedAssign {
+  int& r;
+};
+static_assert(__is_trivially_relocatable(ImplicitlyDeletedAssign));
+static_assert(__is_trivially_relocatable(Agg<ImplicitlyDeletedAssign>));
+static_assert(__is_trivially_relocatable(Der<ImplicitlyDeletedAssign>));
+static_assert(__is_trivially_relocatable(Mut<ImplicitlyDeletedAssign>));
+static_assert(__is_trivially_relocatable(Non<ImplicitlyDeletedAssign>));
+
+#if __cplusplus >= 201103L
+struct DeletedCopyAssign {
+  DeletedCopyAssign(const DeletedCopyAssign&) = default;
+  DeletedCopyAssign& operator=(const DeletedCopyAssign&) = delete;
+  ~DeletedCopyAssign() = default;
+};
+static_assert(__is_trivially_relocatable(DeletedCopyAssign));
+static_assert(__is_trivially_relocatable(Agg<DeletedCopyAssign>));
+static_assert(__is_trivially_relocatable(Der<DeletedCopyAssign>));
+static_assert(__is_trivially_relocatable(Mut<DeletedCopyAssign>));
+static_assert(__is_trivially_relocatable(Non<DeletedCopyAssign>));
+
+struct DeletedMoveAssign {
+  DeletedMoveAssign(DeletedMoveAssign&&) = default;
+  DeletedMoveAssign& operator=(DeletedMoveAssign&&) = delete;
+  ~DeletedMoveAssign() = default;
+};
+static_assert(__is_trivially_relocatable(DeletedMoveAssign));
+static_assert(__is_trivially_relocatable(Agg<DeletedMoveAssign>));
+static_assert(__is_trivially_relocatable(Der<DeletedMoveAssign>));
+static_assert(__is_trivially_relocatable(Mut<DeletedMoveAssign>));
+static_assert(__is_trivially_relocatable(Non<DeletedMoveAssign>));
+
+struct DeletedDestructor {
+  DeletedDestructor();
+  ~DeletedDestructor() = delete;
+};
+static_assert(__is_trivially_relocatable(DeletedDestructor));
+static_assert(__is_trivially_relocatable(Agg<DeletedDestructor>));
+static_assert(__is_trivially_relocatable(Der<DeletedDestructor>));
+static_assert(__is_trivially_relocatable(Mut<DeletedDestructor>));
+static_assert(__is_trivially_relocatable(Non<DeletedDestructor>));
+#endif
+
 #if __cplusplus >= 202002L
 template<bool B>
 struct EligibleNonTrivialDefaultCtor {
