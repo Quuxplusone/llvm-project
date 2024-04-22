@@ -100,6 +100,8 @@
 // and WCHAR_MAX. This ABI setting determines whether we should instead track whether the fill
 // value has been initialized using a separate boolean, which changes the ABI.
 #  define _LIBCPP_ABI_IOS_ALLOW_ARBITRARY_FILL_VALUE
+// Make a std::pair of trivially copyable types trivially copyable
+#  define _LIBCPP_ABI_TRIVIALLY_COPYABLE_PAIR
 #elif _LIBCPP_ABI_VERSION == 1
 #  if !(defined(_LIBCPP_OBJECT_FORMAT_COFF) || defined(_LIBCPP_OBJECT_FORMAT_XCOFF))
 // Enable compiling copies of now inline methods into the dylib to support
