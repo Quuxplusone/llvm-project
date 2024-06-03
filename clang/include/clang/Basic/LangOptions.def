@@ -274,6 +274,7 @@ LANGOPT(NewAlignOverride  , 32, 0, NotCompatible, "maximum alignment guaranteed 
 LANGOPT(ModulesCodegen , 1, 0, Benign, "Modules code generation")
 LANGOPT(ModulesDebugInfo , 1, 0, Benign, "Modules debug info")
 LANGOPT(ElideConstructors , 1, 1, Benign, "C++ copy constructor elision")
+LANGOPT(P3279TriviallyFooable , 1, 0, NotCompatible, "P3279 trivially fooable semantics")
 LANGOPT(DumpRecordLayouts , 1, 0, Benign, "dumping the layout of IRgen'd records")
 LANGOPT(DumpRecordLayoutsSimple , 1, 0, Benign, "dumping the layout of IRgen'd records in a simple form")
 LANGOPT(DumpRecordLayoutsCanonical , 1, 0, Benign, "dumping the AST layout of records using canonical field types")
