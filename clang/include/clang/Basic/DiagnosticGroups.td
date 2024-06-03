@@ -255,6 +255,7 @@ def DeprecatedThisCapture : DiagGroup<"deprecated-this-capture">;
 def DeprecatedVolatile : DiagGroup<"deprecated-volatile">;
 def DeprecatedWritableStr : DiagGroup<"deprecated-writable-strings",
                                       [CXX11CompatDeprecatedWritableStr]>;
+def DeprecatedP3279 : DiagGroup<"deprecated-p3279">;
 def DeprecatedPragma : DiagGroup<"deprecated-pragma">;
 def DeprecatedType : DiagGroup<"deprecated-type">;
 def DeprecatedMissingCommaVariadicParam : DiagGroup<"deprecated-missing-comma-variadic-parameter">;
@@ -274,6 +275,7 @@ def Deprecated : DiagGroup<"deprecated", [DeprecatedAnonEnumEnumConversion,
                                           DeprecatedBuiltins,
                                           DeprecatedIncrementBool,
                                           DeprecatedLiteralOperator,
+                                          DeprecatedP3279,
                                           DeprecatedPragma,
                                           DeprecatedRegister,
                                           DeprecatedOFast,
