@@ -674,6 +674,9 @@ def warn_deprecated_copy_with_user_provided_dtor : Warning<
 def warn_cxx17_compat_exception_spec_in_signature : Warning<
   "mangled name of %0 will change in C++17 due to non-throwing exception "
   "specification in function signature">, InGroup<CXX17CompatMangling>;
+def warn_deprecated_multi_argument_trivially_constructible : Warning<
+  "P3279 deprecates the use of 'is_trivially_constructible' with more than one argument">,
+  InGroup<DeprecatedP3279>, DefaultIgnore;
 
 def warn_global_constructor : Warning<
   "declaration requires a global constructor">,

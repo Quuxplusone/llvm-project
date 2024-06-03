@@ -5712,6 +5712,119 @@ static ExprResult CheckConvertibilityForTypeTraits(
   return Result;
 }
 
+static bool IsP3279TriviallyConstructibleFrom(Sema &S,
+                                              SourceLocation KWLoc,
+                                              ArrayRef<TypeSourceInfo *> Args,
+                                              SourceLocation RParenLoc)
+{
+  assert(Args.size() == 2);
+  QualType TheType = Args[0]->getType().getNonReferenceType();
+
+  llvm::BumpPtrAllocator OpaqueExprAllocator;
+  SmallVector<Expr *, 2> ArgExprs;
+  ArgExprs.reserve(Args.size() - 1);
+  for (unsigned I = 1, N = Args.size(); I != N; ++I) {
+    QualType ArgTy = Args[I]->getType();
+    if (ArgTy->isObjectType() || ArgTy->isFunctionType())
+      ArgTy = S.Context.getRValueReferenceType(ArgTy);
+    ArgExprs.push_back(
+        new (OpaqueExprAllocator.Allocate<OpaqueValueExpr>())
+            OpaqueValueExpr(Args[I]->getTypeLoc().getBeginLoc(),
+                            ArgTy.getNonLValueExprType(S.Context),
+                            Expr::getValueKindForType(ArgTy)));
+  }
+
+  // Perform the initialization in an unevaluated context within a SFINAE
+  // trap at translation unit scope.
+  EnterExpressionEvaluationContext Unevaluated(
+      S, Sema::ExpressionEvaluationContext::Unevaluated);
+  Sema::SFINAETrap SFINAE(S, /*AccessCheckingSFINAE=*/true);
+  Sema::ContextRAII TUContext(S, S.Context.getTranslationUnitDecl());
+  InitializedEntity To(
+      InitializedEntity::InitializeTemporary(S.Context, Args[0]));
+  InitializationKind InitKind(
+      InitializationKind::CreateDirect(KWLoc, KWLoc, RParenLoc));
+  InitializationSequence Init(S, To, InitKind, ArgExprs);
+  if (Init.Failed())
+    return false;
+
+  ExprResult Result = Init.Perform(S, To, InitKind, ArgExprs);
+  if (Result.isInvalid() || SFINAE.hasErrorOccurred())
+    return false;
+
+  // Under Objective-C ARC and Weak, if the destination has non-trivial
+  // Objective-C lifetime, this is a non-trivial construction.
+  if (TheType.hasNonTrivialObjCLifetime())
+    return false;
+
+  // For now, don't advertise even `__is_trivially_constructible(int, unsigned)`.
+  if (!S.Context.hasSameType(Args[1]->getType().getNonReferenceType(), TheType))
+    return false;
+
+  if (const auto *CE = dyn_cast<CXXConstructExpr>(Result.get())) {
+    if (const CXXConstructorDecl *Callee = CE->getConstructor()) {
+      // A constructor can be trivial only if it is defaulted; make sure it's a move or copy constructor
+      // of this type itself.
+      return (Callee->isTrivial() && !S.Context.hasSameType(Callee->getParamDecl(0)->getType().getNonReferenceType(), TheType));
+    }
+    // Is this possible? I don't think so.
+    assert(false);
+    return false;
+  }
+
+  // It must be a primitive type or a reference, right?
+  return true;
+}
+
+static bool IsP3279TriviallyAssignableFrom(Sema &Self, SourceLocation KeyLoc, QualType LhsT, QualType RhsT)
+{
+    // Build expressions that emulate the effect of declval<T>() and
+    // declval<U>().
+    if (LhsT->isObjectType() || LhsT->isFunctionType())
+      LhsT = Self.Context.getRValueReferenceType(LhsT);
+    if (RhsT->isObjectType() || RhsT->isFunctionType())
+      RhsT = Self.Context.getRValueReferenceType(RhsT);
+    OpaqueValueExpr Lhs(KeyLoc, LhsT.getNonLValueExprType(Self.Context),
+                        Expr::getValueKindForType(LhsT));
+    OpaqueValueExpr Rhs(KeyLoc, RhsT.getNonLValueExprType(Self.Context),
+                        Expr::getValueKindForType(RhsT));
+
+    // Attempt the assignment in an unevaluated context within a SFINAE
+    // trap at translation unit scope.
+    EnterExpressionEvaluationContext Unevaluated(
+        Self, Sema::ExpressionEvaluationContext::Unevaluated);
+    Sema::SFINAETrap SFINAE(Self, /*AccessCheckingSFINAE=*/true);
+    Sema::ContextRAII TUContext(Self, Self.Context.getTranslationUnitDecl());
+    ExprResult Result = Self.BuildBinOp(/*S=*/nullptr, KeyLoc, BO_Assign, &Lhs,
+                                        &Rhs);
+    if (Result.isInvalid())
+      return false;
+
+    // Treat the assignment as unused for the purpose of -Wdeprecated-volatile.
+    Self.CheckUnusedVolatileAssignment(Result.get());
+
+    if (SFINAE.hasErrorOccurred())
+      return false;
+
+    // Under Objective-C ARC and Weak, if the destination has non-trivial
+    // Objective-C lifetime, this is a non-trivial assignment.
+    if (LhsT.getNonReferenceType().hasNonTrivialObjCLifetime())
+      return false;
+
+    QualType TheType = LhsT.getNonReferenceType();
+    if (!Self.Context.hasSameType(TheType, RhsT.getNonReferenceType()))
+      return false;
+    if (const auto *CE = dyn_cast<CXXOperatorCallExpr>(Result.get())) {
+      if (const FunctionDecl *Callee = CE->getDirectCallee()) {
+        return (Callee->isTrivial() && Self.Context.hasSameType(Callee->getParamDecl(0)->getType().getNonReferenceType(), TheType));
+      }
+    } else {
+      // It must be a primitive type, right?
+      return true;
+    }
+    return false;
+}
+
 static bool EvaluateBooleanTypeTrait(Sema &S, TypeTrait Kind,
                                      SourceLocation KWLoc,
                                      ArrayRef<TypeSourceInfo *> Args,
@@ -5775,6 +5888,18 @@ static bool EvaluateBooleanTypeTrait(Sema &S, TypeTrait Kind,
     CXXRecordDecl *RD = T->getAsCXXRecordDecl();
     if (RD && RD->isAbstract())
       return false;
+
+    if (S.getLangOpts().P3279TriviallyFooable) {
+      if (Args.size() == 1) {
+        // Trivially Default Constructible: the status quo seems okay for this
+      } else if (Args.size() == 2) {
+        // Trivially Move/Copy Constructible
+        return IsP3279TriviallyConstructibleFrom(S, KWLoc, Args, RParenLoc);
+      } else {
+        S.Diag(KWLoc, diag::warn_deprecated_multi_argument_trivially_constructible);
+        return false;
+      }
+    }
 
     llvm::BumpPtrAllocator OpaqueExprAllocator;
     SmallVector<Expr *, 2> ArgExprs;
@@ -6109,6 +6234,10 @@ static bool EvaluateBinaryTypeTrait(Sema &Self, TypeTrait BTT, const TypeSourceI
     // cv void is never assignable.
     if (LhsT->isVoidType() || RhsT->isVoidType())
       return false;
+
+    if (BTT == BTT_IsTriviallyAssignable && Self.getLangOpts().P3279TriviallyFooable) {
+      return IsP3279TriviallyAssignableFrom(Self, KeyLoc, LhsT, RhsT);
+    }
 
     // Build expressions that emulate the effect of declval<T>() and
     // declval<U>().

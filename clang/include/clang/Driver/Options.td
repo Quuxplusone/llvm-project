@@ -2136,6 +2136,12 @@ defm elide_constructors : BoolFOption<"elide-constructors",
   NegFlag<SetFalse, [], [ClangOption, CC1Option],
           "Disable C++ copy constructor elision">,
   PosFlag<SetTrue>>;
+defm p3279_trivially_fooable : BoolFOption<"p3279-trivially-fooable",
+  LangOpts<"P3279TriviallyFooable">, DefaultFalse,
+  NegFlag<SetFalse, [], [ClangOption, CC1Option],
+          "'Trivially fooable' has the Standard C++ semantics">,
+  PosFlag<SetTrue, [], [ClangOption, CC1Option],
+          "'Trivially fooable' means precisely 'tantamount to memfoo'">>;
 def fno_elide_type : Flag<["-"], "fno-elide-type">, Group<f_Group>,
     Visibility<[ClangOption, CC1Option]>,
     HelpText<"Do not elide types when printing diagnostics">,
