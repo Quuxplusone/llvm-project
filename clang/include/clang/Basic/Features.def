@@ -373,6 +373,7 @@ EXTENSION(gnu_asm_constexpr_strings, LangOpts.GNUAsm && LangOpts.CPlusPlus11)
 EXTENSION(matrix_types, LangOpts.MatrixTypes)
 EXTENSION(matrix_types_scalar_division, true)
 EXTENSION(cxx_attributes_on_using_declarations, LangOpts.CPlusPlus11)
+EXTENSION(trivially_relocatable, LangOpts.CPlusPlus)
 EXTENSION(datasizeof, LangOpts.CPlusPlus)
 
 FEATURE(cxx_abi_relative_vtable, LangOpts.CPlusPlus && LangOpts.RelativeCXXABIVTables)
