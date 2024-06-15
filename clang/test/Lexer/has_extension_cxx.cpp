@@ -73,6 +73,11 @@ int has_local_type_template_args();
 int has_binary_literals();
 #endif
 
+// CHECK: has_trivially_relocatable
+#if __has_extension(trivially_relocatable)
+int has_trivially_relocatable();
+#endif
+
 // CHECK: has_variable_templates
 #if __has_extension(cxx_variable_templates)
 int has_variable_templates();
@@ -83,7 +88,6 @@ int has_variable_templates();
 #if __has_extension(cxx_init_captures)
 int has_init_captures();
 #endif
-
 
 // CHECK11-NOT: has_generalized_nttp
 // CHECK20: has_generalized_nttp
