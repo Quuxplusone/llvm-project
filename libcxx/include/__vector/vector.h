@@ -41,6 +41,7 @@
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
 #include <__memory/uninitialized_relocate.h>
+#include <__memory_resource/polymorphic_allocator.h>
 #include <__ranges/access.h>
 #include <__ranges/concepts.h>
 #include <__ranges/container_compatible_range.h>
@@ -53,6 +54,7 @@
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_pmr_relocatable_container.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/type_identity.h>
@@ -82,9 +84,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template<class _Tp, class _Allocator>
 struct __vector_relocate_elements_via_memcpy : integral_constant<bool,
-  __libcpp_is_trivially_relocatable<_Tp>::value &&
-  __allocator_has_trivial_move_construct<_Allocator, _Tp>::value &&
-  __allocator_has_trivial_destroy<_Allocator, _Tp>::value
+  (__libcpp_is_trivially_relocatable<_Tp>::value && __allocator_has_trivial_move_construct<_Allocator, _Tp>::value && __allocator_has_trivial_destroy<_Allocator, _Tp>::value) ||
+  (__is_pmr_relocatable_container<_Tp>::value && __is_pmr_allocator<_Allocator>::value)
 > {};
 
 template <class _Allocator>
@@ -1187,7 +1188,7 @@ vector<_Tp, _Allocator>::erase(const_iterator __position) {
   pointer __p          = this->__begin_ + __ps;
   if (__vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
     __alloc_traits::destroy(__alloc_, std::__to_address(__p));
-    std::uninitialized_relocate(__p + 1, this->__end_, __p);
+    ::__builtin_memmove((void*)std::__to_address(__p), (void*)std::__to_address(__p + 1), (this->__end_ - (__p + 1)) * sizeof(_Tp));
     this->__destruct_at_end(this->__end_ - 1, true_type()); // destroy_via_noop
   } else {
     this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
@@ -1206,7 +1207,7 @@ vector<_Tp, _Allocator>::erase(const_iterator __first, const_iterator __last) {
       for (pointer __q = __p; __q != __endp; ++__q) {
         __alloc_traits::destroy(__alloc_, std::__to_address(__q));
       }
-      std::uninitialized_relocate(__endp, this->__end_, __p);
+      ::__builtin_memmove((void*)std::__to_address(__p), (void*)std::__to_address(__endp), (this->__end_ - __endp) * sizeof(_Tp));
       this->__destruct_at_end(this->__end_ - (__last - __first), true_type()); // destroy_via_noop
     } else {
       this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
@@ -1236,7 +1237,7 @@ _LIBCPP_CONSTEXPR_SINCE_CXX20 void
 vector<_Tp, _Allocator>::__relocate_upward_and_insert_single(pointer __from_s, pointer __from_e, _Up&& __elt)
 {
   if (!__libcpp_is_constant_evaluated() && __vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value) {
-    ::__builtin_memmove(std::__to_address(__from_s + 1), std::__to_address(__from_s), (__from_e - __from_s) * sizeof(_Tp));
+    ::__builtin_memmove((void*)std::__to_address(__from_s + 1), (void*)std::__to_address(__from_s), (__from_e - __from_s) * sizeof(_Tp));
 #if _LIBCPP_HAS_EXCEPTIONS
     try {
 #endif // _LIBCPP_HAS_EXCEPTIONS
@@ -1247,7 +1248,7 @@ vector<_Tp, _Allocator>::__relocate_upward_and_insert_single(pointer __from_s, p
     } catch (...) {
       // We've opened a "window" of unconstructed elements; if construction throws,
       // then we must close that window again.
-      ::__builtin_memmove(std::__to_address(__from_s), std::__to_address(__from_s + 1), (__from_e - __from_s) * sizeof(_Tp));
+      ::__builtin_memmove((void*)std::__to_address(__from_s), (void*)std::__to_address(__from_s + 1), (__from_e - __from_s) * sizeof(_Tp));
       throw;
     }
 #endif // _LIBCPP_HAS_EXCEPTIONS
@@ -1272,7 +1273,7 @@ vector<_Tp, _Allocator>::__relocate_upward_and_insert_range(pointer __from_s, po
     auto *__window_sill = std::__to_address(__from_s);
     size_type __window_bottom = std::min(__from_n, __upward);
     size_type __window_height = (__from_n + __upward) - __window_bottom;
-    ::__builtin_memmove(__window_sill + __upward, __window_sill, __from_n * sizeof(_Tp));
+    ::__builtin_memmove((void*)(__window_sill + __upward), (void*)__window_sill, __from_n * sizeof(_Tp));
     size_type __i = 0;
 #if _LIBCPP_HAS_EXCEPTIONS
     try {
@@ -1288,7 +1289,7 @@ vector<_Tp, _Allocator>::__relocate_upward_and_insert_range(pointer __from_s, po
 #if _LIBCPP_HAS_EXCEPTIONS
     } catch (...) {
       // Lower the window back down to the last successfully constructed element.
-      ::__builtin_memmove(__window_sill + __i, __window_sill + __window_bottom, __window_height * sizeof(_Tp));
+      ::__builtin_memmove((void*)(__window_sill + __i), (void*)(__window_sill + __window_bottom), __window_height * sizeof(_Tp));
       throw;
     }
 #endif // _LIBCPP_HAS_EXCEPTIONS
