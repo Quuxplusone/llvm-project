@@ -25,10 +25,12 @@
 #include <__memory/pointer_traits.h>
 #include <__type_traits/enable_if.h>
 #include <__type_traits/is_constant_evaluated.h>
+#include <__type_traits/is_pmr_relocatable_container.h>
 #include <__type_traits/is_reference.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_trivially_assignable.h>
 #include <__type_traits/is_trivially_constructible.h>
+#include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/remove_const.h>
 #include <__utility/exception_guard.h>
@@ -386,11 +388,20 @@ inline const bool __allocator_has_trivial_destroy_v = !__has_destroy_v<_Alloc, _
 template <class _Tp, class _Up>
 inline const bool __allocator_has_trivial_destroy_v<allocator<_Tp>, _Up> = true;
 
+template<class _Alloc, class _Tp>
+inline const bool __uninitialized_allocator_relocate_via_memcpy_v =
+  (__libcpp_is_trivially_relocatable<_Tp>::value && __allocator_has_trivial_move_construct_v<_Alloc, _Tp> && __allocator_has_trivial_destroy_v<_Alloc, _Tp>) ||
+  (is_trivially_move_constructible<_Tp>::value && is_trivially_destructible<_Tp>::value && __allocator_has_trivial_move_construct_v<_Alloc, _Tp> && __allocator_has_trivial_destroy_v<_Alloc, _Tp>) ||
+  (__is_pmr_relocatable_container<_Tp>::value && __allocator_has_trivial_move_construct_v<_Alloc, _Tp> && __allocator_has_trivial_destroy_v<_Alloc, _Tp>) ||
+  (__is_pmr_relocatable_container<_Tp>::value && __is_pmr_allocator<_Alloc>::value);
+
 // __uninitialized_allocator_relocate relocates the objects in [__first, __last) into __result.
 // Relocation means that the objects in [__first, __last) are placed into __result as-if by move-construct and destroy,
 // except that the move constructor and destructor may never be called if they are known to be equivalent to a memcpy.
 //
 // Preconditions:  __result doesn't contain any objects and [__first, __last) contains objects
+//                 All objects in [__first, __last) have the same allocator
+//                 ...which is the same as __alloc, too, if __alloc is a PMR allocator
 // Postconditions: __result contains the objects from [__first, __last) and
 //                 [__first, __last) doesn't contain any objects
 //
@@ -405,9 +416,8 @@ _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 void __uninitialized_allocat
   using _ValueType = typename iterator_traits<_ContiguousIterator>::value_type;
   static_assert(
       __is_cpp17_move_insertable_v<_Alloc>, "The specified type does not meet the requirements of Cpp17MoveInsertable");
-  if (__libcpp_is_constant_evaluated() || !__is_trivially_relocatable_v<_ValueType> ||
-      !__allocator_has_trivial_move_construct_v<_Alloc, _ValueType> ||
-      !__allocator_has_trivial_destroy_v<_Alloc, _ValueType>) {
+  if (__libcpp_is_constant_evaluated() ||
+      !__uninitialized_allocator_relocate_via_memcpy_v<_Alloc, _ValueType>) {
     auto __destruct_first = __result;
     auto __guard          = std::__make_exception_guard(
         _AllocatorDestroyRangeReverse<_Alloc, _ContiguousIterator>(__alloc, __destruct_first, __result));

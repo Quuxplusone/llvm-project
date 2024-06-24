@@ -6,32 +6,24 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef _LIBCPP___VECTOR_PMR_H
-#define _LIBCPP___VECTOR_PMR_H
+#ifndef _LIBCPP___TYPE_TRAITS_IS_PMR_RELOCATABLE_CONTAINER_H
+#define _LIBCPP___TYPE_TRAITS_IS_PMR_RELOCATABLE_CONTAINER_H
 
 #include <__config>
-#include <__fwd/vector.h>
-#include <__memory_resource/polymorphic_allocator.h>
-#include <__type_traits/is_pmr_relocatable_container.h>
+#include <__type_traits/integral_constant.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
 #endif
 
-#if _LIBCPP_STD_VER >= 17
-
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-namespace pmr {
-template <class _ValueT>
-using vector _LIBCPP_AVAILABILITY_PMR = std::vector<_ValueT, polymorphic_allocator<_ValueT>>;
-} // namespace pmr
+template <class>
+struct __is_pmr_allocator : false_type {};
 
-template<class _Tp>
-struct __is_pmr_relocatable_container<pmr::vector<_Tp>> : true_type {};
+template <class>
+struct __is_pmr_relocatable_container : false_type {};
 
 _LIBCPP_END_NAMESPACE_STD
 
-#endif
-
-#endif // _LIBCPP___VECTOR_PMR_H
+#endif // _LIBCPP___TYPE_TRAITS_IS_PMR_RELOCATABLE_CONTAINER_H
