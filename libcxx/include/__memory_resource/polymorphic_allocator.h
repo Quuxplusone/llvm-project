@@ -17,6 +17,7 @@
 #include <__memory_resource/memory_resource.h>
 #include <__new/exceptions.h>
 #include <__new/placement_new_delete.h>
+#include <__type_traits/is_pmr_relocatable_container.h>
 #include <__utility/exception_guard.h>
 #include <__utility/piecewise_construct.h>
 #include <limits>
@@ -239,6 +240,9 @@ operator!=(const polymorphic_allocator<_Tp>& __lhs, const polymorphic_allocator<
 #  endif
 
 } // namespace pmr
+
+template <class _Tp>
+struct __is_pmr_allocator<pmr::polymorphic_allocator<_Tp>> : true_type {};
 
 _LIBCPP_END_NAMESPACE_STD
 
