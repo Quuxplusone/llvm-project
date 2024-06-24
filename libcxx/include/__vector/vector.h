@@ -44,6 +44,7 @@
 #include <__memory/temp_value.h>
 #include <__memory/uninitialized_algorithms.h>
 #include <__memory/uninitialized_relocate.h>
+#include <__memory_resource/polymorphic_allocator.h>
 #include <__ranges/access.h>
 #include <__ranges/concepts.h>
 #include <__ranges/container_compatible_range.h>
@@ -56,6 +57,7 @@
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_pmr_relocatable_container.h>
 #include <__type_traits/is_pointer.h>
 #include <__type_traits/is_replaceable.h>
 #include <__type_traits/is_same.h>
@@ -88,9 +90,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template<class _Tp, class _Allocator>
 struct __vector_relocate_elements_via_memcpy : integral_constant<bool,
-  __libcpp_is_trivially_relocatable<_Tp>::value &&
-  __allocator_has_trivial_move_construct_v<_Allocator, _Tp> &&
-  __allocator_has_trivial_destroy_v<_Allocator, _Tp>
+  (__libcpp_is_trivially_relocatable<_Tp>::value && __allocator_has_trivial_move_construct_v<_Allocator, _Tp> && __allocator_has_trivial_destroy_v<_Allocator, _Tp>) ||
+  (__is_pmr_relocatable_container<_Tp>::value && __is_pmr_allocator<_Allocator>::value)
 > {};
 
 template <class _Allocator>
@@ -1235,7 +1236,7 @@ vector<_Tp, _Allocator>::erase(const_iterator __position) {
   pointer __p          = this->__begin_ + __ps;
   if (__vector_relocate_elements_via_memcpy<_Tp, _Allocator>::value && !__libcpp_is_constant_evaluated()) {
     __alloc_traits::destroy(__alloc_, std::__to_address(__p));
-    std::uninitialized_relocate(__p + 1, this->__end_, __p);
+    ::__builtin_memmove((void*)std::__to_address(__p), (void*)std::__to_address(__p + 1), (this->__end_ - (__p + 1)) * sizeof(_Tp));
     this->__destruct_at_end(this->__end_ - 1, true_type()); // destroy_via_noop
   } else {
     this->__destruct_at_end(std::move(__p + 1, this->__end_, __p));
@@ -1254,7 +1255,7 @@ vector<_Tp, _Allocator>::erase(const_iterator __first, const_iterator __last) {
       for (pointer __q = __p; __q != __endp; ++__q) {
         __alloc_traits::destroy(__alloc_, std::__to_address(__q));
       }
-      std::uninitialized_relocate(__endp, this->__end_, __p);
+      ::__builtin_memmove((void*)std::__to_address(__p), (void*)std::__to_address(__endp), (this->__end_ - __endp) * sizeof(_Tp));
       this->__destruct_at_end(this->__end_ - (__last - __first), true_type()); // destroy_via_noop
     } else {
       this->__destruct_at_end(std::move(__p + (__last - __first), this->__end_, __p));
