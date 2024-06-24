@@ -625,6 +625,7 @@ basic_string<char32_t> operator""s( const char32_t *str, size_t len );          
 #include <__type_traits/is_convertible.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_pmr_container.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_standard_layout.h>
 #include <__type_traits/is_trivial.h>
@@ -4339,6 +4340,13 @@ inline constexpr bool __format::__enable_insertable<std::basic_string<wchar_t>> 
 #  endif
 
 #endif
+
+#if _LIBCPP_STD_VER >= 17
+
+template<class _Tp, class _Traits>
+struct __is_pmr_container<pmr::basic_string<_Tp, _Traits>> : true_type {};
+
+#endif // _LIBCPP_STD_VER >= 17
 
 _LIBCPP_END_NAMESPACE_STD
 

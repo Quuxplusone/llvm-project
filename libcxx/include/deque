@@ -213,6 +213,7 @@ template <class T, class Allocator, class Predicate>
 #include <__split_buffer>
 #include <__type_traits/is_allocator.h>
 #include <__type_traits/is_convertible.h>
+#include <__type_traits/is_pmr_container.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_swappable.h>
 #include <__type_traits/type_identity.h>
@@ -2599,6 +2600,9 @@ namespace pmr {
 template <class _ValueT>
 using deque _LIBCPP_AVAILABILITY_PMR = std::deque<_ValueT, polymorphic_allocator<_ValueT>>;
 } // namespace pmr
+
+template<class _Tp>
+struct __is_pmr_container<pmr::deque<_Tp>> : true_type {};
 _LIBCPP_END_NAMESPACE_STD
 #endif
 

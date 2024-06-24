@@ -1995,6 +1995,7 @@ module std_private_type_traits_is_object                                 [system
   header "__type_traits/is_object.h"
   export std_private_type_traits_is_scalar
 }
+module std_private_type_traits_is_pmr_container                          [system] { header "__type_traits/is_pmr_container.h" }
 module std_private_type_traits_is_pod                                    [system] { header "__type_traits/is_pod.h" }
 module std_private_type_traits_is_pointer                                [system] { header "__type_traits/is_pointer.h" }
 module std_private_type_traits_is_polymorphic                            [system] { header "__type_traits/is_polymorphic.h" }
