@@ -798,6 +798,7 @@ set(files
   __type_traits/is_nothrow_destructible.h
   __type_traits/is_null_pointer.h
   __type_traits/is_object.h
+  __type_traits/is_pmr_relocatable_container.h
   __type_traits/is_pod.h
   __type_traits/is_pointer.h
   __type_traits/is_polymorphic.h

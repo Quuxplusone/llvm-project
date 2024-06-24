@@ -235,6 +235,10 @@ module std_core [system] {
       header "__type_traits/is_object.h"
       export std_core.type_traits.integral_constant
     }
+    module is_pmr_relocatable_container {
+      header "__type_traits/is_pmr_relocatable_container.h"
+      export std_core.type_traits.integral_constant
+    }
     module is_pod {
       header "__type_traits/is_pod.h"
       export std_core.type_traits.integral_constant

@@ -48,12 +48,14 @@ void test_reallocate_with_string()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "1", "2" }));
-  // Breaking the PMR invariant causes UB.
-  // We use `allocator_traits::construct` to re-construct the pmr::strings in
-  // the new buffer using v's own allocator (mr3).
-  assert(v[0].get_allocator().resource() == &mr[3]);
-  assert(v[1].get_allocator().resource() == &mr[3]);
-  assert(v[2].get_allocator().resource() == &mr[3]);
+  // Breaking the PMR invariant causes UB. You might expect that
+  // we would use `allocator_traits::construct` to re-construct the pmr::strings in
+  // the new buffer using v's own allocator (mr3), but in fact we now recognize the
+  // "trivial move-destructibility" of pmr::string even when it's not fully trivially
+  // relocatable in the Rule-of-Five sense. So the allocators are preserved.
+  assert(v[0].get_allocator().resource() == &mr[0]);
+  assert(v[1].get_allocator().resource() == &mr[1]);
+  assert(v[2].get_allocator().resource() == &mr[2]);
 }
 
 void test_reallocate_with_list()
@@ -65,7 +67,7 @@ void test_reallocate_with_list()
   v.reserve(v.capacity() + 10);
   assert(v.size() == 3);
   assert((v == decltype(v){ {}, {}, {} }));
-  // Breaking the PMR invariant causes UB. Here, pmr::list isn't trivially
+  // Breaking the PMR invariant causes UB.
   // We use `allocator_traits::construct` to re-construct
   // the pmr::lists in the new buffer using v's own allocator (mr3).
   assert(v[0].get_allocator().resource() == &mr[3]);
@@ -85,13 +87,15 @@ void test_insert_one()
   assert((v == decltype(v){ "0", "1", "a", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  // Breaking the PMR invariant causes UB.
-  // The allocators don't shift
-  // along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[5]);
+  // Breaking the PMR invariant causes UB. Here, vector assumes the
+  // PMR invariant remains unbroken, making pmr::string
+  // "effectively trivially relocatable" by insert and erase.
+  // So when we shift them up in the vector, we observe that
+  // the allocators shift along with the elements' values.
+  assert(v[2].get_allocator().resource() == &mr[5]);
+  assert(v[3].get_allocator().resource() == &mr[2]);
+  assert(v[4].get_allocator().resource() == &mr[3]);
+  assert(v[5].get_allocator().resource() == &mr[4]);
 }
 
 void test_insert_range()
@@ -111,11 +115,11 @@ void test_insert_range()
   assert((v == decltype(v){ "0", "1", "a", "b", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[7]);
-  assert(v[6].get_allocator().resource() == &mr[7]);
+  assert(v[2].get_allocator().resource() == &mr[7]);
+  assert(v[3].get_allocator().resource() == &mr[7]);
+  assert(v[4].get_allocator().resource() == &mr[2]);
+  assert(v[5].get_allocator().resource() == &mr[3]);
+  assert(v[6].get_allocator().resource() == &mr[4]);
 }
 
 void test_erase_one()
@@ -129,11 +133,13 @@ void test_erase_one()
   assert((v == decltype(v){ "0", "1", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  // Breaking the PMR invariant causes UB.
-  // The allocators don't shift
-  // along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
+  // Breaking the PMR invariant causes UB. Here, vector assumes the
+  // PMR invariant remains unbroken, making pmr::string
+  // "effectively trivially relocatable" by insert and erase.
+  // So when we shift them up in the vector, we observe that
+  // the allocators shift along with the elements' values.
+  assert(v[2].get_allocator().resource() == &mr[3]);
+  assert(v[3].get_allocator().resource() == &mr[4]);
 }
 
 void test_erase_range()
@@ -146,8 +152,8 @@ void test_erase_range()
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
-  assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
+  assert(v[1].get_allocator().resource() == &mr[3]);
+  assert(v[2].get_allocator().resource() == &mr[4]);
 }
 
 int main(int, char**)
