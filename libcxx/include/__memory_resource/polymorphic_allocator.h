@@ -14,6 +14,7 @@
 #include <__fwd/pair.h>
 #include <__memory/allocator_traits.h>
 #include <__memory_resource/memory_resource.h>
+#include <__type_traits/is_pmr_container.h>
 #include <__type_traits/negation.h>
 #include <__utility/exception_guard.h>
 #include <cstddef>
@@ -235,6 +236,9 @@ operator!=(const polymorphic_allocator<_Tp>& __lhs, const polymorphic_allocator<
 #  endif
 
 } // namespace pmr
+
+template <class _Tp>
+struct __is_pmr_allocator<pmr::polymorphic_allocator<_Tp>> : true_type {};
 
 template <class _Tp, class _Up>
 struct __allocator_has_trivial_copy_construct<pmr::polymorphic_allocator<_Tp>, _Up> : _Not<uses_allocator<_Up, pmr::polymorphic_allocator<_Tp>>> {};
