@@ -222,6 +222,7 @@ template <class T, class Allocator, class Predicate>
 #include <__type_traits/is_const.h>
 #include <__type_traits/is_nothrow_assignable.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_pmr_container.h>
 #include <__type_traits/is_pointer.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_swappable.h>
@@ -1550,6 +1551,9 @@ namespace pmr {
 template <class _ValueT>
 using forward_list _LIBCPP_AVAILABILITY_PMR = std::forward_list<_ValueT, polymorphic_allocator<_ValueT>>;
 } // namespace pmr
+
+template<class _Tp>
+struct __is_pmr_container<pmr::forward_list<_Tp>> : true_type {};
 _LIBCPP_END_NAMESPACE_STD
 #endif
 
