@@ -92,10 +92,10 @@ void test_insert_one()
   // "effectively trivially relocatable" by insert and erase.
   // So when we shift them up in the vector, we observe that
   // the allocators shift along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[5]);
+  assert(v[2].get_allocator().resource() == &mr[5]);
+  assert(v[3].get_allocator().resource() == &mr[2]);
+  assert(v[4].get_allocator().resource() == &mr[3]);
+  assert(v[5].get_allocator().resource() == &mr[4]);
 }
 
 void test_insert_range()
@@ -115,11 +115,11 @@ void test_insert_range()
   assert((v == decltype(v){ "0", "1", "a", "b", "2", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
   assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
-  assert(v[4].get_allocator().resource() == &mr[4]);
-  assert(v[5].get_allocator().resource() == &mr[7]);
-  assert(v[6].get_allocator().resource() == &mr[7]);
+  assert(v[2].get_allocator().resource() == &mr[7]);
+  assert(v[3].get_allocator().resource() == &mr[7]);
+  assert(v[4].get_allocator().resource() == &mr[2]);
+  assert(v[5].get_allocator().resource() == &mr[3]);
+  assert(v[6].get_allocator().resource() == &mr[4]);
 }
 
 void test_erase_one()
@@ -138,8 +138,8 @@ void test_erase_one()
   // "effectively trivially relocatable" by insert and erase.
   // So when we shift them up in the vector, we observe that
   // the allocators shift along with the elements' values.
-  assert(v[2].get_allocator().resource() == &mr[2]);
-  assert(v[3].get_allocator().resource() == &mr[3]);
+  assert(v[2].get_allocator().resource() == &mr[3]);
+  assert(v[3].get_allocator().resource() == &mr[4]);
 }
 
 void test_erase_range()
@@ -152,8 +152,8 @@ void test_erase_range()
   assert(v.size() == 3);
   assert((v == decltype(v){ "0", "3", "4" }));
   assert(v[0].get_allocator().resource() == &mr[0]);
-  assert(v[1].get_allocator().resource() == &mr[1]);
-  assert(v[2].get_allocator().resource() == &mr[2]);
+  assert(v[1].get_allocator().resource() == &mr[3]);
+  assert(v[2].get_allocator().resource() == &mr[4]);
 }
 
 int main(int, char**)
