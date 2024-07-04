@@ -213,6 +213,13 @@ _LIBCPP_HIDE_FROM_ABI const __remove_cvref_t<_Ep>* try_cast(const exception_ptr&
 #endif // _LIBCPP_HAS_NO_EXCEPTIONS
 }
 
+// P2927R2 uses the LEWG-favored name "exception_ptr_cast", although Arthur dislikes it.
+// Provide both names for now.
+template <class _Ep>
+_LIBCPP_HIDE_FROM_ABI const __remove_cvref_t<_Ep>* exception_ptr_cast(const exception_ptr& __p) _NOEXCEPT {
+  return std::try_cast<_Ep>(__p);
+}
+
 } // namespace std
 
 #endif // _LIBCPP___EXCEPTION_EXCEPTION_PTR_H
