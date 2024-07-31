@@ -24,13 +24,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 // A type is trivially relocatable if a move construct + destroy of the original object is equivalent to
 // `memcpy(dst, src, sizeof(T))`.
 
-#if __has_builtin(__is_trivially_relocatable)
-template <class _Tp, class = void>
-struct __libcpp_is_trivially_relocatable : integral_constant<bool, __is_trivially_relocatable(_Tp)> {};
-#else
 template <class _Tp, class = void>
 struct __libcpp_is_trivially_relocatable : is_trivially_copyable<_Tp> {};
-#endif
 
 template <class _Tp>
 struct __libcpp_is_trivially_relocatable<_Tp,
