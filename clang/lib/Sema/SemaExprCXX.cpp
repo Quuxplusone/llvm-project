@@ -5126,13 +5126,14 @@ static bool HasNoThrowOperator(const RecordType *RT, OverloadedOperatorKind Op,
   return false;
 }
 
-static bool HasNonDeletedDefaultedEqualityComparison(Sema &S,
-                                                     const CXXRecordDecl *Decl,
+static bool HasNonDeletedDefaultedEqualityComparison(Sema &S, QualType Type,
                                                      SourceLocation KeyLoc) {
-  if (Decl->isUnion())
-    return false;
-  if (Decl->isLambda())
-    return Decl->isCapturelessLambda();
+  if (const auto *Decl = Type->getAsCXXRecordDecl()) {
+    if (Decl->isUnion())
+      return false;
+    if (Decl->isLambda())
+      return Decl->isCapturelessLambda();
+  }
 
   {
     EnterExpressionEvaluationContext UnevaluatedContext(
@@ -5141,9 +5142,8 @@ static bool HasNonDeletedDefaultedEqualityComparison(Sema &S,
     Sema::ContextRAII TUContext(S, S.Context.getTranslationUnitDecl());
 
     // const ClassT& obj;
-    OpaqueValueExpr Operand(
-        {}, Decl->getTypeForDecl()->getCanonicalTypeUnqualified().withConst(),
-        ExprValueKind::VK_LValue);
+    OpaqueValueExpr Operand({}, Type->getCanonicalTypeUnqualified().withConst(),
+                            ExprValueKind::VK_LValue);
     UnresolvedSet<16> Functions;
     // obj == obj;
     S.LookupBinOp(S.TUScope, {}, BinaryOperatorKind::BO_EQ, Functions);
@@ -5155,47 +5155,49 @@ static bool HasNonDeletedDefaultedEqualityComparison(Sema &S,
 
     const auto *CallExpr = dyn_cast<CXXOperatorCallExpr>(Result.get());
     if (!CallExpr)
-      return false;
+      return Type->isEnumeralType();
     const auto *Callee = CallExpr->getDirectCallee();
     auto ParamT = Callee->getParamDecl(0)->getType();
     if (!Callee->isDefaulted())
       return false;
-    if (!ParamT->isReferenceType() && !Decl->isTriviallyCopyable())
+    if (!ParamT->isReferenceType() && !Type.isTriviallyCopyableType(S.Context))
       return false;
     if (ParamT.getNonReferenceType()->getUnqualifiedDesugaredType() !=
-        Decl->getTypeForDecl())
+        Type->getUnqualifiedDesugaredType())
       return false;
   }
 
-  return llvm::all_of(Decl->bases(),
-                      [&](const CXXBaseSpecifier &BS) {
-                        if (const auto *RD = BS.getType()->getAsCXXRecordDecl())
+  if (const auto *Decl = Type->getAsCXXRecordDecl()) {
+    return llvm::all_of(Decl->bases(),
+                        [&](const CXXBaseSpecifier &BS) {
                           return HasNonDeletedDefaultedEqualityComparison(
-                              S, RD, KeyLoc);
-                        return true;
-                      }) &&
-         llvm::all_of(Decl->fields(), [&](const FieldDecl *FD) {
-           auto Type = FD->getType();
-           if (Type->isArrayType())
-             Type = Type->getBaseElementTypeUnsafe()
-                        ->getCanonicalTypeUnqualified();
+                              S, BS.getType(), KeyLoc);
+                        }) &&
+           llvm::all_of(Decl->fields(), [&](const FieldDecl *FD) {
+             auto Type = FD->getType();
+             if (Type->isArrayType())
+               Type = Type->getBaseElementTypeUnsafe()
+                          ->getCanonicalTypeUnqualified();
 
-           if (Type->isReferenceType() || Type->isEnumeralType())
-             return false;
-           if (const auto *RD = Type->getAsCXXRecordDecl())
-             return HasNonDeletedDefaultedEqualityComparison(S, RD, KeyLoc);
-           return true;
-         });
+             if (Type->isReferenceType())
+               return false;
+             if (Type->isOverloadableType())
+               return HasNonDeletedDefaultedEqualityComparison(S, Type, KeyLoc);
+             return true;
+           });
+  }
+
+  return true;
 }
 
 static bool isTriviallyEqualityComparableType(Sema &S, QualType Type, SourceLocation KeyLoc) {
   QualType CanonicalType = Type.getCanonicalType();
   if (CanonicalType->isIncompleteType() || CanonicalType->isDependentType() ||
-      CanonicalType->isEnumeralType() || CanonicalType->isArrayType())
+      CanonicalType->isArrayType())
     return false;
 
-  if (const auto *RD = CanonicalType->getAsCXXRecordDecl()) {
-    if (!HasNonDeletedDefaultedEqualityComparison(S, RD, KeyLoc))
+  if (CanonicalType->isOverloadableType()) {
+    if (!HasNonDeletedDefaultedEqualityComparison(S, CanonicalType, KeyLoc))
       return false;
   }
 
