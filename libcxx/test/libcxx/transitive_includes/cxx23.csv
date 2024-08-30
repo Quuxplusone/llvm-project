@@ -498,6 +498,16 @@ hive stdexcept
 hive tuple
 hive version
 initializer_list version
+inplace_vector cctype
+inplace_vector compare
+inplace_vector cstdint
+inplace_vector cwchar
+inplace_vector cwctype
+inplace_vector initializer_list
+inplace_vector limits
+inplace_vector new
+inplace_vector stdexcept
+inplace_vector version
 iomanip cctype
 iomanip cerrno
 iomanip climits

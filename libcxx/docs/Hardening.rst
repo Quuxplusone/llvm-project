@@ -392,7 +392,8 @@ CMake configuration time. The available options are:
   Supported containers:
 
   - ``span``;
-  - ``string_view``.
+  - ``string_view``;
+  - ``inplace_vector``.
 
 - ``_LIBCPP_ABI_BOUNDED_ITERATORS_IN_STRING`` -- changes the iterator type of
   ``basic_string`` to a bounded iterator that keeps track of whether it's within

@@ -113,6 +113,8 @@ private:
   friend class basic_string_view;
   template <class _Tp, class _Alloc>
   friend class vector;
+  template <class _Tp, size_t _Capacity>
+  friend class inplace_vector;
   template <class _Tp, size_t>
   friend class span;
   template <class _Tp, size_t _Size>
