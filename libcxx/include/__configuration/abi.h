@@ -138,7 +138,8 @@
 //
 // Supported containers:
 // - `span`;
-// - `string_view`.
+// - `string_view`;
+// - `inplace_vector`.
 // #define _LIBCPP_ABI_BOUNDED_ITERATORS
 
 // Changes the iterator type of `basic_string` to a bounded iterator that keeps track of whether it's within the bounds

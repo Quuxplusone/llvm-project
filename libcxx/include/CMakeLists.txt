@@ -970,6 +970,7 @@ set(files
   future
   hive
   initializer_list
+  inplace_vector
   inttypes.h
   iomanip
   ios
