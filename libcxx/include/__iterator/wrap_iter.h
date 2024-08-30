@@ -117,6 +117,8 @@ private:
   friend class span;
   template <class _Tp, size_t _Size>
   friend struct array;
+  template <class _Tp, size_t _Capacity>
+  friend class inplace_vector;
 
 #if _LIBCPP_STD_VER >= 20
   // This makes __wrap_iter trivially equality comparable if _Iter is trivially equality comparable
