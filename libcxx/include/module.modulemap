@@ -1412,6 +1412,11 @@ module std [system] {
     export *
   }
 
+  module inplace_vector {
+    header "inplace_vector"
+    export *
+  }
+
   module iomanip {
     header "iomanip"
     export *
