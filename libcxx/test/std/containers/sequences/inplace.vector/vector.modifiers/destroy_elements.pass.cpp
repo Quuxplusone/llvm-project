@@ -18,8 +18,14 @@
 #include <array>
 #include <cassert>
 #include <inplace_vector>
+#include <vector>
 
 #include "test_macros.h"
+
+namespace my {
+  template<class T>
+  using vector = std::inplace_vector<T, 1000>;
+} // namespace my
 
 struct DestroyTracker {
   constexpr DestroyTracker(std::vector<bool>& vec) : vec_(&vec), index_(vec.size()) { vec.push_back(false); }
@@ -40,7 +46,7 @@ TEST_CONSTEXPR_CXX20 void test(Operation operation) {
   std::vector<bool> all_destroyed;
 
   {
-    std::vector<DestroyTracker> v;
+    my::vector<DestroyTracker> v;
     for (size_t i = 0; i != 100; ++i)
       operation(v, all_destroyed);
   }
@@ -49,16 +55,15 @@ TEST_CONSTEXPR_CXX20 void test(Operation operation) {
 }
 
 constexpr bool test() {
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.emplace_back(tracker); });
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.push_back(tracker); });
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.emplace(vec.begin(), tracker); });
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.insert(vec.begin(), tracker); });
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.resize(vec.size() + 1, tracker); });
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) {
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.emplace_back(tracker); });
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.push_back(tracker); });
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.emplace(vec.begin(), tracker); });
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.insert(vec.begin(), tracker); });
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) { vec.resize(vec.size() + 1, tracker); });
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) {
     vec.insert_range(vec.begin(), std::array<DestroyTracker, 2>{tracker, tracker});
   });
-
-  test([](std::vector<DestroyTracker>& vec, std::vector<bool>& tracker) {
+  test([](my::vector<DestroyTracker>& vec, std::vector<bool>& tracker) {
     vec.append_range(std::array<DestroyTracker, 2>{tracker, tracker});
   });
 

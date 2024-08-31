@@ -126,7 +126,7 @@ template <template <typename...> typename ContainerAdaptor,
           typename Elem,
           typename Order>
 constexpr void test_sequence_container_adaptor_spaceship_with_type() {
-  if (!can_run<Container<Elem>>)
+  if (!can_run<Container<Elem>>())
     return;
   // Empty containers
   {

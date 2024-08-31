@@ -141,7 +141,6 @@ headers_not_available = [
     "debugging",
     "generator",
     "hazard_pointer",
-    "inplace_vector",
     "linalg",
     "rcu",
     "spanstream",

@@ -165,25 +165,39 @@ namespace std {
 #include <__algorithm/lexicographical_compare_three_way.h>
 #include <__algorithm/min.h>
 #include <__algorithm/move.h>
+#include <__algorithm/move_backward.h>
 #include <__algorithm/remove.h>
 #include <__algorithm/remove_if.h>
 #include <__algorithm/rotate.h>
+#include <__algorithm/swap_ranges.h>
 #include <__compare/synth_three_way.h>
 #include <__config>
+#include <__iterator/distance.h>
 #include <__iterator/iterator_traits.h>
 #include <__iterator/move_iterator.h>
 #include <__iterator/reverse_iterator.h>
 #include <__iterator/wrap_iter.h>
+#include <__memory/addressof.h>
 #include <__memory/construct_at.h>
+#include <__memory/pointer_traits.h>
 #include <__memory/voidify.h>
+#include <__ranges/access.h>
+#include <__ranges/concepts.h>
 #include <__ranges/container_compatible_range.h>
+#include <__ranges/dangling.h>
 #include <__ranges/from_range.h>
+#include <__type_traits/conditional.h>
+#include <__type_traits/is_nothrow_assignable.h>
+#include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_swappable.h>
 #include <__type_traits/is_trivially_assignable.h>
 #include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
 #include <__utility/cmp.h>
+#include <__utility/forward.h>
 #include <__utility/unreachable.h>
+#include <new>
 #include <stdexcept>
 
 // standard-mandated includes
@@ -396,8 +410,8 @@ public:
     }
     __append_with_sentinel(__first, __last);
   }
-  template <_ContainerCompatibleRange<_Tp> _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI inplace_vector(from_range_t, _R&& __rg) : inplace_vector() {
+  template <_ContainerCompatibleRange<_Tp> _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI inplace_vector(from_range_t, _Rp&& __rg) : inplace_vector() {
     append_range<true>(__rg);
   }
   constexpr _LIBCPP_HIDE_FROM_ABI
@@ -543,11 +557,11 @@ public:
     }
     __assign_with_sentinel(__first, __last);
   }
-  template <_ContainerCompatibleRange<_Tp> _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI void assign_range(_R&& __rg) {
-    if constexpr (ranges::sized_range<_R&>) {
+  template <_ContainerCompatibleRange<_Tp> _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI void assign_range(_Rp&& __rg) {
+    if constexpr (ranges::sized_range<_Rp&>) {
       return __assign_with_size(ranges::begin(__rg), ranges::end(__rg), ranges::size(__rg));
-    } else if constexpr (ranges::forward_range<_R&>) {
+    } else if constexpr (ranges::forward_range<_Rp&>) {
       decltype(auto) __first(ranges::begin(__rg));
       decltype(auto) __last(ranges::end(__rg));
       return __assign_with_size(__first, __last, ranges::distance(__first, __last));
@@ -748,14 +762,14 @@ private:
     }
   }
 
-  template <bool _ThrowOnMissingCapacity, class _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI __conditional_t<_ThrowOnMissingCapacity, void, ranges::borrowed_iterator_t<_R>>
-  __append_range(_R&& __rg) {
+  template <bool _ThrowOnMissingCapacity, class _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI __conditional_t<_ThrowOnMissingCapacity, void, ranges::borrowed_iterator_t<_Rp>>
+  __append_range(_Rp&& __rg) {
     decltype(auto) __first(ranges::begin(__rg));
     size_t __remaining = capacity() - size();
     if (!_ThrowOnMissingCapacity && __remaining != 0) {
       decltype(auto) __sent(ranges::end(__rg));
-      if constexpr (ranges::sized_range<_R&>) {
+      if constexpr (ranges::sized_range<_Rp&>) {
         auto __n = ranges::size(__rg);
         size_t __copied;
         if constexpr (_ThrowOnMissingCapacity) {
@@ -787,9 +801,9 @@ public:
   }
   constexpr _LIBCPP_HIDE_FROM_ABI reference push_back(const _Tp& __x) { return emplace_back(__x); }
   constexpr _LIBCPP_HIDE_FROM_ABI reference push_back(_Tp&& __x) { return emplace_back(std::move(__x)); }
-  template <_ContainerCompatibleRange<_Tp> _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI void append_range(_R&& __rg) {
-    __append_range<true>(std::forward<_R>(__rg));
+  template <_ContainerCompatibleRange<_Tp> _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI void append_range(_Rp&& __rg) {
+    __append_range<true>(std::forward<_Rp>(__rg));
   }
 
   constexpr _LIBCPP_HIDE_FROM_ABI void pop_back() noexcept /* strengthened */ {
@@ -823,9 +837,9 @@ public:
   ) {
     return try_emplace_back(std::move(__x));
   }
-  template <_ContainerCompatibleRange<_Tp> _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI ranges::borrowed_iterator_t<_R> try_append_range(_R&& __rg) {
-    return __append_range<false>(std::forward<_R>(__rg));
+  template <_ContainerCompatibleRange<_Tp> _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI ranges::borrowed_iterator_t<_Rp> try_append_range(_Rp&& __rg) {
+    return __append_range<false>(std::forward<_Rp>(__rg));
   }
 
   template <class... _Args>
@@ -947,9 +961,9 @@ private:
       [[maybe_unused]] __small_size_type __expected_size = __sz_;
       for (size_t __i = 0; __i < __n; ++__i) {
         if (is_reference_v<decltype(*__it)>) {
-          auto&& __deref = *__it; // (In case *__it is a throwing operation)
+          auto&& __value = *__it; // (In case *__it is a throwing operation)
           std::destroy_at(__p + __i);
-          std::construct_at(__p + __i, std::forward<decltype(__deref)>(__deref));
+          std::construct_at(__p + __i, std::forward<decltype(__value)>(__value));
         } else {
           std::destroy_at(__p + __i);
           __deref_construct_at(__p + __i, __it);
@@ -991,12 +1005,12 @@ public:
     }
     return __insert_with_sentinel(__position, __first, __last);
   }
-  template <_ContainerCompatibleRange<_Tp> _R>
-  constexpr _LIBCPP_HIDE_FROM_ABI iterator insert_range(const_iterator __position, _R&& __rg) {
+  template <_ContainerCompatibleRange<_Tp> _Rp>
+  constexpr _LIBCPP_HIDE_FROM_ABI iterator insert_range(const_iterator __position, _Rp&& __rg) {
     decltype(auto) __first(ranges::begin(__rg));
     decltype(auto) __sent(ranges::end(__rg));
-    if constexpr (ranges::sized_range<_R&>) {
-      return __insert_with_sentinel(__first, __sent, ranges::size(__rg));
+    if constexpr (ranges::sized_range<_Rp&>) {
+      return __insert_with_size(__position, __first, __sent, ranges::size(__rg));
     } else {
       return __insert_with_sentinel(__position, __first, __sent);
     }
