@@ -3882,6 +3882,22 @@ static_assert(!__is_trivially_equality_comparable(int[3]));
 static_assert(!__is_trivially_equality_comparable(float));
 static_assert(!__is_trivially_equality_comparable(double));
 static_assert(!__is_trivially_equality_comparable(long double));
+static_assert(__is_trivially_equality_comparable(Enum));
+static_assert(__is_trivially_equality_comparable(SignedEnum));
+static_assert(__is_trivially_equality_comparable(UnsignedEnum));
+static_assert(__is_trivially_equality_comparable(EnumClass));
+static_assert(__is_trivially_equality_comparable(SignedEnumClass));
+static_assert(__is_trivially_equality_comparable(UnsignedEnumClass));
+
+enum EnumWithComparisons { EWC_Zero };
+static_assert(__is_trivially_equality_comparable(EnumWithComparisons));
+bool operator==(EnumWithComparisons, EnumWithComparisons);
+static_assert(!__is_trivially_equality_comparable(EnumWithComparisons));
+
+enum class EnumClassWithComparisons { EWC_Zero };
+static_assert(__is_trivially_equality_comparable(EnumClassWithComparisons));
+bool operator==(EnumClassWithComparisons, EnumClassWithComparisons);
+static_assert(!__is_trivially_equality_comparable(EnumClassWithComparisons));
 
 struct NonTriviallyEqualityComparableNoComparator {
   int i;
