@@ -18,6 +18,7 @@ struct A
 
 A source() {return A();}
 const A csource() {return A();}
+  // expected-warning@-1{{'const' type qualifier on return type is a bad idea}}
 
 int main(int, char**)
 {
