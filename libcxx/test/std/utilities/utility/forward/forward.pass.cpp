@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 // UNSUPPORTED: c++03
+// ADDITIONAL_COMPILE_FLAGS(clang): -Wno-qual-class-return-type
 
 // test forward
 
