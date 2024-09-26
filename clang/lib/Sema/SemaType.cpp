@@ -2915,13 +2915,13 @@ void Sema::diagnoseIgnoredQualifiers(unsigned DiagID, unsigned Quals,
 }
 
 // Diagnose pointless type qualifiers on the return type of a function.
-static void diagnoseRedundantReturnTypeQualifiers(Sema &S, QualType RetTy,
+static void diagnoseRedundantReturnTypeQualifiers(unsigned DiagID, Sema &S, QualType RetTy,
                                                   Declarator &D,
                                                   unsigned FunctionChunkIndex) {
   const DeclaratorChunk::FunctionTypeInfo &FTI =
       D.getTypeObject(FunctionChunkIndex).Fun;
   if (FTI.hasTrailingReturnType()) {
-    S.diagnoseIgnoredQualifiers(diag::warn_qual_return_type,
+    S.diagnoseIgnoredQualifiers(DiagID,
                                 RetTy.getLocalCVRQualifiers(),
                                 FTI.getTrailingReturnTypeLoc());
     return;
@@ -2938,7 +2938,7 @@ static void diagnoseRedundantReturnTypeQualifiers(Sema &S, QualType RetTy,
     case DeclaratorChunk::Pointer: {
       DeclaratorChunk::PointerTypeInfo &PTI = OuterChunk.Ptr;
       S.diagnoseIgnoredQualifiers(
-          diag::warn_qual_return_type,
+          DiagID,
           PTI.TypeQuals,
           SourceLocation(),
           PTI.ConstQualLoc,
@@ -2958,7 +2958,7 @@ static void diagnoseRedundantReturnTypeQualifiers(Sema &S, QualType RetTy,
       // FIXME: We can't currently provide an accurate source location and a
       // fix-it hint for these.
       unsigned AtomicQual = RetTy->isAtomicType() ? DeclSpec::TQ_atomic : 0;
-      S.diagnoseIgnoredQualifiers(diag::warn_qual_return_type,
+      S.diagnoseIgnoredQualifiers(DiagID,
                                   RetTy.getCVRQualifiers() | AtomicQual,
                                   D.getIdentifierLoc());
       return;
@@ -2975,7 +2975,7 @@ static void diagnoseRedundantReturnTypeQualifiers(Sema &S, QualType RetTy,
 
   // Just parens all the way out to the decl specifiers. Diagnose any qualifiers
   // which are present there.
-  S.diagnoseIgnoredQualifiers(diag::warn_qual_return_type,
+  S.diagnoseIgnoredQualifiers(DiagID,
                               D.getDeclSpec().getTypeQualifiers(),
                               D.getIdentifierLoc(),
                               D.getDeclSpec().getConstSpecLoc(),
@@ -5006,10 +5006,11 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
 
       // cv-qualifiers on return types are pointless except when the type is a
       // class type in C++.
-      if ((T.getCVRQualifiers() || T->isAtomicType()) &&
-          !(S.getLangOpts().CPlusPlus &&
-            (T->isDependentType() || T->isRecordType()))) {
-        if (T->isVoidType() && !S.getLangOpts().CPlusPlus &&
+      if (T.getCVRQualifiers() || T->isAtomicType()) {
+        if (S.getLangOpts().CPlusPlus && (T->isDependentType() || T->isRecordType())) {
+          // Diagnose with a different diagnostic.
+          diagnoseRedundantReturnTypeQualifiers(diag::warn_qual_class_return_type, S, T, D, chunkIndex);
+        } else if (T->isVoidType() && !S.getLangOpts().CPlusPlus &&
             D.getFunctionDefinitionKind() ==
                 FunctionDefinitionKind::Definition) {
           // [6.9.1/3] qualified void return is invalid on a C
@@ -5017,7 +5018,7 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
           // in C++ though (!)
           S.Diag(DeclType.Loc, diag::err_func_returning_qualified_void) << T;
         } else
-          diagnoseRedundantReturnTypeQualifiers(S, T, D, chunkIndex);
+          diagnoseRedundantReturnTypeQualifiers(diag::warn_qual_return_type, S, T, D, chunkIndex);
 
       }
 
