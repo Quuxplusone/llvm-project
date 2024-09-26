@@ -102,7 +102,7 @@ public:
 
     constexpr almost_forward_iterator& operator++() { ++it_; return *this; }
     // Notice the slightly different return type.
-    constexpr const almost_forward_iterator operator++(int) { return almost_forward_iterator(it_); }
+    constexpr void operator++(int) { ++it_; }
 
     friend constexpr bool operator==(const almost_forward_iterator& x, const almost_forward_iterator& y) {
       return x.it_ == y.it_;

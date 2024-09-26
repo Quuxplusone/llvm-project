@@ -21,8 +21,8 @@ T h() {
 // Don't warn on cv-qualified class return types, only scalar return types.
 namespace ignored_quals {
 struct S {};
-const S class_c();
-const volatile S class_cv();
+const S class_c(); // expected-warning{{'const' type qualifier on return type is a bad idea}}
+const volatile S class_cv(); // expected-warning{{'const volatile' type qualifiers on return type are a bad idea}}
 
 const int scalar_c(); // expected-warning{{'const' type qualifier on return type has no effect}}
 int const scalar_c2(); // expected-warning{{'const' type qualifier on return type has no effect}}
@@ -138,7 +138,7 @@ void cxx_unresolved_expr() {
 namespace GH43054 {
 struct S{};
 const auto foo() { return 0; } // expected-warning {{'const' type qualifier on return type has no effect}}
-const auto bar() { return S{}; }
+const auto bar() { return S{}; } // expected-warning{{'const' type qualifier on return type is a bad idea}}
 template <typename T>
 const auto baz() { return T{}; }
 
@@ -150,7 +150,7 @@ void test() {
     return 0;
   }();
 
-  []() -> const auto {
+  []() -> const auto { // expected-warning{{'const' type qualifier on return type is a bad idea}}
     return S{};
   }();
 }
