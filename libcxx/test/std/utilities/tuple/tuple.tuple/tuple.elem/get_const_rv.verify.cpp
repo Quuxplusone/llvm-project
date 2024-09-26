@@ -6,6 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+// ADDITIONAL_COMPILE_FLAGS(clang): -Wno-qual-class-return-type
+
 // <tuple>
 
 // template <class... Types> class tuple;
