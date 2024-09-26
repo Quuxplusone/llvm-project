@@ -563,6 +563,9 @@ def warn_qual_return_type : Warning<
 def warn_qual_base_type : Warning<
   "'%0' qualifier%s1 on base class type %2 %plural{1:has|:have}1 no effect">,
   InGroup<IgnoredBaseClassQualifiers>, DefaultIgnore;
+def warn_qual_class_return_type : Warning<
+  "'%0' type qualifier%s1 on return type %plural{1:is|:are}1 a bad idea">,
+  InGroup<QualClassReturnType>, DefaultIgnore;
 
 def warn_deprecated_redundant_constexpr_static_def : Warning<
   "out-of-line definition of constexpr static data member is redundant "

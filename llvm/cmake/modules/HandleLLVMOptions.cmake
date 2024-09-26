@@ -884,6 +884,8 @@ if (LLVM_ENABLE_WARNINGS AND (LLVM_COMPILER_IS_GCC_COMPATIBLE OR CLANG_CL))
   # The LLVM libraries have no stable C++ API, so -Wnoexcept-type is not useful.
   append("-Wno-noexcept-type" CMAKE_CXX_FLAGS)
 
+  add_flag_if_supported("-Wno-qual-class-return-type" CXX_SUPPORTS_QUAL_CLASS_RETURN_TYPE_FLAG)
+
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     append("-Wnon-virtual-dtor" CMAKE_CXX_FLAGS)
   endif()
