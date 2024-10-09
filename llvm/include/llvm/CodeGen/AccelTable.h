@@ -207,7 +207,7 @@ public:
   void addName(DwarfStringPoolEntryRef Name, Types &&... Args);
   void clear() { Entries.clear(); }
   void addEntries(AccelTable<DataT> &Table);
-  const StringEntries getEntries() const { return Entries; }
+  StringEntries getEntries() const { return Entries; }
 };
 
 template <typename AccelTableDataT>

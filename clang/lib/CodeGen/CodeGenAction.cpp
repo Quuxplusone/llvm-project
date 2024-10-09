@@ -576,7 +576,7 @@ bool BackendConsumer::ResourceLimitDiagHandler(
   return true;
 }
 
-const FullSourceLoc BackendConsumer::getBestLocationFromDebugLoc(
+FullSourceLoc BackendConsumer::getBestLocationFromDebugLoc(
     const llvm::DiagnosticInfoWithLocationBase &D, bool &BadDebugInfo,
     StringRef &Filename, unsigned &Line, unsigned &Column) const {
   SourceManager &SourceMgr = Context->getSourceManager();

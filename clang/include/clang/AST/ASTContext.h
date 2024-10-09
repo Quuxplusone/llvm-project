@@ -794,7 +794,7 @@ public:
   const TargetInfo &getTargetInfo() const { return *Target; }
   const TargetInfo *getAuxTargetInfo() const { return AuxTarget; }
 
-  const QualType GetHigherPrecisionFPType(QualType ElementType) const {
+  QualType GetHigherPrecisionFPType(QualType ElementType) const {
     const auto *CurrentBT = cast<BuiltinType>(ElementType);
     switch (CurrentBT->getKind()) {
     case BuiltinType::Kind::Half:

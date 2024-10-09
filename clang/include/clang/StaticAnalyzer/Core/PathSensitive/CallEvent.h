@@ -452,7 +452,7 @@ public:
   std::optional<SVal> getReturnValueUnderConstruction() const;
 
   // Returns the CallEvent representing the caller of this function
-  const CallEventRef<> getCaller() const;
+  CallEventRef<> getCaller() const;
 
   // Returns true if the function was called from a standard library function.
   // If not or could not get the caller (it may be a top level function)

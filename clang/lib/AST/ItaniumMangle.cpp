@@ -977,7 +977,7 @@ bool CXXNameMangler::isStdNamespace(const DeclContext *DC) {
   return isStd(cast<NamespaceDecl>(DC));
 }
 
-static const GlobalDecl
+static GlobalDecl
 isTemplate(GlobalDecl GD, const TemplateArgumentList *&TemplateArgs) {
   const NamedDecl *ND = cast<NamedDecl>(GD.getDecl());
   // Check if we have a function template.

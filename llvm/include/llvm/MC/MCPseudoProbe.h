@@ -507,7 +507,7 @@ public:
     return iterator_range(It->second);
   }
 
-  const ArrayRef<MCDecodedPseudoProbeInlineTree> getInlineTreeVec() const {
+  ArrayRef<MCDecodedPseudoProbeInlineTree> getInlineTreeVec() const {
     return InlineTreeVec;
   }
 

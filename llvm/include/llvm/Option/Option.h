@@ -103,13 +103,13 @@ public:
     return Info->getName();
   }
 
-  const Option getGroup() const {
+  Option getGroup() const {
     assert(Info && "Must have a valid info!");
     assert(Owner && "Must have a valid owner!");
     return Owner->getOption(Info->GroupID);
   }
 
-  const Option getAlias() const {
+  Option getAlias() const {
     assert(Info && "Must have a valid info!");
     assert(Owner && "Must have a valid owner!");
     return Owner->getOption(Info->AliasID);
@@ -193,7 +193,7 @@ public:
 
   /// getUnaliasedOption - Return the final option this option
   /// aliases (itself, if the option has no alias).
-  const Option getUnaliasedOption() const {
+  Option getUnaliasedOption() const {
     const Option Alias = getAlias();
     if (Alias.isValid()) return Alias.getUnaliasedOption();
     return *this;

@@ -1684,7 +1684,7 @@ VendorSignatures getVendorSignature(unsigned *MaxLeaf) {
 
 #if defined(__i386__) || defined(_M_IX86) || \
     defined(__x86_64__) || defined(_M_X64)
-const StringMap<bool> sys::getHostCPUFeatures() {
+StringMap<bool> sys::getHostCPUFeatures() {
   unsigned EAX = 0, EBX = 0, ECX = 0, EDX = 0;
   unsigned MaxLevel;
   StringMap<bool> Features;
@@ -1889,7 +1889,7 @@ const StringMap<bool> sys::getHostCPUFeatures() {
   return Features;
 }
 #elif defined(__linux__) && (defined(__arm__) || defined(__aarch64__))
-const StringMap<bool> sys::getHostCPUFeatures() {
+StringMap<bool> sys::getHostCPUFeatures() {
   StringMap<bool> Features;
   std::unique_ptr<llvm::MemoryBuffer> P = getProcCpuinfoContent();
   if (!P)
@@ -1964,7 +1964,7 @@ const StringMap<bool> sys::getHostCPUFeatures() {
   return Features;
 }
 #elif defined(_WIN32) && (defined(__aarch64__) || defined(_M_ARM64))
-const StringMap<bool> sys::getHostCPUFeatures() {
+StringMap<bool> sys::getHostCPUFeatures() {
   StringMap<bool> Features;
 
   // If we're asking the OS at runtime, believe what the OS says
@@ -1983,7 +1983,7 @@ const StringMap<bool> sys::getHostCPUFeatures() {
 }
 #elif defined(__linux__) && defined(__loongarch__)
 #include <sys/auxv.h>
-const StringMap<bool> sys::getHostCPUFeatures() {
+StringMap<bool> sys::getHostCPUFeatures() {
   unsigned long hwcap = getauxval(AT_HWCAP);
   bool HasFPU = hwcap & (1UL << 3); // HWCAP_LOONGARCH_FPU
   uint32_t cpucfg2 = 0x2;
@@ -2006,7 +2006,7 @@ struct RISCVHwProbe {
   int64_t Key;
   uint64_t Value;
 };
-const StringMap<bool> sys::getHostCPUFeatures() {
+StringMap<bool> sys::getHostCPUFeatures() {
   RISCVHwProbe Query[]{{/*RISCV_HWPROBE_KEY_BASE_BEHAVIOR=*/3, 0},
                        {/*RISCV_HWPROBE_KEY_IMA_EXT_0=*/4, 0},
                        {/*RISCV_HWPROBE_KEY_MISALIGNED_SCALAR_PERF=*/9, 0}};
@@ -2089,7 +2089,7 @@ const StringMap<bool> sys::getHostCPUFeatures() {
   return Features;
 }
 #else
-const StringMap<bool> sys::getHostCPUFeatures() { return {}; }
+StringMap<bool> sys::getHostCPUFeatures() { return {}; }
 #endif
 
 #if __APPLE__

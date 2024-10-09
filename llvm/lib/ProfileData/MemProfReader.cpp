@@ -766,7 +766,7 @@ RawMemProfReader::getModuleOffset(const uint64_t VirtualAddress) {
 
 Error RawMemProfReader::readNextRecord(
     GuidMemProfRecordPair &GuidRecord,
-    std::function<const Frame(const FrameId)> Callback) {
+    std::function<Frame(FrameId)> Callback) {
   // Create a new callback for the RawMemProfRecord iterator so that we can
   // provide the symbol name if the reader was initialized with KeepSymbolName =
   // true. This is useful for debugging and testing.

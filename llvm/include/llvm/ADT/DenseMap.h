@@ -465,13 +465,13 @@ protected:
     return KeyInfoT::getHashValue(Val);
   }
 
-  static const KeyT getEmptyKey() {
+  static KeyT getEmptyKey() {
     static_assert(std::is_base_of_v<DenseMapBase, DerivedT>,
                   "Must pass the derived type to this template!");
     return KeyInfoT::getEmptyKey();
   }
 
-  static const KeyT getTombstoneKey() { return KeyInfoT::getTombstoneKey(); }
+  static KeyT getTombstoneKey() { return KeyInfoT::getTombstoneKey(); }
 
 private:
   iterator makeIterator(BucketT *P, BucketT *E, DebugEpochBase &Epoch,

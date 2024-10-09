@@ -391,7 +391,7 @@ public:
 
   uint64_t getSamples() const { return NumSamples; }
   const CallTargetMap &getCallTargets() const { return CallTargets; }
-  const SortedCallTargetSet getSortedCallTargets() const {
+  SortedCallTargetSet getSortedCallTargets() const {
     return sortCallTargets(CallTargets);
   }
 
@@ -403,7 +403,7 @@ public:
   }
 
   /// Sort call targets in descending order of call frequency.
-  static const SortedCallTargetSet
+  static SortedCallTargetSet
   sortCallTargets(const CallTargetMap &Targets) {
     SortedCallTargetSet SortedTargets;
     for (const auto &[Target, Frequency] : Targets) {
@@ -413,8 +413,8 @@ public:
   }
 
   /// Prorate call targets by a distribution factor.
-  static const CallTargetMap adjustCallTargets(const CallTargetMap &Targets,
-                                               float DistributionFactor) {
+  static CallTargetMap adjustCallTargets(const CallTargetMap &Targets,
+                                         float DistributionFactor) {
     CallTargetMap AdjustedTargets;
     for (const auto &[Target, Frequency] : Targets) {
       AdjustedTargets[Target] = Frequency * DistributionFactor;

@@ -4991,19 +4991,11 @@ public:
 
   void updateDependence() { setDependence(computeDependence(this)); }
 
-  ArrayRef<Expr *> getInitExprs() {
+  ArrayRef<Expr *> getInitExprs() const {
     return ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
   }
 
-  const ArrayRef<Expr *> getInitExprs() const {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
-  }
-
-  ArrayRef<Expr *> getUserSpecifiedInitExprs() {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
-  }
-
-  const ArrayRef<Expr *> getUserSpecifiedInitExprs() const {
+  ArrayRef<Expr *> getUserSpecifiedInitExprs() const {
     return ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
   }
 

@@ -317,7 +317,7 @@ void PGOContextualProfile::visit(ConstVisitor V, const Function *F) const {
     V(*reinterpret_cast<const PGOCtxProfContext *>(Node));
 }
 
-const CtxProfFlatProfile PGOContextualProfile::flatten() const {
+CtxProfFlatProfile PGOContextualProfile::flatten() const {
   assert(Profiles.has_value());
   CtxProfFlatProfile Flat;
   preorderVisit<const PGOCtxProfContext::CallTargetMapTy,
