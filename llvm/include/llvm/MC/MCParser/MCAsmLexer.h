@@ -108,7 +108,7 @@ public:
   }
 
   /// Look ahead at the next token to be lexed.
-  const AsmToken peekTok(bool ShouldSkipSpace = true) {
+  AsmToken peekTok(bool ShouldSkipSpace = true) {
     AsmToken Tok;
 
     MutableArrayRef<AsmToken> Buf(Tok);

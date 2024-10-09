@@ -2069,7 +2069,7 @@ StringRef CodeGenModule::getBlockMangledName(GlobalDecl GD,
   return Result.first->first();
 }
 
-const GlobalDecl CodeGenModule::getMangledNameDecl(StringRef Name) {
+GlobalDecl CodeGenModule::getMangledNameDecl(StringRef Name) {
   auto it = MangledDeclNames.begin();
   while (it != MangledDeclNames.end()) {
     if (it->second == Name)

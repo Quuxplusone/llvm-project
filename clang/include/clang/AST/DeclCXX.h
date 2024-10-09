@@ -1939,7 +1939,7 @@ public:
   void setExpr(Expr *E) { ExplicitSpec.setPointer(E); }
   // Retrieve the explicit specifier in the given declaration, if any.
   static ExplicitSpecifier getFromDecl(FunctionDecl *Function);
-  static const ExplicitSpecifier getFromDecl(const FunctionDecl *Function) {
+  static ExplicitSpecifier getFromDecl(const FunctionDecl *Function) {
     return getFromDecl(const_cast<FunctionDecl *>(Function));
   }
   static ExplicitSpecifier Invalid() {
@@ -1996,7 +1996,7 @@ public:
                                                    GlobalDeclID ID);
 
   ExplicitSpecifier getExplicitSpecifier() { return ExplicitSpec; }
-  const ExplicitSpecifier getExplicitSpecifier() const { return ExplicitSpec; }
+  ExplicitSpecifier getExplicitSpecifier() const { return ExplicitSpec; }
 
   /// Return true if the declaration is already resolved to be explicit.
   bool isExplicit() const { return ExplicitSpec.isExplicit(); }
@@ -2614,10 +2614,7 @@ public:
       CXXConstructorDeclBits.IsSimpleExplicit = ES.isExplicit();
   }
 
-  ExplicitSpecifier getExplicitSpecifier() {
-    return getCanonicalDecl()->getExplicitSpecifierInternal();
-  }
-  const ExplicitSpecifier getExplicitSpecifier() const {
+  ExplicitSpecifier getExplicitSpecifier() const {
     return getCanonicalDecl()->getExplicitSpecifierInternal();
   }
 
@@ -2897,11 +2894,7 @@ public:
          Expr *TrailingRequiresClause = nullptr);
   static CXXConversionDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  ExplicitSpecifier getExplicitSpecifier() {
-    return getCanonicalDecl()->ExplicitSpec;
-  }
-
-  const ExplicitSpecifier getExplicitSpecifier() const {
+  ExplicitSpecifier getExplicitSpecifier() const {
     return getCanonicalDecl()->ExplicitSpec;
   }
 

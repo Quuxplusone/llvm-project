@@ -438,7 +438,7 @@ struct MainSwitch {
   virtual ~MainSwitch() = default;
 
   SwitchInst *getInstr() const { return Instr; }
-  const SmallVector<SelectInstToUnfold, 4> getSelectInsts() {
+  SmallVector<SelectInstToUnfold, 4> getSelectInsts() {
     return SelectInsts;
   }
 

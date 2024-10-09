@@ -394,7 +394,7 @@ public:
 
     inline DefInfo getPreviousDefinition();
 
-    const DefInfo getPreviousDefinition() const {
+    DefInfo getPreviousDefinition() const {
       return const_cast<DefInfo *>(this)->getPreviousDefinition();
     }
   };
@@ -403,7 +403,7 @@ public:
   /// macro definition directive along with info about its undefined location
   /// (if there is one) and if it is public or private.
   DefInfo getDefinition();
-  const DefInfo getDefinition() const {
+  DefInfo getDefinition() const {
     return const_cast<MacroDirective *>(this)->getDefinition();
   }
 
@@ -420,8 +420,8 @@ public:
 
   /// Find macro definition active in the specified source location. If
   /// this macro was not defined there, return NULL.
-  const DefInfo findDirectiveAtLoc(SourceLocation L,
-                                   const SourceManager &SM) const;
+  DefInfo findDirectiveAtLoc(SourceLocation L,
+                             const SourceManager &SM) const;
 
   void dump() const;
 

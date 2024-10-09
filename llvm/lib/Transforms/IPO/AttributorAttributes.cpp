@@ -1029,7 +1029,7 @@ struct AAPointerInfoImpl
   AAPointerInfoImpl(const IRPosition &IRP, Attributor &A) : BaseTy(IRP) {}
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return std::string("PointerInfo ") +
            (isValidState() ? (std::string("#") +
                               std::to_string(OffsetBins.size()) + " bins")
@@ -2099,7 +2099,7 @@ struct AANoUnwindImpl : AANoUnwind {
     (void)IsKnown;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "nounwind" : "may-unwind";
   }
 
@@ -2224,7 +2224,7 @@ struct AANoSyncImpl : AANoSync {
     (void)IsKnown;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "nosync" : "may-sync";
   }
 
@@ -2314,7 +2314,7 @@ struct AANoFreeImpl : public AANoFree {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "nofree" : "may-free";
   }
 };
@@ -2620,7 +2620,7 @@ struct AANonNullImpl : AANonNull {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "nonnull" : "may-null";
   }
 };
@@ -2698,7 +2698,7 @@ struct AANonNullReturned final
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "nonnull" : "may-null";
   }
 
@@ -2750,7 +2750,7 @@ struct AAMustProgressImpl : public AAMustProgress {
   }
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "mustprogress" : "may-not-progress";
   }
 };
@@ -2833,7 +2833,7 @@ struct AANoRecurseImpl : public AANoRecurse {
   }
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "norecurse" : "may-recurse";
   }
 };
@@ -2898,7 +2898,7 @@ struct AANonConvergentImpl : public AANonConvergent {
       : AANonConvergent(IRP, A) {}
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "non-convergent" : "may-be-convergent";
   }
 };
@@ -3198,7 +3198,7 @@ struct AAUndefinedBehaviorImpl : public AAUndefinedBehavior {
   }
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "undefined-behavior" : "no-ub";
   }
 
@@ -3367,7 +3367,7 @@ struct AAWillReturnImpl : public AAWillReturn {
   }
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "willreturn" : "may-noreturn";
   }
 };
@@ -3569,7 +3569,7 @@ struct CachedReachabilityAA : public BaseTy {
     return Result == RQITy::Reachable::Yes;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     // TODO: Return the number of reachable queries.
     return "#queries(" + std::to_string(QueryVector.size()) + ")";
   }
@@ -3800,7 +3800,7 @@ struct AANoAliasImpl : AANoAlias {
            "Noalias is a pointer attribute");
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "noalias" : "may-alias";
   }
 };
@@ -4132,7 +4132,7 @@ struct AAIsDeadValueImpl : public AAIsDead {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return isAssumedDead() ? "assumed-dead" : "assumed-live";
   }
 
@@ -4264,7 +4264,7 @@ struct AAIsDeadFloating : public AAIsDeadValueImpl {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     Instruction *I = dyn_cast<Instruction>(&getAssociatedValue());
     if (isa_and_nonnull<StoreInst>(I))
       if (isValidState())
@@ -4448,7 +4448,7 @@ struct AAIsDeadCallSiteReturned : public AAIsDeadFloating {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return isAssumedDead()
                ? "assumed-dead"
                : (getAssumed() ? "assumed-dead-users" : "assumed-live");
@@ -4525,7 +4525,7 @@ struct AAIsDeadFunction : public AAIsDead {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return "Live[#BB " + std::to_string(AssumedLiveBlocks.size()) + "/" +
            std::to_string(getAnchorScope()->size()) + "][#TBEP " +
            std::to_string(ToBeExploredFrom.size()) + "][#KDE " +
@@ -5038,7 +5038,7 @@ struct AADereferenceableImpl : AADereferenceable {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (!getAssumedDereferenceableBytes())
       return "unknown-dereferenceable";
     bool IsKnownNonNull;
@@ -5343,7 +5343,7 @@ struct AAAlignImpl : AAAlign {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return "align<" + std::to_string(getKnownAlign().value()) + "-" +
            std::to_string(getAssumedAlign().value()) + ">";
   }
@@ -5511,7 +5511,7 @@ struct AANoReturnImpl : public AANoReturn {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "noreturn" : "may-return";
   }
 
@@ -5658,7 +5658,7 @@ struct AAInstanceInfoImpl : public AAInstanceInfo {
   }
 
   /// See AbstractState::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return isAssumedUniqueForAnalysis() ? "<unique [fAa]>" : "<unknown>";
   }
 
@@ -5851,7 +5851,7 @@ struct AANoCaptureImpl : public AANoCapture {
   }
 
   /// See AbstractState::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (isKnownNoCapture())
       return "known not-captured";
     if (isAssumedNoCapture())
@@ -6159,7 +6159,7 @@ struct AAValueSimplifyImpl : AAValueSimplify {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     LLVM_DEBUG({
       dbgs() << "SAV: " << (bool)SimplifiedAssociatedValue << " ";
       if (SimplifiedAssociatedValue && *SimplifiedAssociatedValue)
@@ -6696,7 +6696,7 @@ struct AAHeapToStackFunction final : public AAHeapToStack {
                                        SCB);
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     unsigned NumH2SMallocs = 0, NumInvalidMallocs = 0;
     for (const auto &It : AllocationInfos) {
       if (It.second->Status == AllocationInfo::INVALID)
@@ -7225,7 +7225,7 @@ struct AAPrivatizablePtrImpl : public AAPrivatizablePtr {
     return PrivatizableType;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return isAssumedPrivatizablePtr() ? "[priv]" : "[no-priv]";
   }
 
@@ -7876,7 +7876,7 @@ struct AAMemoryBehaviorImpl : public AAMemoryBehavior {
   }
 
   /// See AbstractState::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (isAssumedReadNone())
       return "readnone";
     if (isAssumedReadOnly())
@@ -8897,7 +8897,7 @@ struct AADenormalFPMathImpl : public AADenormalFPMath {
   AADenormalFPMathImpl(const IRPosition &IRP, Attributor &A)
       : AADenormalFPMath(IRP, A) {}
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     std::string Str("AADenormalFPMath[");
     raw_string_ostream OS(Str);
 
@@ -9015,7 +9015,7 @@ struct AAValueConstantRangeImpl : AAValueConstantRange {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     std::string Str;
     llvm::raw_string_ostream OS(Str);
     OS << "range(" << getBitWidth() << ")<";
@@ -9696,7 +9696,7 @@ struct AAPotentialConstantValuesImpl : AAPotentialConstantValues {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     std::string Str;
     llvm::raw_string_ostream OS(Str);
     OS << getState();
@@ -10239,7 +10239,7 @@ struct AANoUndefImpl : AANoUndef {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getAssumed() ? "noundef" : "may-undef-or-poison";
   }
 
@@ -10399,7 +10399,7 @@ struct AANoFPClassImpl : AANoFPClass {
     return false;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     std::string Result = "nofpclass";
     raw_string_ostream OS(Result);
     OS << getKnownNoFPClass() << '/' << getAssumedNoFPClass();
@@ -10510,7 +10510,7 @@ struct AACallEdgesImpl : public AACallEdges {
     return HasUnknownCalleeNonAsm;
   }
 
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return "CallEdges[" + std::to_string(HasUnknownCallee) + "," +
            std::to_string(CalledFunctions.size()) + "]";
   }
@@ -10818,7 +10818,7 @@ struct AAPotentialValuesImpl : AAPotentialValues {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     std::string Str;
     llvm::raw_string_ostream OS(Str);
     OS << getState();
@@ -11775,7 +11775,7 @@ struct AAAssumptionInfoImpl : public AAAssumptionInfo {
   }
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     const SetContents &Known = getKnown();
     const SetContents &Assumed = getAssumed();
 
@@ -11895,7 +11895,7 @@ struct AAUnderlyingObjectsImpl
   AAUnderlyingObjectsImpl(const IRPosition &IRP, Attributor &A) : BaseTy(IRP) {}
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (!isValidState())
       return "<invalid>";
     std::string Str;
@@ -12186,7 +12186,7 @@ struct AAGlobalValueInfoFloating : public AAGlobalValueInfo {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return "[" + std::to_string(Uses.size()) + " uses]";
   }
 
@@ -12486,7 +12486,7 @@ struct AAIndirectCallInfoCallSite : public AAIndirectCallInfo {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return std::string(AllCalleesKnown ? "eliminate" : "specialize") +
            " indirect call site with " + std::to_string(AssumedCallees.size()) +
            " functions";
@@ -12650,7 +12650,7 @@ struct AAAddressSpaceImpl : public AAAddressSpace {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (!isValidState())
       return "addrspace(<invalid>)";
     return "addrspace(" +
@@ -12875,7 +12875,7 @@ struct AAAllocationInfoImpl : public AAAllocationInfo {
   }
 
   /// See AbstractAttribute::getAsStr().
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     if (!isValidState())
       return "allocationinfo(<invalid>)";
     return "allocationinfo(" +

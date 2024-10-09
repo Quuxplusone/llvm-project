@@ -7302,7 +7302,7 @@ bool llvm::replaceAndRecursivelySimplify(
 }
 
 namespace llvm {
-const SimplifyQuery getBestSimplifyQuery(Pass &P, Function &F) {
+SimplifyQuery getBestSimplifyQuery(Pass &P, Function &F) {
   auto *DTWP = P.getAnalysisIfAvailable<DominatorTreeWrapperPass>();
   auto *DT = DTWP ? &DTWP->getDomTree() : nullptr;
   auto *TLIWP = P.getAnalysisIfAvailable<TargetLibraryInfoWrapperPass>();
@@ -7312,21 +7312,21 @@ const SimplifyQuery getBestSimplifyQuery(Pass &P, Function &F) {
   return {F.getDataLayout(), TLI, DT, AC};
 }
 
-const SimplifyQuery getBestSimplifyQuery(LoopStandardAnalysisResults &AR,
-                                         const DataLayout &DL) {
+SimplifyQuery getBestSimplifyQuery(LoopStandardAnalysisResults &AR,
+                                   const DataLayout &DL) {
   return {DL, &AR.TLI, &AR.DT, &AR.AC};
 }
 
 template <class T, class... TArgs>
-const SimplifyQuery getBestSimplifyQuery(AnalysisManager<T, TArgs...> &AM,
-                                         Function &F) {
+SimplifyQuery getBestSimplifyQuery(AnalysisManager<T, TArgs...> &AM,
+                                   Function &F) {
   auto *DT = AM.template getCachedResult<DominatorTreeAnalysis>(F);
   auto *TLI = AM.template getCachedResult<TargetLibraryAnalysis>(F);
   auto *AC = AM.template getCachedResult<AssumptionAnalysis>(F);
   return {F.getDataLayout(), TLI, DT, AC};
 }
-template const SimplifyQuery getBestSimplifyQuery(AnalysisManager<Function> &,
-                                                  Function &);
+template SimplifyQuery getBestSimplifyQuery(AnalysisManager<Function> &,
+                                            Function &);
 
 bool SimplifyQuery::isUndefValue(Value *V) const {
   if (!CanUseUndef)

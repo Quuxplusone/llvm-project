@@ -434,7 +434,7 @@ public:
   using PTMDataType =
       llvm::PointerUnion<const NamedDecl *, const PointerToMemberData *>;
 
-  const PTMDataType getPTMData() const {
+  PTMDataType getPTMData() const {
     return PTMDataType::getFromOpaqueValue(const_cast<void *>(Data));
   }
 

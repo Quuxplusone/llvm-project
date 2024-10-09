@@ -1632,7 +1632,7 @@ namespace {
     bool IsNullPtr : 1;
     bool InvalidBase : 1;
 
-    const APValue::LValueBase getLValueBase() const { return Base; }
+    APValue::LValueBase getLValueBase() const { return Base; }
     CharUnits &getLValueOffset() { return Offset; }
     const CharUnits &getLValueOffset() const { return Offset; }
     SubobjectDesignator &getLValueDesignator() { return Designator; }
@@ -12346,7 +12346,7 @@ static bool isDesignatorAtObjectEnd(const ASTContext &Ctx, const LValue &LVal) {
     return FD->getFieldIndex() + 1 == Layout.getFieldCount();
   };
 
-  auto &Base = LVal.getLValueBase();
+  const auto &Base = LVal.getLValueBase();
   if (auto *ME = dyn_cast_or_null<MemberExpr>(Base.dyn_cast<const Expr *>())) {
     if (auto *FD = dyn_cast<FieldDecl>(ME->getMemberDecl())) {
       bool Invalid;

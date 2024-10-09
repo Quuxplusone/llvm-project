@@ -1125,7 +1125,7 @@ public:
     /// Retrieve the function ProtoTypeLoc candidate.
     /// This can be called for any Kind, but returns null for kinds
     /// other than CK_FunctionProtoTypeLoc.
-    const FunctionProtoTypeLoc getFunctionProtoTypeLoc() const;
+    FunctionProtoTypeLoc getFunctionProtoTypeLoc() const;
 
     const TemplateDecl *getTemplate() const {
       assert(getKind() == CK_Template && "Not a template");

@@ -87,7 +87,7 @@ Error ModuleDebugStreamRef::reloadSerialize(BinaryStreamReader &Reader) {
   return Error::success();
 }
 
-const codeview::CVSymbolArray
+codeview::CVSymbolArray
 ModuleDebugStreamRef::getSymbolArrayForScope(uint32_t ScopeBegin) const {
   return limitSymbolArrayToScope(SymbolArray, ScopeBegin);
 }

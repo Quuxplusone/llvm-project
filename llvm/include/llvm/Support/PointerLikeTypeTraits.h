@@ -79,10 +79,10 @@ template <> struct PointerLikeTypeTraits<void *> {
 template <typename T> struct PointerLikeTypeTraits<const T> {
   typedef PointerLikeTypeTraits<T> NonConst;
 
-  static inline const void *getAsVoidPointer(const T P) {
+  static inline const void *getAsVoidPointer(T P) {
     return NonConst::getAsVoidPointer(P);
   }
-  static inline const T getFromVoidPointer(const void *P) {
+  static inline T getFromVoidPointer(const void *P) {
     return NonConst::getFromVoidPointer(const_cast<void *>(P));
   }
   static constexpr int NumLowBitsAvailable = NonConst::NumLowBitsAvailable;

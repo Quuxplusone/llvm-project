@@ -282,12 +282,12 @@ bool replaceAndRecursivelySimplify(
 // These helper functions return a SimplifyQuery structure that contains as
 // many of the optional analysis we use as are currently valid.  This is the
 // strongly preferred way of constructing SimplifyQuery in passes.
-const SimplifyQuery getBestSimplifyQuery(Pass &, Function &);
+SimplifyQuery getBestSimplifyQuery(Pass &, Function &);
 template <class T, class... TArgs>
-const SimplifyQuery getBestSimplifyQuery(AnalysisManager<T, TArgs...> &,
-                                         Function &);
-const SimplifyQuery getBestSimplifyQuery(LoopStandardAnalysisResults &,
-                                         const DataLayout &);
+SimplifyQuery getBestSimplifyQuery(AnalysisManager<T, TArgs...> &,
+                                   Function &);
+SimplifyQuery getBestSimplifyQuery(LoopStandardAnalysisResults &,
+                                   const DataLayout &);
 } // end namespace llvm
 
 #endif

@@ -537,7 +537,7 @@ class StdLibraryFunctionsChecker
     /// a later bug report created by ErrnoChecker.
     /// Empty return value means that 'errno' related bug may not happen from
     /// the current analyzed function.
-    virtual const std::string describe(CheckerContext &C) const { return ""; }
+    virtual std::string describe(CheckerContext &C) const { return ""; }
 
     virtual ~ErrnoConstraintBase() {}
 
@@ -606,7 +606,7 @@ class StdLibraryFunctionsChecker
       return errno_modeling::setErrnoForStdSuccess(State, C);
     }
 
-    const std::string describe(CheckerContext &C) const override {
+    std::string describe(CheckerContext &C) const override {
       return "'errno' becomes undefined after the call";
     }
   };
@@ -624,7 +624,7 @@ class StdLibraryFunctionsChecker
                                                       Call.getOriginExpr());
     }
 
-    const std::string describe(CheckerContext &C) const override {
+    std::string describe(CheckerContext &C) const override {
       return "reading 'errno' is required to find out if the call has failed";
     }
   };

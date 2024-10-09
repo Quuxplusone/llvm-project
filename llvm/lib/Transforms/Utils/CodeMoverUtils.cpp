@@ -59,7 +59,7 @@ public:
   /// \p BB from \p Dominator. If \p MaxLookup is non-zero, it limits the
   /// number of conditions to collect. Return std::nullopt if not all conditions
   /// are collected successfully, or we hit the limit.
-  static const std::optional<ControlConditions>
+  static std::optional<ControlConditions>
   collectControlConditions(const BasicBlock &BB, const BasicBlock &Dominator,
                            const DominatorTree &DT,
                            const PostDominatorTree &PDT,
@@ -104,7 +104,7 @@ static bool domTreeLevelBefore(DominatorTree *DT, const Instruction *InstA,
   return DA->getLevel() < DB->getLevel();
 }
 
-const std::optional<ControlConditions>
+std::optional<ControlConditions>
 ControlConditions::collectControlConditions(const BasicBlock &BB,
                                             const BasicBlock &Dominator,
                                             const DominatorTree &DT,

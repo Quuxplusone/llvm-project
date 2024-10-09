@@ -124,7 +124,7 @@ void OptTable::buildPrefixChars() {
 
 OptTable::~OptTable() = default;
 
-const Option OptTable::getOption(OptSpecifier Opt) const {
+Option OptTable::getOption(OptSpecifier Opt) const {
   unsigned id = Opt.getID();
   if (id == 0)
     return Option(nullptr, nullptr);

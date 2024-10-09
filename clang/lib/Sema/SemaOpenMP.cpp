@@ -497,7 +497,7 @@ public:
   void addCriticalWithHint(const OMPCriticalDirective *D, llvm::APSInt Hint) {
     Criticals.try_emplace(D->getDirectiveName().getAsString(), D, Hint);
   }
-  const std::pair<const OMPCriticalDirective *, llvm::APSInt>
+  std::pair<const OMPCriticalDirective *, llvm::APSInt>
   getCriticalWithHint(const DeclarationNameInfo &Name) const {
     auto I = Criticals.find(Name.getAsString());
     if (I != Criticals.end())
@@ -519,18 +519,18 @@ public:
   /// current region.
   /// \return The index of the loop control variable in the list of associated
   /// for-loops (from outer to inner).
-  const LCDeclInfo isLoopControlVariable(const ValueDecl *D) const;
+  LCDeclInfo isLoopControlVariable(const ValueDecl *D) const;
   /// Check if the specified variable is a loop control variable for
   /// parent region.
   /// \return The index of the loop control variable in the list of associated
   /// for-loops (from outer to inner).
-  const LCDeclInfo isParentLoopControlVariable(const ValueDecl *D) const;
+  LCDeclInfo isParentLoopControlVariable(const ValueDecl *D) const;
   /// Check if the specified variable is a loop control variable for
   /// current region.
   /// \return The index of the loop control variable in the list of associated
   /// for-loops (from outer to inner).
-  const LCDeclInfo isLoopControlVariable(const ValueDecl *D,
-                                         unsigned Level) const;
+  LCDeclInfo isLoopControlVariable(const ValueDecl *D,
+                                   unsigned Level) const;
   /// Get the loop control variable for the I-th loop (or nullptr) in
   /// parent directive.
   const ValueDecl *getParentLoopControlVariable(unsigned I) const;
@@ -563,13 +563,13 @@ public:
                                  const Expr *ReductionRef);
   /// Returns the location and reduction operation from the innermost parent
   /// region for the given \p D.
-  const DSAVarData
+  DSAVarData
   getTopMostTaskgroupReductionData(const ValueDecl *D, SourceRange &SR,
                                    BinaryOperatorKind &BOK,
                                    Expr *&TaskgroupDescriptor) const;
   /// Returns the location and reduction operation from the innermost parent
   /// region for the given \p D.
-  const DSAVarData
+  DSAVarData
   getTopMostTaskgroupReductionData(const ValueDecl *D, SourceRange &SR,
                                    const Expr *&ReductionRef,
                                    Expr *&TaskgroupDescriptor) const;
@@ -594,15 +594,15 @@ public:
 
   /// Returns data sharing attributes from top of the stack for the
   /// specified declaration.
-  const DSAVarData getTopDSA(ValueDecl *D, bool FromParent);
+  DSAVarData getTopDSA(ValueDecl *D, bool FromParent);
   /// Returns data-sharing attributes for the specified declaration.
-  const DSAVarData getImplicitDSA(ValueDecl *D, bool FromParent) const;
+  DSAVarData getImplicitDSA(ValueDecl *D, bool FromParent) const;
   /// Returns data-sharing attributes for the specified declaration.
-  const DSAVarData getImplicitDSA(ValueDecl *D, unsigned Level) const;
+  DSAVarData getImplicitDSA(ValueDecl *D, unsigned Level) const;
   /// Checks if the specified variables has data-sharing attributes which
   /// match specified \a CPred predicate in any directive which matches \a DPred
   /// predicate.
-  const DSAVarData
+  DSAVarData
   hasDSA(ValueDecl *D,
          const llvm::function_ref<bool(OpenMPClauseKind, bool,
                                        DefaultDataSharingAttributes)>
@@ -612,7 +612,7 @@ public:
   /// Checks if the specified variables has data-sharing attributes which
   /// match specified \a CPred predicate in any innermost directive which
   /// matches \a DPred predicate.
-  const DSAVarData
+  DSAVarData
   hasInnermostDSA(ValueDecl *D,
                   const llvm::function_ref<bool(OpenMPClauseKind, bool)> CPred,
                   const llvm::function_ref<bool(OpenMPDirectiveKind)> DPred,
@@ -1436,7 +1436,7 @@ void DSAStackTy::addLoopControlVariable(const ValueDecl *D, VarDecl *Capture) {
       D, LCDeclInfo(StackElem.LCVMap.size() + 1, Capture));
 }
 
-const DSAStackTy::LCDeclInfo
+DSAStackTy::LCDeclInfo
 DSAStackTy::isLoopControlVariable(const ValueDecl *D) const {
   assert(!isStackEmpty() && "Data-sharing attributes stack is empty");
   D = getCanonicalDecl(D);
@@ -1447,7 +1447,7 @@ DSAStackTy::isLoopControlVariable(const ValueDecl *D) const {
   return {0, nullptr};
 }
 
-const DSAStackTy::LCDeclInfo
+DSAStackTy::LCDeclInfo
 DSAStackTy::isLoopControlVariable(const ValueDecl *D, unsigned Level) const {
   assert(!isStackEmpty() && "Data-sharing attributes stack is empty");
   D = getCanonicalDecl(D);
@@ -1460,7 +1460,7 @@ DSAStackTy::isLoopControlVariable(const ValueDecl *D, unsigned Level) const {
   return {0, nullptr};
 }
 
-const DSAStackTy::LCDeclInfo
+DSAStackTy::LCDeclInfo
 DSAStackTy::isParentLoopControlVariable(const ValueDecl *D) const {
   const SharingMapTy *Parent = getSecondOnStackOrNull();
   assert(Parent && "Data-sharing attributes stack is empty");
@@ -1602,7 +1602,7 @@ void DSAStackTy::addTaskgroupReductionData(const ValueDecl *D, SourceRange SR,
   }
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::getTopMostTaskgroupReductionData(
+DSAStackTy::DSAVarData DSAStackTy::getTopMostTaskgroupReductionData(
     const ValueDecl *D, SourceRange &SR, BinaryOperatorKind &BOK,
     Expr *&TaskgroupDescriptor) const {
   D = getCanonicalDecl(D);
@@ -1629,7 +1629,7 @@ const DSAStackTy::DSAVarData DSAStackTy::getTopMostTaskgroupReductionData(
   return DSAVarData();
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::getTopMostTaskgroupReductionData(
+DSAStackTy::DSAVarData DSAStackTy::getTopMostTaskgroupReductionData(
     const ValueDecl *D, SourceRange &SR, const Expr *&ReductionRef,
     Expr *&TaskgroupDescriptor) const {
   D = getCanonicalDecl(D);
@@ -1721,8 +1721,8 @@ static bool rejectConstNotMutableType(Sema &SemaRef, const ValueDecl *D,
   return false;
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::getTopDSA(ValueDecl *D,
-                                                   bool FromParent) {
+DSAStackTy::DSAVarData DSAStackTy::getTopDSA(ValueDecl *D,
+                                             bool FromParent) {
   D = getCanonicalDecl(D);
   DSAVarData DVar;
 
@@ -1881,8 +1881,8 @@ const DSAStackTy::DSAVarData DSAStackTy::getTopDSA(ValueDecl *D,
   return DVar;
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
-                                                        bool FromParent) const {
+DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
+                                                  bool FromParent) const {
   if (isStackEmpty()) {
     const_iterator I;
     return getDSA(I, D);
@@ -1895,8 +1895,8 @@ const DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
   return getDSA(StartI, D);
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
-                                                        unsigned Level) const {
+DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
+                                                  unsigned Level) const {
   if (getStackSize() <= Level)
     return DSAVarData();
   D = getCanonicalDecl(D);
@@ -1904,7 +1904,7 @@ const DSAStackTy::DSAVarData DSAStackTy::getImplicitDSA(ValueDecl *D,
   return getDSA(StartI, D);
 }
 
-const DSAStackTy::DSAVarData
+DSAStackTy::DSAVarData
 DSAStackTy::hasDSA(ValueDecl *D,
                    const llvm::function_ref<bool(OpenMPClauseKind, bool,
                                                  DefaultDataSharingAttributes)>
@@ -1930,7 +1930,7 @@ DSAStackTy::hasDSA(ValueDecl *D,
   return {};
 }
 
-const DSAStackTy::DSAVarData DSAStackTy::hasInnermostDSA(
+DSAStackTy::DSAVarData DSAStackTy::hasInnermostDSA(
     ValueDecl *D, const llvm::function_ref<bool(OpenMPClauseKind, bool)> CPred,
     const llvm::function_ref<bool(OpenMPDirectiveKind)> DPred,
     bool FromParent) const {
@@ -22487,7 +22487,7 @@ bool SemaOpenMP::ActOnStartOpenMPDeclareTargetContext(
   return true;
 }
 
-const SemaOpenMP::DeclareTargetContextInfo
+SemaOpenMP::DeclareTargetContextInfo
 SemaOpenMP::ActOnOpenMPEndDeclareTargetDirective() {
   assert(!DeclareTargetNesting.empty() &&
          "check isInOpenMPDeclareTargetContext() first!");

@@ -116,7 +116,7 @@ public:
 
   /// Get the best possible source location to represent a diagnostic that
   /// may have associated debug info.
-  const FullSourceLoc getBestLocationFromDebugLoc(
+  FullSourceLoc getBestLocationFromDebugLoc(
     const llvm::DiagnosticInfoWithLocationBase &D,
     bool &BadDebugInfo, StringRef &Filename,
     unsigned &Line, unsigned &Column) const;

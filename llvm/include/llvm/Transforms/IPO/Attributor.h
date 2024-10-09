@@ -607,8 +607,8 @@ struct IRPosition {
   IRPosition() : Enc(nullptr, ENC_VALUE) { verify(); }
 
   /// Create a position describing the value of \p V.
-  static const IRPosition value(const Value &V,
-                                const CallBaseContext *CBContext = nullptr) {
+  static IRPosition value(const Value &V,
+                          const CallBaseContext *CBContext = nullptr) {
     if (auto *Arg = dyn_cast<Argument>(&V))
       return IRPosition::argument(*Arg, CBContext);
     if (auto *CB = dyn_cast<CallBase>(&V))
@@ -619,52 +619,52 @@ struct IRPosition {
   /// Create a position describing the instruction \p I. This is different from
   /// the value version because call sites are treated as intrusctions rather
   /// than their return value in this function.
-  static const IRPosition inst(const Instruction &I,
-                               const CallBaseContext *CBContext = nullptr) {
+  static IRPosition inst(const Instruction &I,
+                         const CallBaseContext *CBContext = nullptr) {
     return IRPosition(const_cast<Instruction &>(I), IRP_FLOAT, CBContext);
   }
 
   /// Create a position describing the function scope of \p F.
   /// \p CBContext is used for call base specific analysis.
-  static const IRPosition function(const Function &F,
-                                   const CallBaseContext *CBContext = nullptr) {
+  static IRPosition function(const Function &F,
+                             const CallBaseContext *CBContext = nullptr) {
     return IRPosition(const_cast<Function &>(F), IRP_FUNCTION, CBContext);
   }
 
   /// Create a position describing the returned value of \p F.
   /// \p CBContext is used for call base specific analysis.
-  static const IRPosition returned(const Function &F,
-                                   const CallBaseContext *CBContext = nullptr) {
+  static IRPosition returned(const Function &F,
+                             const CallBaseContext *CBContext = nullptr) {
     return IRPosition(const_cast<Function &>(F), IRP_RETURNED, CBContext);
   }
 
   /// Create a position describing the argument \p Arg.
   /// \p CBContext is used for call base specific analysis.
-  static const IRPosition argument(const Argument &Arg,
-                                   const CallBaseContext *CBContext = nullptr) {
+  static IRPosition argument(const Argument &Arg,
+                             const CallBaseContext *CBContext = nullptr) {
     return IRPosition(const_cast<Argument &>(Arg), IRP_ARGUMENT, CBContext);
   }
 
   /// Create a position describing the function scope of \p CB.
-  static const IRPosition callsite_function(const CallBase &CB) {
+  static IRPosition callsite_function(const CallBase &CB) {
     return IRPosition(const_cast<CallBase &>(CB), IRP_CALL_SITE);
   }
 
   /// Create a position describing the returned value of \p CB.
-  static const IRPosition callsite_returned(const CallBase &CB) {
+  static IRPosition callsite_returned(const CallBase &CB) {
     return IRPosition(const_cast<CallBase &>(CB), IRP_CALL_SITE_RETURNED);
   }
 
   /// Create a position describing the argument of \p CB at position \p ArgNo.
-  static const IRPosition callsite_argument(const CallBase &CB,
-                                            unsigned ArgNo) {
+  static IRPosition callsite_argument(const CallBase &CB,
+                                      unsigned ArgNo) {
     return IRPosition(const_cast<Use &>(CB.getArgOperandUse(ArgNo)),
                       IRP_CALL_SITE_ARGUMENT);
   }
 
   /// Create a position describing the argument of \p ACS at position \p ArgNo.
-  static const IRPosition callsite_argument(AbstractCallSite ACS,
-                                            unsigned ArgNo) {
+  static IRPosition callsite_argument(AbstractCallSite ACS,
+                                      unsigned ArgNo) {
     if (ACS.getNumArgOperands() <= ArgNo)
       return IRPosition();
     int CSArgNo = ACS.getCallArgOperandNo(ArgNo);
@@ -678,7 +678,7 @@ struct IRPosition {
   /// If \p IRP is a call site (see isAnyCallSitePosition()) then the result
   /// will be a call site position, otherwise the function position of the
   /// associated function.
-  static const IRPosition
+  static IRPosition
   function_scope(const IRPosition &IRP,
                  const CallBaseContext *CBContext = nullptr) {
     if (IRP.isAnyCallSitePosition()) {
@@ -1338,7 +1338,7 @@ struct InformationCache {
 
   /// Return all functions that might be called indirectly, only valid for
   /// closed world modules (see isClosedWorldModule).
-  const ArrayRef<Function *>
+  ArrayRef<Function *>
   getIndirectlyCallableFunctions(Attributor &A) const;
 
   /// Return the flat address space if the associated target has.
@@ -3371,10 +3371,10 @@ struct AbstractAttribute : public IRPosition, public AADepGraphNode {
   void dump() const { this->print(dbgs()); }
 
   /// This function should return the "summarized" assumed state as string.
-  virtual const std::string getAsStr(Attributor *A) const = 0;
+  virtual std::string getAsStr(Attributor *A) const = 0;
 
   /// This function should return the name of the AbstractAttribute
-  virtual const std::string getName() const = 0;
+  virtual std::string getName() const = 0;
 
   /// This function should return the address of the ID of the AbstractAttribute
   virtual const char *getIdAddr() const = 0;
@@ -3488,7 +3488,7 @@ struct AANoUnwind
   static AANoUnwind &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoUnwind"; }
+  std::string getName() const override { return "AANoUnwind"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3571,7 +3571,7 @@ struct AANoSync
   static AANoSync &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoSync"; }
+  std::string getName() const override { return "AANoSync"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3612,7 +3612,7 @@ struct AAMustProgress
                                            Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAMustProgress"; }
+  std::string getName() const override { return "AAMustProgress"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3664,7 +3664,7 @@ struct AANonNull
   static AANonNull &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANonNull"; }
+  std::string getName() const override { return "AANonNull"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3695,7 +3695,7 @@ struct AANoRecurse
   static AANoRecurse &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoRecurse"; }
+  std::string getName() const override { return "AANoRecurse"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3759,7 +3759,7 @@ struct AAWillReturn
   static AAWillReturn &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAWillReturn"; }
+  std::string getName() const override { return "AAWillReturn"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3796,7 +3796,7 @@ struct AAUndefinedBehavior
                                                 Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAUndefinedBehavior"; }
+  std::string getName() const override { return "AAUndefinedBehavior"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3829,7 +3829,7 @@ struct AAIntraFnReachability
                                                   Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAIntraFnReachability"; }
+  std::string getName() const override { return "AAIntraFnReachability"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3876,7 +3876,7 @@ struct AANoAlias
   static AANoAlias &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoAlias"; }
+  std::string getName() const override { return "AANoAlias"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3926,7 +3926,7 @@ struct AANoFree
   static AANoFree &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoFree"; }
+  std::string getName() const override { return "AANoFree"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -3957,7 +3957,7 @@ struct AANoReturn
   static AANoReturn &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoReturn"; }
+  std::string getName() const override { return "AANoReturn"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4052,7 +4052,7 @@ public:
   }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAIsDead"; }
+  std::string getName() const override { return "AAIsDead"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4248,7 +4248,7 @@ struct AADereferenceable
                                               Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AADereferenceable"; }
+  std::string getName() const override { return "AADereferenceable"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4286,7 +4286,7 @@ struct AAAlign
   Align getKnownAlign() const { return Align(getKnown()); }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAAlign"; }
+  std::string getName() const override { return "AAAlign"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4328,7 +4328,7 @@ struct AAInstanceInfo : public StateWrapper<BooleanState, AbstractAttribute> {
                                            Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAInstanceInfo"; }
+  std::string getName() const override { return "AAInstanceInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4410,7 +4410,7 @@ struct AANoCapture
   static AANoCapture &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoCapture"; }
+  std::string getName() const override { return "AANoCapture"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4510,7 +4510,7 @@ struct AAValueSimplify
                                             Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAValueSimplify"; }
+  std::string getName() const override { return "AAValueSimplify"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4551,7 +4551,7 @@ struct AAHeapToStack : public StateWrapper<BooleanState, AbstractAttribute> {
   static AAHeapToStack &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAHeapToStack"; }
+  std::string getName() const override { return "AAHeapToStack"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4606,7 +4606,7 @@ struct AAPrivatizablePtr
                                               Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAPrivatizablePtr"; }
+  std::string getName() const override { return "AAPrivatizablePtr"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4681,7 +4681,7 @@ struct AAMemoryBehavior
                                              Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAMemoryBehavior"; }
+  std::string getName() const override { return "AAMemoryBehavior"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4861,12 +4861,12 @@ struct AAMemoryLocation
                                              Attributor &A);
 
   /// See AbstractState::getAsStr(Attributor).
-  const std::string getAsStr(Attributor *A) const override {
+  std::string getAsStr(Attributor *A) const override {
     return getMemoryLocationsAsStr(getAssumedNotAccessedLocation());
   }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAMemoryLocation"; }
+  std::string getName() const override { return "AAMemoryLocation"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -4934,7 +4934,7 @@ struct AAValueConstantRange
   }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAValueConstantRange"; }
+  std::string getName() const override { return "AAValueConstantRange"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5287,7 +5287,7 @@ struct AAPotentialConstantValues
   }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override {
+  std::string getName() const override {
     return "AAPotentialConstantValues";
   }
 
@@ -5326,7 +5326,7 @@ struct AAPotentialValues
                                SmallVectorImpl<AA::ValueAndContext> &Values);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAPotentialValues"; }
+  std::string getName() const override { return "AAPotentialValues"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5376,7 +5376,7 @@ struct AANoUndef
   static AANoUndef &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoUndef"; }
+  std::string getName() const override { return "AANoUndef"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5427,7 +5427,7 @@ struct AANoFPClass
   static AANoFPClass &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANoFPClass"; }
+  std::string getName() const override { return "AANoFPClass"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5516,7 +5516,7 @@ struct AACallEdges : public StateWrapper<BooleanState, AbstractAttribute>,
   static AACallEdges &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AACallEdges"; }
+  std::string getName() const override { return "AACallEdges"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5638,7 +5638,7 @@ struct AAExecutionDomain
                                               Attributor &A);
 
   /// See AbstractAttribute::getName().
-  const std::string getName() const override { return "AAExecutionDomain"; }
+  std::string getName() const override { return "AAExecutionDomain"; }
 
   /// See AbstractAttribute::getIdAddr().
   const char *getIdAddr() const override { return &ID; }
@@ -5704,7 +5704,7 @@ struct AAInterFnReachability
                                                   Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAInterFnReachability"; }
+  std::string getName() const override { return "AAInterFnReachability"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5736,7 +5736,7 @@ struct AANonConvergent : public StateWrapper<BooleanState, AbstractAttribute> {
   bool isKnownNotConvergent() const { return getKnown(); }
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AANonConvergent"; }
+  std::string getName() const override { return "AANonConvergent"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6159,7 +6159,7 @@ struct AAPointerInfo : public AbstractAttribute {
   static AAPointerInfo &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAPointerInfo"; }
+  std::string getName() const override { return "AAPointerInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6225,7 +6225,7 @@ struct AAAssumptionInfo
                                              Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAAssumptionInfo"; }
+  std::string getName() const override { return "AAAssumptionInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6259,7 +6259,7 @@ struct AAUnderlyingObjects : AbstractAttribute {
                                                 Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAUnderlyingObjects"; }
+  std::string getName() const override { return "AAUnderlyingObjects"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6307,7 +6307,7 @@ struct AAAddressSpace : public StateWrapper<BooleanState, AbstractAttribute> {
                                            Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAAddressSpace"; }
+  std::string getName() const override { return "AAAddressSpace"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6344,7 +6344,7 @@ struct AAAllocationInfo : public StateWrapper<BooleanState, AbstractAttribute> {
   virtual std::optional<TypeSize> getAllocatedSize() const = 0;
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAAllocationInfo"; }
+  std::string getName() const override { return "AAAllocationInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6385,7 +6385,7 @@ struct AAGlobalValueInfo
   virtual bool isPotentialUse(const Use &U) const = 0;
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAGlobalValueInfo"; }
+  std::string getName() const override { return "AAGlobalValueInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6424,7 +6424,7 @@ struct AAIndirectCallInfo
   virtual bool foreachCallee(function_ref<bool(Function *)> CB) const = 0;
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAIndirectCallInfo"; }
+  std::string getName() const override { return "AAIndirectCallInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -6454,7 +6454,7 @@ struct AADenormalFPMath
                                              Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AADenormalFPMath"; }
+  std::string getName() const override { return "AADenormalFPMath"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }

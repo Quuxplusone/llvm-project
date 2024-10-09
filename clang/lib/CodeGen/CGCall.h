@@ -56,7 +56,7 @@ public:
   const FunctionProtoType *getCalleeFunctionProtoType() const {
     return CalleeProtoTy;
   }
-  const GlobalDecl getCalleeDecl() const { return CalleeDecl; }
+  GlobalDecl getCalleeDecl() const { return CalleeDecl; }
 };
 
 /// All available information about a concrete callee.

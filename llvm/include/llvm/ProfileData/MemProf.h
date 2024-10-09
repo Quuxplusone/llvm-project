@@ -380,7 +380,7 @@ struct AllocationInfo {
   AllocationInfo() = default;
   AllocationInfo(
       const IndexedAllocationInfo &IndexedAI,
-      llvm::function_ref<const Frame(const FrameId)> IdToFrameCallback) {
+      llvm::function_ref<Frame(FrameId)> IdToFrameCallback) {
     for (const FrameId &Id : IndexedAI.CallStack) {
       CallStack.push_back(IdToFrameCallback(Id));
     }
@@ -475,7 +475,7 @@ struct MemProfRecord {
   MemProfRecord() = default;
   MemProfRecord(
       const IndexedMemProfRecord &Record,
-      llvm::function_ref<const Frame(const FrameId Id)> IdToFrameCallback) {
+      llvm::function_ref<Frame(FrameId)> IdToFrameCallback) {
     for (const IndexedAllocationInfo &IndexedAI : Record.AllocSites) {
       AllocSites.emplace_back(IndexedAI, IdToFrameCallback);
     }

@@ -92,7 +92,7 @@ public:
     std::vector<DWARFFormValue> IncludeDirectories;
     std::vector<FileNameEntry> FileNames;
 
-    const dwarf::FormParams getFormParams() const { return FormParams; }
+    dwarf::FormParams getFormParams() const { return FormParams; }
     uint16_t getVersion() const { return FormParams.Version; }
     uint8_t getAddressSize() const { return FormParams.AddrSize; }
     bool isDWARF64() const { return FormParams.Format == dwarf::DWARF64; }

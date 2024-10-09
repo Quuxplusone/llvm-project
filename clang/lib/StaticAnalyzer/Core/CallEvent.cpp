@@ -518,7 +518,7 @@ const ConstructionContext *CallEvent::getConstructionContext() const {
   return nullptr;
 }
 
-const CallEventRef<> CallEvent::getCaller() const {
+CallEventRef<> CallEvent::getCaller() const {
   const auto *CallLocationContext = this->getLocationContext();
   if (!CallLocationContext || CallLocationContext->inTopFrame())
     return nullptr;

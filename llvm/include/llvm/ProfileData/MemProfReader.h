@@ -65,7 +65,7 @@ public:
 
   virtual Error
   readNextRecord(GuidMemProfRecordPair &GuidRecord,
-                 std::function<const Frame(const FrameId)> Callback = nullptr) {
+                 std::function<Frame(FrameId)> Callback = nullptr) {
     if (FunctionProfileData.empty())
       return make_error<InstrProfError>(instrprof_error::empty_raw_profile);
 
@@ -163,7 +163,7 @@ public:
 
   Error
   readNextRecord(GuidMemProfRecordPair &GuidRecord,
-                 std::function<const Frame(const FrameId)> Callback) override;
+                 std::function<Frame(FrameId)> Callback) override;
 
   // Constructor for unittests only.
   RawMemProfReader(std::unique_ptr<llvm::symbolize::SymbolizableModule> Sym,

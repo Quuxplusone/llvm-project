@@ -1533,8 +1533,7 @@ public:
   const Decl *getSingleDecl() const { return DG.getSingleDecl(); }
   Decl *getSingleDecl() { return DG.getSingleDecl(); }
 
-  const DeclGroupRef getDeclGroup() const { return DG; }
-  DeclGroupRef getDeclGroup() { return DG; }
+  DeclGroupRef getDeclGroup() const { return DG; }
   void setDeclGroup(DeclGroupRef DGR) { DG = DGR; }
 
   void setStartLoc(SourceLocation L) { StartLoc = L; }

@@ -6093,7 +6093,7 @@ void BoUpSLP::reorderBottomToTop(bool IgnoreReorder) {
           continue;
         if (!OpTE->ReuseShuffleIndices.empty() && !GathersToOrders.count(OpTE))
           continue;
-        const auto Order = [&]() -> const OrdersType {
+        const auto Order = [&]() -> OrdersType {
           if (OpTE->isGather() || !OpTE->ReuseShuffleIndices.empty())
             return getReorderingData(*OpTE, /*TopToBottom=*/false)
                 .value_or(OrdersType(1));

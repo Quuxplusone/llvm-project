@@ -216,7 +216,7 @@ MacroDirective::DefInfo MacroDirective::getDefinition() {
   return DefInfo(nullptr, UndefLoc, !isPublic || *isPublic);
 }
 
-const MacroDirective::DefInfo
+MacroDirective::DefInfo
 MacroDirective::findDirectiveAtLoc(SourceLocation L,
                                    const SourceManager &SM) const {
   assert(L.isValid() && "SourceLocation is invalid.");

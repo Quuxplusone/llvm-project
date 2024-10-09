@@ -2286,7 +2286,7 @@ struct AAICVTracker : public StateWrapper<BooleanState, AbstractAttribute> {
   InternalControlVar TrackableICVs[1] = {ICV_nthreads};
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAICVTracker"; }
+  std::string getName() const override { return "AAICVTracker"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -2304,7 +2304,7 @@ struct AAICVTrackerFunction : public AAICVTracker {
       : AAICVTracker(IRP, A) {}
 
   // FIXME: come up with better string.
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     return "ICVTrackerFunction";
   }
 
@@ -2498,7 +2498,7 @@ struct AAICVTrackerFunctionReturned : AAICVTracker {
       : AAICVTracker(IRP, A) {}
 
   // FIXME: come up with better string.
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     return "ICVTrackerFunctionReturned";
   }
 
@@ -2597,7 +2597,7 @@ struct AAICVTrackerCallSite : AAICVTracker {
   }
 
   // FIXME: come up with better string.
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     return "ICVTrackerCallSite";
   }
 
@@ -2638,7 +2638,7 @@ struct AAICVTrackerCallSiteReturned : AAICVTracker {
       : AAICVTracker(IRP, A) {}
 
   // FIXME: come up with better string.
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     return "ICVTrackerCallSiteReturned";
   }
 
@@ -2710,7 +2710,7 @@ struct AAExecutionDomainFunction : public AAExecutionDomain {
     RPOT = new ReversePostOrderTraversal<Function *>(F);
   }
 
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     unsigned TotalBlocks = 0, InitialThreadBlocks = 0, AlignedBlocks = 0;
     for (auto &It : BEDMap) {
       if (!It.getFirst())
@@ -3399,7 +3399,7 @@ struct AAHeapToShared : public StateWrapper<BooleanState, AbstractAttribute> {
   virtual bool isAssumedHeapToSharedRemovedFree(CallBase &CB) const = 0;
 
   /// See AbstractAttribute::getName().
-  const std::string getName() const override { return "AAHeapToShared"; }
+  std::string getName() const override { return "AAHeapToShared"; }
 
   /// See AbstractAttribute::getIdAddr().
   const char *getIdAddr() const override { return &ID; }
@@ -3418,7 +3418,7 @@ struct AAHeapToSharedFunction : public AAHeapToShared {
   AAHeapToSharedFunction(const IRPosition &IRP, Attributor &A)
       : AAHeapToShared(IRP, A) {}
 
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     return "[AAHeapToShared] " + std::to_string(MallocCalls.size()) +
            " malloc calls eligible.";
   }
@@ -3622,7 +3622,7 @@ struct AAKernelInfo : public StateWrapper<KernelInfoState, AbstractAttribute> {
   void trackStatistics() const override {}
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     if (!isValidState())
       return "<invalid>";
     return std::string(SPMDCompatibilityTracker.isAssumed() ? "SPMD"
@@ -3652,7 +3652,7 @@ struct AAKernelInfo : public StateWrapper<KernelInfoState, AbstractAttribute> {
   static AAKernelInfo &createForPosition(const IRPosition &IRP, Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAKernelInfo"; }
+  std::string getName() const override { return "AAKernelInfo"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5186,7 +5186,7 @@ struct AAFoldRuntimeCall
                                               Attributor &A);
 
   /// See AbstractAttribute::getName()
-  const std::string getName() const override { return "AAFoldRuntimeCall"; }
+  std::string getName() const override { return "AAFoldRuntimeCall"; }
 
   /// See AbstractAttribute::getIdAddr()
   const char *getIdAddr() const override { return &ID; }
@@ -5205,7 +5205,7 @@ struct AAFoldRuntimeCallCallSiteReturned : AAFoldRuntimeCall {
       : AAFoldRuntimeCall(IRP, A) {}
 
   /// See AbstractAttribute::getAsStr()
-  const std::string getAsStr(Attributor *) const override {
+  std::string getAsStr(Attributor *) const override {
     if (!isValidState())
       return "<invalid>";
 

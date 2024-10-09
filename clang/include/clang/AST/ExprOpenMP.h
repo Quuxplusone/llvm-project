@@ -258,7 +258,7 @@ public:
 
   /// Gets the iterator range for the given iterator.
   IteratorRange getIteratorRange(unsigned I);
-  const IteratorRange getIteratorRange(unsigned I) const {
+  IteratorRange getIteratorRange(unsigned I) const {
     return const_cast<OMPIteratorExpr *>(this)->getIteratorRange(I);
   }
 

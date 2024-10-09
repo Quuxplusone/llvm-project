@@ -531,7 +531,7 @@ CodeCompleteConsumer::OverloadCandidate::getFunctionType() const {
   llvm_unreachable("Invalid CandidateKind!");
 }
 
-const FunctionProtoTypeLoc
+FunctionProtoTypeLoc
 CodeCompleteConsumer::OverloadCandidate::getFunctionProtoTypeLoc() const {
   if (Kind == CK_FunctionProtoTypeLoc)
     return ProtoTypeLoc;
