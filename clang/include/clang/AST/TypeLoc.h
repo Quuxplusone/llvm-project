@@ -2235,7 +2235,7 @@ public:
 
   // FIXME: Several of the following functions can be removed. Instead the
   // caller can directly work with the ConceptReference.
-  const NestedNameSpecifierLoc getNestedNameSpecifierLoc() const {
+  NestedNameSpecifierLoc getNestedNameSpecifierLoc() const {
     if (const auto *CR = getConceptReference())
       return CR->getNestedNameSpecifierLoc();
     return NestedNameSpecifierLoc();

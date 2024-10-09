@@ -762,7 +762,7 @@ private:
   /// Note that \p Vec is passed by value, leading to quadratic copying cost,
   /// but it's OK in practice since its length is limited to DEREFERENCE_LIMIT.
   /// \return A chain fields leading to the region of interest or std::nullopt.
-  const std::optional<RegionVector>
+  std::optional<RegionVector>
   findRegionOfInterestInRecord(const RecordDecl *RD, ProgramStateRef State,
                                const MemRegion *R, const RegionVector &Vec = {},
                                int depth = 0);

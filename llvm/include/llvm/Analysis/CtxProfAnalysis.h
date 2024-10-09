@@ -99,7 +99,7 @@ public:
   void update(Visitor, const Function &F);
   void visit(ConstVisitor, const Function *F = nullptr) const;
 
-  const CtxProfFlatProfile flatten() const;
+  CtxProfFlatProfile flatten() const;
 
   bool invalidate(Module &, const PreservedAnalyses &PA,
                   ModuleAnalysisManager::Invalidator &) {

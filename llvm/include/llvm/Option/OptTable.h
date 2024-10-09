@@ -137,7 +137,7 @@ public:
   /// if necessary.
   ///
   /// \return The option, or null for the INVALID option id.
-  const Option getOption(OptSpecifier Opt) const;
+  Option getOption(OptSpecifier Opt) const;
 
   /// Lookup the name of the given option.
   StringRef getOptionName(OptSpecifier id) const {

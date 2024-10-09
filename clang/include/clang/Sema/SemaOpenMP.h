@@ -326,7 +326,7 @@ public:
   bool ActOnStartOpenMPDeclareTargetContext(DeclareTargetContextInfo &DTCI);
 
   /// Called at the end of target region i.e. '#pragma omp end declare target'.
-  const DeclareTargetContextInfo ActOnOpenMPEndDeclareTargetDirective();
+  DeclareTargetContextInfo ActOnOpenMPEndDeclareTargetDirective();
 
   /// Called once a target context is completed, that can be when a
   /// '#pragma omp end declare target' was encountered or when a

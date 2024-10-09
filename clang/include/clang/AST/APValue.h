@@ -526,7 +526,7 @@ public:
     return const_cast<APValue*>(this)->getComplexFloatImag();
   }
 
-  const LValueBase getLValueBase() const;
+  LValueBase getLValueBase() const;
   CharUnits &getLValueOffset();
   const CharUnits &getLValueOffset() const {
     return const_cast<APValue*>(this)->getLValueOffset();

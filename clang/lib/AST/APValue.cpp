@@ -970,7 +970,7 @@ bool APValue::toIntegralConstant(APSInt &Result, QualType SrcTy,
   return false;
 }
 
-const APValue::LValueBase APValue::getLValueBase() const {
+APValue::LValueBase APValue::getLValueBase() const {
   assert(isLValue() && "Invalid accessor");
   return ((const LV *)(const void *)&Data)->Base;
 }

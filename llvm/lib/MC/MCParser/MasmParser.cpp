@@ -570,7 +570,7 @@ public:
 
 private:
   bool expandMacros();
-  const AsmToken peekTok(bool ShouldSkipSpace = true);
+  AsmToken peekTok(bool ShouldSkipSpace = true);
 
   bool parseStatement(ParseStatementInfo &Info,
                       MCAsmParserSemaCallback *SI);
@@ -1287,7 +1287,7 @@ const AsmToken &MasmParser::Lex(ExpandKind ExpandNextToken) {
   return *tok;
 }
 
-const AsmToken MasmParser::peekTok(bool ShouldSkipSpace) {
+AsmToken MasmParser::peekTok(bool ShouldSkipSpace) {
   AsmToken Tok;
 
   MutableArrayRef<AsmToken> Buf(Tok);

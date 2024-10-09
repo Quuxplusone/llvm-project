@@ -325,7 +325,7 @@ public:
 
   // Most methods are provided by the base class.
 
-  const PtrTy operator*() const {
+  PtrTy operator*() const {
     assert(isHandleInSync() && "invalid iterator access!");
     if (shouldReverseIterate()) {
       assert(Bucket > End);
