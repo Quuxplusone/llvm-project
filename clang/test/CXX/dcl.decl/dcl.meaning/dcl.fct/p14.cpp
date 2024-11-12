@@ -22,7 +22,9 @@ template<typename T, typename ...Types>
 struct X0 {
   typedef identity<T(Types...)> function_pack_1;
   typedef identity<T(Types......)> variadic_function_pack_1; // expected-warning {{varargs}} expected-note {{pack}} expected-note {{insert ','}}
+    // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
   typedef identity<T(T...)> variadic_1;
+    // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
   typedef tuple<T(Types, ...)...> template_arg_expansion_1;
 };
 

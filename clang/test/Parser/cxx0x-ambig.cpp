@@ -131,8 +131,10 @@ namespace ellipsis {
     void i(int(T, ...)); // function type, expected-error {{unexpanded parameter pack}}
     void i(int(T, ...a)); // expected-error {{expected ')'}} expected-note {{to match}} expected-error {{unexpanded parameter pack}}
     void j(int(int...)); // function type, ok
+      // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
     void j(int(int...a)); // expected-error {{does not contain any unexpanded parameter packs}}
     void j(T(int...)); // expected-error {{unexpanded parameter pack}}
+      // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
     void j(T(T...)); // expected-error {{unexpanded parameter pack}}
     void k(int(...)(T)); // expected-error {{cannot return function type}}
     void k(int ...(T));

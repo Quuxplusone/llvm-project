@@ -6,3 +6,4 @@ void f(...) {
 }
 
 void h(int n..., int m); // expected-error {{expected ')'}} expected-note {{to match}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}

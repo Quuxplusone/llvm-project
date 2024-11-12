@@ -236,6 +236,8 @@ namespace pr16989 {
 
 namespace pr20660 {
  appendList(int[]...);     // expected-error {{a type specifier is required for all declarations}}
+   // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
  appendList(int[]...) { }  // expected-error {{a type specifier is required for all declarations}}
+   // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 }
 

@@ -48,13 +48,16 @@ void f4(T ...args); // expected-error{{type 'T' of function parameter pack does 
 
 void f4i(int ... x); // expected-error{{type 'int' of function parameter pack does not contain any unexpanded parameter packs}}
 void f4i0(int ...);
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
 namespace array_type {
 template<typename T>
 void a(T[] ... x); // expected-error{{expected ')'}} expected-note{{to match this '('}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
 template<typename T>
 void b(T[] ...);
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
 template<typename T>
 void c(T ... []); // expected-error {{expected expression}} \
@@ -65,14 +68,19 @@ template<typename T>
 void d(T ... x[]); // expected-error{{type 'T[]' of function parameter pack does not contain any unexpanded parameter packs}}
 
 void ai(int[] ... x); // expected-error{{expected ')'}} expected-note{{to match this '('}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 void bi(int[] ...);
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 void ci(int ... []); // expected-error{{type 'int[]' of function parameter pack does not contain any unexpanded parameter packs}}
 void di(int ... x[]); // expected-error{{type 'int[]' of function parameter pack does not contain any unexpanded parameter packs}}
 }
 
 void f5a(auto fp(int)->unk ...) {} // expected-error{{unknown type name 'unk'}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 void f5b(auto fp(int)->auto ...) {} // expected-error{{'auto' not allowed in function return type}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 void f5c(auto fp()->...) {} // expected-error{{expected a type}}
+  // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
 // FIXME: Expand for function and member pointer types.
 

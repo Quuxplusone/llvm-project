@@ -88,7 +88,7 @@ void instantiate_template_foo() {
 }
 
 // variadic function
-void vararg_foo(int * p...) { // expected-warning{{'p' is an unsafe pointer used for buffer access}}
+void vararg_foo(int * p, ...) { // expected-warning{{'p' is an unsafe pointer used for buffer access}}
   int tmp;
   tmp = p[5];                 // expected-note{{used in buffer access here}}
 }

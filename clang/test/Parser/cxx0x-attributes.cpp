@@ -256,6 +256,7 @@ void foo () {
   void bar [[noreturn]] ([[]] int i, [[]] int j);
   using FuncType = void ([[]] int);
   void baz([[]]...); // expected-error {{expected parameter declarator}}
+    // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
   [[]] return;
 }

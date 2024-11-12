@@ -119,6 +119,7 @@ using D3 = drop<5, int, char, double, long>::type; // expected-note {{in instant
 template<typename ...Default> struct DefArg {
   template<template<typename T = Default> class ...Classes> struct Inner { // expected-error {{default argument contains unexpanded parameter pack}} expected-note {{here}}
     Inner(Classes<>...); // expected-error {{too few}}
+      // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
   };
 };
 template<typename T> struct vector {};

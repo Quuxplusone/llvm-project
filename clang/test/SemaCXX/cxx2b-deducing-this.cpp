@@ -765,6 +765,7 @@ struct D {
 namespace GH80971 {
 struct S {
   auto f(this auto self...) {  }
+    // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 };
 
 int bug() {

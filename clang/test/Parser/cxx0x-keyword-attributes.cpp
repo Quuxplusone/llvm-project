@@ -242,6 +242,7 @@ void foo () {
                                                                               expected-error {{'ATTR_NAME' cannot be applied to a declaration}}
   using FuncType = void (ATTR_USE int); // expected-error {{'ATTR_NAME' only applies to function types}}
   void baz(ATTR_USE...); // expected-error {{expected parameter declarator}}
+    // expected-warning@-1 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 
   ATTR_USE return; // expected-error {{'ATTR_NAME' cannot be applied to a statement}}
 }

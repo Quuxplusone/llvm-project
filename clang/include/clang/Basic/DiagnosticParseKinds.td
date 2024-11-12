@@ -408,6 +408,9 @@ def err_function_scope_depth_exceeded : Error<
   "function scope depth exceeded maximum of %0">, DefaultFatal;
 def err_missing_comma_before_ellipsis : Error<
   "C requires a comma prior to the ellipsis in a variadic function type">;
+def warn_missing_comma_before_ellipsis : Warning<
+  "variadic ellipsis without a leading comma is deprecated in C++26">,
+  InGroup<DeprecatedEllipsis>;
 def err_unexpected_typedef_ident : Error<
   "unexpected type name %0: expected identifier">;
 def warn_cxx98_compat_decltype : Warning<

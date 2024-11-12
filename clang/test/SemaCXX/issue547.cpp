@@ -57,7 +57,7 @@ struct classify_function<R(Args..., ...) const &> {
 };
 
 typedef void f0(int) const;
-typedef void f1(int, float...) const volatile;
+typedef void f1(int, float, ...) const volatile;
 typedef void f2(int, double, ...) &&;
 typedef void f3(int, double, ...) const &;
 

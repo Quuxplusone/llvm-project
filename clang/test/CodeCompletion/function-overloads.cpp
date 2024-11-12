@@ -1,5 +1,5 @@
 int f(int i, int j = 2, int k = 5);
-int f(float x, float y...);
+int f(float x, float y, ...);
 
 class A {
  public:

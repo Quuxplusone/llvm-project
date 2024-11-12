@@ -18,11 +18,13 @@ namespace Ellipsis {
              t // expected-note {{place '...' immediately before declared identifier to declare a function parameter pack}}
              ... // expected-warning {{'...' in this location creates a C-style varargs function, not a function parameter pack}}
              // expected-note@-1 {{insert ',' before '...' to silence this warning}}
+             // expected-warning@-2 {{variadic ellipsis without a leading comma is deprecated in C++26}}
              );
       void h(T (&
               ) // expected-note {{place '...' here to declare a function parameter pack}}
              ... // expected-warning {{'...' in this location creates a C-style varargs function, not a function parameter pack}}
              // expected-note@-1 {{insert ',' before '...' to silence this warning}}
+             // expected-warning@-2 {{variadic ellipsis without a leading comma is deprecated in C++26}}
              );
       void i(T (&), ...);
     }...);
@@ -32,6 +34,7 @@ namespace Ellipsis {
     void f(T ... // expected-note {{preceding '...' declares a function parameter pack}}
            t...); // expected-warning-re {{'...' in this location creates a C-style varargs function{{$}}}}
            // expected-note@-1 {{insert ',' before '...' to silence this warning}}
+             // expected-warning@-2 {{variadic ellipsis without a leading comma is deprecated in C++26}}
   };
 
   // FIXME: We should just issue a single error in this case pointing out where
@@ -43,4 +46,5 @@ namespace Ellipsis {
   // expected-note@-2 {{place '...' immediately before declared identifier}}
   // expected-note@-3 {{insert ','}}
   // expected-error@-4 {{unexpanded parameter pack}}
+  // expected-warning@-5 {{variadic ellipsis without a leading comma is deprecated in C++26}}
 }

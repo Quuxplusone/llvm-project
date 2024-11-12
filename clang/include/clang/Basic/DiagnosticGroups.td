@@ -202,6 +202,7 @@ def : DiagGroup<"partial-availability", [UnguardedAvailability]>;
 def DeprecatedDynamicExceptionSpec
     : DiagGroup<"deprecated-dynamic-exception-spec">;
 def DeprecatedBuiltins : DiagGroup<"deprecated-builtins">;
+def DeprecatedEllipsis : DiagGroup<"deprecated-ellipsis">;
 def DeprecatedImplementations :DiagGroup<"deprecated-implementations">;
 def DeprecatedIncrementBool : DiagGroup<"deprecated-increment-bool">;
 def DeprecatedRegister : DiagGroup<"deprecated-register">;
@@ -221,6 +222,7 @@ def Deprecated : DiagGroup<"deprecated", [DeprecatedAnonEnumEnumConversion,
                                           DeprecatedCopyWithDtor,
                                           DeprecatedDeclarations,
                                           DeprecatedDynamicExceptionSpec,
+                                          DeprecatedEllipsis,
                                           DeprecatedEnumCompare,
                                           DeprecatedEnumCompareConditional,
                                           DeprecatedEnumEnumConversion,

@@ -243,7 +243,7 @@ namespace FunctionTypes {
   };
 
   template<typename R, typename ...Types>
-  struct Arity<R(Types......)> { // expected-warning {{varargs}} expected-note {{pack}} expected-note {{insert ','}}
+  struct Arity<R(Types..., ...)> {
     static const unsigned value = sizeof...(Types);
   };
 
@@ -252,8 +252,8 @@ namespace FunctionTypes {
 
   int check0[Arity<int()>::value == 0? 1 : -1];
   int check1[Arity<int(float, double)>::value == 2? 1 : -1];
-  int check2[Arity<int(float...)>::value == 1? 1 : -1];
-  int check3[Arity<int(float, double, long double...)>::value == 3? 1 : -1];
+  int check2[Arity<int(float, ...)>::value == 1? 1 : -1];
+  int check3[Arity<int(float, double, long double, ...)>::value == 3? 1 : -1];
   Arity<int(float, double, long double, char)> check4; // expected-error{{implicit instantiation of undefined template 'FunctionTypes::Arity<int (float, double, long double, char)>'}}
 }
 
