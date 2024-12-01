@@ -929,6 +929,7 @@ set(files
   __utility/forward_like.h
   __utility/in_place.h
   __utility/integer_sequence.h
+  __utility/integer_sequence_bindings.h
   __utility/is_pointer_in_range.h
   __utility/is_valid_range.h
   __utility/move.h

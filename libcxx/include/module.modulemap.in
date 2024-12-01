@@ -2180,6 +2180,7 @@ module std [system] {
       export std_core.type_traits.integral_constant
     }
     module integer_sequence           { header "__utility/integer_sequence.h" }
+    module integer_sequence_bindings  { header "__utility/integer_sequence_bindings.h" }
     module is_pointer_in_range        { header "__utility/is_pointer_in_range.h" }
     module is_valid_range             { header "__utility/is_valid_range.h" }
     module move                       { header "__utility/move.h" }
