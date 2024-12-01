@@ -70,9 +70,9 @@ void test() {
   // Test const& overload
   {
     const std::expected<void, int> e;
-    e.transform_error(return_unexpected<const int &>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)e.transform_error(return_unexpected<const int &>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
-    e.transform_error(return_no_object<const int &>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)e.transform_error(return_no_object<const int &>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
     // expected-error-re@*:* 0-1 {{call to deleted constructor of {{.*}}}}
   }
@@ -80,18 +80,18 @@ void test() {
   // Test && overload
   {
     std::expected<void, int> e;
-    std::move(e).transform_error(return_unexpected<int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)std::move(e).transform_error(return_unexpected<int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
-    std::move(e).transform_error(return_no_object<int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)std::move(e).transform_error(return_no_object<int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
   }
 
   // Test const&& overload
   {
     const std::expected<void, int> e;
-    std::move(e).transform_error(return_unexpected<const int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)std::move(e).transform_error(return_unexpected<const int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
-    std::move(e).transform_error(return_no_object<const int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
+    (void)std::move(e).transform_error(return_no_object<const int&&>); // expected-error-re@*:* {{static assertion failed {{.*}}The result of {{.*}} must be a valid template argument for unexpected}}
     // expected-error-re@*:* 0-1 {{no matching constructor for initialization of{{.*}}}}
   }
 }
