@@ -359,9 +359,6 @@ set(files
   __filesystem/recursive_directory_iterator.h
   __filesystem/space_info.h
   __filesystem/u8path.h
-  __flat_map/flat_map.h
-  __flat_map/key_value_iterator.h
-  __flat_map/sorted_unique.h
   __format/buffer.h
   __format/concepts.h
   __format/container_adaptor.h
@@ -979,7 +976,6 @@ set(files
   ext/hash_set
   fenv.h
   filesystem
-  flat_map
   float.h
   format
   forward_list
