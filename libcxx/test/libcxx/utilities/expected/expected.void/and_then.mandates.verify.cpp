@@ -60,7 +60,7 @@ void test() {
     // !std::is_same_v<U:error_type, E>
     {
       std::expected<void, int> f1;
-      f1.and_then(lval_error_type_not_same_as_int);  // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
+      (void)f1.and_then(lval_error_type_not_same_as_int);  // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
       // expected-error-re@*:* {{static assertion failed {{.*}}The result of f() must have the same error_type as this expected}}
     }
   }
@@ -79,7 +79,7 @@ void test() {
     // !std::is_same_v<U:error_type, E>
     {
       const std::expected<void, int> f1;
-      f1.and_then(clval_error_type_not_same_as_int);  // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
+      (void)f1.and_then(clval_error_type_not_same_as_int);  // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
       // expected-error-re@*:* {{static assertion failed {{.*}}The result of f() must have the same error_type as this expected}}
     }
   }
@@ -98,7 +98,7 @@ void test() {
     // !std::is_same_v<U:error_type, E>
     {
       std::expected<void, int> f1;
-      std::move(f1).and_then(rval_error_type_not_same_as_int); // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
+      (void)std::move(f1).and_then(rval_error_type_not_same_as_int); // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
       // expected-error-re@*:* {{static assertion failed {{.*}}The result of f() must have the same error_type as this expected}}
     }
   }
@@ -117,7 +117,7 @@ void test() {
     // !std::is_same_v<U:error_type, E>
     {
       const std::expected<void, int> f1;
-      std::move(f1).and_then(crval_error_type_not_same_as_int); // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
+      (void)std::move(f1).and_then(crval_error_type_not_same_as_int); // expected-note{{in instantiation of function template specialization 'std::expected<void, int>::and_then<std::expected<int, NotSameAsInt> (&)()>' requested here}}
       // expected-error-re@*:* {{static assertion failed {{.*}}The result of f() must have the same error_type as this expected}}
     }
   }
