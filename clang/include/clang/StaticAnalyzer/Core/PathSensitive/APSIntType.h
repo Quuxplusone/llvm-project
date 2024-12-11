@@ -67,7 +67,7 @@ public:
   }
 
   llvm::APSInt getValue(uint64_t RawValue) const LLVM_READONLY {
-    return (llvm::APSInt(BitWidth, IsUnsigned) = RawValue);
+    return llvm::APSInt(BitWidth, IsUnsigned).withValue(RawValue);
   }
 
   /// Used to classify whether a value is representable using this type.
