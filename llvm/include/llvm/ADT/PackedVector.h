@@ -88,9 +88,9 @@ public:
     reference() = delete;
     reference(PackedVector &vec, unsigned idx) : Vec(vec), Idx(idx) {}
 
-    reference &operator=(T val) {
+    T operator=(T val) const {
       Vec.setValue(Vec.Bits, Idx, val);
-      return *this;
+      return val;
     }
 
     operator T() const {
