@@ -73,17 +73,16 @@ public:
 
     reference(const reference&) = default;
 
-    reference& operator=(reference t) {
-      *this = bool(t);
-      return *this;
+    bool operator=(reference t) const {
+      return *this = bool(t);
     }
 
-    reference& operator=(bool t) {
+    bool operator=(bool t) const {
       if (t)
         TheVector.set(BitPos);
       else
         TheVector.reset(BitPos);
-      return *this;
+      return t;
     }
 
     operator bool() const {
