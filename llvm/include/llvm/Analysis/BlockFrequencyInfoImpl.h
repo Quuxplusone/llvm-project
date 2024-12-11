@@ -148,16 +148,16 @@ public:
 };
 
 inline BlockMass operator+(BlockMass L, BlockMass R) {
-  return BlockMass(L) += R;
+  return L += R;
 }
 inline BlockMass operator-(BlockMass L, BlockMass R) {
-  return BlockMass(L) -= R;
+  return L -= R;
 }
 inline BlockMass operator*(BlockMass L, BranchProbability R) {
-  return BlockMass(L) *= R;
+  return L *= R;
 }
 inline BlockMass operator*(BranchProbability L, BlockMass R) {
-  return BlockMass(R) *= L;
+  return R *= L;
 }
 
 inline raw_ostream &operator<<(raw_ostream &OS, BlockMass X) {
