@@ -6349,7 +6349,7 @@ bool Sema::CheckFormatArguments(ArrayRef<const Expr *> Args,
       *this, OrigFormatExpr, Args, APK, format_idx, firstDataArg, Type,
       CallType,
       /*IsFunctionCall*/ true, CheckedVarArgs, UncoveredArg,
-      /*no string offset*/ llvm::APSInt(64, false) = 0);
+      /*no string offset*/ llvm::APSInt(64, false).withValue(0));
 
   // Generate a diagnostic where an uncovered argument is detected.
   if (UncoveredArg.hasUncoveredArg()) {
