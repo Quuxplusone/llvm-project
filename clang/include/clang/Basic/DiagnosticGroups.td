@@ -756,6 +756,9 @@ def MSBitfieldCompatibility : DiagGroup<"ms-bitfield-padding"> {
   }];
 }
 
+def AssignToClassRvalue : DiagGroup<"assign-to-class-rvalue">;
+def PreIncrementOfClassRvalue : DiagGroup<"preincrement-of-class-rvalue">;
+
 def PessimizingMove : DiagGroup<"pessimizing-move">;
 def ReturnStdMove : DiagGroup<"return-std-move">;
 
@@ -1247,6 +1250,7 @@ def Extra : DiagGroup<"extra", [
 
 def Most : DiagGroup<"most", [
     ArrayParameter,
+    AssignToClassRvalue,
     BoolOperation,
     CharSubscript,
     Comment,
