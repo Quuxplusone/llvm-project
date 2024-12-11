@@ -4,6 +4,7 @@ RUN: FileCheck --input-file=%t %s
      CHECK:-Wall
 CHECK-NEXT:  -Wmost
 CHECK-NEXT:    -Warray-parameter
+CHECK-NEXT:    -Wassign-to-class-rvalue
 CHECK-NEXT:    -Wbool-operation
 CHECK-NEXT:    -Wbitwise-instead-of-logical
 CHECK-NEXT:    -Wchar-subscripts

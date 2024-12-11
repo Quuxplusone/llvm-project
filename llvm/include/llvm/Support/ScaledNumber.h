@@ -722,7 +722,7 @@ private:
   template <class DigitsT>                                                     \
   ScaledNumber<DigitsT> operator op(const ScaledNumber<DigitsT> &L,            \
                                     const ScaledNumber<DigitsT> &R) {          \
-    return ScaledNumber<DigitsT>(L) base R;                                    \
+    ScaledNumber<DigitsT> Copy(L); Copy base R; return Copy;                   \
   }
 SCALED_NUMBER_BOP(+, += )
 SCALED_NUMBER_BOP(-, -= )
@@ -733,13 +733,13 @@ SCALED_NUMBER_BOP(/, /= )
 template <class DigitsT>
 ScaledNumber<DigitsT> operator<<(const ScaledNumber<DigitsT> &L,
                                  int16_t Shift) {
-  return ScaledNumber<DigitsT>(L) <<= Shift;
+  ScaledNumber<DigitsT> Copy(L); Copy <<= Shift; return Copy;
 }
 
 template <class DigitsT>
 ScaledNumber<DigitsT> operator>>(const ScaledNumber<DigitsT> &L,
                                  int16_t Shift) {
-  return ScaledNumber<DigitsT>(L) >>= Shift;
+  ScaledNumber<DigitsT> Copy(L); Copy >>= Shift; return Copy;
 }
 
 template <class DigitsT>

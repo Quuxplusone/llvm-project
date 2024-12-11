@@ -23,6 +23,7 @@ _warningFlags = [
     "-Wundef",
     "-Wunused-template",
     "-Wno-unused-command-line-argument",
+    "-Wno-assign-to-class-rvalue",
     "-Wno-attributes",
     "-Wno-pessimizing-move",
     "-Wno-noexcept-type",

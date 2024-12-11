@@ -15025,6 +15025,50 @@ Sema::CreateOverloadedUnaryOp(SourceLocation OpLoc, UnaryOperatorKind Opc,
       // We matched an overloaded operator. Build a call to that
       // operator.
 
+      if ((Opc == UO_PreDec || Opc == UO_PreInc || Opc == UO_PostDec || Opc == UO_PostInc) && !Args[0]->isLValue()) {
+        if (auto *MD = dyn_cast<CXXMethodDecl>(FnDecl)) {
+          if (MD->isImplicitObjectMemberFunction() && !MD->isConst() && (MD->getRefQualifier() == RQ_None)) {
+            // Do the overload resolution over again, as if this rvalue
+            // were a const-qualified xvalue. Would it still have worked?
+            QualType DifferentLhsT = Args[0]->getType().getNonReferenceType().withConst();
+            OpaqueValueExpr DifferentLhs(Args[0]->getExprLoc(), DifferentLhsT, VK_XValue);
+            Expr *DifferentArgs[2] = { &DifferentLhs, NumArgs == 2 ? Args[1] : nullptr };
+            ArrayRef<Expr *> DifferentArgsArray(DifferentArgs, NumArgs);
+
+            // Build the overload set.
+            OverloadCandidateSet DifferentCandidateSet(OpLoc, OverloadCandidateSet::CSK_Operator);
+            AddNonMemberOperatorCandidates(Fns, DifferentArgsArray, DifferentCandidateSet);
+            AddMemberOperatorCandidates(Op, OpLoc, DifferentArgsArray, DifferentCandidateSet);
+            if (PerformADL) {
+              AddArgumentDependentLookupCandidates(OpName, OpLoc, DifferentArgsArray,
+                                                   /*ExplicitTemplateArgs*/nullptr,
+                                                   DifferentCandidateSet);
+            }
+            AddBuiltinOperatorCandidates(Op, OpLoc, DifferentArgsArray, DifferentCandidateSet);
+
+            OverloadCandidateSet::iterator DifferentBest;
+            OverloadingResult OR = DifferentCandidateSet.BestViableFunction(*this, OpLoc, DifferentBest);
+            if (OR != OR_Success) {
+              // If the operand had been a const xvalue, the operation would have
+              // been ill-formed. Therefore, this is probably a mistake by
+              // the user, and we should warn about it.
+              // However, `--end()` is pretty common in practice.
+              if (Opc == UO_PreInc || Opc == UO_PreDec) {
+                Diag(OpLoc, diag::warn_preincrement_of_class_rvalue)
+                    << (Opc == UO_PreInc)
+                    << Args[0]->getType() << Args[0]->getSourceRange();
+                Diag(FnDecl->getLocation(), diag::note_declared_at);
+              } else {
+                Diag(OpLoc, diag::warn_postincrement_of_class_rvalue)
+                    << (Opc == UO_PostInc)
+                    << Args[0]->getType() << Args[0]->getSourceRange();
+                Diag(FnDecl->getLocation(), diag::note_declared_at);
+              }
+            }
+          }
+        }
+      }
+
       // Convert the arguments.
       if (CXXMethodDecl *Method = dyn_cast<CXXMethodDecl>(FnDecl)) {
         CheckMemberOperatorAccess(OpLoc, Input, nullptr, Best->FoundDecl);
@@ -15319,6 +15363,39 @@ ExprResult Sema::CreateOverloadedBinOp(SourceLocation OpLoc,
 
         OverloadedOperatorKind ChosenOp =
             FnDecl->getDeclName().getCXXOverloadedOperator();
+
+        if ((isCompoundAssignmentOperator(ChosenOp) || ChosenOp == OO_Equal) && !Args[0]->isLValue()) {
+          if (auto *MD = dyn_cast<CXXMethodDecl>(FnDecl)) {
+            if (MD->isImplicitObjectMemberFunction() && !MD->isConst() && (MD->getRefQualifier() == RQ_None)) {
+              // Do the overload resolution over again, as if this rvalue
+              // were a const-qualified xvalue. Would it still have worked?
+              QualType DifferentLhsT = Args[0]->getType().getNonReferenceType().withConst();
+              OpaqueValueExpr DifferentLhs(Args[0]->getExprLoc(), DifferentLhsT, VK_XValue);
+              Expr *DifferentArgs[2] = { &DifferentLhs, Args[1] };
+
+              // Build the overload set.
+              OverloadCandidateSet DifferentCandidateSet(OpLoc, OverloadCandidateSet::CSK_Operator,
+                                                OverloadCandidateSet::OperatorRewriteInfo(
+                                                Op, OpLoc, AllowRewrittenCandidates));
+              if (DefaultedFn)
+                DifferentCandidateSet.exclude(DefaultedFn);
+              LookupOverloadedBinOp(DifferentCandidateSet, Op, Fns, DifferentArgs, PerformADL);
+              OverloadCandidateSet::iterator DifferentBest;
+              OverloadingResult OR = DifferentCandidateSet.BestViableFunction(*this, OpLoc, DifferentBest);
+              if (OR != OR_Success) {
+                // If the LHS had been a const xvalue, the assignment would have
+                // been ill-formed. Therefore, this is probably a mistake by
+                // the user, and we should warn about it.
+                // But the operator= for tuple, pair, and reference gains `const` only in C++23,
+                // so emit a different warning, omitted from -Wall, for operator= prior to C++23.
+                Diag(OpLoc, (ChosenOp == OO_Equal && !getLangOpts().CPlusPlus23) ?
+                    diag::warn_cxx23_compat_assign_to_class_rvalue : diag::warn_assign_to_class_rvalue)
+                    << Args[0]->getType() << Args[0]->getSourceRange();
+                Diag(FnDecl->getLocation(), diag::note_declared_at);
+              }
+            }
+          }
+        }
 
         // C++2a [over.match.oper]p9:
         //   If a rewritten operator== candidate is selected by overload

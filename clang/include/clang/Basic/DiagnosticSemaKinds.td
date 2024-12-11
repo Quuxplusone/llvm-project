@@ -9067,6 +9067,14 @@ def ext_typecheck_convert_incompatible_function_pointer : ExtWarn<
 def warn_typecheck_convert_incompatible_function_pointer_strict : Warning<
   err_typecheck_convert_incompatible_function_pointer.Summary>,
   InGroup<DiagGroup<"incompatible-function-pointer-types-strict">>, DefaultIgnore;
+def warn_assign_to_class_rvalue : Warning<"possibly unintended assignment to an rvalue of type %0">,
+  InGroup<AssignToClassRvalue>, DefaultIgnore;
+def warn_cxx23_compat_assign_to_class_rvalue : Warning<"possibly unintended assignment to an rvalue of type %0">,
+  InGroup<DiagGroup<"cxx23-compat-assign-to-class-rvalue">>, DefaultIgnore;
+def warn_postincrement_of_class_rvalue : Warning<"possibly unintended %select{postdecrement|postincrement}0 of an rvalue of type %1">,
+  InGroup<AssignToClassRvalue>, DefaultIgnore;
+def warn_preincrement_of_class_rvalue : Warning<"possibly unintended %select{predecrement|preincrement}0 of an rvalue of type %1">,
+  InGroup<PreIncrementOfClassRvalue>, DefaultIgnore;
 def ext_typecheck_convert_discards_qualifiers : ExtWarn<
   "%select{%diff{assigning to $ from $|assigning to different types}0,1"
   "|%diff{passing $ to parameter of type $|"

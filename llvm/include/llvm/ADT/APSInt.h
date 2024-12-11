@@ -74,6 +74,12 @@ public:
     return *this;
   }
 
+  APSInt &&withValue(uint64_t RHS) && {
+    // Retain our current sign.
+    APInt::operator=(RHS);
+    return std::move(*this);
+  }
+
   // Query sign information.
   bool isSigned() const { return !IsUnsigned; }
   bool isUnsigned() const { return IsUnsigned; }
