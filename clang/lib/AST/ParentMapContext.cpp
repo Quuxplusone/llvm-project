@@ -19,12 +19,6 @@
 
 using namespace clang;
 
-ParentMapContext::ParentMapContext(ASTContext &Ctx) : ASTCtx(Ctx) {}
-
-ParentMapContext::~ParentMapContext() = default;
-
-void ParentMapContext::clear() { Parents.reset(); }
-
 const Expr *ParentMapContext::traverseIgnored(const Expr *E) const {
   return traverseIgnored(const_cast<Expr *>(E));
 }
@@ -482,3 +476,9 @@ DynTypedNodeList ParentMapContext::getParents(const DynTypedNode &Node) {
     Parents = std::make_unique<ParentMap>(ASTCtx);
   return Parents->getParents(getTraversalKind(), Node);
 }
+
+ParentMapContext::ParentMapContext(ASTContext &Ctx) : ASTCtx(Ctx) {}
+
+ParentMapContext::~ParentMapContext() = default;
+
+void ParentMapContext::clear() { Parents.reset(); }

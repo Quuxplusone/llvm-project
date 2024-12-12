@@ -23,6 +23,8 @@ STATISTIC(NumPatternEmitted, "Number of patterns emitted");
 namespace llvm {
 namespace gi {
 
+InstructionOperandMatcher::~InstructionOperandMatcher() = default;
+
 namespace {
 
 Error failUnsupported(const Twine &Reason) {

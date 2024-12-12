@@ -305,7 +305,7 @@ bool LoongArchTargetInfo::hasFeature(StringRef Feature) const {
 
 ArrayRef<Builtin::Info> LoongArchTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::LoongArch::LastTSBuiltin -
-                                         Builtin::FirstTSBuiltin);
+                                         unsigned(Builtin::FirstTSBuiltin));
 }
 
 bool LoongArchTargetInfo::handleTargetFeatures(

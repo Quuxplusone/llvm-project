@@ -368,7 +368,6 @@ template <typename Class> struct bind_ty {
 
 inline bind_ty<Register> m_Reg(Register &R) { return R; }
 inline bind_ty<MachineInstr *> m_MInstr(MachineInstr *&MI) { return MI; }
-inline bind_ty<LLT> m_Type(LLT Ty) { return Ty; }
 inline bind_ty<CmpInst::Predicate> m_Pred(CmpInst::Predicate &P) { return P; }
 inline operand_type_match m_Pred() { return operand_type_match(); }
 

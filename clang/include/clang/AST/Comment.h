@@ -179,7 +179,7 @@ protected:
     unsigned CommandMarker : 1;
   };
   enum { NumBlockCommandCommentBits = NumCommentBits +
-                                      CommandInfo::NumCommandIDBits + 1 };
+                                      unsigned(CommandInfo::NumCommandIDBits) + 1 };
 
   class ParamCommandCommentBitfields {
     friend class ParamCommandComment;

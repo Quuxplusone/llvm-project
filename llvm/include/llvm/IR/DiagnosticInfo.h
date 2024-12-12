@@ -560,7 +560,7 @@ operator<<(RemarkT &&R,
                StringRef>
                S) {
   R.insert(S);
-  return R;
+  return static_cast<RemarkT&>(R);
 }
 
 template <class RemarkT>
@@ -582,7 +582,7 @@ operator<<(RemarkT &&R,
                DiagnosticInfoOptimizationBase::Argument>
                A) {
   R.insert(A);
-  return R;
+  return static_cast<RemarkT&>(R);
 }
 
 template <class RemarkT>
@@ -604,7 +604,7 @@ operator<<(RemarkT &&R,
                DiagnosticInfoOptimizationBase::setIsVerbose>
                V) {
   R.insert(V);
-  return R;
+  return static_cast<RemarkT&>(R);
 }
 
 template <class RemarkT>

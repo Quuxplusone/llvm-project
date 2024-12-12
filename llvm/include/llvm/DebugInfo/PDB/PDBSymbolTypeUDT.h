@@ -9,6 +9,7 @@
 #ifndef LLVM_DEBUGINFO_PDB_PDBSYMBOLTYPEUDT_H
 #define LLVM_DEBUGINFO_PDB_PDBSYMBOLTYPEUDT_H
 
+#include "llvm/DebugInfo/PDB/IPDBLineNumber.h"
 #include "llvm/DebugInfo/PDB/IPDBRawSymbol.h"
 
 #include "PDBSymbol.h"

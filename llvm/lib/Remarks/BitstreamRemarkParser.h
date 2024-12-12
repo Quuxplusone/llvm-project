@@ -17,6 +17,7 @@
 #include "llvm/Remarks/BitstreamRemarkParser.h"
 #include "llvm/Remarks/RemarkFormat.h"
 #include "llvm/Remarks/RemarkParser.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include <cstdint>
 #include <memory>
 #include <optional>

@@ -722,7 +722,7 @@ AggExprEmitter::VisitCompoundLiteralExpr(CompoundLiteralExpr *E) {
     if (QualType::DestructionKind DtorKind = E->getType().isDestructedType())
       CGF.pushLifetimeExtendedDestroy(
           CGF.getCleanupKind(DtorKind), Slot.getAddress(), E->getType(),
-          CGF.getDestroyer(DtorKind), DtorKind & EHCleanup);
+          CGF.getDestroyer(DtorKind), unsigned(DtorKind) & EHCleanup);
 }
 
 /// Attempt to look through various unimportant expressions to find a

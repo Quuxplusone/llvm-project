@@ -266,5 +266,5 @@ void HexagonTargetInfo::fillValidCPUList(
 
 ArrayRef<Builtin::Info> HexagonTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::Hexagon::LastTSBuiltin -
-                                         Builtin::FirstTSBuiltin);
+                                         unsigned(Builtin::FirstTSBuiltin));
 }

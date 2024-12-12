@@ -5101,7 +5101,7 @@ LValue CodeGenFunction::EmitCompoundLiteralLValue(const CompoundLiteralExpr *E){
     if (QualType::DestructionKind DtorKind = E->getType().isDestructedType())
       pushLifetimeExtendedDestroy(getCleanupKind(DtorKind), DeclPtr,
                                   E->getType(), getDestroyer(DtorKind),
-                                  DtorKind & EHCleanup);
+                                  unsigned(DtorKind) & EHCleanup);
 
   return Result;
 }

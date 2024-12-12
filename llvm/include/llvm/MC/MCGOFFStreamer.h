@@ -9,6 +9,8 @@
 #ifndef LLVM_MC_MCGOFFSTREAMER_H
 #define LLVM_MC_MCGOFFSTREAMER_H
 
+#include "llvm/MC/MCAsmBackend.h"
+#include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCObjectStreamer.h"
 #include "llvm/MC/MCObjectWriter.h"
 

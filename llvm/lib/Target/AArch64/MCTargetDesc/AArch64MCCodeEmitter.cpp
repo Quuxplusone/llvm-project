@@ -751,7 +751,7 @@ void AArch64MCCodeEmitter::encodeInstruction(const MCInst &MI,
                      : ELF::R_AARCH64_TLSDESC_CALL;
     Fixups.push_back(
         MCFixup::create(0, MI.getOperand(0).getExpr(),
-                        MCFixupKind(FirstLiteralRelocationKind + Reloc)));
+                        MCFixupKind(FirstLiteralRelocationKind + unsigned(Reloc))));
     return;
   }
 

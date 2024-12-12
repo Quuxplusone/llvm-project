@@ -690,7 +690,7 @@ void AArch64TargetInfo::getTargetDefines(const LangOptions &Opts,
 
 ArrayRef<Builtin::Info> AArch64TargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::AArch64::LastTSBuiltin -
-                                         Builtin::FirstTSBuiltin);
+                                         unsigned(Builtin::FirstTSBuiltin));
 }
 
 std::optional<std::pair<unsigned, unsigned>>

@@ -566,9 +566,9 @@ private:
   std::unique_ptr<DelimitedScope> OuterScope;
 
 public:
-  JSONScopedPrinter(raw_ostream &OS, bool PrettyPrint = false,
-                    std::unique_ptr<DelimitedScope> &&OuterScope =
-                        std::unique_ptr<DelimitedScope>{});
+  JSONScopedPrinter(raw_ostream &OS, bool PrettyPrint,
+                    std::unique_ptr<DelimitedScope> &&OuterScope);
+  JSONScopedPrinter(raw_ostream &OS, bool PrettyPrint = false);
 
   static bool classof(const ScopedPrinter *SP) {
     return SP->getKind() == ScopedPrinter::ScopedPrinterKind::JSON;

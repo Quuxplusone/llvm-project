@@ -53,7 +53,7 @@ private:
   /// Create a key for a binding to region \p r, which has a symbolic offset
   /// from region \p Base.
   explicit BindingKey(const SubRegion *r, const SubRegion *Base, Kind k)
-    : P(r, k | Symbolic), Data(reinterpret_cast<uintptr_t>(Base)) {
+    : P(r, unsigned(k) | Symbolic), Data(reinterpret_cast<uintptr_t>(Base)) {
     assert(r && Base && "Must have known regions.");
     assert(getConcreteOffsetRegion() == Base && "Failed to store base region");
   }

@@ -315,7 +315,7 @@ bool WebAssemblyTargetInfo::handleTargetFeatures(
 
 ArrayRef<Builtin::Info> WebAssemblyTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::WebAssembly::LastTSBuiltin -
-                                         Builtin::FirstTSBuiltin);
+                                         unsigned(Builtin::FirstTSBuiltin));
 }
 
 void WebAssemblyTargetInfo::adjust(DiagnosticsEngine &Diags,

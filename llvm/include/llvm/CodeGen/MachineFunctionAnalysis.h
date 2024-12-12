@@ -13,6 +13,7 @@
 #ifndef LLVM_CODEGEN_MACHINEFUNCTIONANALYSIS
 #define LLVM_CODEGEN_MACHINEFUNCTIONANALYSIS
 
+#include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/IR/PassManager.h"
 
 namespace llvm {

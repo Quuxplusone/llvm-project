@@ -16,6 +16,7 @@
 #ifndef LLVM_CODEGEN_RESOURCEPRIORITYQUEUE_H
 #define LLVM_CODEGEN_RESOURCEPRIORITYQUEUE_H
 
+#include "llvm/CodeGen/DFAPacketizer.h"
 #include "llvm/CodeGen/ScheduleDAG.h"
 
 namespace llvm {
