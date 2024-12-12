@@ -14710,7 +14710,10 @@ ExprResult Sema::CreateOverloadedBinOp(SourceLocation OpLoc,
                 // If the LHS had been a const xvalue, the assignment would have
                 // been ill-formed. Therefore, this is probably a mistake by
                 // the user, and we should warn about it.
-                Diag(OpLoc, diag::warn_assign_to_class_rvalue)
+                // But the operator= for tuple, pair, and reference gains `const` only in C++23,
+                // so emit a different warning, omitted from -Wall, for operator= prior to C++23.
+                Diag(OpLoc, (ChosenOp == OO_Equal && !getLangOpts().CPlusPlus23) ?
+                    diag::warn_cxx23_compat_assign_to_class_rvalue : diag::warn_assign_to_class_rvalue)
                     << Args[0]->getType() << Args[0]->getSourceRange();
                 Diag(FnDecl->getLocation(), diag::note_declared_at);
               }
