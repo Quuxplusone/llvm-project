@@ -1,4 +1,4 @@
-// RUN: %clang_cc1 -std=c++11 -fsyntax-only -Wassign-to-class-rvalue -verify %s
+// RUN: %clang_cc1 -std=c++11 -fsyntax-only -Wassign-to-class-rvalue -Wcxx23-compat-assign-to-class-rvalue -verify %s
 // RUN: %clang_cc1 -std=c++23 -fsyntax-only -Wassign-to-class-rvalue -verify %s
 
 template<class T>
