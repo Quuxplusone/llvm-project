@@ -306,7 +306,9 @@ public:
   _LIBCPP_HIDE_FROM_ABI friend constexpr __iterator operator+(const __iterator& __x, difference_type __y)
     requires random_access_range<_Base>
   {
-    return __iterator{__x} += __y;
+    __iterator __copy = __x;
+    __copy += __y;
+    return __copy;
   }
 
   _LIBCPP_HIDE_FROM_ABI friend constexpr __iterator operator+(difference_type __x, const __iterator& __y)
@@ -318,7 +320,9 @@ public:
   _LIBCPP_HIDE_FROM_ABI friend constexpr __iterator operator-(const __iterator& __x, difference_type __y)
     requires random_access_range<_Base>
   {
-    return __iterator{__x} -= __y;
+    __iterator __copy = __x;
+    __copy -= __y;
+    return __copy;
   }
 
   _LIBCPP_HIDE_FROM_ABI friend constexpr difference_type operator-(const __iterator& __x, const __iterator& __y)
