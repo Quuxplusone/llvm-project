@@ -2334,8 +2334,11 @@ deque<_Tp, _Allocator>::__move_and_check(iterator __f, iterator __l, iterator __
       __bs = __n;
       __fe = __fb + __bs;
     }
-    if (__fb <= __vt && __vt < __fe)
-      __vt = (const_iterator(static_cast<__map_const_pointer>(__f.__m_iter_), __vt) -= __f - __r).__ptr_;
+    if (__fb <= __vt && __vt < __fe) {
+      const_iterator __cit(static_cast<__map_const_pointer>(__f.__m_iter_), __vt);
+      __cit -= (__f - __r);
+      __vt = __cit.__ptr_;
+    }
     __r = std::move(__fb, __fe, __r);
     __n -= __bs;
     __f += __bs;
@@ -2361,8 +2364,11 @@ deque<_Tp, _Allocator>::__move_backward_and_check(iterator __f, iterator __l, it
       __bs = __n;
       __lb = __le - __bs;
     }
-    if (__lb <= __vt && __vt < __le)
-      __vt = (const_iterator(static_cast<__map_const_pointer>(__l.__m_iter_), __vt) += __r - __l - 1).__ptr_;
+    if (__lb <= __vt && __vt < __le) {
+      const_iterator __cit(static_cast<__map_const_pointer>(__l.__m_iter_), __vt);
+      __cit += (__r - __l - 1);
+      __vt = __cit.__ptr_;
+    }
     __r = std::move_backward(__lb, __le, __r);
     __n -= __bs;
     __l -= __bs - 1;
@@ -2387,8 +2393,11 @@ void deque<_Tp, _Allocator>::__move_construct_and_check(iterator __f, iterator _
       __bs = __n;
       __fe = __fb + __bs;
     }
-    if (__fb <= __vt && __vt < __fe)
-      __vt = (const_iterator(static_cast<__map_const_pointer>(__f.__m_iter_), __vt) += __r - __f).__ptr_;
+    if (__fb <= __vt && __vt < __fe) {
+      const_iterator __cit(static_cast<__map_const_pointer>(__f.__m_iter_), __vt);
+      __cit += (__r - __f);
+      __vt = __cit.__ptr_;
+    }
     for (; __fb != __fe; ++__fb, ++__r, ++__size())
       __alloc_traits::construct(__a, std::addressof(*__r), std::move(*__fb));
     __n -= __bs;
@@ -2419,8 +2428,11 @@ void deque<_Tp, _Allocator>::__move_construct_backward_and_check(
       __bs = __n;
       __lb = __le - __bs;
     }
-    if (__lb <= __vt && __vt < __le)
-      __vt = (const_iterator(static_cast<__map_const_pointer>(__l.__m_iter_), __vt) -= __l - __r + 1).__ptr_;
+    if (__lb <= __vt && __vt < __le) {
+      const_iterator __cit(static_cast<__map_const_pointer>(__l.__m_iter_), __vt);
+      __cit -= (__l - __r + 1);
+      __vt = __cit.__ptr_;
+    }
     while (__le != __lb) {
       __alloc_traits::construct(__a, std::addressof(*--__r), std::move(*--__le));
       --__start_;
