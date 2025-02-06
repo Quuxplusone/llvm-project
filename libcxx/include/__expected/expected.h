@@ -33,6 +33,7 @@
 #include <__type_traits/is_replaceable.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_swappable.h>
+#include <__type_traits/is_trivially_assignable.h>
 #include <__type_traits/is_trivially_constructible.h>
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
@@ -217,18 +218,24 @@ class __expected_base {
   // it's not clear that it's implementable, given that the function is allowed to clobber
   // the tail padding) - see https://github.com/itanium-cxx-abi/cxx-abi/issues/107.
   union __union_t {
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t(const __union_t&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t(const __union_t&)
-      requires(is_copy_constructible_v<_Tp> && is_copy_constructible_v<_Err> &&
-               is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_constructible_v<_Err>)
+    __union_t(const __union_t&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __union_t(const __union_t&)
+      requires(is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_constructible_v<_Err>)
     = default;
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t(__union_t&&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t(__union_t&&)
-      requires(is_move_constructible_v<_Tp> && is_move_constructible_v<_Err> &&
-               is_trivially_move_constructible_v<_Tp> && is_trivially_move_constructible_v<_Err>)
+    __union_t(__union_t&&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __union_t(__union_t&&)
+      requires(is_trivially_move_constructible_v<_Tp> && is_trivially_move_constructible_v<_Err>)
     = default;
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t& operator=(const __union_t&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __union_t& operator=(__union_t&&)      = delete;
+    __union_t& operator=(const __union_t&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __union_t& operator=(const __union_t&)
+      requires(is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_constructible_v<_Err> &&
+               is_trivially_copy_assignable_v<_Tp> && is_trivially_copy_assignable_v<_Err>)
+    = default;
+    __union_t& operator=(__union_t&&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __union_t& operator=(__union_t&&)
+      requires(is_trivially_move_constructible_v<_Tp> && is_trivially_move_constructible_v<_Err> &&
+               is_trivially_move_assignable_v<_Tp> && is_trivially_move_assignable_v<_Err>)
+    = default;
 
     template <class... _Args>
     _LIBCPP_HIDE_FROM_ABI constexpr explicit __union_t(in_place_t, _Args&&... __args)
@@ -295,19 +302,24 @@ class __expected_base {
                    [&] { return __make_union(__has_val, std::forward<_OtherUnion>(__other)); }),
           __has_val_(__has_val) {}
 
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr(const __repr&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr(const __repr&)
-      requires(is_copy_constructible_v<_Tp> && is_copy_constructible_v<_Err> &&
-               is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_constructible_v<_Err>)
+    __repr(const __repr&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __repr(const __repr&)
+      requires is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_constructible_v<_Err>
     = default;
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr(__repr&&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr(__repr&&)
-      requires(is_move_constructible_v<_Tp> && is_move_constructible_v<_Err> &&
-               is_trivially_move_constructible_v<_Tp> && is_trivially_move_constructible_v<_Err>)
+    __repr(__repr&&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __repr(__repr&&)
+      requires is_trivially_move_constructible_v<_Tp> && is_trivially_move_constructible_v<_Err>
     = default;
-
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr& operator=(const __repr&) = delete;
-    _LIBCPP_HIDE_FROM_ABI constexpr __repr& operator=(__repr&&)      = delete;
+    __repr& operator=(const __repr&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __repr& operator=(const __repr&)
+      requires is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_assignable_v<_Tp> &&
+               is_trivially_copy_constructible_v<_Err> && is_trivially_copy_assignable_v<_Err>
+    = default;
+    __repr& operator=(__repr&&) = delete;
+    _LIBCPP_HIDE_FROM_ABI __repr& operator=(__repr&&)
+      requires is_trivially_move_constructible_v<_Tp> && is_trivially_move_assignable_v<_Tp> &&
+               is_trivially_move_constructible_v<_Err> && is_trivially_move_assignable_v<_Err>
+    = default;
 
     _LIBCPP_HIDE_FROM_ABI constexpr ~__repr()
       requires(is_trivially_destructible_v<_Tp> && is_trivially_destructible_v<_Err>)
@@ -446,6 +458,19 @@ protected:
 private:
   _LIBCPP_NO_UNIQUE_ADDRESS __conditional_no_unique_address<__allow_reusing_expected_tail_padding, __repr> __repr_;
 };
+
+template<class _Tp, class _Err>
+concept __expected_have_copy_assignment =
+    is_copy_constructible_v<_Tp> && is_copy_assignable_v<_Tp> &&
+    is_copy_constructible_v<_Err> && is_copy_assignable_v<_Err> &&
+    (is_nothrow_move_constructible_v<_Tp> || is_nothrow_move_constructible_v<_Err>);
+
+template<class _Tp, class _Err>
+concept __expected_have_move_assignment =
+    is_move_constructible_v<_Tp> && is_move_assignable_v<_Tp> &&
+    is_move_constructible_v<_Err> && is_move_assignable_v<_Err> &&
+    (is_nothrow_move_constructible_v<_Tp> || is_nothrow_move_constructible_v<_Err>);
+
 
 template <class _Tp, class _Err>
 inline constexpr bool __expected_be_trivially_relocatable_v =
@@ -639,9 +664,7 @@ public:
   _LIBCPP_HIDE_FROM_ABI constexpr expected& operator=(const expected& __rhs) noexcept(
       is_nothrow_copy_assignable_v<_Tp> && is_nothrow_copy_constructible_v<_Tp> && is_nothrow_copy_assignable_v<_Err> &&
       is_nothrow_copy_constructible_v<_Err>) // strengthened
-    requires(is_copy_assignable_v<_Tp> && is_copy_constructible_v<_Tp> && is_copy_assignable_v<_Err> &&
-             is_copy_constructible_v<_Err> &&
-             (is_nothrow_move_constructible_v<_Tp> || is_nothrow_move_constructible_v<_Err>))
+    requires __expected_have_copy_assignment<_Tp, _Err>
   {
     if (this->__has_val() && __rhs.__has_val()) {
       this->__val() = __rhs.__val();
@@ -655,12 +678,16 @@ public:
     return *this;
   }
 
+  _LIBCPP_HIDE_FROM_ABI constexpr expected& operator=(const expected& __rhs)
+    requires __expected_have_copy_assignment<_Tp, _Err> &&
+      is_trivially_copy_constructible_v<_Tp> && is_trivially_copy_assignable_v<_Tp> &&
+      is_trivially_copy_constructible_v<_Err> && is_trivially_copy_assignable_v<_Err>
+  = default;
+
   _LIBCPP_HIDE_FROM_ABI constexpr expected&
   operator=(expected&& __rhs) noexcept(is_nothrow_move_assignable_v<_Tp> && is_nothrow_move_constructible_v<_Tp> &&
                                        is_nothrow_move_assignable_v<_Err> && is_nothrow_move_constructible_v<_Err>)
-    requires(is_move_constructible_v<_Tp> && is_move_assignable_v<_Tp> && is_move_constructible_v<_Err> &&
-             is_move_assignable_v<_Err> &&
-             (is_nothrow_move_constructible_v<_Tp> || is_nothrow_move_constructible_v<_Err>))
+    requires __expected_have_move_assignment<_Tp, _Err>
   {
     if (this->__has_val() && __rhs.__has_val()) {
       this->__val() = std::move(__rhs.__val());
@@ -673,6 +700,12 @@ public:
     }
     return *this;
   }
+
+  _LIBCPP_HIDE_FROM_ABI constexpr expected& operator=(expected&& __rhs)
+    requires __expected_have_move_assignment<_Tp, _Err> &&
+      is_trivially_move_constructible_v<_Tp> && is_trivially_move_assignable_v<_Tp> &&
+      is_trivially_move_constructible_v<_Err> && is_trivially_move_assignable_v<_Err>
+  = default;
 
   template <class _Up = _Tp>
   _LIBCPP_HIDE_FROM_ABI constexpr expected& operator=(_Up&& __v)
