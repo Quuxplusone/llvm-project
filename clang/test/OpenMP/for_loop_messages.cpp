@@ -838,7 +838,7 @@ void test_static_data_member() {
 #pragma omp for
   for (int i = 0; i < 16; ++i) {
     class X {
-      static int x; // expected-error {{static data member 'x' not allowed in local class 'X'}}
+      static int x; // expected-warning {{static data member 'x' not allowed in local class 'X'}}
     };
   }
 }
