@@ -675,14 +675,6 @@ filesystem typeinfo
 filesystem utility
 filesystem variant
 filesystem version
-flat_map cmath
-flat_map compare
-flat_map cstddef
-flat_map cstdint
-flat_map initializer_list
-flat_map limits
-flat_map type_traits
-flat_map version
 format algorithm
 format array
 format atomic
