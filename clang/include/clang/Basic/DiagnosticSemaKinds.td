@@ -2268,9 +2268,9 @@ def note_nontrivial_objc_ownership : Note<
 def select_tag_type_kind : TextSubstitution<
   "%select{struct|interface|union|class|enum}0">;
 
-def err_static_data_member_not_allowed_in_anon_struct : Error<
-  "static data member %0 not allowed in anonymous "
-  "%sub{select_tag_type_kind}1">;
+def ext_static_data_member_in_unnamed_class : ExtWarn<
+  "static data member %0 not allowed in unnamed "
+  "%sub{select_tag_type_kind}1">, InGroup<P3588>;
 def ext_union_member_of_reference_type : ExtWarn<
   "union member %0 has reference type %1, which is a Microsoft extension">,
   InGroup<MicrosoftUnionMemberReference>;
@@ -10022,8 +10022,8 @@ def warn_cxx17_compat_capture_binding : Warning<
   "C++ standards before C++20">,
   InGroup<CXXPre20Compat>, DefaultIgnore;
 
-def err_static_data_member_not_allowed_in_local_class : Error<
-  "static data member %0 not allowed in local %sub{select_tag_type_kind}2 %1">;
+def ext_static_data_member_in_local_class : ExtWarn<
+  "static data member %0 not allowed in local %sub{select_tag_type_kind}2 %1">, InGroup<P3588>;
 
 // C++ derived classes
 def err_base_clause_on_union : Error<"unions cannot have base classes">;

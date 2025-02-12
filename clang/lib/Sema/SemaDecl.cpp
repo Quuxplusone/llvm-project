@@ -7811,18 +7811,17 @@ NamedDecl *Sema::ActOnVariableDeclarator(
           }
           if (FunctionOrMethod) {
             // C++ [class.static.data]p5: A local class shall not have static
-            // data members.
+            // data members. P3588 drops this restriction.
             Diag(D.getIdentifierLoc(),
-                 diag::err_static_data_member_not_allowed_in_local_class)
+                 diag::ext_static_data_member_in_local_class)
                 << Name << RD->getDeclName() << RD->getTagKind();
           } else if (AnonStruct) {
             // C++ [class.static.data]p4: Unnamed classes and classes contained
             // directly or indirectly within unnamed classes shall not contain
-            // static data members.
+            // static data members. P3588 drops this restriction.
             Diag(D.getIdentifierLoc(),
-                 diag::err_static_data_member_not_allowed_in_anon_struct)
+                 diag::ext_static_data_member_in_unnamed_class)
                 << Name << AnonStruct->getTagKind();
-            Invalid = true;
           } else if (RD->isUnion()) {
             // C++98 [class.union]p1: If a union contains a static data member,
             // the program is ill-formed. C++11 drops this restriction.

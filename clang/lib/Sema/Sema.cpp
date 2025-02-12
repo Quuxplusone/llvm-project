@@ -1027,6 +1027,9 @@ static void checkUndefinedButUsed(Sema &S) {
       // FIXME: We can promote this to an error. The function or variable can't
       // be defined anywhere else, so the program must necessarily violate the
       // one definition rule.
+      //
+      // FIXME: The diagnostic should say "no linkage" in some cases, e.g., for
+      // a member of a local class.
       bool IsImplicitBase = false;
       if (const auto *BaseD = dyn_cast<FunctionDecl>(VD)) {
         auto *DVAttr = BaseD->getAttr<OMPDeclareVariantAttr>();

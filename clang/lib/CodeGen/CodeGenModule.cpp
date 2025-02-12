@@ -7252,12 +7252,18 @@ void CodeGenModule::EmitTopLevelDecl(Decl *D) {
   switch (D->getKind()) {
   case Decl::CXXConversion:
   case Decl::CXXMethod:
-  case Decl::Function:
-    EmitGlobal(cast<FunctionDecl>(D));
+  case Decl::Function: {
+    auto *FD = cast<FunctionDecl>(D);
+    EmitGlobal(FD);
+    // Local classes can have static data members.
+    for (auto *I : FD->decls())
+      if (isa<CXXRecordDecl>(I))
+        EmitTopLevelDecl(I);
     // Always provide some coverage mapping
     // even for the functions that aren't emitted.
     AddDeferredUnusedCoverageMapping(D);
     break;
+  }
 
   case Decl::CXXDeductionGuide:
     // Function-like, but does not result in code emission.

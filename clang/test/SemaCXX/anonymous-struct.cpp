@@ -158,19 +158,19 @@ typedef struct {
 } // namespace ImplicitDecls
 
 struct {
-  static int x; // expected-error {{static data member 'x' not allowed in anonymous struct}}
+  static int x; // expected-warning {{static data member 'x' not allowed in unnamed struct}}
 } static_member_1;
 
 class {
   struct A {
-    static int x; // expected-error {{static data member 'x' not allowed in anonymous class}}
+    static int x; // expected-warning {{static data member 'x' not allowed in unnamed class}}
   } x;
 } static_member_2;
 
 union {
   struct A {
     struct B {
-      static int x; // expected-error {{static data member 'x' not allowed in anonymous union}}
+      static int x; // expected-warning {{static data member 'x' not allowed in unnamed union}}
     } x;
   } x;
 } static_member_3;
