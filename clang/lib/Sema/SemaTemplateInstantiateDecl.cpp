@@ -6187,6 +6187,9 @@ void Sema::BuildVariableInstantiation(
   } else if (NewVar->getType()->isUndeducedType()) {
     // We need the type to complete the declaration of the variable.
     InstantiateVariableInitializer(NewVar, OldVar, TemplateArgs);
+  } else if (Owner->isRecord() && cast<CXXRecordDecl>(Owner)->isLocalClass()) {
+    // Members of local classes are instantiated eagerly.
+    InstantiateVariableInitializer(NewVar, OldVar, TemplateArgs);
   } else if (InstantiatingSpecFromTemplate ||
              (OldVar->isInline() && OldVar->isThisDeclarationADefinition() &&
               !NewVar->isThisDeclarationADefinition())) {

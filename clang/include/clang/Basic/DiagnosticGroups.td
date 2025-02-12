@@ -596,6 +596,7 @@ def GNULineMarker : DiagGroup<"gnu-line-marker">;
 def LiteralRange : DiagGroup<"literal-range">;
 def LocalTypeTemplateArgs : DiagGroup<"local-type-template-args",
                                       [CXX98CompatLocalTypeTemplateArgs]>;
+def P3588 : DiagGroup<"p3588">;
 def RangeLoopConstruct : DiagGroup<"range-loop-construct">;
 def RangeLoopBindReference : DiagGroup<"range-loop-bind-reference">;
 def RangeLoopAnalysis : DiagGroup<"range-loop-analysis",
