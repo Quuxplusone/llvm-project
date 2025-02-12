@@ -10,28 +10,13 @@
 
 // <map>
 
-// template<class InputIterator,
-//          class Compare = less<iter-value-type<InputIterator>>,
-//          class Allocator = allocator<iter-value-type<InputIterator>>>
-// map(InputIterator, InputIterator,
-//          Compare = Compare(), Allocator = Allocator())
-//   -> map<iter-value-type<InputIterator>, Compare, Allocator>;
-// template<class Key, class Compare = less<Key>, class Allocator = allocator<Key>>
-// map(initializer_list<Key>, Compare = Compare(), Allocator = Allocator())
-//   -> map<Key, Compare, Allocator>;
-// template<class InputIterator, class Allocator>
-// map(InputIterator, InputIterator, Allocator)
-//   -> map<iter-value-type<InputIterator>, less<iter-value-type<InputIterator>>, Allocator>;
-// template<class Key, class Allocator>
-// map(initializer_list<Key>, Allocator)
-//   -> map<Key, less<Key>, Allocator>;
+// Test CTAD on cases where deduction should fail.
 
 #include <array>
-#include <climits> // INT_MAX
 #include <functional>
 #include <map>
+#include <memory>
 #include <tuple>
-#include <type_traits>
 
 struct NotAnAllocator {
   friend bool operator<(NotAnAllocator, NotAnAllocator) { return false; }
@@ -40,7 +25,7 @@ struct NotAnAllocator {
 using P  = std::pair<int, long>;
 using PC = std::pair<const int, long>;
 
-int main(int, char**) {
+void test() {
   {
     // cannot deduce Key and T from nothing
     std::map m;
@@ -115,5 +100,4 @@ int main(int, char**) {
     std::map m(arr);
     // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}map'}}
   }
-  return 0;
 }
