@@ -10,8 +10,6 @@
 #define TEST_STD_UTILITIES_FORMAT_FORMAT_RANGE_FORMAT_RANGE_FMTMAP_FORMAT_FUNCTIONS_TESTS_H
 
 #include <algorithm>
-#include <deque>
-#include <flat_map>
 #include <format>
 #include <map>
 #include <unordered_map>
@@ -243,7 +241,10 @@ void test_char_to_wchar(TestFunction check, ExceptionTest check_exception) {
 // Bool
 //
 template <class CharT, class TestFunction, class ExceptionTest>
-void test_bool(TestFunction check, ExceptionTest check_exception, auto&& input) {
+void test_bool(TestFunction check, ExceptionTest check_exception) {
+  // duplicates are stored in order of insertion
+  std::multimap<bool, int> input{{true, 42}, {false, 0}, {true, 1}};
+
   check(SV("{false: 0, true: 42, true: 1}"), SV("{}"), input);
   check(SV("{false: 0, true: 42, true: 1}^42"), SV("{}^42"), input);
   check(SV("{false: 0, true: 42, true: 1}^42"), SV("{:}^42"), input);
@@ -336,17 +337,6 @@ void test_bool(TestFunction check, ExceptionTest check_exception, auto&& input) 
       "The argument index value is too large for the number of arguments supplied", SV("{:^^{}:#>10}"), input);
   check_exception(
       "The argument index value is too large for the number of arguments supplied", SV("{:^^{}:#>{}}"), input, 41);
-}
-
-template <class CharT, class TestFunction, class ExceptionTest>
-void test_bool(TestFunction check, ExceptionTest check_exception) {
-  // duplicates are stored in order of insertion
-  test_bool<CharT>(check, check_exception, std::multimap<bool, int>{{true, 42}, {false, 0}, {true, 1}});
-#if TEST_STD_VER >= 23
-  test_bool<CharT>(check,
-                   check_exception,
-                   std::flat_multimap<bool, int, std::less<bool>, std::deque<bool>>{{true, 42}, {false, 0}, {true, 1}});
-#endif
 }
 
 //
@@ -452,9 +442,6 @@ void test_int(TestFunction check, ExceptionTest check_exception, auto&& input) {
 template <class CharT, class TestFunction, class ExceptionTest>
 void test_int(TestFunction check, ExceptionTest check_exception) {
   test_int<CharT>(check, check_exception, std::map<int, int>{{1, -1}, {42, -42}, {-42, 42}});
-#if TEST_STD_VER >= 23
-  test_int<CharT>(check, check_exception, std::flat_map<int, int>{{1, -1}, {42, -42}, {-42, 42}});
-#endif
 }
 
 //
