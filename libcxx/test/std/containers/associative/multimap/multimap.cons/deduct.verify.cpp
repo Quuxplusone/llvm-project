@@ -10,26 +10,11 @@
 
 // <map>
 
-// template<class InputIterator,
-//          class Compare = less<iter-value-type<InputIterator>>,
-//          class Allocator = allocator<iter-value-type<InputIterator>>>
-// multimap(InputIterator, InputIterator,
-//          Compare = Compare(), Allocator = Allocator())
-//   -> multimap<iter-value-type<InputIterator>, Compare, Allocator>;
-// template<class Key, class Compare = less<Key>, class Allocator = allocator<Key>>
-// multimap(initializer_list<Key>, Compare = Compare(), Allocator = Allocator())
-//   -> multimap<Key, Compare, Allocator>;
-// template<class InputIterator, class Allocator>
-// multimap(InputIterator, InputIterator, Allocator)
-//   -> multimap<iter-value-type<InputIterator>, less<iter-value-type<InputIterator>>, Allocator>;
-// template<class Key, class Allocator>
-// multimap(initializer_list<Key>, Allocator)
-//   -> multimap<Key, less<Key>, Allocator>;
+// Test CTAD on cases where deduction should fail.
 
-#include <climits> // INT_MAX
-#include <functional>
 #include <map>
-#include <type_traits>
+#include <functional>
+#include <memory>
 
 struct NotAnAllocator {
   friend bool operator<(NotAnAllocator, NotAnAllocator) { return false; }
@@ -38,7 +23,7 @@ struct NotAnAllocator {
 using P  = std::pair<int, long>;
 using PC = std::pair<const int, long>;
 
-int main(int, char**) {
+void test() {
   {
     // cannot deduce Key and T from nothing
     std::multimap m;
@@ -63,7 +48,7 @@ int main(int, char**) {
     // refuse to rebind the allocator if Allocator::value_type is not exactly what we expect
     const P arr[] = {{1, 1L}, {2, 2L}, {3, 3L}};
     std::multimap m(arr, arr + 3, std::allocator<P>());
-    // expected-error-re@map:* {{static assertion failed{{( due to requirement '.*')?}}{{.*}}Allocator::value_type must be same type as value_type}}
+    // expected-error-re@map:*{{static assertion failed{{( due to requirement '.*')?}}{{.*}}Allocator::value_type must be same type as value_type}}
   }
   {
     // cannot convert from some arbitrary unrelated type
@@ -101,6 +86,4 @@ int main(int, char**) {
     std::multimap m(PC{1, 1L});
     // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}multimap'}}
   }
-
-  return 0;
 }
