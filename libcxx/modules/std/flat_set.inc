@@ -9,21 +9,21 @@
 
 export namespace std {
 #if _LIBCPP_STD_VER >= 23
-  // [flat.set], class template flat_­set
-  using std::flat_set;
+  // [flat.set], class template flat_set
+  //using std::flat_set;
 
-  using std::sorted_unique;
-  using std::sorted_unique_t;
+  //using std::sorted_unique;
+  //using std::sorted_unique_t;
 
   using std::uses_allocator;
 
-  // [flat.set.erasure], erasure for flat_­set
-  using std::erase_if;
+  // [flat.set.erasure], erasure for flat_set
+  //using std::erase_if;
 
-  // [flat.multiset], class template flat_­multiset
-  using std::flat_multiset;
+  // [flat.multiset], class template flat_multiset
+  //using std::flat_multiset;
 
-  using std::sorted_equivalent;
-  using std::sorted_equivalent_t;
+  //using std::sorted_equivalent;
+  //using std::sorted_equivalent_t;
 #endif // _LIBCPP_STD_VER >= 23
 } // namespace std
