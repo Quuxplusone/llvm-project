@@ -10,33 +10,17 @@
 
 // <set>
 
-// template<class InputIterator,
-//          class Compare = less<iter-value-type<InputIterator>>,
-//          class Allocator = allocator<iter-value-type<InputIterator>>>
-// set(InputIterator, InputIterator,
-//     Compare = Compare(), Allocator = Allocator())
-//   -> set<iter-value-type<InputIterator>, Compare, Allocator>;
-// template<class Key, class Compare = less<Key>,
-//          class Allocator = allocator<Key>>
-// set(initializer_list<Key>, Compare = Compare(), Allocator = Allocator())
-//   -> set<Key, Compare, Allocator>;
-// template<class InputIterator, class Allocator>
-// set(InputIterator, InputIterator, Allocator)
-//   -> set<iter-value-type<InputIterator>,
-//          less<iter-value-type<InputIterator>>, Allocator>;
-// template<class Key, class Allocator>
-// set(initializer_list<Key>, Allocator)
-//   -> set<Key, less<Key>, Allocator>;
+// Test CTAD on cases where deduction should fail.
 
-#include <functional>
 #include <set>
-#include <type_traits>
+#include <functional>
+#include <memory>
 
 struct NotAnAllocator {
   friend bool operator<(NotAnAllocator, NotAnAllocator) { return false; }
 };
 
-int main(int, char**) {
+void test() {
   {
     // cannot deduce Key from nothing
     std::set s;
@@ -64,6 +48,4 @@ int main(int, char**) {
     std::set s(a);
     // expected-error-re@-1{{no viable constructor or deduction guide for deduction of template arguments of '{{(std::)?}}set'}}
   }
-
-  return 0;
 }
