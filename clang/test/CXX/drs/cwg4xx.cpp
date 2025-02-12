@@ -161,13 +161,17 @@ namespace cwg405 { // cwg405: 2.7
 
 namespace cwg406 { // cwg406: 2.9
   typedef struct {
+    // expected-error@-1 {{add a tag name here}}
     static int n;
-    // expected-error@-1 {{static data member 'n' not allowed in anonymous struct}}
-  } A;
+    // expected-error@-1 {{static data member 'n' not allowed in unnamed struct}}
+    // expected-note@-2 {{type is not C-compatible due to this member declaration}}
+  } A; // expected-note {{type is given name 'A' for linkage purposes}}
   typedef union {
+    // expected-error@-1 {{add a tag name here}}
     static int n;
-    // expected-error@-1 {{static data member 'n' not allowed in anonymous union}}
-  } B;
+    // expected-error@-1 {{static data member 'n' not allowed in unnamed union}}
+    // expected-note@-2 {{type is not C-compatible due to this member declaration}}
+  } B; // expected-note {{type is given name 'B' for linkage purposes}}
 } // namespace cwg406
 
 namespace cwg407 { // cwg407: 3.8
