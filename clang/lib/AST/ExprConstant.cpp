@@ -5987,6 +5987,16 @@ static bool CheckConstexprFunction(EvalInfo &Info, SourceLocation CallLoc,
         DiagDecl = CD = Inherited;
     }
 
+    // If an assertion fails during constant evaluation, give a specific note.
+    // Compare the list of assert-like names in `hasUnguardedAccess`.
+    // The note message will point directly to the failing `assert(expr)` line.
+    if (CallLoc.isMacroID() && (DiagDecl->getName() == "__assert_rtn" ||
+                                DiagDecl->getName() == "__assert_fail" ||
+                                DiagDecl->getName() == "_wassert")) {
+      Info.FFDiag(CallLoc, diag::note_constexpr_assert_failed);
+      return false;
+    }
+
     // FIXME: If DiagDecl is an implicitly-declared special member function
     // or an inheriting constructor, we should be much more explicit about why
     // it's not constexpr.
