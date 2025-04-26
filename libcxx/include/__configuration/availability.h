@@ -347,7 +347,7 @@
 
 // This controls whether `std::__hash_memory` is available in the dylib, which
 // is used for some `std::hash` specializations.
-#define _LIBCPP_AVAILABILITY_HAS_HASH_MEMORY _LIBCPP_INTRODUCED_IN_LLVM_21
+#define _LIBCPP_AVAILABILITY_HAS_HASH_MEMORY 0 // allow .cpp files to be compiled with our headers to be linked with /usr/bin/clang++'s libc++
 // No attribute, since we've had hash in the headers before
 
 // This controls whether we provide a message for `bad_function_call::what()` that specific to `std::bad_function_call`.
