@@ -4041,6 +4041,11 @@ static_assert(!__is_trivially_equality_comparable(NonTriviallyEqualityComparable
 
 #if __cplusplus >= 202002L
 
+enum TriviallyEqualityComparableEnum {
+  x, y
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableEnum));
+
 struct TriviallyEqualityComparable {
   int i;
   int j;
@@ -4058,6 +4063,13 @@ struct TriviallyEqualityComparableContainsArray {
   bool operator==(const TriviallyEqualityComparableContainsArray&) const = default;
 };
 static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsArray));
+
+struct TriviallyEqualityComparableContainsEnum {
+  TriviallyEqualityComparableEnum e;
+
+  bool operator==(const TriviallyEqualityComparableContainsEnum&) const = default;
+};
+static_assert(__is_trivially_equality_comparable(TriviallyEqualityComparableContainsEnum));
 
 struct TriviallyEqualityComparableContainsMultiDimensionArray {
   int a[4][4];
