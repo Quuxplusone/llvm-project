@@ -510,6 +510,9 @@ Improvements to Clang's diagnostics
 - Several compatibility diagnostics that were incorrectly being grouped under
   ``-Wpre-c++20-compat`` are now part of ``-Wc++20-compat``. (#GH138775)
 
+- ``-Wvolatile`` now warns about volatile-qualified class return types
+  as well as volatile-qualified scalar return types. Fixes #GH133380
+
 Improvements to Clang's time-trace
 ----------------------------------
 
