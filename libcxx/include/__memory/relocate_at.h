@@ -16,6 +16,7 @@
 #include <__type_traits/is_constructible.h>
 #include <__type_traits/is_destructible.h>
 #include <__type_traits/is_nothrow_constructible.h>
+#include <__type_traits/is_nothrow_destructible.h>
 #include <__type_traits/is_same.h>
 #include <__type_traits/is_trivially_destructible.h>
 #include <__type_traits/is_trivially_relocatable.h>
@@ -38,8 +39,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 template<class _Tp>
 struct __destroy_guard {
   _Tp *__t_;
-  _LIBCPP_HIDE_FROM_ABI explicit __destroy_guard(_Tp *__t) : __t_(__t) { }
-  _LIBCPP_HIDE_FROM_ABI ~__destroy_guard() { std::__destroy_at(__t_); }
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 explicit __destroy_guard(_Tp *__t) : __t_(__t) { }
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 ~__destroy_guard() { std::__destroy_at(__t_); }
 };
 
 template<class _Tp, __enable_if_t<__libcpp_is_trivially_relocatable<_Tp>::value && !is_trivially_destructible<_Tp>::value, int> = 0>
@@ -101,33 +102,51 @@ __remove_cvref_t<_Tp> relocate(_Tp *__source)
 
 template<class _St, class _Dt>
 _LIBCPP_HIDE_FROM_ABI
-_Dt *__libcpp_relocate_at2(long, _St *__source, _Dt *__dest)
-    _NOEXCEPT_((is_nothrow_constructible<_Dt, _St&&>::value))
-{
-  __destroy_guard<_St> __g(__source);
-  return ::new (static_cast<void*>(__dest)) _Dt(std::move(*__source));
-}
-
-template<class _St, class _Dt, __enable_if_t<
-  is_same<__remove_cvref_t<_St>, __remove_cvref_t<_Dt> >::value &&
-  __libcpp_is_trivially_relocatable<__remove_cvref_t<_Dt> >::value &&
-  !is_volatile<_St>::value && !is_volatile<_Dt>::value,
-  int> = 0>
-_LIBCPP_HIDE_FROM_ABI
-_Dt *__libcpp_relocate_at2(int, _St *__source, _Dt *__dest) _NOEXCEPT {
+_Dt *__libcpp_relocate_at2_impl(_St *__source, _Dt *__dest, true_type) {
   ::__builtin_memmove((void*)__dest, (void*)__source, sizeof(_St));
   return std::__launder(__dest);
 }
 
+template<class _St, class _Dt>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
+_Dt *__libcpp_relocate_at2_impl(_St *__source, _Dt *__dest, false_type) {
+  __destroy_guard<_St> __g(__source);
+  return ::new (static_cast<void*>(__dest)) _Dt(std::move(*__source));
+}
+
+template<class _St, class _Dt>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
+_Dt *__libcpp_relocate_at2(_St *__source, _Dt *__dest) {
+#ifdef _LIBCPP_CXX03_LANG
+  return std::__libcpp_relocate_at2_impl(__source, __dest, _BoolConstant<
+    is_same<__remove_cvref_t<_St>, __remove_cvref_t<_Dt> >::value &&
+    __libcpp_is_trivially_relocatable<__remove_cvref_t<_Dt> >::value &&
+    !is_volatile<_St>::value && !is_volatile<_Dt>::value
+  >());
+#else
+  constexpr bool __use_memcpy =
+    is_same<__remove_cvref_t<_St>, __remove_cvref_t<_Dt> >::value &&
+    __libcpp_is_trivially_relocatable<__remove_cvref_t<_Dt> >::value &&
+    !is_volatile<_St>::value && !is_volatile<_Dt>::value;
+
+  if constexpr (__use_memcpy) {
+    if (!__libcpp_is_constant_evaluated()) {
+      return std::__libcpp_relocate_at2_impl(__source, __dest, true_type());
+    }
+  }
+  return std::__libcpp_relocate_at2_impl(__source, __dest, false_type());
+#endif
+}
+
 template<class _Tp>
-_LIBCPP_HIDE_FROM_ABI
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20
 _Tp *relocate_at(_Tp *__source, _Tp *__dest)
-  _NOEXCEPT_(noexcept(std::__libcpp_relocate_at2(0, __source, __dest)))
+  _NOEXCEPT_(is_nothrow_move_constructible<_Tp>::value && is_nothrow_destructible<_Tp>::value)
 {
   static_assert(is_move_constructible<_Tp>::value && is_destructible<_Tp>::value,
     "::new (voidify(*dest)) T(std::move(*source)) must be well-formed");
 
-  return std::__libcpp_relocate_at2(0, __source, __dest);
+  return std::__libcpp_relocate_at2(__source, __dest);
 }
 
 _LIBCPP_END_NAMESPACE_STD

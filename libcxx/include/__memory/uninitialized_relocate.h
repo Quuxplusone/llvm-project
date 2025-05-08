@@ -48,7 +48,7 @@ __uninitialized_relocate_impl(_InputIt __first, _InputIt __last,
 #if _LIBCPP_HAS_EXCEPTIONS
     try {
 #endif
-      std::__libcpp_relocate_at2(0, std::addressof(*__first), std::addressof(*__result));
+      std::__libcpp_relocate_at2(std::addressof(*__first), std::addressof(*__result));
 #if _LIBCPP_HAS_EXCEPTIONS
     } catch (...) {
       std::__destroy(__orig_result, __result);
@@ -67,7 +67,7 @@ __uninitialized_relocate_impl(_InputIt __first, _InputIt __last,
                               _ForwardIt __result, false_type, true_type)
 {
   for (; __first != __last; ++__result, void(), ++__first) {
-    std::__libcpp_relocate_at2(0, std::addressof(*__first), std::addressof(*__result));
+    std::__libcpp_relocate_at2(std::addressof(*__first), std::addressof(*__result));
   }
   return __result;
 }
@@ -126,7 +126,7 @@ __uninitialized_relocate_n_impl(_InputIt __first, _Size __n,
 #if _LIBCPP_HAS_EXCEPTIONS
     try {
 #endif
-      std::__libcpp_relocate_at2(0, std::addressof(*__first), std::addressof(*__result));
+      std::__libcpp_relocate_at2(std::addressof(*__first), std::addressof(*__result));
 #if _LIBCPP_HAS_EXCEPTIONS
     } catch (...) {
       std::__destroy(__orig_result, __result);
@@ -147,7 +147,7 @@ __uninitialized_relocate_n_impl(_InputIt __first, _Size __n,
                                 _ForwardIt __result, false_type, true_type)
 {
   for (; __n > 0; ++__result, ++__first, void(), --__n) {
-    std::__libcpp_relocate_at2(0, std::addressof(*__first), std::addressof(*__result));
+    std::__libcpp_relocate_at2(std::addressof(*__first), std::addressof(*__result));
   }
   return {__first, __result};
 }

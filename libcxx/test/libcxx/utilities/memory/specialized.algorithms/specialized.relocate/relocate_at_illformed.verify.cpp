@@ -28,4 +28,5 @@ static_assert(!std::is_move_constructible<A>::value, "");
 void test(A *p, A *q) {
   std::relocate_at(p, q);
     // expected-error@*:*{{::new (voidify(*dest)) T(std::move(*source)) must be well-formed}}
+    // expected-error@*:*{{call to implicitly-deleted copy constructor of 'A'}}
 }
