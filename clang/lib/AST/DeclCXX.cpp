@@ -615,7 +615,8 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
 }
 
 bool CXXRecordDecl::isP1144TriviallyRelocatable() const {
-  return (data().IsNaturallyP1144TriviallyRelocatable || hasAttr<TrivialABIAttr>());
+  return (data().IsNaturallyP1144TriviallyRelocatable ||
+          hasAttr<P1144TriviallyRelocatableAttr>() || hasAttr<TrivialABIAttr>());
 }
 
 bool CXXRecordDecl::isTriviallyCopyable() const {

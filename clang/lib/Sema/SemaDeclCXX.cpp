@@ -7340,6 +7340,23 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
       checkCUDADeviceBuiltinTextureClassTemplate(*this, Record);
   }
 
+  if (!Record->isDependentContext()) {
+    // Deal with [[trivially_relocatable(condition)]].
+    if (auto *TRA = Record->getAttr<P1144TriviallyRelocatableAttr>()) {
+      if (Expr *Arg = TRA->getCond()) {
+        // Evaluate the condition. If it's ill-formed, ignore the attribute.
+        // If it's well-formed and true, render this type trivially relocatable.
+        SFINAETrap Trap(*this);
+        bool Result = false;
+        if (!Arg->EvaluateAsBooleanCondition(Result, Context) || !Result) {
+          // An ill-formed, non-constant, non-boolean, or false expression drops
+          // the attribute.
+          Record->dropAttr<P1144TriviallyRelocatableAttr>();
+        }
+      }
+    }
+  }
+
   llvm::SmallDenseMap<OverloadedOperatorKind,
                       llvm::SmallVector<const FunctionDecl *, 2>, 4>
       TypeAwareDecls{{OO_New, {}},

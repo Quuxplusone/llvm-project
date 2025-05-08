@@ -1925,7 +1925,8 @@ The following type trait primitives are supported by Clang. Those traits marked
   of the given type, and then destroying the source object, is known to be
   functionally equivalent to copying the underlying bytes and then dropping the
   source object on the floor. This is true of trivial types and types which
-  were made trivially relocatable via the ``clang::trivial_abi`` attribute.
+  were made trivially relocatable via the ``clang::trivial_abi`` or
+  ``clang::trivially_relocatable`` attributes.
 * ``__builtin_is_cpp_trivially_relocatable`` (C++): Returns true if an object
   is trivially relocatable, as defined by the C++26 standard [meta.unary.prop].
   Note that when relocating the caller code should ensure that if the object is polymorphic,

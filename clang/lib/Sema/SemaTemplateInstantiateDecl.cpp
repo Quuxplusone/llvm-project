@@ -233,6 +233,28 @@ static void instantiateDependentAnnotationAttr(
   }
 }
 
+static void instantiateDependentP1144TriviallyRelocatableAttr(
+    Sema &S, const MultiLevelTemplateArgumentList &TemplateArgs,
+    const P1144TriviallyRelocatableAttr *TRA, Decl *New) {
+  EnterExpressionEvaluationContext Unevaluated(
+      S, Sema::ExpressionEvaluationContext::ConstantEvaluated);
+  Expr *Cond = TRA->getCond();
+  if (Cond != nullptr) {
+    ExprResult Result = S.SubstExpr(Cond, TemplateArgs);
+    if (Result.isInvalid())
+      return;
+    Cond = Result.getAs<Expr>();
+    assert(!Cond->isTypeDependent());
+    ExprResult Converted = S.PerformContextuallyConvertToBool(Cond);
+    if (Converted.isInvalid())
+      return;
+    Cond = Converted.get();
+  }
+
+  New->addAttr(::new (S.Context)
+                   P1144TriviallyRelocatableAttr(S.Context, *TRA, Cond));
+}
+
 static Expr *instantiateDependentFunctionAttrCondition(
     Sema &S, const MultiLevelTemplateArgumentList &TemplateArgs,
     const Attr *A, Expr *OldCond, const Decl *Tmpl, FunctionDecl *New) {
@@ -827,6 +849,12 @@ void Sema::InstantiateAttrs(const MultiLevelTemplateArgumentList &TemplateArgs,
     if (const auto *EnableIf = dyn_cast<EnableIfAttr>(TmplAttr)) {
       instantiateDependentEnableIfAttr(*this, TemplateArgs, EnableIf, Tmpl,
                                        cast<FunctionDecl>(New));
+      continue;
+    }
+
+    if (const auto *TRA = dyn_cast<P1144TriviallyRelocatableAttr>(TmplAttr)) {
+      instantiateDependentP1144TriviallyRelocatableAttr(*this, TemplateArgs, TRA,
+                                                        New);
       continue;
     }
 

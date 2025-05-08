@@ -4563,6 +4563,16 @@ Attribute ``trivial_abi`` has no effect in the following cases:
   }];
 }
 
+def P1144TriviallyRelocatableDocs : Documentation {
+  let Category = DocCatVariable;
+  let Content = [{
+The ``trivially_relocatable`` attribute can be applied to a C++ class, struct, or union.
+It warrants to the compiler that moving an object of that type, and then destroying the
+source object, is functionally equivalent to copying the underlying bytes
+and then dropping the source object on the floor.
+  }];
+}
+
 def MSInheritanceDocs : Documentation {
   let Category = DocCatDecl;
   let Heading = "__single_inheritance, __multiple_inheritance, __virtual_inheritance";
