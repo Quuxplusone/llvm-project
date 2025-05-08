@@ -49,7 +49,7 @@ __uninitialized_relocate_backward_impl(_BidirIt1 __first, _BidirIt1 __last,
 #if _LIBCPP_HAS_EXCEPTIONS
     try {
 #endif
-      std::__libcpp_relocate_at2(0, std::addressof(*__last), std::addressof(*__result));
+      std::__libcpp_relocate_at2(std::addressof(*__last), std::addressof(*__result));
 #if _LIBCPP_HAS_EXCEPTIONS
     } catch (...) {
       std::__destroy(++__result, __orig_result);
@@ -70,7 +70,7 @@ __uninitialized_relocate_backward_impl(_BidirIt1 __first, _BidirIt1 __last,
   while (__first != __last) {
     --__last;
     --__result;
-    std::__libcpp_relocate_at2(0, std::addressof(*__last), std::addressof(*__result));
+    std::__libcpp_relocate_at2(std::addressof(*__last), std::addressof(*__result));
   }
   return __result;
 }
