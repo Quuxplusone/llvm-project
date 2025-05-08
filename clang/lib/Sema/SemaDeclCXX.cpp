@@ -7355,6 +7355,34 @@ void Sema::CheckCompletedCXXClass(Scope *S, CXXRecordDecl *Record) {
         }
       }
     }
+
+    // Warn if a [[trivially_relocatable]] type isn't move-constructible
+    // or isn't destructible. That would be unusual, but isn't fatal.
+
+    if ((Record->hasAttr<P1144TriviallyRelocatableAttr>() ||
+         Record->hasAttr<P1144MaybeTriviallyRelocatableAttr>()) &&
+        !isTemplateInstantiation(Record->getTemplateSpecializationKind())) {
+      int Reason = 0;
+      SpecialMemberOverloadResult SMOR = LookupSpecialMember(
+          Record, CXXSpecialMemberKind::Destructor, false, false, false, false, false);
+      if (SMOR.getKind() != SpecialMemberOverloadResult::Success) {
+        Reason = 1;
+      } else {
+        SMOR = LookupSpecialMember(Record, CXXSpecialMemberKind::MoveConstructor, false,
+                                   false, false, false, false);
+        if (SMOR.getKind() != SpecialMemberOverloadResult::Success)
+          Reason = 2;
+      }
+
+      if (Reason != 0) {
+        if (Record->hasAttr<P1144TriviallyRelocatableAttr>()) {
+          Diag(Record->getLocation(),
+               diag::warn_trivially_relocatable_class_is_not_relocatable)
+              << llvm::to_underlying(Record->getCanonicalDecl()->getTagKind())
+              << Context.getCanonicalTagType(Record) << (Reason == 1);
+        }
+      }
+    }
   }
 
   llvm::SmallDenseMap<OverloadedOperatorKind,

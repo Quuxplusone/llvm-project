@@ -761,6 +761,7 @@ static void InitializeCPlusPlusFeatureTestMacros(const LangOptions &LangOpts,
     Builder.defineMacro("__cpp_static_call_operator", "202207L");
   Builder.defineMacro("__cpp_named_character_escapes", "202207L");
   Builder.defineMacro("__cpp_placeholder_variables", "202306L");
+  Builder.defineMacro("__cpp_impl_trivially_relocatable", "202401L");
 
   // C++26 features supported in earlier language modes.
   Builder.defineMacro("__cpp_pack_indexing", "202311L");

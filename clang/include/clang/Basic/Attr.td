@@ -3710,10 +3710,18 @@ def PointerAuth : TypeAttr {
 }
 
 def P1144TriviallyRelocatable : InheritableAttr {
-  let Spellings = [Clang<"trivially_relocatable", 0>];
+  let Spellings = [CXX11<"", "trivially_relocatable", 202401>,
+                   Clang<"trivially_relocatable", 0>];
   let Subjects = SubjectList<[CXXRecord]>;
   let Args = [ExprArgument<"Cond", 1>];
   let Documentation = [P1144TriviallyRelocatableDocs];
+  let LangOpts = [CPlusPlus];
+}
+
+def P1144MaybeTriviallyRelocatable : InheritableAttr {
+  let Spellings = [Clang<"maybe_trivially_relocatable", 0>];
+  let Subjects = SubjectList<[CXXRecord]>;
+  let Documentation = [P1144MaybeTriviallyRelocatableDocs];
   let LangOpts = [CPlusPlus];
 }
 

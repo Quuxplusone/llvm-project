@@ -6067,8 +6067,22 @@ static void handleLayoutVersion(Sema &S, Decl *D, const ParsedAttr &AL) {
   D->addAttr(::new (S.Context) LayoutVersionAttr(S.Context, AL, Version));
 }
 
+#if 0
+template<class AttrType>
+static void checkAttributeNotOnFirstDecl(Sema &S, Decl *D, const ParsedAttr &AL) {
+  Decl *FirstD = D->getCanonicalDecl();
+  if (FirstD != D && !FirstD->hasAttr<AttrType>()) {
+    NamedDecl *ND = dyn_cast<NamedDecl>(D);
+    S.Diag(AL.getLoc(), diag::err_attribute_missing_on_first_decl)
+      << AL.getName();
+    S.Diag(FirstD->getLocation(), diag::note_previous_declaration);
+  }
+}
+#endif
+
 static void handleP1144TriviallyRelocatableAttr(Sema &S, Decl *D,
                                                 const ParsedAttr &AL) {
+  // checkAttributeNotOnFirstDecl<P1144TriviallyRelocatableAttr>(S, D, AL);
   Expr *Cond = nullptr;
   if (AL.getNumArgs() == 1) {
     Cond = AL.getArgAsExpr(0);
@@ -6082,6 +6096,12 @@ static void handleP1144TriviallyRelocatableAttr(Sema &S, Decl *D,
   }
 
   D->addAttr(::new (S.Context) P1144TriviallyRelocatableAttr(S.Context, AL, Cond));
+}
+
+static void handleP1144MaybeTriviallyRelocatableAttr(Sema &S, Decl *D,
+                                                     const ParsedAttr &AL) {
+  // checkAttributeNotOnFirstDecl<P1144MaybeTriviallyRelocatableAttr>(S, D, AL);
+  handleSimpleAttribute<P1144MaybeTriviallyRelocatableAttr>(S, D, AL);
 }
 
 DLLImportAttr *Sema::mergeDLLImportAttr(Decl *D,
@@ -7622,6 +7642,10 @@ ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D, const ParsedAttr &AL,
 
   case ParsedAttr::AT_P1144TriviallyRelocatable:
     handleP1144TriviallyRelocatableAttr(S, D, AL);
+    break;
+
+  case ParsedAttr::AT_P1144MaybeTriviallyRelocatable:
+    handleP1144MaybeTriviallyRelocatableAttr(S, D, AL);
     break;
 
   case ParsedAttr::AT_AlwaysDestroy:
