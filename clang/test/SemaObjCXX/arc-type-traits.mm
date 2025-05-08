@@ -17,6 +17,14 @@ struct HasStrong { id obj; };
 struct HasWeak { __weak id obj; };
 struct HasUnsafeUnretained { __unsafe_unretained id obj; };
 
+struct HasVolatileStrong { volatile __strong id obj; };
+struct HasVolatileWeak { volatile __weak id obj; };
+struct HasVolatileUnsafeUnretained { volatile __unsafe_unretained id obj; };
+
+struct PolymorphicHasStrong { virtual int f(); __strong id obj; };
+struct PolymorphicHasWeak { virtual int f(); __weak id obj; };
+struct PolymorphicHasUnsafeUnretained { virtual int f(); __unsafe_unretained id obj; };
+
 // __has_nothrow_assign
 TRAIT_IS_TRUE(__has_nothrow_assign, __strong id);
 TRAIT_IS_TRUE(__has_nothrow_assign, __weak id);
@@ -221,6 +229,12 @@ TRAIT_IS_TRUE(__is_trivially_relocatable, __unsafe_unretained id);
 TRAIT_IS_TRUE(__is_trivially_relocatable, HasStrong);
 TRAIT_IS_FALSE(__is_trivially_relocatable, HasWeak);
 TRAIT_IS_TRUE(__is_trivially_relocatable, HasUnsafeUnretained);
+TRAIT_IS_TRUE(__is_trivially_relocatable, HasVolatileStrong);
+TRAIT_IS_FALSE(__is_trivially_relocatable, HasVolatileWeak);
+TRAIT_IS_TRUE(__is_trivially_relocatable, HasVolatileUnsafeUnretained);
+TRAIT_IS_FALSE(__is_trivially_relocatable, PolymorphicHasStrong);
+TRAIT_IS_FALSE(__is_trivially_relocatable, PolymorphicHasWeak);
+TRAIT_IS_FALSE(__is_trivially_relocatable, PolymorphicHasUnsafeUnretained);
 
 // __is_bitwise_cloneable
 TRAIT_IS_FALSE(__is_bitwise_cloneable, __strong id);
