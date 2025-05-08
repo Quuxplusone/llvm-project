@@ -97,7 +97,8 @@ CXXRecordDecl::DefinitionData::DefinitionData(CXXRecordDecl *D)
       HasTrivialSpecialMembersForCall(SMF_All),
       DeclaredNonTrivialSpecialMembers(0),
       DeclaredNonTrivialSpecialMembersForCall(0),
-      IsNaturallyP1144TriviallyRelocatable(true), HasIrrelevantDestructor(true),
+      IsNaturallyP1144TriviallyRelocatable(true),
+      HasNonP1144TriviallyRelocatableSubobject(false), HasIrrelevantDestructor(true),
       HasConstexprNonCopyMoveConstructor(false),
       HasDefaultedDefaultConstructor(false),
       DefaultedDefaultConstructorIsConstexpr(true),
@@ -285,6 +286,7 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
       // A trivially relocatable class is a class:
       // -- which has no virtual member functions or virtual base classes
       data().IsNaturallyP1144TriviallyRelocatable = false;
+      data().HasNonP1144TriviallyRelocatableSubobject = true;
     }
 
     // C++0x [class]p7:
@@ -299,8 +301,10 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
     if (!hasNonLiteralTypeFieldsOrBases() && !BaseType->isLiteralType(C))
       data().HasNonLiteralTypeFieldsOrBases = true;
 
-    if (Base->isVirtual() || !BaseClassDecl->isP1144TriviallyRelocatable())
+    if (Base->isVirtual() || !BaseClassDecl->isP1144TriviallyRelocatable()) {
       data().IsNaturallyP1144TriviallyRelocatable = false;
+      data().HasNonP1144TriviallyRelocatableSubobject = true;
+    }
 
     // Now go through all virtual bases of this base and add them.
     for (const auto &VBase : BaseClassDecl->vbases()) {
@@ -626,7 +630,9 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
 
 bool CXXRecordDecl::isP1144TriviallyRelocatable() const {
   return (data().IsNaturallyP1144TriviallyRelocatable ||
-          hasAttr<P1144TriviallyRelocatableAttr>() || hasAttr<TrivialABIAttr>());
+          hasAttr<P1144TriviallyRelocatableAttr>() || hasAttr<TrivialABIAttr>() ||
+          (hasAttr<P1144MaybeTriviallyRelocatableAttr>() &&
+           !data().HasNonP1144TriviallyRelocatableSubobject));
 }
 
 bool CXXRecordDecl::isTriviallyCopyable() const {
@@ -824,6 +830,7 @@ void CXXRecordDecl::addedMember(Decl *D) {
       // A trivially relocatable class is a class:
       // -- which has no virtual member functions or virtual base classes
       data().IsNaturallyP1144TriviallyRelocatable = false;
+      data().HasNonP1144TriviallyRelocatableSubobject = true;
     }
   }
 
@@ -1168,8 +1175,10 @@ void CXXRecordDecl::addedMember(Decl *D) {
     // A trivially relocatable class is a class:
     // -- all of whose members are either of reference type or of trivially
     // relocatable type
-    if (!T->isReferenceType() && !T.isP1144TriviallyRelocatableType(Context))
+    if (!T->isReferenceType() && !T.isP1144TriviallyRelocatableType(Context)) {
       data().IsNaturallyP1144TriviallyRelocatable = false;
+      data().HasNonP1144TriviallyRelocatableSubobject = true;
+    }
 
     if (T->isReferenceType()) {
       if (!Field->hasInClassInitializer())
