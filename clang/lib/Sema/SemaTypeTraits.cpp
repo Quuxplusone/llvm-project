@@ -521,7 +521,7 @@ static bool CheckUnaryTypeTraitTypeCompleteness(Sema &S, TypeTrait UTT,
   case UTT_IsBitwiseCloneable:
   // By analogy, is_trivially_relocatable and is_trivially_equality_comparable
   // impose the same constraints.
-  case UTT_IsTriviallyRelocatable:
+  case UTT_IsP1144TriviallyRelocatable:
   case UTT_IsTriviallyEqualityComparable:
   case UTT_IsCppTriviallyRelocatable:
   case UTT_IsReplaceable:
@@ -665,40 +665,6 @@ static bool isTriviallyEqualityComparableType(Sema &S, QualType Type,
 
   return S.getASTContext().hasUniqueObjectRepresentations(
       CanonicalType, /*CheckIfTriviallyCopyable=*/false);
-}
-
-static bool IsTriviallyRelocatableType(Sema &SemaRef, QualType T) {
-  QualType BaseElementType = SemaRef.getASTContext().getBaseElementType(T);
-
-  if (BaseElementType->isIncompleteType())
-    return false;
-  if (!BaseElementType->isObjectType())
-    return false;
-
-  // The deprecated __builtin_is_trivially_relocatable does not have
-  // an equivalent to __builtin_trivially_relocate, so there is no
-  // safe way to use it if there are any address discriminated values.
-  if (SemaRef.getASTContext().containsAddressDiscriminatedPointerAuth(T))
-    return false;
-
-  if (const auto *RD = BaseElementType->getAsCXXRecordDecl();
-      RD && !RD->isPolymorphic() && SemaRef.IsCXXTriviallyRelocatableType(*RD))
-    return true;
-
-  if (const auto *RD = BaseElementType->getAsRecordDecl())
-    return RD->canPassInRegisters();
-
-  if (BaseElementType.isTriviallyCopyableType(SemaRef.getASTContext()))
-    return true;
-
-  switch (T.isNonTrivialToPrimitiveDestructiveMove()) {
-  case QualType::PCK_Trivial:
-    return !T.isDestructedType();
-  case QualType::PCK_ARCStrong:
-    return true;
-  default:
-    return false;
-  }
 }
 
 static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
@@ -1123,8 +1089,8 @@ static bool EvaluateUnaryTypeTrait(Sema &Self, TypeTrait UTT,
     return !T->isIncompleteType();
   case UTT_HasUniqueObjectRepresentations:
     return C.hasUniqueObjectRepresentations(T);
-  case UTT_IsTriviallyRelocatable:
-    return IsTriviallyRelocatableType(Self, T);
+  case UTT_IsP1144TriviallyRelocatable:
+    return T.isP1144TriviallyRelocatableType(C);
   case UTT_IsBitwiseCloneable:
     return T.isBitwiseCloneableType(C);
   case UTT_IsCppTriviallyRelocatable:
@@ -1482,9 +1448,6 @@ void DiagnoseBuiltinDeprecation(Sema &S, TypeTrait Kind, SourceLocation KWLoc) {
     break;
   case UTT_HasTrivialDestructor:
     Replacement = UTT_IsTriviallyDestructible;
-    break;
-  case UTT_IsTriviallyRelocatable:
-    Replacement = clang::UTT_IsCppTriviallyRelocatable;
     break;
   case BTT_ReferenceBindsToTemporary:
     Replacement = clang::BTT_ReferenceConstructsFromTemporary;
