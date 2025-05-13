@@ -2962,6 +2962,31 @@ bool QualType::isTriviallyCopyConstructibleType(
                                      /*IsCopyConstructible=*/true);
 }
 
+bool QualType::isP1144TriviallyRelocatableType(const ASTContext &Context) const {
+  QualType BaseElementType = Context.getBaseElementType(*this);
+
+  if (BaseElementType->isIncompleteType()) {
+    return false;
+  } else if (!BaseElementType->isObjectType()) {
+    return false;
+  } else if (CXXRecordDecl *RD = BaseElementType->getAsCXXRecordDecl()) {
+    return RD->isP1144TriviallyRelocatable();
+  } else if (BaseElementType.isTriviallyCopyableType(Context)) {
+    return true;
+  } else {
+    switch (isNonTrivialToPrimitiveDestructiveMove()) {
+    case PCK_ARCStrong:
+    case PCK_Trivial:
+    case PCK_VolatileTrivial:
+      return true;
+    case PCK_ARCWeak:
+    case PCK_Struct:
+    case PCK_PtrAuth:
+      return false;
+    }
+  }
+}
+
 bool QualType::isNonWeakInMRRWithObjCWeak(const ASTContext &Context) const {
   return !Context.getLangOpts().ObjCAutoRefCount &&
          Context.getLangOpts().ObjCWeak &&

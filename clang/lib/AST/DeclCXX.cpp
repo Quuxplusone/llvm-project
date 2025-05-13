@@ -96,7 +96,8 @@ CXXRecordDecl::DefinitionData::DefinitionData(CXXRecordDecl *D)
       DefaultedDestructorIsDeleted(false), HasTrivialSpecialMembers(SMF_All),
       HasTrivialSpecialMembersForCall(SMF_All),
       DeclaredNonTrivialSpecialMembers(0),
-      DeclaredNonTrivialSpecialMembersForCall(0), HasIrrelevantDestructor(true),
+      DeclaredNonTrivialSpecialMembersForCall(0),
+      IsNaturallyP1144TriviallyRelocatable(true), HasIrrelevantDestructor(true),
       HasConstexprNonCopyMoveConstructor(false),
       HasDefaultedDefaultConstructor(false),
       DefaultedDefaultConstructorIsConstexpr(true),
@@ -268,6 +269,10 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
 
       //   An aggregate is a class with [...] no virtual functions.
       data().Aggregate = false;
+
+      // A trivially relocatable class is a class:
+      // -- which has no virtual member functions or virtual base classes
+      data().IsNaturallyP1144TriviallyRelocatable = false;
     }
 
     // C++0x [class]p7:
@@ -281,6 +286,9 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
     // Record if this base is the first non-literal field or base.
     if (!hasNonLiteralTypeFieldsOrBases() && !BaseType->isLiteralType(C))
       data().HasNonLiteralTypeFieldsOrBases = true;
+
+    if (Base->isVirtual() || !BaseClassDecl->isP1144TriviallyRelocatable())
+      data().IsNaturallyP1144TriviallyRelocatable = false;
 
     // Now go through all virtual bases of this base and add them.
     for (const auto &VBase : BaseClassDecl->vbases()) {
@@ -607,6 +615,10 @@ bool CXXRecordDecl::hasAnyDependentBases() const {
   return !forallBases([](const CXXRecordDecl *) { return true; });
 }
 
+bool CXXRecordDecl::isP1144TriviallyRelocatable() const {
+  return (data().IsNaturallyP1144TriviallyRelocatable || hasAttr<TrivialABIAttr>());
+}
+
 bool CXXRecordDecl::isTriviallyCopyable() const {
   // C++0x [class]p5:
   //   A trivially copyable class is a class that:
@@ -798,6 +810,10 @@ void CXXRecordDecl::addedMember(Decl *D) {
       //    -- has no virtual functions
       data().IsStandardLayout = false;
       data().IsCXX11StandardLayout = false;
+
+      // A trivially relocatable class is a class:
+      // -- which has no virtual member functions or virtual base classes
+      data().IsNaturallyP1144TriviallyRelocatable = false;
     }
   }
 
@@ -1138,6 +1154,12 @@ void CXXRecordDecl::addedMember(Decl *D) {
 
     if (Field->hasAttr<ExplicitInitAttr>())
       setHasUninitializedExplicitInitFields(true);
+
+    // A trivially relocatable class is a class:
+    // -- all of whose members are either of reference type or of trivially
+    // relocatable type
+    if (!T->isReferenceType() && !T.isP1144TriviallyRelocatableType(Context))
+      data().IsNaturallyP1144TriviallyRelocatable = false;
 
     if (T->isReferenceType()) {
       if (!Field->hasInClassInitializer())
@@ -1556,6 +1578,18 @@ void CXXRecordDecl::addedEligibleSpecialMemberFunction(const CXXMethodDecl *MD,
     if (DD->isNoReturn())
       data().IsAnyDestructorNoReturn = true;
   }
+
+  // A trivially relocatable class is a class:
+  // -- where no eligible copy constructor, move constructor, copy
+  // assignment operator, move assignment operator, or destructor is
+  // user-provided,
+  if (MD->isUserProvided() &&
+      (SMKind & (SMF_CopyConstructor | SMF_MoveConstructor |
+                 SMF_CopyAssignment | SMF_MoveAssignment | SMF_Destructor)) !=
+          0u) {
+    data().IsNaturallyP1144TriviallyRelocatable = false;
+  }
+
   if (!MD->isImplicit() && !MD->isUserProvided()) {
     // This method is user-declared but not user-provided. We can't work
     // out whether it's trivial yet (not until we get to the end of the
