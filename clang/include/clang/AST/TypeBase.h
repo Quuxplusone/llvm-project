@@ -1117,6 +1117,9 @@ public:
   /// Return true if this is a trivially copyable type (C++0x [basic.types]p9)
   bool isTriviallyCopyableType(const ASTContext &Context) const;
 
+  /// Return true if this is a trivially relocatable type (per P1144).
+  bool isP1144TriviallyRelocatableType(const ASTContext &Context) const;
+
   /// Return true if the type is safe to bitwise copy using memcpy/memmove.
   ///
   /// This is an extension in clang: bitwise cloneable types act as trivially

@@ -575,9 +575,8 @@ TYPE_TRAIT_2(__builtin_ge_synthesizes_from_spaceship, GeSynthesizesFromSpaceship
 // is not exposed to users.
 TYPE_TRAIT_2(/*EmptySpellingName*/, IsDeducible, KEYCXX)
 
-// __is_trivially_relocatable is deprecated
 TYPE_TRAIT_1(__builtin_is_cpp_trivially_relocatable, IsCppTriviallyRelocatable, KEYCXX)
-TYPE_TRAIT_1(__is_trivially_relocatable, IsTriviallyRelocatable, KEYCXX)
+TYPE_TRAIT_1(__is_trivially_relocatable, IsP1144TriviallyRelocatable, KEYCXX)
 TYPE_TRAIT_1(__is_bitwise_cloneable, IsBitwiseCloneable, KEYALL)
 TYPE_TRAIT_1(__builtin_structured_binding_size, StructuredBindingSize, KEYCXX)
 
