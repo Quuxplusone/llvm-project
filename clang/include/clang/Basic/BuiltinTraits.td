@@ -455,13 +455,12 @@ def GeSynthesizesFromSpaceship : BinaryTrait {
 // is not exposed to users.
 def IsDeducible : BinaryTrait {}
 
-// __is_trivially_relocatable is deprecated
 def IsCppTriviallyRelocatable : UnaryTrait {
   let Spelling = "__builtin_is_cpp_trivially_relocatable";
   let StdName = "is_trivially_relocatable";
 }
 
-def IsTriviallyRelocatable : UnaryTrait {
+def IsP1144TriviallyRelocatable : UnaryTrait {
   let Spelling = "__is_trivially_relocatable";
 }
 
