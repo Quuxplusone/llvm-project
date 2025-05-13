@@ -26,6 +26,7 @@ bool Operator::hasPoisonGeneratingFlags() const {
   case Instruction::Sub:
   case Instruction::Mul:
   case Instruction::Shl: {
+    assert(isa<OverflowingBinaryOperator>(this));
     auto *OBO = cast<OverflowingBinaryOperator>(this);
     return OBO->hasNoUnsignedWrap() || OBO->hasNoSignedWrap();
   }
@@ -38,10 +39,13 @@ bool Operator::hasPoisonGeneratingFlags() const {
   case Instruction::SDiv:
   case Instruction::AShr:
   case Instruction::LShr:
+    assert(isa<PossiblyExactOperator>(this));
     return cast<PossiblyExactOperator>(this)->isExact();
   case Instruction::Or:
+    assert(isa<PossiblyDisjointInst>(this));
     return cast<PossiblyDisjointInst>(this)->isDisjoint();
   case Instruction::GetElementPtr: {
+    assert(isa<GEPOperator>(this));
     auto *GEP = cast<GEPOperator>(this);
     // Note: inrange exists on constexpr only
     return GEP->getNoWrapFlags() != GEPNoWrapFlags::none() ||
@@ -53,6 +57,7 @@ bool Operator::hasPoisonGeneratingFlags() const {
       return NNI->hasNonNeg();
     return false;
   case Instruction::ICmp:
+    assert(isa<ICmpInst>(this));
     return cast<ICmpInst>(this)->hasSameSign();
   case Instruction::Call:
     if (auto *II = dyn_cast<IntrinsicInst>(this)) {
