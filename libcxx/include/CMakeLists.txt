@@ -824,6 +824,7 @@ set(files
   __type_traits/is_bounded_array.h
   __type_traits/is_callable.h
   __type_traits/is_char_like_type.h
+  __type_traits/is_cheap_to_copy.h
   __type_traits/is_class.h
   __type_traits/is_compound.h
   __type_traits/is_const.h

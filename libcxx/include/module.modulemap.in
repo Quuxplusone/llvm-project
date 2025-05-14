@@ -140,6 +140,9 @@ module std_core [system] {
       header "__type_traits/is_char_like_type.h"
       export std_core.type_traits.integral_constant
     }
+    module is_cheap_to_copy {
+      header "__type_traits/is_cheap_to_copy.h"
+    }
     module is_class {
       header "__type_traits/is_class.h"
       export std_core.type_traits.integral_constant
