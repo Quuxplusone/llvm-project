@@ -238,6 +238,10 @@ module std_core [system] {
       header "__type_traits/is_nothrow_destructible.h"
       export std_core.type_traits.integral_constant
     }
+    module is_nothrow_relocatable {
+      header "__type_traits/is_nothrow_relocatable.h"
+      export std_core.type_traits.integral_constant
+    }
     module is_null_pointer {
       header "__type_traits/is_null_pointer.h"
       export std_core.type_traits.integral_constant
@@ -268,6 +272,10 @@ module std_core [system] {
     }
     module is_reference {
       header "__type_traits/is_reference.h"
+      export std_core.type_traits.integral_constant
+    }
+    module is_relocatable {
+      header "__type_traits/is_relocatable.h"
       export std_core.type_traits.integral_constant
     }
     module is_same {
@@ -1694,6 +1702,7 @@ module std [system] {
       export std.algorithm.in_out_result
     }
     module raw_storage_iterator               { header "__memory/raw_storage_iterator.h" }
+    module relocate_at                        { header "__memory/relocate_at.h" }
     module shared_count                       { header "__memory/shared_count.h" }
     module shared_ptr                         {
       header "__memory/shared_ptr.h"
@@ -1710,6 +1719,8 @@ module std [system] {
       export std.memory.destroy
       export std.utility.pair
     }
+    module uninitialized_relocate             { header "__memory/uninitialized_relocate.h" }
+    module uninitialized_relocate_backward    { header "__memory/uninitialized_relocate_backward.h" }
     module unique_ptr {
       header "__memory/unique_ptr.h"
       export std.functional.hash
