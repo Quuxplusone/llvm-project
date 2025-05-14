@@ -20,7 +20,7 @@
 #include <__iterator/projected.h>
 #include <__ranges/access.h>
 #include <__ranges/concepts.h>
-#include <__type_traits/is_trivially_copyable.h>
+#include <__type_traits/is_cheap_to_copy.h>
 #include <initializer_list>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
