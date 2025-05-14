@@ -145,6 +145,10 @@ This flag adds ``[[clang::trivial_abi]]`` to ``shared_ptr``, which makes it triv
 This flag makes ``__bit_iterator`` (a.k.a. ``vector<bool>::iterator``) trivially copyable as well as trivial for the
 purpose of calls, since the copy constructor is made trivial.
 
+``_LIBCPP_ABI_TRIVIALLY_COPYABLE_PAIR``
+---------------------------------------
+This flag makes ``pair<T, U>`` trivially copyable whenever ``T`` and ``U`` are both trivially copyable.
+
 Types that public aliases reference
 ===================================
 There are a lot of aliases that reference types with library internal names. For example, containers contain an
