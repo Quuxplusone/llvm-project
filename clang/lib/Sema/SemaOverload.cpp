@@ -93,7 +93,8 @@ static bool IsStandardConversion(Sema &S, Expr* From, QualType ToType,
                                  bool InOverloadResolution,
                                  StandardConversionSequence &SCS,
                                  bool CStyle,
-                                 bool AllowObjCWritebackConversion);
+                                 bool AllowObjCWritebackConversion,
+                                 bool AllowPointerToBoolConversion);
 
 static bool IsTransparentUnionStandardConversion(Sema &S, Expr* From,
                                                  QualType &ToType,
@@ -1785,10 +1786,12 @@ TryImplicitConversion(Sema &S, Expr *From, QualType ToType,
                       bool AllowObjCConversionOnExplicit) {
   ImplicitConversionSequence ICS;
   if (IsStandardConversion(S, From, ToType, InOverloadResolution,
-                           ICS.Standard, CStyle, AllowObjCWritebackConversion)){
+                           ICS.Standard, CStyle, AllowObjCWritebackConversion,
+                           /*AllowPointerToBoolConversion=*/(AllowExplicit != AllowedExplicit::None))){
     ICS.setStandard();
     return ICS;
   }
+
 
   if (!S.getLangOpts().CPlusPlus) {
     ICS.setBad(BadConversionSequence::no_conversion, From, ToType);
@@ -2249,7 +2252,8 @@ static bool IsStandardConversion(Sema &S, Expr* From, QualType ToType,
                                  bool InOverloadResolution,
                                  StandardConversionSequence &SCS,
                                  bool CStyle,
-                                 bool AllowObjCWritebackConversion) {
+                                 bool AllowObjCWritebackConversion,
+                                 bool AllowPointerToBoolConversion) {
   QualType FromType = From->getType();
 
   // Standard conversions (C++ [conv])
@@ -2428,8 +2432,13 @@ static bool IsStandardConversion(Sema &S, Expr* From, QualType ToType,
     SCS.Second = ICK_Complex_Promotion;
     FromType = ToType.getUnqualifiedType();
   } else if (ToType->isBooleanType() &&
-             (FromType->isArithmeticType() ||
-              FromType->isAnyPointerType() ||
+             FromType->isArithmeticType()) {
+    // Boolean conversions (C++ 4.12).
+    SCS.Second = ICK_Boolean_Conversion;
+    FromType = S.Context.BoolTy;
+  } else if (AllowPointerToBoolConversion &&
+             ToType->isBooleanType() &&
+             (FromType->isAnyPointerType() ||
               FromType->isBlockPointerType() ||
               FromType->isMemberPointerType())) {
     // Boolean conversions (C++ 4.12).
@@ -2621,7 +2630,8 @@ IsTransparentUnionStandardConversion(Sema &S, Expr* From,
   // It's compatible if the expression matches any of the fields.
   for (const auto *it : UD->fields()) {
     if (IsStandardConversion(S, From, it->getType(), InOverloadResolution, SCS,
-                             CStyle, /*AllowObjCWritebackConversion=*/false)) {
+                             CStyle, /*AllowObjCWritebackConversion=*/false,
+                             /*AllowPointerToBoolConversion=*/true)) {
       ToType = it->getType();
       return true;
     }
@@ -3865,7 +3875,8 @@ static bool tryAtomicConversion(Sema &S, Expr *From, QualType ToType,
   StandardConversionSequence InnerSCS;
   if (!IsStandardConversion(S, From, ToAtomic->getValueType(),
                             InOverloadResolution, InnerSCS,
-                            CStyle, /*AllowObjCWritebackConversion=*/false))
+                            CStyle, /*AllowObjCWritebackConversion=*/false,
+                            /*AllowPointerToBoolConversion=*/true))
     return false;
 
   SCS.Second = InnerSCS.Second;

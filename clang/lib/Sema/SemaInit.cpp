@@ -6902,7 +6902,7 @@ void InitializationSequence::InitializeFrom(Sema &S,
   ImplicitConversionSequence ICS
     = S.TryImplicitConversion(Initializer, DestType,
                               /*SuppressUserConversions*/true,
-                              Sema::AllowedExplicit::None,
+                              (Kind.getKind() == InitializationKind::IK_Copy) ? Sema::AllowedExplicit::None : Sema::AllowedExplicit::All,
                               /*InOverloadResolution*/ false,
                               /*CStyle=*/Kind.isCStyleOrFunctionalCast(),
                               allowObjCWritebackConversion);
