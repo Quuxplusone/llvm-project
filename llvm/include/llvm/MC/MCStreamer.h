@@ -352,7 +352,7 @@ public:
     return CurrentWinEpilog;
   }
 
-  bool isInEpilogCFI() const { return CurrentWinEpilog; }
+  bool isInEpilogCFI() const { return CurrentWinEpilog != nullptr; }
 
   void generateCompactUnwindEncodings(MCAsmBackend *MAB);
 

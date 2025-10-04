@@ -986,7 +986,7 @@ static bool targetSupportsFrem(const TargetLowering &TLI, Type *Ty) {
   if (!TLI.isOperationExpand(ISD::FREM, EVT::getEVT(Ty)))
     return true;
 
-  return TLI.getLibcallName(fremToLibcall(Ty->getScalarType()));
+  return TLI.getLibcallName(fremToLibcall(Ty->getScalarType())) != nullptr;
 }
 
 static bool runImpl(Function &F, const TargetLowering &TLI,

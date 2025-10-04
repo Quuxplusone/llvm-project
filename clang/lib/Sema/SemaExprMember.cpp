@@ -104,7 +104,7 @@ static IMAKind ClassifyImplicitMemberAccess(Sema &SemaRef,
       // A dependent class scope function template explicit specialization
       // that is neither declared 'static' nor with an explicit object
       // parameter could instantiate to a static or non-static member function.
-      couldInstantiateToStatic = MD->getDependentSpecializationInfo();
+      couldInstantiateToStatic = MD->getDependentSpecializationInfo() != nullptr;
     }
   }
 

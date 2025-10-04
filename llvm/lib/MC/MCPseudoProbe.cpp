@@ -531,7 +531,7 @@ bool MCPseudoProbeDecoder::buildAddress2ProbeMap(
   for (uint32_t I = 0; I < ChildrenToProcess; I++) {
     buildAddress2ProbeMap<false>(Cur, LastAddr, GuidFilter, FuncStartAddrs, I);
   }
-  return Cur;
+  return Cur != nullptr;
 }
 
 template <bool IsTopLevelFunc>

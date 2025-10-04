@@ -179,7 +179,7 @@ public:
   pointer operator->() const { return &operator*(); }
 
   /// Check for null.
-  bool isValid() const { return MII.getNodePtr(); }
+  bool isValid() const { return MII.getNodePtr() != nullptr; }
 
   friend bool operator==(const MachineInstrBundleIterator &L,
                          const MachineInstrBundleIterator &R) {

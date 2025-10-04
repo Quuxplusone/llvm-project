@@ -158,6 +158,7 @@ public:
     return ValueHandleBase::operator=(RHS);
   }
 
+  explicit operator bool() const { return getValPtr() != nullptr; }
   operator Value*() const {
     return getValPtr();
   }
@@ -220,6 +221,9 @@ public:
 
   operator Value*() const {
     return getValPtr();
+  }
+  explicit operator bool() const {
+    return getValPtr() != nullptr;
   }
 
   bool pointsToAliveValue() const {
@@ -294,6 +298,7 @@ public:
   operator ValueTy*() const {
     return getValPtr();
   }
+  explicit operator bool() const { return getValPtr() != nullptr; }
 
   ValueTy *operator=(ValueTy *RHS) {
     setValPtr(RHS);

@@ -847,7 +847,7 @@ RegBankSelect::RepairingPlacement::RepairingPlacement(
     // Split each outcoming edges.
     MachineBasicBlock &Src = *MI.getParent();
     for (auto &Succ : Src.successors())
-      addInsertPoint(Src, Succ);
+      addInsertPoint(Src, *Succ);
   }
 }
 

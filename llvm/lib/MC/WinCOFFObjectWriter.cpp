@@ -921,7 +921,7 @@ void WinCOFFWriter::recordRelocation(const MCFragment &F, const MCFixup &Fixup,
 
   Reloc.Data.VirtualAddress += Fixup.getOffset();
   Reloc.Data.Type = OWriter.TargetObjectWriter->getRelocType(
-      getContext(), Target, Fixup, Target.getSubSym(), Asm->getBackend());
+      getContext(), Target, Fixup, Target.getSubSym() != nullptr, Asm->getBackend());
 
   // The *_REL32 relocations are relative to the end of the relocation,
   // not to the start.

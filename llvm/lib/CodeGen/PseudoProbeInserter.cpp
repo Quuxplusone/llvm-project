@@ -43,7 +43,7 @@ public:
   }
 
   bool doInitialization(Module &M) override {
-    ShouldRun = M.getNamedMetadata(PseudoProbeDescMetadataName);
+    ShouldRun = M.getNamedMetadata(PseudoProbeDescMetadataName) != nullptr;
     return false;
   }
 

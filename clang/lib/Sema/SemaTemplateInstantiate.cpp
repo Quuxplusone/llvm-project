@@ -113,7 +113,7 @@ struct EnclosingTypeAliasTemplateDetails {
   TypeAliasTemplateDecl *PrimaryTypeAliasDecl = nullptr;
   ArrayRef<TemplateArgument> AssociatedTemplateArguments;
 
-  explicit operator bool() noexcept { return Template; }
+  explicit operator bool() const noexcept { return Template != nullptr; }
 };
 
 // Find the enclosing type alias template Decl from CodeSynthesisContexts, as
@@ -3671,7 +3671,7 @@ Sema::InstantiateClass(SourceLocation PointOfInstantiation,
   CXXRecordDecl *PatternDef
     = cast_or_null<CXXRecordDecl>(Pattern->getDefinition());
   if (DiagnoseUninstantiableTemplate(PointOfInstantiation, Instantiation,
-                                Instantiation->getInstantiatedFromMemberClass(),
+                                Instantiation->getInstantiatedFromMemberClass() != nullptr,
                                      Pattern, PatternDef, TSK, Complain))
     return true;
 
@@ -3918,7 +3918,7 @@ bool Sema::InstantiateEnum(SourceLocation PointOfInstantiation,
                            TemplateSpecializationKind TSK) {
   EnumDecl *PatternDef = Pattern->getDefinition();
   if (DiagnoseUninstantiableTemplate(PointOfInstantiation, Instantiation,
-                                 Instantiation->getInstantiatedFromMemberEnum(),
+                                 Instantiation->getInstantiatedFromMemberEnum() != nullptr,
                                      Pattern, PatternDef, TSK,/*Complain*/true))
     return true;
   Pattern = PatternDef;

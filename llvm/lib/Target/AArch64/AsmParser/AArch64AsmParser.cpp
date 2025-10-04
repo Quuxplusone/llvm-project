@@ -1210,13 +1210,13 @@ public:
 
   bool isSystemPStateFieldWithImm0_1() const {
     if (!isSysReg()) return false;
-    return AArch64PState::lookupPStateImm0_1ByEncoding(SysReg.PStateField);
+    return AArch64PState::lookupPStateImm0_1ByEncoding(SysReg.PStateField) != nullptr;
   }
 
   bool isSystemPStateFieldWithImm0_15() const {
     if (!isSysReg())
       return false;
-    return AArch64PState::lookupPStateImm0_15ByEncoding(SysReg.PStateField);
+    return AArch64PState::lookupPStateImm0_15ByEncoding(SysReg.PStateField) != nullptr;
   }
 
   bool isSVCR() const {

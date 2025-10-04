@@ -2105,7 +2105,7 @@ private:
   /// Check if -fsanitize=nullability-return instrumentation is required for
   /// this function.
   bool requiresReturnValueNullabilityCheck() const {
-    return RetValNullabilityPrecondition;
+    return RetValNullabilityPrecondition != nullptr;
   }
 
   /// Used to store precise source locations for return statements by the

@@ -1865,7 +1865,7 @@ bool CallAnalyzer::simplifyIntrinsicCallObjectSize(CallBase &CB) {
   Constant *C = dyn_cast_or_null<Constant>(V);
   if (C)
     SimplifiedValues[&CB] = C;
-  return C;
+  return C != nullptr;
 }
 
 bool CallAnalyzer::visitBitCast(BitCastInst &I) {

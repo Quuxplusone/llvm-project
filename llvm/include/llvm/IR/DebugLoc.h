@@ -238,7 +238,7 @@ namespace llvm {
     /// the conversion to \c DILocation, this doesn't require that \c Loc is of
     /// the right type.  Important for cases like \a llvm::StripDebugInfo() and
     /// \a Instruction::hasMetadata().
-    explicit operator bool() const { return Loc; }
+    explicit operator bool() const { return static_cast<bool>(Loc.get()); }
 
     /// Check whether this has a trivial destructor.
     bool hasTrivialDestructor() const { return Loc.hasTrivialDestructor(); }

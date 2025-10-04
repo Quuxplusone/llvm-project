@@ -1040,7 +1040,7 @@ static void StripEnv() {
   Dl_info info;
   RAW_CHECK(dladdr((void *)&StripEnv, &info));
   const char *dylib_name = StripModuleName(info.dli_fname);
-  bool lib_is_in_env = internal_strstr(dyld_insert_libraries, dylib_name);
+  bool lib_is_in_env = internal_strstr(dyld_insert_libraries, dylib_name) != nullptr;
   if (!lib_is_in_env)
     return;
 

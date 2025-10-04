@@ -188,7 +188,7 @@ public:
 
   Value *getCallee() { return Callee; }
 
-  explicit operator bool() { return Callee; }
+  explicit operator bool() { return Callee != nullptr; }
 
 private:
   FunctionType *FnTy = nullptr;

@@ -536,7 +536,7 @@ public:
   bool hasQueuesTag() const { return !QueuesLoc.isInvalid(); }
   SourceLocation getQueuesLoc() const { return QueuesLoc; }
 
-  bool hasDevNumExpr() const { return getExprs()[0]; }
+  bool hasDevNumExpr() const { return getExprs()[0] != nullptr; }
   Expr *getDevNumExpr() const { return getExprs()[0]; }
   ArrayRef<Expr *> getQueueIdExprs() { return getExprs().drop_front(); }
   ArrayRef<Expr *> getQueueIdExprs() const { return getExprs().drop_front(); }

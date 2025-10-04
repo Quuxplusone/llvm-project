@@ -3807,7 +3807,7 @@ bool IRTranslator::finalizeBasicBlock(const BasicBlock &BB,
   StackProtector &SP = getAnalysis<StackProtector>();
   if (SP.shouldEmitSDCheck(BB)) {
     bool FunctionBasedInstrumentation =
-        TLI->getSSPStackGuardCheck(*MF->getFunction().getParent());
+        TLI->getSSPStackGuardCheck(*MF->getFunction().getParent()) != nullptr;
     SPDescriptor.initialize(&BB, &MBB, FunctionBasedInstrumentation);
   }
   // Handle stack protector.

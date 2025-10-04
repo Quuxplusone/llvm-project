@@ -92,7 +92,7 @@ private:
 
   // Private constructor for use by OptionalStorage.
   DirectoryEntryRef(optional_none_tag) : ME(nullptr) {}
-  bool hasOptionalValue() const { return ME; }
+  bool hasOptionalValue() const { return ME != nullptr; }
 
   friend struct llvm::DenseMapInfo<DirectoryEntryRef>;
   struct dense_map_empty_tag {};

@@ -3138,7 +3138,7 @@ ASTReader::ReadControlBlock(ModuleFile &F,
     if (!HasReadUnhashedControlBlock) {
       HasReadUnhashedControlBlock = true;
       if (ASTReadResult Result =
-              readUnhashedControlBlock(F, ImportedBy, ClientLoadCapabilities))
+              readUnhashedControlBlock(F, ImportedBy != nullptr, ClientLoadCapabilities))
         return Result;
     }
     return Success;

@@ -2265,7 +2265,7 @@ class ObjCInterfaceOrSuperCCC final : public CorrectionCandidateCallback {
   ObjCInterfaceOrSuperCCC(ObjCMethodDecl *Method) {
     // Determine whether "super" is acceptable in the current context.
     if (Method && Method->getClassInterface())
-      WantObjCSuper = Method->getClassInterface()->getSuperClass();
+      WantObjCSuper = Method->getClassInterface()->getSuperClass() != nullptr;
   }
 
   bool ValidateCandidate(const TypoCorrection &candidate) override {

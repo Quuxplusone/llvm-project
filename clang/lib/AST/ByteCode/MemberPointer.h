@@ -72,7 +72,7 @@ public:
     return dyn_cast_if_present<FieldDecl>(Dcl);
   }
 
-  bool hasDecl() const { return Dcl; }
+  bool hasDecl() const { return Dcl != nullptr; }
   const ValueDecl *getDecl() const { return Dcl; }
 
   MemberPointer atInstanceBase(unsigned Offset) const {

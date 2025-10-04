@@ -94,7 +94,7 @@ class TwoLevelMap {
 
   bool contains(uptr idx) const {
     CHECK_LT(idx, kSize1 * kSize2);
-    return Get(idx / kSize2);
+    return Get(idx / kSize2) != nullptr;
   }
 
   const T &operator[](uptr idx) const {

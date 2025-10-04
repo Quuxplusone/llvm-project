@@ -674,7 +674,7 @@ bool MLEvictAdvisor::loadInterferenceFeatures(
     return false;
   }
 
-  const bool IsLocal = LIS->intervalIsInOneMBB(VirtReg);
+  const bool IsLocal = LIS->intervalIsInOneMBB(VirtReg) != nullptr;
   int64_t LocalIntfs = 0;
   float NumUrgent = 0.0f;
 

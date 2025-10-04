@@ -1184,7 +1184,7 @@ public:
       ResDelta = SchedResourceDelta();
     }
 
-    bool isValid() const { return SU; }
+    bool isValid() const { return SU != nullptr; }
 
     // Copy the status of another candidate without changing policy.
     void setBest(SchedCandidate &Best) {

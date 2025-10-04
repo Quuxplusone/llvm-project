@@ -54,7 +54,7 @@ struct __libcpp_unique_locale {
       __locale::__freelocale(__loc_);
   }
 
-  explicit operator bool() const { return __loc_; }
+  explicit operator bool() const { return __loc_ != nullptr; }
 
   __locale::__locale_t& get() { return __loc_; }
 

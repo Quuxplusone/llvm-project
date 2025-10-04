@@ -1760,7 +1760,7 @@ static bool isConstNotMutableType(Sema &SemaRef, QualType Type,
     if (const ClassTemplateDecl *CTD = CTSD->getSpecializedTemplate())
       RD = CTD->getTemplatedDecl();
   if (IsClassType)
-    *IsClassType = RD;
+    *IsClassType = !!RD;
   return IsConstant && !(SemaRef.getLangOpts().CPlusPlus && RD &&
                          RD->hasDefinition() && RD->hasMutableFields());
 }

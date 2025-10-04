@@ -162,8 +162,8 @@ struct ValueDFS_Compare {
     DomTreeNode *DomBDest = DT.getNode(BDest);
     unsigned AIn = DomADest->getDFSNumIn();
     unsigned BIn = DomBDest->getDFSNumIn();
-    bool isAUse = A.U;
-    bool isBUse = B.U;
+    bool isAUse = A.U != nullptr;
+    bool isBUse = B.U != nullptr;
     assert((!A.PInfo || !A.U) && (!B.PInfo || !B.U) &&
            "Def and U cannot be set at the same time");
     // Now sort by edge destination and then defs before uses.

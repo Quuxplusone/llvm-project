@@ -1285,7 +1285,7 @@ public:
   }
 
   /// Returns true if this iterator is still pointing at a valid entry.
-  bool isValid() const { return Idx; }
+  bool isValid() const { return Idx != nullptr; }
 
   /// Returns the current sub-register index.
   unsigned getSubReg() const { return SubReg; }

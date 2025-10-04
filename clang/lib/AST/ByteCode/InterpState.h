@@ -36,7 +36,7 @@ class SourceMapper;
 struct StdAllocatorCaller {
   const Expr *Call = nullptr;
   QualType AllocType;
-  explicit operator bool() { return Call; }
+  explicit operator bool() const { return Call != nullptr; }
 };
 
 /// Interpreter context.

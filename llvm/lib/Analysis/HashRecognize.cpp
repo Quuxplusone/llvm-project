@@ -112,7 +112,7 @@ struct RecurrenceInfo {
   std::optional<APInt> ExtraConst;
 
   RecurrenceInfo(const Loop &L) : L(L) {}
-  operator bool() const { return BO; }
+  explicit operator bool() const { return BO != nullptr; }
 
   void print(raw_ostream &OS, unsigned Indent = 0) const {
     OS.indent(Indent) << "Phi: ";

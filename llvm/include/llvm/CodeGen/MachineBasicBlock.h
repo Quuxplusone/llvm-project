@@ -298,7 +298,7 @@ public:
   ///
   /// If this function returns true, it _does_ mean that branch target
   /// enforcement needs to put a BTI or equivalent at the start of the block.
-  bool isIRBlockAddressTaken() const { return AddressTakenIRBlock; }
+  bool isIRBlockAddressTaken() const { return AddressTakenIRBlock != nullptr; }
 
   /// Retrieves the BasicBlock which corresponds to this MachineBasicBlock.
   BasicBlock *getAddressTakenIRBlock() const { return AddressTakenIRBlock; }

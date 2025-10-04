@@ -358,7 +358,7 @@ public:
     return tmp;
   }
 
-  bool isValid() const { return NodePtr; }
+  bool isValid() const { return static_cast<bool>(NodePtr); }
 
   /// Get the underlying ilist_node.
   node_pointer getNodePtr() const { return static_cast<node_pointer>(NodePtr); }

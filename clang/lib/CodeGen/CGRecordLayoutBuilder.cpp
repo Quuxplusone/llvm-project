@@ -338,10 +338,10 @@ void CGRecordLowering::lowerUnion(bool isNonVirtualBaseType) {
     // type, it might not be very easy to come up with a Constant which
     // correctly initializes it.
     if (!SeenNamedMember) {
-      SeenNamedMember = Field->getIdentifier();
+      SeenNamedMember = Field->getIdentifier() != nullptr;
       if (!SeenNamedMember)
         if (const auto *FieldRD = Field->getType()->getAsRecordDecl())
-          SeenNamedMember = FieldRD->findFirstNamedDataMember();
+          SeenNamedMember = FieldRD->findFirstNamedDataMember() != nullptr;
       if (SeenNamedMember && !isZeroInitializable(Field)) {
         IsZeroInitializable = IsZeroInitializableAsBase = false;
         StorageType = FieldType;

@@ -5344,7 +5344,7 @@ public:
 
   /// Return true if this is an array initializer and its array "filler"
   /// has been set.
-  bool hasArrayFiller() const { return getArrayFiller(); }
+  bool hasArrayFiller() const { return getArrayFiller() != nullptr; }
 
   /// Determine whether this initializer list contains a designated initializer.
   bool hasDesignatedInit() const {

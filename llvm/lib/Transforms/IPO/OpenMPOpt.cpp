@@ -360,7 +360,7 @@ struct OMPInformationCache : public InformationCache {
     void clearUsesMap() { UsesMap.clear(); }
 
     /// Boolean conversion that is true if the runtime function was found.
-    operator bool() const { return Declaration; }
+    explicit operator bool() const { return Declaration != nullptr; }
 
     /// Return the vector of uses in function \p F.
     UseVector &getOrCreateUseVector(Function *F) {

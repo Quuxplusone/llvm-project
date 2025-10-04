@@ -895,10 +895,10 @@ public:
 
   unsigned getCompoundStmtAbbrev() const { return CompoundStmtAbbrev; }
 
-  bool hasChain() const { return Chain; }
+  bool hasChain() const { return Chain != nullptr; }
   ASTReader *getChain() const { return Chain; }
 
-  bool isWritingModule() const { return WritingModule; }
+  bool isWritingModule() const { return WritingModule != nullptr; }
 
   bool isWritingStdCXXNamedModules() const {
     return WritingModule && WritingModule->isNamedModule();

@@ -32,7 +32,7 @@ bool ConstructionContextLayer::isStrictlyMoreSpecificThan(
   const ConstructionContextLayer *Self = this;
   while (true) {
     if (!Other)
-      return Self;
+      return Self != nullptr;
     if (!Self || !(Self->Item == Other->Item))
       return false;
     Self = Self->getParent();

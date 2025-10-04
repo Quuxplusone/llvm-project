@@ -214,7 +214,7 @@ private:
     }
 
     /// Returns true if this iterator is not yet at the end.
-    bool isValid() const { return List; }
+    bool isValid() const { return List != nullptr; }
 
     /// Dereference the iterator to get the value at the current position.
     const unsigned &operator*() const { return Val; }

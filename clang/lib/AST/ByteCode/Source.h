@@ -48,7 +48,7 @@ public:
 
   bool operator!=(const CodePtr &RHS) const { return Ptr != RHS.Ptr; }
   const std::byte *operator*() const { return Ptr; }
-  explicit operator bool() const { return Ptr; }
+  explicit operator bool() const { return Ptr != nullptr; }
   bool operator<=(const CodePtr &RHS) const { return Ptr <= RHS.Ptr; }
   bool operator>=(const CodePtr &RHS) const { return Ptr >= RHS.Ptr; }
 

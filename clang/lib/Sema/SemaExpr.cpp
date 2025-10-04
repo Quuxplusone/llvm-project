@@ -8987,7 +8987,7 @@ ExprResult Sema::ActOnConditionalOp(SourceLocation QuestionLoc,
 
   CheckBoolLikeConversion(Cond.get(), QuestionLoc);
 
-  result = computeConditionalNullability(result, commonExpr, LHSTy, RHSTy,
+  result = computeConditionalNullability(result, commonExpr != nullptr, LHSTy, RHSTy,
                                          Context);
 
   if (!commonExpr)
@@ -11247,7 +11247,7 @@ QualType Sema::CheckAdditionOperands(ExprResult &LHS, ExprResult &RHS,
   if (LHS.get()->getType()->isVectorType() ||
       RHS.get()->getType()->isVectorType()) {
     QualType compType =
-        CheckVectorOperands(LHS, RHS, Loc, CompLHSTy,
+        CheckVectorOperands(LHS, RHS, Loc, CompLHSTy != nullptr,
                             /*AllowBothBool*/ getLangOpts().AltiVec,
                             /*AllowBoolConversions*/ getLangOpts().ZVector,
                             /*AllowBooleanOperation*/ false,
@@ -11258,7 +11258,7 @@ QualType Sema::CheckAdditionOperands(ExprResult &LHS, ExprResult &RHS,
 
   if (LHS.get()->getType()->isSveVLSBuiltinType() ||
       RHS.get()->getType()->isSveVLSBuiltinType()) {
-    QualType compType = CheckSizelessVectorOperands(LHS, RHS, Loc, CompLHSTy,
+    QualType compType = CheckSizelessVectorOperands(LHS, RHS, Loc, CompLHSTy != nullptr,
                                                     ArithConvKind::Arithmetic);
     if (CompLHSTy)
       *CompLHSTy = compType;
@@ -11268,7 +11268,7 @@ QualType Sema::CheckAdditionOperands(ExprResult &LHS, ExprResult &RHS,
   if (LHS.get()->getType()->isConstantMatrixType() ||
       RHS.get()->getType()->isConstantMatrixType()) {
     QualType compType =
-        CheckMatrixElementwiseOperands(LHS, RHS, Loc, CompLHSTy);
+        CheckMatrixElementwiseOperands(LHS, RHS, Loc, CompLHSTy != nullptr);
     if (CompLHSTy)
       *CompLHSTy = compType;
     return compType;
@@ -11374,7 +11374,7 @@ QualType Sema::CheckSubtractionOperands(ExprResult &LHS, ExprResult &RHS,
   if (LHS.get()->getType()->isVectorType() ||
       RHS.get()->getType()->isVectorType()) {
     QualType compType =
-        CheckVectorOperands(LHS, RHS, Loc, CompLHSTy,
+        CheckVectorOperands(LHS, RHS, Loc, CompLHSTy != nullptr,
                             /*AllowBothBool*/ getLangOpts().AltiVec,
                             /*AllowBoolConversions*/ getLangOpts().ZVector,
                             /*AllowBooleanOperation*/ false,
@@ -11385,7 +11385,7 @@ QualType Sema::CheckSubtractionOperands(ExprResult &LHS, ExprResult &RHS,
 
   if (LHS.get()->getType()->isSveVLSBuiltinType() ||
       RHS.get()->getType()->isSveVLSBuiltinType()) {
-    QualType compType = CheckSizelessVectorOperands(LHS, RHS, Loc, CompLHSTy,
+    QualType compType = CheckSizelessVectorOperands(LHS, RHS, Loc, CompLHSTy != nullptr,
                                                     ArithConvKind::Arithmetic);
     if (CompLHSTy)
       *CompLHSTy = compType;
@@ -11395,7 +11395,7 @@ QualType Sema::CheckSubtractionOperands(ExprResult &LHS, ExprResult &RHS,
   if (LHS.get()->getType()->isConstantMatrixType() ||
       RHS.get()->getType()->isConstantMatrixType()) {
     QualType compType =
-        CheckMatrixElementwiseOperands(LHS, RHS, Loc, CompLHSTy);
+        CheckMatrixElementwiseOperands(LHS, RHS, Loc, CompLHSTy != nullptr);
     if (CompLHSTy)
       *CompLHSTy = compType;
     return compType;

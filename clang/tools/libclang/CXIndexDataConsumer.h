@@ -161,7 +161,7 @@ struct ObjCProtocolDeclInfo : public ObjCContainerDeclInfo {
   ObjCProtocolDeclInfo(const ObjCProtocolDecl *D)
     : ObjCContainerDeclInfo(Info_ObjCProtocol,
                             /*isForwardRef=*/false,
-                            /*isRedeclaration=*/D->getPreviousDecl(),
+                            /*isRedeclaration=*/D->getPreviousDecl() != nullptr,
                             /*isImplementation=*/false) { }
 
   static bool classof(const DeclInfo *D) {
@@ -358,7 +358,7 @@ public:
 
   bool shouldAbort();
 
-  bool hasDiagnosticCallback() const { return CB.diagnostic; }
+  bool hasDiagnosticCallback() const { return CB.diagnostic != nullptr; }
 
   void enteredMainFile(OptionalFileEntryRef File);
 

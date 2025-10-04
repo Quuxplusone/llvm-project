@@ -241,7 +241,7 @@ public:
     return *this;
   }
 
-  bool hasOffset() const { return Offset; }
+  bool hasOffset() const { return Offset != nullptr; }
 
   llvm::Value *getOffset() const { return Offset; }
 

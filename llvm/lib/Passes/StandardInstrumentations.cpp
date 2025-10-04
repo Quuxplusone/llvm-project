@@ -1527,7 +1527,7 @@ void InLineChangePrinter::handleAfter(StringRef PassID, std::string &Name,
       formatv("*** IR Dump After {0} on {1} ***\n", PassID, Name);
   Out << Banner;
   IRComparer<EmptyData>(Before, After)
-      .compare(getModuleForComparison(IR),
+      .compare(getModuleForComparison(IR) != nullptr,
                [&](bool InModule, unsigned Minor,
                    const FuncDataT<EmptyData> &Before,
                    const FuncDataT<EmptyData> &After) -> void {
@@ -2293,7 +2293,7 @@ void DotCfgChangeReporter::handleInitialIR(Any IR) {
   // Now compare it against itself, which will have everything the
   // same and will generate the files.
   IRComparer<DCData>(Data, Data)
-      .compare(getModuleForComparison(IR),
+      .compare(getModuleForComparison(IR) != nullptr,
                [&](bool InModule, unsigned Minor,
                    const FuncDataT<DCData> &Before,
                    const FuncDataT<DCData> &After) -> void {
@@ -2324,7 +2324,7 @@ void DotCfgChangeReporter::handleAfter(StringRef PassID, std::string &Name,
                                        const IRDataT<DCData> &After, Any IR) {
   assert(HTML && "Expected outstream to be set");
   IRComparer<DCData>(Before, After)
-      .compare(getModuleForComparison(IR),
+      .compare(getModuleForComparison(IR) != nullptr,
                [&](bool InModule, unsigned Minor,
                    const FuncDataT<DCData> &Before,
                    const FuncDataT<DCData> &After) -> void {

@@ -690,7 +690,7 @@ void Sema::diagnoseExprIntendedAsTemplateName(Scope *S, ExprResult TemplateName,
     };
     bool ValidateCandidate(const TypoCorrection &Candidate) override {
       if (auto *ND = Candidate.getCorrectionDecl())
-        return S.getAsTemplateNameDecl(ND);
+        return S.getAsTemplateNameDecl(ND) != nullptr;
       return Candidate.isKeyword();
     }
 
@@ -10178,7 +10178,7 @@ DeclResult Sema::ActOnExplicitInstantiation(
       Context.getTargetInfo().getCXXABI().isMicrosoft()) {
     // Check for dllimport class template instantiation definitions.
     bool DLLImport =
-        ClassTemplate->getTemplatedDecl()->getAttr<DLLImportAttr>();
+        ClassTemplate->getTemplatedDecl()->getAttr<DLLImportAttr>() != nullptr;
     for (const ParsedAttr &AL : Attr) {
       if (AL.getKind() == ParsedAttr::AT_DLLImport)
         DLLImport = true;

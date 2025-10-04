@@ -364,7 +364,7 @@ protected:
 public:
   static bool classof(const OpenACCClause *C);
 
-  bool hasConditionExpr() const { return ConditionExpr; }
+  bool hasConditionExpr() const { return ConditionExpr != nullptr; }
   const Expr *getConditionExpr() const { return ConditionExpr; }
   Expr *getConditionExpr() { return ConditionExpr; }
 
@@ -561,7 +561,7 @@ public:
 
   bool hasQueuesTag() const { return !QueuesLoc.isInvalid(); }
   SourceLocation getQueuesLoc() const { return QueuesLoc; }
-  bool hasDevNumExpr() const { return getExprs()[0]; }
+  bool hasDevNumExpr() const { return getExprs()[0] != nullptr; }
   Expr *getDevNumExpr() const { return getExprs()[0]; }
   ArrayRef<Expr *> getQueueIdExprs() {
     return OpenACCClauseWithExprs::getExprs().drop_front();
@@ -846,7 +846,7 @@ struct OpenACCPrivateRecipe {
     assert(!AllocaDecl || AllocaDecl->getInit() == nullptr);
   }
 
-  bool isSet() const { return AllocaDecl; }
+  bool isSet() const { return AllocaDecl != nullptr; }
 
   static OpenACCPrivateRecipe Empty() {
     return OpenACCPrivateRecipe(nullptr, nullptr);
@@ -909,7 +909,7 @@ struct OpenACCFirstPrivateRecipe {
     assert(!InitFromTemporary || InitFromTemporary->getInit() == nullptr);
   }
 
-  bool isSet() const { return AllocaDecl; }
+  bool isSet() const { return AllocaDecl != nullptr; }
 
   static OpenACCFirstPrivateRecipe Empty() {
     return OpenACCFirstPrivateRecipe(nullptr, nullptr, nullptr);
@@ -1291,7 +1291,7 @@ struct OpenACCReductionRecipe {
     assert(!AllocaDecl || AllocaDecl->getInit() == nullptr);
   }
 
-  bool isSet() const { return AllocaDecl; }
+  bool isSet() const { return AllocaDecl != nullptr; }
   static OpenACCReductionRecipe Empty() {
     return OpenACCReductionRecipe(nullptr, nullptr);
   }

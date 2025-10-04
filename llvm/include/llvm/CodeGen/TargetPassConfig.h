@@ -62,7 +62,7 @@ public:
   IdentifyingPassPtr(AnalysisID IDPtr) : ID(IDPtr) {}
   IdentifyingPassPtr(Pass *InstancePtr) : P(InstancePtr), IsInstance(true) {}
 
-  bool isValid() const { return P; }
+  bool isValid() const { return P != nullptr; }
   bool isInstance() const { return IsInstance; }
 
   AnalysisID getID() const {

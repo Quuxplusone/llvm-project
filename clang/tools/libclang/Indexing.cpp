@@ -620,7 +620,7 @@ static CXErrorCode clang_indexSourceFile_Impl(
       std::move(CInvok), CXXIdx->getPCHContainerOperations(), DiagOpts, Diags,
       IndexAction.get(), UPtr, Persistent, CXXIdx->getClangResourcesPath(),
       OnlyLocalDecls, CaptureDiagnostics, PrecompilePreambleAfterNParses,
-      CacheCodeCompletionResults, /*UserFilesAreVolatile=*/true);
+      CacheCodeCompletionResults, /*UserFilesAreVolatile=*/true) != nullptr;
   if (DiagTrap.hasErrorOccurred() && CXXIdx->getDisplayDiagnostics())
     printDiagsToStderr(UPtr);
 

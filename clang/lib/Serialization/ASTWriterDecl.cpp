@@ -1308,7 +1308,7 @@ void ASTDeclWriter::VisitVarDecl(VarDecl *D) {
     VarDeclBits.addBit(D->isPreviousDeclInSameBlockScope());
 
     VarDeclBits.addBit(D->isEscapingByref());
-    HasDeducedType = D->getType()->getContainedDeducedType();
+    HasDeducedType = D->getType()->getContainedDeducedType() != nullptr;
     VarDeclBits.addBit(HasDeducedType);
 
     if (const auto *IPD = dyn_cast<ImplicitParamDecl>(D))

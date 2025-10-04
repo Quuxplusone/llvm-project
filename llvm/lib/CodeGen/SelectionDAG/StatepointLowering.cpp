@@ -753,7 +753,7 @@ SDValue SelectionDAGBuilder::LowerAsSTATEPOINT(
   SDValue Chain = CallNode->getOperand(0);
 
   SDValue Glue;
-  bool CallHasIncomingGlue = CallNode->getGluedNode();
+  bool CallHasIncomingGlue = CallNode->getGluedNode() != nullptr;
   if (CallHasIncomingGlue) {
     // Glue is always last operand
     Glue = CallNode->getOperand(CallNode->getNumOperands() - 1);

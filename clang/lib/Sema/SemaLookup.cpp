@@ -3776,7 +3776,7 @@ Sema::LookupLiteralOperator(Scope *S, LookupResult &R,
     } else if (AllowCooked && IsCooked) {
       FoundCooked = true;
       AllowRaw = false;
-      AllowTemplate = StringLit;
+      AllowTemplate = StringLit != nullptr;
       AllowStringTemplatePack = false;
       if (FoundRaw || FoundTemplate || FoundStringTemplatePack) {
         // Go through again and remove the raw and template decls we've

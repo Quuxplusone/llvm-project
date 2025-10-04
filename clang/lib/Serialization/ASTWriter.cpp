@@ -1410,7 +1410,7 @@ void ASTWriter::writeUnhashedControlBlock(Preprocessor &PP) {
   }
 
   if (!HSOpts.ModulesSkipPragmaDiagnosticMappings)
-    WritePragmaDiagnosticMappings(Diags, /* isModule = */ WritingModule);
+    WritePragmaDiagnosticMappings(Diags, /* isModule = */ WritingModule != nullptr);
 
   // Header search entry usage.
   {
@@ -8638,7 +8638,7 @@ void ASTRecordWriter::writeOMPTraitInfo(const OMPTraitInfo *TI) {
     writeUInt32(Set.Selectors.size());
     for (const auto &Selector : Set.Selectors) {
       writeEnum(Selector.Kind);
-      writeBool(Selector.ScoreOrCondition);
+      writeBool(Selector.ScoreOrCondition != nullptr);
       if (Selector.ScoreOrCondition)
         writeExprRef(Selector.ScoreOrCondition);
       writeUInt32(Selector.Properties.size());
@@ -8865,7 +8865,7 @@ void ASTRecordWriter::writeOpenACCClause(const OpenACCClause *C) {
   case OpenACCClauseKind::Wait: {
     const auto *WC = cast<OpenACCWaitClause>(C);
     writeSourceLocation(WC->getLParenLoc());
-    writeBool(WC->getDevNumExpr());
+    writeBool(WC->getDevNumExpr() != nullptr);
     if (Expr *DNE = WC->getDevNumExpr())
       AddStmt(DNE);
     writeSourceLocation(WC->getQueuesLoc());
@@ -8879,7 +8879,7 @@ void ASTRecordWriter::writeOpenACCClause(const OpenACCClause *C) {
     writeSourceLocation(DTC->getLParenLoc());
     writeUInt32(DTC->getArchitectures().size());
     for (const DeviceTypeArgument &Arg : DTC->getArchitectures()) {
-      writeBool(Arg.getIdentifierInfo());
+      writeBool(Arg.getIdentifierInfo() != nullptr);
       if (Arg.getIdentifierInfo())
         AddIdentifierRef(Arg.getIdentifierInfo());
       writeSourceLocation(Arg.getLoc());

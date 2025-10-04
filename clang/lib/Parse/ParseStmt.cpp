@@ -114,7 +114,7 @@ public:
     if (FieldDecl *FD = candidate.getCorrectionDeclAs<FieldDecl>())
       return !candidate.getCorrectionSpecifier() || isa<ObjCIvarDecl>(FD);
     if (NextToken.is(tok::equal))
-      return candidate.getCorrectionDeclAs<VarDecl>();
+      return candidate.getCorrectionDeclAs<VarDecl>() != nullptr;
     if (NextToken.is(tok::period) &&
         candidate.getCorrectionDeclAs<NamespaceDecl>())
       return false;

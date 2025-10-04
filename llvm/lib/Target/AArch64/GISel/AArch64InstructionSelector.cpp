@@ -2550,7 +2550,7 @@ bool AArch64InstructionSelector::select(MachineInstr &I) {
 
       I.setDesc(TII.get(TargetOpcode::PHI));
 
-      return RBI.constrainGenericRegister(DefReg, *DefRC, MRI);
+      return RBI.constrainGenericRegister(DefReg, *DefRC, MRI) != nullptr;
     }
 
     if (I.isCopy())
@@ -2741,7 +2741,7 @@ bool AArch64InstructionSelector::select(MachineInstr &I) {
         }
         MIB.buildCopy({DefReg}, {LoadMI->getOperand(0).getReg()});
         I.eraseFromParent();
-        return RBI.constrainGenericRegister(DefReg, FPRRC, MRI);
+        return RBI.constrainGenericRegister(DefReg, FPRRC, MRI) != nullptr;
       }
       }
 
@@ -3117,7 +3117,7 @@ bool AArch64InstructionSelector::select(MachineInstr &I) {
           .addImm(AArch64::sub_32);
       constrainSelectedInstRegOperands(*LoadStore, TII, TRI, RBI);
       return RBI.constrainGenericRegister(DstReg, AArch64::GPR64allRegClass,
-                                          MRI);
+                                          MRI) != nullptr;
     }
     return constrainSelectedInstRegOperands(*LoadStore, TII, TRI, RBI);
   }
@@ -5839,7 +5839,7 @@ bool AArch64InstructionSelector::tryOptBuildVecToSubregToReg(
                          .addImm(SubReg);
   I.eraseFromParent();
   constrainSelectedInstRegOperands(*SubregToReg, TII, TRI, RBI);
-  return RBI.constrainGenericRegister(Dst, *DstRC, MRI);
+  return RBI.constrainGenericRegister(Dst, *DstRC, MRI) != nullptr;
 }
 
 bool AArch64InstructionSelector::selectBuildVector(MachineInstr &I,

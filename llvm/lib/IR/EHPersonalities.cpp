@@ -106,7 +106,7 @@ bool llvm::canSimplifyInvokeNoUnwind(const Function *F) {
 
   // Cannot simplify CXX Personality under AsynchEH
   const llvm::Module *M = (const llvm::Module *)F->getParent();
-  bool EHa = M->getModuleFlag("eh-asynch");
+  bool EHa = M->getModuleFlag("eh-asynch") != nullptr;
   return !EHa && !isAsynchronousEHPersonality(Personality);
 }
 

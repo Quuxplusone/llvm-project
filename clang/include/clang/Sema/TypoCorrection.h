@@ -371,7 +371,7 @@ public:
       : CorrectionCandidateCallback(Typo, TypoNNS) {}
 
   bool ValidateCandidate(const TypoCorrection &candidate) override {
-    return candidate.getCorrectionDeclAs<C>();
+    return candidate.getCorrectionDeclAs<C>() != nullptr;
   }
   std::unique_ptr<CorrectionCandidateCallback> clone() override {
     return std::make_unique<DeclFilterCCC>(*this);

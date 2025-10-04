@@ -578,8 +578,8 @@ public:
   ///
   /// If this is true, the slices are never fully built and should be
   /// ignored.
-  bool isEscaped() const { return PointerEscapingInstr; }
-  bool isEscapedReadOnly() const { return PointerEscapingInstrReadOnly; }
+  bool isEscaped() const { return PointerEscapingInstr != nullptr; }
+  bool isEscapedReadOnly() const { return PointerEscapingInstrReadOnly != nullptr; }
 
   /// Support for iterating over the slices.
   /// @{

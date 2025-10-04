@@ -111,7 +111,7 @@ public:
 
   /// Return true if this alias set should be ignored as part of the
   /// AliasSetTracker object.
-  bool isForwardingAliasSet() const { return Forward; }
+  bool isForwardingAliasSet() const { return Forward != nullptr; }
 
   /// Merge the specified alias set into this alias set.
   LLVM_ABI void mergeSetIn(AliasSet &AS, AliasSetTracker &AST,

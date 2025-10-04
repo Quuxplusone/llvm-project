@@ -119,7 +119,7 @@ static bool hasAnyUnrollPragma(const Loop *L, StringRef Prefix) {
 
 // Returns true if the loop has an unroll_and_jam(enable) pragma.
 static bool hasUnrollAndJamEnablePragma(const Loop *L) {
-  return getUnrollMetadataForLoop(L, "llvm.loop.unroll_and_jam.enable");
+  return getUnrollMetadataForLoop(L, "llvm.loop.unroll_and_jam.enable") != nullptr;
 }
 
 // If loop has an unroll_and_jam_count pragma return the (necessarily

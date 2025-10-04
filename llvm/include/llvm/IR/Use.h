@@ -52,6 +52,7 @@ public:
   friend class User;
 
   operator Value *() const { return Val; }
+  explicit operator bool() const { return bool(Val); }
   Value *get() const { return Val; }
 
   /// Returns the User that contains this Use.

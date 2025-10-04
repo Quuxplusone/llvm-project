@@ -42,7 +42,7 @@ OMPChildren *OMPChildren::Create(void *Mem, ArrayRef<OMPClause *> Clauses) {
 
 OMPChildren *OMPChildren::Create(void *Mem, ArrayRef<OMPClause *> Clauses,
                                  Stmt *S, unsigned NumChildren) {
-  auto *Data = CreateEmpty(Mem, Clauses.size(), S, NumChildren);
+  auto *Data = CreateEmpty(Mem, Clauses.size(), S != nullptr, NumChildren);
   Data->setClauses(Clauses);
   if (S)
     Data->setAssociatedStmt(S);

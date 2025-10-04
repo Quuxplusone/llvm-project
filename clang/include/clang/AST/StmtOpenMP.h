@@ -302,7 +302,7 @@ protected:
                             Stmt *AssociatedStmt, unsigned NumChildren,
                             Params &&... P) {
     void *Mem =
-        C.Allocate(sizeof(T) + OMPChildren::size(Clauses.size(), AssociatedStmt,
+        C.Allocate(sizeof(T) + OMPChildren::size(Clauses.size(), AssociatedStmt != nullptr,
                                                  NumChildren),
                    alignof(T));
 

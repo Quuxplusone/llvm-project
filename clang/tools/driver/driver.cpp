@@ -128,7 +128,7 @@ static T checkEnvVar(const char *EnvOptSet, const char *EnvOptFile,
   if (!Str)
     return T{};
 
-  T OptVal = Str;
+  T OptVal = T(Str);
   if (const char *Var = ::getenv(EnvOptFile))
     OptFile = Var;
   return OptVal;

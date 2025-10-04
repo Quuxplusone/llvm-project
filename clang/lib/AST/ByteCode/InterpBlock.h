@@ -72,7 +72,7 @@ public:
   /// Returns the block's descriptor.
   const Descriptor *getDescriptor() const { return Desc; }
   /// Checks if the block has any live pointers.
-  bool hasPointers() const { return Pointers; }
+  bool hasPointers() const { return Pointers != nullptr; }
   /// Checks if the block is extern.
   bool isExtern() const { return AccessFlags & ExternFlag; }
   /// Checks if the block has static storage duration.

@@ -49,7 +49,7 @@ public:
   explicit TypeInfoLValue(const Type *T);
 
   const Type *getType() const { return T; }
-  explicit operator bool() const { return T; }
+  explicit operator bool() const { return T != nullptr; }
 
   void *getOpaqueValue() { return const_cast<Type*>(T); }
   static TypeInfoLValue getFromOpaqueValue(void *Value) {

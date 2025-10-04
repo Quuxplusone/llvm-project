@@ -1263,7 +1263,7 @@ public:
       PSet = nullptr;
   }
 
-  bool isValid() const { return PSet; }
+  bool isValid() const { return PSet != nullptr; }
 
   unsigned getWeight() const { return Weight; }
 

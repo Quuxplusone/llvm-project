@@ -2677,7 +2677,7 @@ bool VectorCombine::foldShuffleOfShuffles(Instruction &I) {
   }
 
   if (!NewX)
-    return PoisonValue::get(ShuffleDstTy);
+    return PoisonValue::get(ShuffleDstTy) != nullptr;
   if (!NewY)
     NewY = PoisonValue::get(ShuffleSrcTy);
 

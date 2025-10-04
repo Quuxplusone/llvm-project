@@ -155,7 +155,7 @@ public:
 
   void *getAsOpaquePtr() const { return Value.getOpaqueValue(); }
 
-  explicit operator bool() const { return getAsOpaquePtr(); }
+  explicit operator bool() const { return getAsOpaquePtr() != nullptr; }
 
   static GlobalDecl getFromOpaquePtr(void *P) {
     GlobalDecl GD;

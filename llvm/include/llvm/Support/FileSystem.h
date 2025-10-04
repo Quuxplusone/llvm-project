@@ -1345,7 +1345,7 @@ public:
   ~mapped_file_region() { unmapImpl(); }
 
   /// Check if this is a valid mapping.
-  explicit operator bool() const { return Mapping; }
+  explicit operator bool() const { return static_cast<bool>(Mapping); }
 
   /// Unmap.
   void unmap() {

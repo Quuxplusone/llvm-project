@@ -164,8 +164,8 @@ public:
 
   /// Retrieve the set of API notes readers for the current module.
   ArrayRef<APINotesReader *> getCurrentModuleReaders() const {
-    bool HasPublic = CurrentModuleReaders[ReaderKind::Public];
-    bool HasPrivate = CurrentModuleReaders[ReaderKind::Private];
+    bool HasPublic = CurrentModuleReaders[ReaderKind::Public] != nullptr;
+    bool HasPrivate = CurrentModuleReaders[ReaderKind::Private] != nullptr;
     assert((!HasPrivate || HasPublic) && "private module requires public module");
     if (!HasPrivate && !HasPublic)
       return {};

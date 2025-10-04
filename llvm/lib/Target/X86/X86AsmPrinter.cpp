@@ -78,7 +78,7 @@ bool X86AsmPrinter::runOnMachineFunction(MachineFunction &MF) {
   const Module *M = MF.getFunction().getParent();
   EmitFPOData = Subtarget->isTargetWin32() && M->getCodeViewFlag();
 
-  IndCSPrefix = M->getModuleFlag("indirect_branch_cs_prefix");
+  IndCSPrefix = M->getModuleFlag("indirect_branch_cs_prefix") != nullptr;
 
   SetupMachineFunction(MF);
 

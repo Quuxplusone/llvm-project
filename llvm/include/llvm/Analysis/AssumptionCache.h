@@ -53,6 +53,7 @@ public:
     /// containing the knowledge.
     unsigned Index;
     operator Value *() const { return Assume; }
+    explicit operator bool() const { return bool(Assume); }
   };
 
 private:

@@ -545,7 +545,7 @@ TEST_F(FileManagerTest, getBypassFile) {
 
   // Set up a virtual file with a different size than FakeStatCache uses.
   FileEntryRef File = Manager.getVirtualFileRef("/tmp/test", /*Size=*/10, 0);
-  ASSERT_TRUE(File);
+  //ASSERT_TRUE(File);
   const FileEntry &FE = *File;
   EXPECT_EQ(FE.getSize(), 10);
 

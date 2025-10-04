@@ -3810,7 +3810,7 @@ public:
   /// Returns whether this object currently represents the IR of a loop. If
   /// returning false, it may have been consumed by a loop transformation or not
   /// been intialized. Do not use in this case;
-  bool isValid() const { return Header; }
+  bool isValid() const { return Header != nullptr; }
 
   /// The preheader ensures that there is only a single edge entering the loop.
   /// Code that must be execute before any loop iteration can be emitted here,

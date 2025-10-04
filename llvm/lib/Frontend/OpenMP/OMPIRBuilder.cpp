@@ -5168,7 +5168,7 @@ OpenMPIRBuilder::InsertPointOrErrorTy OpenMPIRBuilder::applyWorkshareLoop(
   if (Config.isTargetDevice())
     return applyWorkshareLoopTarget(DL, CLI, AllocaIP, LoopType);
   OMPScheduleType EffectiveScheduleType = computeOpenMPScheduleType(
-      SchedKind, ChunkSize, HasSimdModifier, HasMonotonicModifier,
+      SchedKind, ChunkSize != nullptr, HasSimdModifier, HasMonotonicModifier,
       HasNonmonotonicModifier, HasOrderedClause);
 
   bool IsOrdered = (EffectiveScheduleType & OMPScheduleType::ModifierOrdered) ==
@@ -9476,7 +9476,7 @@ Expected<std::pair<Value *, Value *>> OpenMPIRBuilder::emitAtomicUpdate(
   case AtomicRMWInst::Or:
   case AtomicRMWInst::Xor:
   case AtomicRMWInst::Xchg:
-    emitRMWOp = XElemTy;
+    emitRMWOp = XElemTy != nullptr;
     break;
   case AtomicRMWInst::Sub:
     emitRMWOp = (IsXBinopExpr && XElemTy);

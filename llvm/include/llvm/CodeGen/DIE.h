@@ -639,7 +639,7 @@ public:
       return *this;
     }
 
-    explicit operator bool() const { return N; }
+    explicit operator bool() const { return N != nullptr; }
     T &operator*() const { return *static_cast<T *>(N); }
 
     bool operator==(const iterator &X) const { return N == X.N; }
@@ -661,7 +661,7 @@ public:
       return *this;
     }
 
-    explicit operator bool() const { return N; }
+    explicit operator bool() const { return N != nullptr; }
     const T &operator*() const { return *static_cast<const T *>(N); }
 
     bool operator==(const const_iterator &X) const { return N == X.N; }

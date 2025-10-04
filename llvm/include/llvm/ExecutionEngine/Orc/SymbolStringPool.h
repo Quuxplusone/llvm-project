@@ -78,7 +78,7 @@ public:
   SymbolStringPtrBase() = default;
   SymbolStringPtrBase(std::nullptr_t) {}
 
-  explicit operator bool() const { return S; }
+  explicit operator bool() const { return S != nullptr; }
 
   StringRef operator*() const { return S->first(); }
 

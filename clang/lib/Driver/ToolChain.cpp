@@ -521,7 +521,7 @@ ToolChain::getTargetAndModeFromProgramName(StringRef PN) {
   std::string IgnoredError;
 
   llvm::Triple Triple(Prefix);
-  bool IsRegistered = llvm::TargetRegistry::lookupTarget(Triple, IgnoredError);
+  bool IsRegistered = llvm::TargetRegistry::lookupTarget(Triple, IgnoredError) != nullptr;
   return ParsedClangName{std::string(Prefix), ModeSuffix, DS->ModeFlag,
                          IsRegistered};
 }

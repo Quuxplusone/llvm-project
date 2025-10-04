@@ -1511,7 +1511,7 @@ bool CommandLineParser::ParseCommandLineOptions(int argc,
   assert(hasOptions() && "No options specified!");
 
   ProgramOverview = Overview;
-  bool IgnoreErrors = Errs;
+  bool IgnoreErrors = (Errs != nullptr);
   if (!Errs)
     Errs = &errs();
   bool ErrorParsing = false;

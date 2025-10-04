@@ -1633,8 +1633,8 @@ void LiveIntervals::repairOldRegInRange(const MachineBasicBlock::iterator Begin,
       continue;
 
     SlotIndex instrIdx = getInstructionIndex(MI);
-    bool isStartValid = getInstructionFromIndex(LII->start);
-    bool isEndValid = getInstructionFromIndex(LII->end);
+    bool isStartValid = getInstructionFromIndex(LII->start) != nullptr;
+    bool isEndValid = getInstructionFromIndex(LII->end) != nullptr;
 
     // FIXME: This doesn't currently handle early-clobber or multiple removed
     // defs inside of the region to repair.
@@ -1691,7 +1691,7 @@ void LiveIntervals::repairOldRegInRange(const MachineBasicBlock::iterator Begin,
     }
   }
 
-  bool isStartValid = getInstructionFromIndex(LII->start);
+  bool isStartValid = getInstructionFromIndex(LII->start) != nullptr;
   if (!isStartValid && LII->end.isDead())
     LR.removeSegment(*LII, true);
 }

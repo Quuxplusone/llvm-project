@@ -3447,8 +3447,8 @@ class OffloadingActionBuilder final {
         GpuArchList.push_back(Arch.data());
 
       CompileHostOnly = C.getDriver().offloadHostOnly();
-      EmitLLVM = Args.getLastArg(options::OPT_emit_llvm);
-      EmitAsm = Args.getLastArg(options::OPT_S);
+      EmitLLVM = Args.getLastArg(options::OPT_emit_llvm) != nullptr;
+      EmitAsm = Args.getLastArg(options::OPT_S) != nullptr;
 
       return false;
     }

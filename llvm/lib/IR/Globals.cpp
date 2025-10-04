@@ -426,7 +426,7 @@ bool GlobalValue::isAbsoluteSymbolRef() const {
   if (!GO)
     return false;
 
-  return GO->getMetadata(LLVMContext::MD_absolute_symbol);
+  return GO->getMetadata(LLVMContext::MD_absolute_symbol) != nullptr;
 }
 
 std::optional<ConstantRange> GlobalValue::getAbsoluteSymbolRange() const {

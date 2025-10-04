@@ -772,7 +772,7 @@ struct GetReturnObjectManager {
 static void emitBodyAndFallthrough(CodeGenFunction &CGF,
                                    const CoroutineBodyStmt &S, Stmt *Body) {
   CGF.EmitStmt(Body);
-  const bool CanFallthrough = CGF.Builder.GetInsertBlock();
+  const bool CanFallthrough = CGF.Builder.GetInsertBlock() != nullptr;
   if (CanFallthrough)
     if (Stmt *OnFallthrough = S.getFallthroughHandler())
       CGF.EmitStmt(OnFallthrough);
@@ -938,7 +938,7 @@ void CodeGenFunction::EmitCoroutineBody(const CoroutineBodyStmt &S) {
     }
 
     // See if we need to generate final suspend.
-    const bool CanFallthrough = Builder.GetInsertBlock();
+    const bool CanFallthrough = Builder.GetInsertBlock() != nullptr;
     const bool HasCoreturns = CurCoro.Data->CoreturnCount > 0;
     if (CanFallthrough || HasCoreturns) {
       EmitBlock(FinalBB);

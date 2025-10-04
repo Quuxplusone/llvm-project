@@ -2052,7 +2052,7 @@ void CGOpenMPRuntime::emitMaskedRegion(CodeGenFunction &CGF,
   // }
   // Prepare arguments and build a call to __kmpc_masked
   llvm::Value *FilterVal = Filter
-                               ? CGF.EmitScalarExpr(Filter, CGF.Int32Ty)
+                               ? CGF.EmitScalarExpr(Filter, CGF.Int32Ty != nullptr)
                                : llvm::ConstantInt::get(CGM.Int32Ty, /*V=*/0);
   llvm::Value *Args[] = {emitUpdateLocation(CGF, Loc), getThreadID(CGF, Loc),
                          FilterVal};

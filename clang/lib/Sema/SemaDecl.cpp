@@ -3838,7 +3838,7 @@ bool Sema::MergeFunctionDecl(FunctionDecl *New, NamedDecl *&OldD, Scope *S,
     const FunctionType *FT =
         First->getType().getCanonicalType()->castAs<FunctionType>();
     FunctionType::ExtInfo FI = FT->getExtInfo();
-    bool NewCCExplicit = getCallingConvAttributedType(New->getType());
+    bool NewCCExplicit = getCallingConvAttributedType(New->getType()) != nullptr;
     if (!NewCCExplicit) {
       // Inherit the CC from the previous declaration if it was specified
       // there but not here.
@@ -3858,7 +3858,7 @@ bool Sema::MergeFunctionDecl(FunctionDecl *New, NamedDecl *&OldD, Scope *S,
       RequiresAdjustment = true;
     } else {
       // Calling conventions aren't compatible, so complain.
-      bool FirstCCExplicit = getCallingConvAttributedType(First->getType());
+      bool FirstCCExplicit = getCallingConvAttributedType(First->getType()) != nullptr;
       Diag(New->getLocation(), diag::err_cconv_change)
         << FunctionType::getNameForCallConv(NewTypeInfo.getCC())
         << !FirstCCExplicit
@@ -17455,7 +17455,7 @@ bool Sema::isAcceptableTagRedeclaration(const TagDecl *Previous,
 
   bool isTemplate = false;
   if (const CXXRecordDecl *Record = dyn_cast<CXXRecordDecl>(Previous))
-    isTemplate = Record->getDescribedClassTemplate();
+    isTemplate = Record->getDescribedClassTemplate() != nullptr;
 
   if (inTemplateInstantiation()) {
     if (OldTag != NewTag) {

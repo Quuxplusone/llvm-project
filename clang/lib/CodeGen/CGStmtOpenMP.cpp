@@ -4421,7 +4421,7 @@ void CodeGenFunction::EmitOMPSectionsDirective(const OMPSectionsDirective &S) {
     llvm::OpenMPIRBuilder::InsertPointTy AfterIP =
         cantFail(OMPBuilder.createSections(
             Builder, AllocaIP, SectionCBVector, PrivCB, FiniCB, S.hasCancel(),
-            S.getSingleClause<OMPNowaitClause>()));
+            S.getSingleClause<OMPNowaitClause>() != nullptr));
     Builder.restoreIP(AfterIP);
     return;
   }
@@ -4578,7 +4578,7 @@ void CodeGenFunction::EmitOMPMaskedDirective(const OMPMaskedDirective &S) {
     if (const auto *FilterClause = S.getSingleClause<OMPFilterClause>())
       Filter = FilterClause->getThreadID();
     llvm::Value *FilterVal = Filter
-                                 ? EmitScalarExpr(Filter, CGM.Int32Ty)
+                                 ? EmitScalarExpr(Filter, CGM.Int32Ty != nullptr)
                                  : llvm::ConstantInt::get(CGM.Int32Ty, /*V=*/0);
 
     auto FiniCB = [this](InsertPointTy IP) {
@@ -7925,7 +7925,7 @@ void CodeGenFunction::EmitOMPTaskLoopBasedDirective(const OMPLoopDirective &S) {
 
   OMPTaskDataTy Data;
   // Check if taskloop must be emitted without taskgroup.
-  Data.Nogroup = S.getSingleClause<OMPNogroupClause>();
+  Data.Nogroup = S.getSingleClause<OMPNogroupClause>() != nullptr;
   // TODO: Check if we should emit tied or untied task.
   Data.Tied = true;
   // Set scheduling for taskloop

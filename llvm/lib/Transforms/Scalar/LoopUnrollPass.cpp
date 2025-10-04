@@ -748,18 +748,18 @@ static MDNode *getUnrollMetadataForLoop(const Loop *L, StringRef Name) {
 
 // Returns true if the loop has an unroll(full) pragma.
 static bool hasUnrollFullPragma(const Loop *L) {
-  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.full");
+  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.full") != nullptr;
 }
 
 // Returns true if the loop has an unroll(enable) pragma. This metadata is used
 // for both "#pragma unroll" and "#pragma clang loop unroll(enable)" directives.
 static bool hasUnrollEnablePragma(const Loop *L) {
-  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.enable");
+  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.enable") != nullptr;
 }
 
 // Returns true if the loop has an runtime unroll(disable) pragma.
 static bool hasRuntimeUnrollDisablePragma(const Loop *L) {
-  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.runtime.disable");
+  return getUnrollMetadataForLoop(L, "llvm.loop.unroll.runtime.disable") != nullptr;
 }
 
 // If loop has an unroll_count pragma return the (necessarily

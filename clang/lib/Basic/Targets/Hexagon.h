@@ -119,7 +119,7 @@ public:
   static std::optional<unsigned> getHexagonCPURev(StringRef Name);
 
   bool isValidCPUName(StringRef Name) const override {
-    return getHexagonCPUSuffix(Name);
+    return getHexagonCPUSuffix(Name) != nullptr;
   }
 
   void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;

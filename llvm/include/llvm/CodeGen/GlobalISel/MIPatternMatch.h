@@ -373,7 +373,7 @@ template <> struct bind_helper<MachineInstr *> {
   static bool bind(const MachineRegisterInfo &MRI, MachineInstr *&MI,
                    MachineInstr *Inst) {
     MI = Inst;
-    return MI;
+    return MI != nullptr;
   }
 };
 
@@ -381,12 +381,12 @@ template <> struct bind_helper<const MachineInstr *> {
   static bool bind(const MachineRegisterInfo &MRI, const MachineInstr *&MI,
                    Register Reg) {
     MI = MRI.getVRegDef(Reg);
-    return MI;
+    return MI != nullptr;
   }
   static bool bind(const MachineRegisterInfo &MRI, const MachineInstr *&MI,
                    const MachineInstr *Inst) {
     MI = Inst;
-    return MI;
+    return MI != nullptr;
   }
 };
 

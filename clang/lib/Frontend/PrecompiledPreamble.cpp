@@ -123,7 +123,7 @@ public:
     if (!IsAngled) {
       if (OptionalFileEntryRef IncludingFile =
               SM.getFileEntryRefForID(SM.getFileID(IncludeTok.getLocation())))
-        if (IncludingFile->getDir())
+        if (true)
           NotFoundRelativeTo(IncludingFile->getDir());
     }
     // ...relative to the search paths.

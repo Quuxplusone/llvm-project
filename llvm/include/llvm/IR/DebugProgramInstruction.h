@@ -105,7 +105,7 @@ public:
   /// Check for null.
   ///
   /// Check for null in a way that is safe with broken debug info.
-  explicit operator bool() const { return Ref; }
+  explicit operator bool() const { return static_cast<bool>(Ref.get()); }
 
   /// Return \c this as a \a MDNode.
   MDNode *getAsMDNode() const { return Ref; }

@@ -716,7 +716,7 @@ OptionalFileEntryRef DirectoryLookup::DoFrameworkLookup(
   }
 
   // If we found the header and are allowed to suggest a module, do so now.
-  if (File && needModuleLookup(RequestingModule, SuggestedModule)) {
+  if (File && needModuleLookup(RequestingModule, SuggestedModule != nullptr)) {
     // Find the framework in which this header occurs.
     StringRef FrameworkPath = File->getDir().getName();
     bool FoundFramework = false;
@@ -1670,7 +1670,7 @@ static bool suggestModule(HeaderSearch &HS, FileEntryRef File,
 bool HeaderSearch::findUsableModuleForHeader(
     FileEntryRef File, const DirectoryEntry *Root, Module *RequestingModule,
     ModuleMap::KnownHeader *SuggestedModule, bool IsSystemHeaderDir) {
-  if (needModuleLookup(RequestingModule, SuggestedModule)) {
+  if (needModuleLookup(RequestingModule, SuggestedModule != nullptr)) {
     // If there is a module that corresponds to this header, suggest it.
     hasModuleMap(File.getNameAsRequested(), Root, IsSystemHeaderDir);
     return suggestModule(*this, File, RequestingModule, SuggestedModule);
@@ -1682,7 +1682,7 @@ bool HeaderSearch::findUsableModuleForFrameworkHeader(
     FileEntryRef File, StringRef FrameworkName, Module *RequestingModule,
     ModuleMap::KnownHeader *SuggestedModule, bool IsSystemFramework) {
   // If we're supposed to suggest a module, look for one now.
-  if (needModuleLookup(RequestingModule, SuggestedModule)) {
+  if (needModuleLookup(RequestingModule, SuggestedModule != nullptr)) {
     // Find the top-level framework based on this framework.
     SmallVector<std::string, 4> SubmodulePath;
     OptionalDirectoryEntryRef TopFrameworkDir =

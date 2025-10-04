@@ -580,7 +580,7 @@ bool CachingVPExpander::expandPredication(VPIntrinsic &VPI) {
   case Intrinsic::vp_fneg: {
     Value *NewNegOp = Builder.CreateFNeg(VPI.getOperand(0));
     replaceOperation(*NewNegOp, VPI);
-    return NewNegOp;
+    return NewNegOp != nullptr;
   }
   case Intrinsic::vp_select:
   case Intrinsic::vp_merge: {
@@ -588,7 +588,7 @@ bool CachingVPExpander::expandPredication(VPIntrinsic &VPI) {
     Value *NewSelectOp = Builder.CreateSelect(
         VPI.getOperand(0), VPI.getOperand(1), VPI.getOperand(2));
     replaceOperation(*NewSelectOp, VPI);
-    return NewSelectOp;
+    return NewSelectOp != nullptr;
   }
   case Intrinsic::vp_abs:
   case Intrinsic::vp_smax:

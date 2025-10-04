@@ -336,7 +336,7 @@ public:
   LLVM_ABI DiagnosticLocation(const DebugLoc &DL);
   LLVM_ABI DiagnosticLocation(const DISubprogram *SP);
 
-  bool isValid() const { return File; }
+  bool isValid() const { return static_cast<bool>(File); }
   /// Return the full path to the file.
   LLVM_ABI std::string getAbsolutePath() const;
   /// Return the file name relative to the compilation directory.

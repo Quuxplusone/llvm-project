@@ -3537,7 +3537,7 @@ CGCallee MicrosoftCXXABI::EmitLoadOfMemberFunctionPointer(
     // We need to extract values.
     unsigned I = 0;
     FunctionPointer = Builder.CreateExtractValue(MemPtr, I++);
-    if (inheritanceModelHasNVOffsetField(MPT, Inheritance))
+    if (inheritanceModelHasNVOffsetField(MPT != nullptr, Inheritance))
       NonVirtualBaseAdjustment = Builder.CreateExtractValue(MemPtr, I++);
     if (inheritanceModelHasVBPtrOffsetField(Inheritance))
       VBPtrOffset = Builder.CreateExtractValue(MemPtr, I++);

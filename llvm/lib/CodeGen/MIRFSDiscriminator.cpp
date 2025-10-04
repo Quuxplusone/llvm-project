@@ -98,7 +98,7 @@ bool MIRAddFSDiscriminators::runOnMachineFunction(MachineFunction &MF) {
     return false;
 
   bool HasPseudoProbe = MF.getFunction().getParent()->getNamedMetadata(
-      PseudoProbeDescMetadataName);
+      PseudoProbeDescMetadataName) != nullptr;
 
   if (!HasPseudoProbe && !MF.getFunction().shouldEmitDebugInfoForProfiling())
     return false;

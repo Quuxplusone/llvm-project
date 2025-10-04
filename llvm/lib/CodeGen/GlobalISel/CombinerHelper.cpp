@@ -2844,13 +2844,13 @@ bool CombinerHelper::matchUndefShuffleVectorMask(MachineInstr &MI) const {
 bool CombinerHelper::matchUndefStore(MachineInstr &MI) const {
   assert(MI.getOpcode() == TargetOpcode::G_STORE);
   return getOpcodeDef(TargetOpcode::G_IMPLICIT_DEF, MI.getOperand(0).getReg(),
-                      MRI);
+                      MRI) != nullptr;
 }
 
 bool CombinerHelper::matchUndefSelectCmp(MachineInstr &MI) const {
   assert(MI.getOpcode() == TargetOpcode::G_SELECT);
   return getOpcodeDef(TargetOpcode::G_IMPLICIT_DEF, MI.getOperand(1).getReg(),
-                      MRI);
+                      MRI) != nullptr;
 }
 
 bool CombinerHelper::matchInsertExtractVecEltOutOfBounds(

@@ -192,7 +192,7 @@ struct ValueInfo {
     RefAndFlags.setInt(HaveGVs);
   }
 
-  explicit operator bool() const { return getRef(); }
+  explicit operator bool() const { return getRef() != nullptr; }
 
   GlobalValue::GUID getGUID() const { return getRef()->first; }
   const GlobalValue *getValue() const {

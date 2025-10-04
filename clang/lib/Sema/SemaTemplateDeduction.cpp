@@ -228,7 +228,7 @@ public:
     return getTemplate()->getLocation();
   }
 
-  operator bool() const { return Template; }
+  explicit operator bool() const { return Template != nullptr; }
 
 private:
   const NamedDecl *Template;
@@ -6485,7 +6485,7 @@ bool Sema::isMoreSpecializedThanPrimary(
       getMoreSpecialized(*this, PartialT, PrimaryT, Spec, Primary, Info);
   if (MaybeSpec)
     Info.clearSFINAEDiagnostic();
-  return MaybeSpec;
+  return MaybeSpec != nullptr;
 }
 
 VarTemplatePartialSpecializationDecl *
@@ -6525,7 +6525,7 @@ bool Sema::isMoreSpecializedThanPrimary(
       getMoreSpecialized(*this, PartialT, PrimaryT, Spec, Primary, Info);
   if (MaybeSpec)
     Info.clearSFINAEDiagnostic();
-  return MaybeSpec;
+  return MaybeSpec != nullptr;
 }
 
 bool Sema::isTemplateTemplateParameterAtLeastAsSpecializedAs(

@@ -259,6 +259,7 @@ class ASTDeclReader : public DeclVisitor<ASTDeclReader, void> {
     void suppress() { AddResult = false; }
 
     operator NamedDecl *() const { return Existing; }
+    explicit operator bool() const { return Existing != nullptr; }
 
     template <typename T> operator T *() const {
       return dyn_cast_or_null<T>(Existing);
@@ -3513,7 +3514,7 @@ ASTDeclReader::FindExistingResult ASTDeclReader::findExisting(NamedDecl *D) {
     for (IdentifierResolver::iterator I = IdResolver.begin(Name),
                                    IEnd = IdResolver.end();
          I != IEnd; ++I) {
-      if (NamedDecl *Existing = getDeclForMerging(*I, TypedefNameForLinkage))
+      if (NamedDecl *Existing = getDeclForMerging(*I, TypedefNameForLinkage != nullptr))
         if (C.isSameEntity(Existing, D))
           return FindExistingResult(Reader, D, Existing, AnonymousDeclNumber,
                                     TypedefNameForLinkage);
@@ -3521,7 +3522,7 @@ ASTDeclReader::FindExistingResult ASTDeclReader::findExisting(NamedDecl *D) {
   } else if (DeclContext *MergeDC = getPrimaryContextForMerging(Reader, DC)) {
     DeclContext::lookup_result R = MergeDC->noload_lookup(Name);
     for (DeclContext::lookup_iterator I = R.begin(), E = R.end(); I != E; ++I) {
-      if (NamedDecl *Existing = getDeclForMerging(*I, TypedefNameForLinkage))
+      if (NamedDecl *Existing = getDeclForMerging(*I, TypedefNameForLinkage != nullptr))
         if (C.isSameEntity(Existing, D))
           return FindExistingResult(Reader, D, Existing, AnonymousDeclNumber,
                                     TypedefNameForLinkage);

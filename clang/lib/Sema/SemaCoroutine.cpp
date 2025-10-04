@@ -1522,7 +1522,7 @@ bool CoroutineStmtBuilder::makeNewAndDeleteExpr() {
   bool FoundNonAlignedInPromise = false;
   if (PromiseContainsNew && S.getLangOpts().CoroAlignedAllocation)
     if (!OperatorNew || !isAlignedAllocation(IAP.PassAlignment)) {
-      FoundNonAlignedInPromise = OperatorNew;
+      FoundNonAlignedInPromise = OperatorNew != nullptr;
 
       LookupAllocationFunction(/*NewScope*/ AllocationFunctionScope::Class,
                                /*WithoutPlacementArgs*/ false,

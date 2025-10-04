@@ -169,7 +169,7 @@ bool EVLIndVarSimplifyImpl::run(Loop &L) {
         return OptimizationRemarkMissed(DEBUG_TYPE, "UnrecognizedIndVar",
                                         L.getStartLoc(), L.getHeader())
                << "Could not infer VF from IndVar step "
-               << ore::NV("Step", StepV);
+               << ore::NV("Step", StepV != nullptr);
       });
     }
     return false;

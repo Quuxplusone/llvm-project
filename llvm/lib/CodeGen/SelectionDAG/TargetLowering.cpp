@@ -553,7 +553,7 @@ bool TargetLowering::ShrinkDemandedConstant(SDValue Op,
 
   // Do target-specific constant optimization.
   if (targetShrinkDemandedConstant(Op, DemandedBits, DemandedElts, TLO))
-    return TLO.New.getNode();
+    return TLO.New.getNode() != nullptr;
 
   // FIXME: ISD::SELECT, ISD::SELECT_CC
   switch (Opcode) {
@@ -4654,9 +4654,9 @@ SDValue TargetLowering::SimplifySetCC(EVT VT, SDValue N0, SDValue N1,
     return Fold;
 
   bool N0ConstOrSplat =
-      isConstOrConstSplat(N0, /*AllowUndefs*/ false, /*AllowTruncate*/ true);
+      isConstOrConstSplat(N0, /*AllowUndefs*/ false, /*AllowTruncate*/ true) != nullptr;
   bool N1ConstOrSplat =
-      isConstOrConstSplat(N1, /*AllowUndefs*/ false, /*AllowTruncate*/ true);
+      isConstOrConstSplat(N1, /*AllowUndefs*/ false, /*AllowTruncate*/ true) != nullptr;
 
   // Canonicalize toward having the constant on the RHS.
   // TODO: Handle non-splat vector constants. All undef causes trouble.

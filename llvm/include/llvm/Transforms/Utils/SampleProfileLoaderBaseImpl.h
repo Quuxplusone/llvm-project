@@ -123,7 +123,7 @@ public:
   }
 
   bool moduleIsProbed(const Module &M) const {
-    return M.getNamedMetadata(PseudoProbeDescMetadataName);
+    return M.getNamedMetadata(PseudoProbeDescMetadataName) != nullptr;
   }
 
   bool profileIsValid(const Function &F, const FunctionSamples &Samples) const {

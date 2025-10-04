@@ -337,7 +337,7 @@ static void RegisterHandlers() { // Not signal-safe.
     registerHandler(S, SignalKind::IsKill);
   for (auto S : KillSigs)
     registerHandler(S, SignalKind::IsKill);
-  if (OneShotPipeSignalFunction)
+  if (OneShotPipeSignalFunction.load())
     registerHandler(SIGPIPE, SignalKind::IsKill);
   for (auto S : InfoSigs)
     registerHandler(S, SignalKind::IsInfo);

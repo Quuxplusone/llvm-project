@@ -2582,7 +2582,7 @@ public:
                        CXXConstructorDecl *BaseCtor)
       : Shadow(Shadow), BaseCtor(BaseCtor) {}
 
-  explicit operator bool() const { return Shadow; }
+  explicit operator bool() const { return Shadow != nullptr; }
 
   ConstructorUsingShadowDecl *getShadowDecl() const { return Shadow; }
   CXXConstructorDecl *getConstructor() const { return BaseCtor; }

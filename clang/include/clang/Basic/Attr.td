@@ -106,7 +106,7 @@ def NonParmVar : SubsetSubject<Var,
 def NonLocalVar : SubsetSubject<Var,
                                 [{!S->hasLocalStorage()}],
                                 "variables with non-local storage">;
-def VarTmpl : SubsetSubject<Var, [{S->getDescribedVarTemplate()}],
+def VarTmpl : SubsetSubject<Var, [{S->getDescribedVarTemplate() != nullptr}],
                             "variable templates">;
 
 def NonBitField : SubsetSubject<Field,
@@ -176,7 +176,7 @@ def HLSLBufferObj : SubsetSubject<HLSLBuffer,
                     [{isa<HLSLBufferDecl>(S)}],
                     "cbuffer/tbuffer">;
 
-def ClassTmpl : SubsetSubject<CXXRecord, [{S->getDescribedClassTemplate()}],
+def ClassTmpl : SubsetSubject<CXXRecord, [{S->getDescribedClassTemplate() != nullptr}],
                               "class templates">;
 
 // FIXME: this hack is needed because DeclNodes.td defines the base Decl node

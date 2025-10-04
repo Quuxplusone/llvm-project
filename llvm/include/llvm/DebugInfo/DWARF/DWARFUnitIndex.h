@@ -148,7 +148,7 @@ public:
     }
 
     uint64_t getSignature() const { return Signature; }
-    bool isValid() { return Index; }
+    bool isValid() { return Index != nullptr; }
   };
 
 private:

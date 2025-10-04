@@ -394,7 +394,7 @@ public:
   TargetExtType *getHandleTy() const { return HandleTy; }
   StringRef getName() const { return Name; }
 
-  bool hasSymbol() const { return Symbol; }
+  bool hasSymbol() const { return Symbol != nullptr; }
   LLVM_ABI GlobalVariable *createSymbol(Module &M, StructType *Ty);
   LLVM_ABI MDTuple *getAsMetadata(Module &M, dxil::ResourceTypeInfo &RTI) const;
 

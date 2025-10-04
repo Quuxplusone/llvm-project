@@ -129,7 +129,7 @@ class raw_ostream;
     /// Returns true if this is a valid index. Invalid indices do
     /// not point into an index table, and cannot be compared.
     bool isValid() const {
-      return lie.getPointer();
+      return lie.getPointer() != nullptr;
     }
 
     /// Return true for a valid index.

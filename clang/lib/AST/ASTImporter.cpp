@@ -10252,7 +10252,7 @@ Expected<FileID> ASTImporter::Import(FileID FromID, bool IsBuiltin) {
       if (FromID == FromSM.getMainFileID())
         ToIncludeLocOrFakeLoc = ToSM.getLocForStartOfFile(ToSM.getMainFileID());
 
-      if (Cache->OrigEntry && Cache->OrigEntry->getDir()) {
+      if (Cache->OrigEntry /*&& Cache->OrigEntry->getDir()*/) {
         // FIXME: We probably want to use getVirtualFileRef(), so we don't hit
         // the disk again
         // FIXME: We definitely want to re-use the existing MemoryBuffer, rather

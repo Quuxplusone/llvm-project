@@ -729,7 +729,7 @@ bool Type::isComplexType() const {
 
 bool Type::isComplexIntegerType() const {
   // Check for GCC complex integer extension.
-  return getAsComplexIntegerType();
+  return getAsComplexIntegerType() != nullptr;
 }
 
 bool Type::isScopedEnumeralType() const {
@@ -739,7 +739,7 @@ bool Type::isScopedEnumeralType() const {
 }
 
 bool Type::isCountAttributedType() const {
-  return getAs<CountAttributedType>();
+  return getAs<CountAttributedType>() != nullptr;
 }
 
 const ComplexType *Type::getAsComplexIntegerType() const {

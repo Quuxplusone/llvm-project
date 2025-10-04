@@ -92,7 +92,7 @@ static bool IsDecomposedVarDecl(VarDecl const *VD) {
   if (!RefExpr)
     return false;
 
-  return llvm::dyn_cast_or_null<DecompositionDecl>(RefExpr->getDecl());
+  return llvm::dyn_cast_or_null<DecompositionDecl>(RefExpr->getDecl()) != nullptr;
 }
 
 /// Returns true if \ref VD is a compiler-generated variable

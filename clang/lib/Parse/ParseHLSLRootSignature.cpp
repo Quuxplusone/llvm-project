@@ -1493,7 +1493,7 @@ void HandleRootSignatureTarget(Sema &S, StringRef EntryRootSig) {
   std::unique_ptr<Parser> P(new Parser(S.getPreprocessor(), S, true));
   S.getPreprocessor().EnterMainSourceFile();
 
-  bool HaveLexer = S.getPreprocessor().getCurrentLexer();
+  bool HaveLexer = S.getPreprocessor().getCurrentLexer() != nullptr;
   if (HaveLexer) {
     P->Initialize();
     S.ActOnStartOfTranslationUnit();

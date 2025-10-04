@@ -472,7 +472,7 @@ namespace {
     CallRef(const FunctionDecl *Callee, unsigned CallIndex, unsigned Version)
         : OrigCallee(Callee), CallIndex(CallIndex), Version(Version) {}
 
-    explicit operator bool() const { return OrigCallee; }
+    explicit operator bool() const { return OrigCallee != nullptr; }
 
     /// Get the parameter that the caller initialized, corresponding to the
     /// given parameter in the callee.
@@ -2710,7 +2710,7 @@ static bool HandleConversionToBool(const APValue &Val, bool &Result) {
     if (Val.getMemberPointerDecl() && Val.getMemberPointerDecl()->isWeak()) {
       return false;
     }
-    Result = Val.getMemberPointerDecl();
+    Result = Val.getMemberPointerDecl() != nullptr;
     return true;
   case APValue::Vector:
   case APValue::Array:
@@ -8860,7 +8860,7 @@ public:
 
     case BO_PtrMemD:
     case BO_PtrMemI:
-      return HandleMemberPointerAccess(this->Info, E, Result);
+      return HandleMemberPointerAccess(this->Info, E, Result) != nullptr;
     }
   }
 

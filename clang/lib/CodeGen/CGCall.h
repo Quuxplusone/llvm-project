@@ -350,7 +350,7 @@ public:
 
   /// Returns if we're using an inalloca struct to pass arguments in
   /// memory.
-  bool isUsingInAlloca() const { return StackBase; }
+  bool isUsingInAlloca() const { return StackBase != nullptr; }
 
   // Support reversing writebacks for MSVC ABI.
   void reverseWritebacks() {

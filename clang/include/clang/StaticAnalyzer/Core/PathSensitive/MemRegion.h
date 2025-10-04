@@ -87,7 +87,7 @@ public:
     return Offset;
   }
 
-  bool isValid() const { return R; }
+  bool isValid() const { return R != nullptr; }
 };
 
 //===----------------------------------------------------------------------===//

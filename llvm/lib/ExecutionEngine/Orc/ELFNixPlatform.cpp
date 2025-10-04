@@ -730,7 +730,7 @@ void ELFNixPlatform::ELFNixPlatformPlugin::modifyPassConfig(
   using namespace jitlink;
 
   bool InBootstrapPhase =
-      &MR.getTargetJITDylib() == &MP.PlatformJD && MP.Bootstrap;
+      &MR.getTargetJITDylib() == &MP.PlatformJD && MP.Bootstrap.load();
 
   // If we're in the bootstrap phase then increment the active graphs.
   if (InBootstrapPhase) {

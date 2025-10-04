@@ -358,7 +358,7 @@ bool hasLoc(const Instruction &I) {
   DebugLocKind Kind = I.getDebugLoc().getKind();
   return Loc || Kind != DebugLocKind::Normal;
 #else
-  return Loc;
+  return Loc != nullptr;
 #endif
 }
 

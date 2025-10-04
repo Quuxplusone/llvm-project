@@ -131,7 +131,7 @@ bool X86DiscriminateMemOps::runOnMachineFunction(MachineFunction &MF) {
       if (BypassPrefetchInstructions && IsPrefetchOpcode(MI.getDesc().Opcode))
         continue;
       const DILocation *DI = MI.getDebugLoc();
-      bool HasDebug = DI;
+      bool HasDebug = DI != nullptr;
       if (!HasDebug) {
         DI = ReferenceDI;
       }

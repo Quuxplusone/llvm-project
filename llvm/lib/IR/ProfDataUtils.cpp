@@ -125,7 +125,7 @@ static bool hasCountTypeMD(const Instruction &I) {
 }
 
 bool hasValidBranchWeightMD(const Instruction &I) {
-  return getValidBranchWeightMDNode(I);
+  return getValidBranchWeightMDNode(I) != nullptr;
 }
 
 bool hasBranchWeightOrigin(const Instruction &I) {

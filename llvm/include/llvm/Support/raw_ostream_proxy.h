@@ -50,7 +50,7 @@ public:
     RawOstreamT::enable_colors(enable);
     getProxiedOS().enable_colors(enable);
   }
-  bool hasProxiedOS() const { return OS; }
+  bool hasProxiedOS() const { return static_cast<bool>(OS); }
   raw_ostream &getProxiedOS() const {
     assert(OS && "raw_ostream_proxy_adaptor use after reset");
     return *OS;

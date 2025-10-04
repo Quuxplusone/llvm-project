@@ -1504,7 +1504,7 @@ class Sema;
     CXXConstructorDecl *Constructor;
     FunctionTemplateDecl *ConstructorTmpl;
 
-    explicit operator bool() const { return Constructor; }
+    explicit operator bool() const { return Constructor != nullptr; }
   };
 
   // FIXME: Add an AddOverloadCandidate / AddTemplateOverloadCandidate overload

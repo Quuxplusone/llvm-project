@@ -180,7 +180,7 @@ private:
 
   // Private constructor for use by OptionalStorage.
   FileEntryRef(optional_none_tag) : ME(nullptr) {}
-  bool hasOptionalValue() const { return ME; }
+  bool hasOptionalValue() const { return ME != nullptr; }
 
   friend struct llvm::DenseMapInfo<FileEntryRef>;
   struct dense_map_empty_tag {};

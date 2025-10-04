@@ -148,7 +148,7 @@ void clang::ParseAST(Sema &S, bool PrintStats, bool SkipFunctionBodies) {
   // If a PCH through header is specified that does not have an include in
   // the source, or a PCH is being created with #pragma hdrstop with nothing
   // after the pragma, there won't be any tokens or a Lexer.
-  bool HaveLexer = S.getPreprocessor().getCurrentLexer();
+  bool HaveLexer = S.getPreprocessor().getCurrentLexer() != nullptr;
 
   if (HaveLexer) {
     llvm::TimeTraceScope TimeScope("Frontend", [&]() {

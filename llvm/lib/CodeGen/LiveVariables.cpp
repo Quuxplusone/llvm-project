@@ -783,7 +783,7 @@ bool LiveVariables::VarInfo::isLiveIn(const MachineBasicBlock &MBB,
     return false;
 
  // Reg was not defined in MBB, was it killed here?
-  return findKill(&MBB);
+  return findKill(&MBB) != nullptr;
 }
 
 bool LiveVariables::isLiveOut(Register Reg, const MachineBasicBlock &MBB) {

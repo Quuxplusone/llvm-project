@@ -203,7 +203,7 @@ public:
   T &operator*() const { return *Obj; }
   T *operator->() const { return Obj; }
   T *get() const { return Obj; }
-  explicit operator bool() const { return Obj; }
+  explicit operator bool() const { return static_cast<bool>(Obj); }
 
   void swap(IntrusiveRefCntPtr &other) {
     T *tmp = other.Obj;

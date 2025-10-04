@@ -1914,7 +1914,7 @@ void AsmPrinter::emitFunctionBody() {
   // Print out code for the function.
   bool HasAnyRealCode = false;
   int NumInstsInFunction = 0;
-  bool IsEHa = MMI->getModule()->getModuleFlag("eh-asynch");
+  bool IsEHa = MMI->getModule()->getModuleFlag("eh-asynch") != nullptr;
 
   const MCSubtargetInfo *STI = nullptr;
   if (this->MF)

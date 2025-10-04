@@ -2597,8 +2597,8 @@ public:
   // Type Predicates: Check to see if this type is structurally the specified
   // type, ignoring typedefs and qualifiers.
   bool isFunctionType() const;
-  bool isFunctionNoProtoType() const { return getAs<FunctionNoProtoType>(); }
-  bool isFunctionProtoType() const { return getAs<FunctionProtoType>(); }
+  bool isFunctionNoProtoType() const { return getAs<FunctionNoProtoType>() != nullptr; }
+  bool isFunctionProtoType() const { return getAs<FunctionProtoType>() != nullptr; }
   bool isPointerType() const;
   bool isPointerOrReferenceType() const;
   bool isSignableType(const ASTContext &Ctx) const;

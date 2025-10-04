@@ -1056,7 +1056,7 @@ void Sema::CompleteLambdaCallOperator(
   } else {
     LSI->Lambda->addDecl(Method);
   }
-  LSI->Lambda->setLambdaIsGeneric(TemplateParams);
+  LSI->Lambda->setLambdaIsGeneric(TemplateParams != nullptr);
   LSI->Lambda->setLambdaTypeInfo(MethodTyInfo);
 
   Method->setLexicalDeclContext(DC);

@@ -73,7 +73,7 @@ static bool cheapToScalarize(Value *V, Value *EI) {
   // to the scalar inserted element. An insertelement to a different constant
   // index is irrelevant to our extract.
   if (match(V, m_InsertElt(m_Value(), m_Value(), m_ConstantInt())))
-    return CEI;
+    return CEI != nullptr;
 
   if (match(V, m_OneUse(m_Load(m_Value()))))
     return true;

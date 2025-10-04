@@ -78,7 +78,7 @@ void ODRHash::AddDeclarationNameInfoImpl(DeclarationNameInfo NameInfo) {
     unsigned SlotsToCheck = NumArgs > 0 ? NumArgs : 1;
     for (unsigned i = 0; i < SlotsToCheck; ++i) {
       const IdentifierInfo *II = S.getIdentifierInfoForSlot(i);
-      AddBoolean(II);
+      AddBoolean(II != nullptr);
       if (II) {
         AddIdentifierInfo(II);
       }
@@ -103,7 +103,7 @@ void ODRHash::AddDeclarationNameInfoImpl(DeclarationNameInfo NameInfo) {
     break;
   case DeclarationName::CXXDeductionGuideName: {
     auto *Template = Name.getCXXDeductionGuideTemplate();
-    AddBoolean(Template);
+    AddBoolean(Template != nullptr);
     if (Template) {
       AddDecl(Template);
     }
@@ -273,14 +273,14 @@ public:
       : ID(ID), Hash(Hash) {}
 
   void AddStmt(const Stmt *S) {
-    Hash.AddBoolean(S);
+    Hash.AddBoolean(S != nullptr);
     if (S) {
       Hash.AddStmt(S);
     }
   }
 
   void AddIdentifierInfo(const IdentifierInfo *II) {
-    Hash.AddBoolean(II);
+    Hash.AddBoolean(II != nullptr);
     if (II) {
       Hash.AddIdentifierInfo(II);
     }
@@ -291,7 +291,7 @@ public:
   }
 
   void AddDecl(const Decl *D) {
-    Hash.AddBoolean(D);
+    Hash.AddBoolean(D != nullptr);
     if (D) {
       Hash.AddDecl(D);
     }
@@ -403,12 +403,12 @@ public:
     ID.AddInteger(llvm::to_underlying(Method->getImplementationControl()));
     ID.AddInteger(Method->getMethodFamily());
     ImplicitParamDecl *Cmd = Method->getCmdDecl();
-    Hash.AddBoolean(Cmd);
+    Hash.AddBoolean(Cmd != nullptr);
     if (Cmd)
       ID.AddInteger(llvm::to_underlying(Cmd->getParameterKind()));
 
     ImplicitParamDecl *Self = Method->getSelfDecl();
-    Hash.AddBoolean(Self);
+    Hash.AddBoolean(Self != nullptr);
     if (Self)
       ID.AddInteger(llvm::to_underlying(Self->getParameterKind()));
 
@@ -426,7 +426,7 @@ public:
       Hash.AddBoolean(IsDefinition);
       if (IsDefinition) {
         Stmt *Body = Method->getBody();
-        Hash.AddBoolean(Body);
+        Hash.AddBoolean(Body != nullptr);
         if (Body)
           AddStmt(Body);
 
@@ -464,7 +464,7 @@ public:
 
   void VisitFriendDecl(const FriendDecl *D) {
     TypeSourceInfo *TSI = D->getFriendType();
-    Hash.AddBoolean(TSI);
+    Hash.AddBoolean(TSI != nullptr);
     if (TSI) {
       AddQualType(TSI->getType());
     } else {
@@ -608,7 +608,7 @@ void ODRHash::AddCXXRecordDecl(const CXXRecordDecl *Record) {
   }
 
   const ClassTemplateDecl *TD = Record->getDescribedClassTemplate();
-  AddBoolean(TD);
+  AddBoolean(TD != nullptr);
   if (TD) {
     AddTemplateParameterList(TD->getTemplateParameters());
   }
@@ -644,7 +644,7 @@ void ODRHash::AddObjCInterfaceDecl(const ObjCInterfaceDecl *IF) {
   AddDecl(IF);
 
   auto *SuperClass = IF->getSuperClass();
-  AddBoolean(SuperClass);
+  AddBoolean(SuperClass != nullptr);
   if (SuperClass)
     ID.AddInteger(SuperClass->getODRHash());
 
@@ -693,7 +693,7 @@ void ODRHash::AddFunctionDecl(const FunctionDecl *Function,
   ID.AddInteger(Function->getDeclKind());
 
   const auto *SpecializationArgs = Function->getTemplateSpecializationArgs();
-  AddBoolean(SpecializationArgs);
+  AddBoolean(SpecializationArgs != nullptr);
   if (SpecializationArgs) {
     ID.AddInteger(SpecializationArgs->size());
     for (const TemplateArgument &TA : SpecializationArgs->asArray()) {
@@ -714,7 +714,7 @@ void ODRHash::AddFunctionDecl(const FunctionDecl *Function,
   AddBoolean(Function->isExplicitlyDefaulted());
 
   StringLiteral *DeletedMessage = Function->getDeletedMessage();
-  AddBoolean(DeletedMessage);
+  AddBoolean(DeletedMessage != nullptr);
 
   if (DeletedMessage)
     ID.AddString(DeletedMessage->getBytes());
@@ -741,7 +741,7 @@ void ODRHash::AddFunctionDecl(const FunctionDecl *Function,
   }
 
   auto *Body = Function->getBody();
-  AddBoolean(Body);
+  AddBoolean(Body != nullptr);
   if (Body)
     AddStmt(Body);
 
@@ -818,7 +818,7 @@ void ODRHash::AddDecl(const Decl *D) {
   D = D->getCanonicalDecl();
 
   const NamedDecl *ND = dyn_cast<NamedDecl>(D);
-  AddBoolean(ND);
+  AddBoolean(ND != nullptr);
   if (!ND) {
     ID.AddInteger(D->getKind());
     return;
@@ -858,14 +858,14 @@ public:
       : ID(ID), Hash(Hash) {}
 
   void AddStmt(Stmt *S) {
-    Hash.AddBoolean(S);
+    Hash.AddBoolean(S != nullptr);
     if (S) {
       Hash.AddStmt(S);
     }
   }
 
   void AddDecl(const Decl *D) {
-    Hash.AddBoolean(D);
+    Hash.AddBoolean(D != nullptr);
     if (D) {
       Hash.AddDecl(D);
     }
@@ -876,7 +876,7 @@ public:
   }
 
   void AddType(const Type *T) {
-    Hash.AddBoolean(T);
+    Hash.AddBoolean(T != nullptr);
     if (T) {
       Hash.AddType(T);
     }
@@ -887,7 +887,7 @@ public:
   }
 
   void AddIdentifierInfo(const IdentifierInfo *II) {
-    Hash.AddBoolean(II);
+    Hash.AddBoolean(II != nullptr);
     if (II) {
       Hash.AddIdentifierInfo(II);
     }

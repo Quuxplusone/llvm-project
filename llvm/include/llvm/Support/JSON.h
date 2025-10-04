@@ -868,7 +868,7 @@ public:
 
   /// True if the expression is an object.
   /// Must be checked before calling map().
-  operator bool() const { return O; }
+  operator bool() const { return static_cast<bool>(O); }
 
   /// Maps a property to a field.
   /// If the property is missing or invalid, reports an error.

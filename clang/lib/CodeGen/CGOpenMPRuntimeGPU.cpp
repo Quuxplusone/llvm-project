@@ -711,7 +711,7 @@ void CGOpenMPRuntimeGPU::emitNonSPMDKernel(const OMPExecutableDirective &D,
   EntryFunctionState EST;
   WrapperFunctionsMap.clear();
 
-  [[maybe_unused]] bool IsBareKernel = D.getSingleClause<OMPXBareClause>();
+  [[maybe_unused]] bool IsBareKernel = D.getSingleClause<OMPXBareClause>() != nullptr;
   assert(!IsBareKernel && "bare kernel should not be at generic mode");
 
   // Emit target region as a standalone region.
@@ -802,7 +802,7 @@ void CGOpenMPRuntimeGPU::emitSPMDKernel(const OMPExecutableDirective &D,
   ExecutionRuntimeModesRAII ModeRAII(CurrentExecutionMode, EM_SPMD);
   EntryFunctionState EST;
 
-  bool IsBareKernel = D.getSingleClause<OMPXBareClause>();
+  bool IsBareKernel = D.getSingleClause<OMPXBareClause>() != nullptr;
 
   // Emit target region as a standalone region.
   class NVPTXPrePostActionTy : public PrePostActionTy {
@@ -853,7 +853,7 @@ void CGOpenMPRuntimeGPU::emitTargetOutlinedFunction(
   assert(!ParentName.empty() && "Invalid target region parent name!");
 
   bool Mode = supportsSPMDExecutionMode(CGM.getContext(), D);
-  bool IsBareKernel = D.getSingleClause<OMPXBareClause>();
+  bool IsBareKernel = D.getSingleClause<OMPXBareClause>() != nullptr;
   if (Mode || IsBareKernel)
     emitSPMDKernel(D, ParentName, OutlinedFn, OutlinedFnID, IsOffloadEntry,
                    CodeGen);
@@ -1185,7 +1185,7 @@ void CGOpenMPRuntimeGPU::emitTeamsCall(CodeGenFunction &CGF,
   if (!CGF.HaveInsertPoint())
     return;
 
-  bool IsBareKernel = D.getSingleClause<OMPXBareClause>();
+  bool IsBareKernel = D.getSingleClause<OMPXBareClause>() != nullptr;
 
   RawAddress ZeroAddr = CGF.CreateDefaultAlignTempAlloca(CGF.Int32Ty,
                                                          /*Name=*/".zero.addr");

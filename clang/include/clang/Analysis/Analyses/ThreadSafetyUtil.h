@@ -264,7 +264,7 @@ public:
   ~CopyOnWriteVector() { destroy(); }
 
   // Returns true if this holds a valid vector.
-  bool valid() const  { return Data; }
+  bool valid() const  { return Data != nullptr; }
 
   // Returns true if this vector is writable.
   bool writable() const { return Data && Data->NumRefs == 1; }

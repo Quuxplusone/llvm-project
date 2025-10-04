@@ -269,7 +269,7 @@ void PrettyStackTraceProgram::print(raw_ostream &OS) const {
   OS << "Program arguments: ";
   // Print the argument list.
   for (int I = 0; I < ArgC; ++I) {
-    const bool HaveSpace = ::strchr(ArgV[I], ' ');
+    const bool HaveSpace = ::strchr(ArgV[I], ' ') != nullptr;
     if (I)
       OS << ' ';
     if (HaveSpace)

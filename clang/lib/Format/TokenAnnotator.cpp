@@ -56,7 +56,7 @@ static bool startsWithInitStatement(const AnnotatedLine &Line) {
 /// invokes @selector(...)). So, we allow treat any identifier or
 /// keyword as a potential Objective-C selector component.
 static bool canBeObjCSelectorComponent(const FormatToken &Tok) {
-  return Tok.Tok.getIdentifierInfo();
+  return Tok.Tok.getIdentifierInfo() != nullptr;
 }
 
 /// With `Left` being '(', check if we're at either `[...](` or

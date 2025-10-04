@@ -4845,7 +4845,7 @@ Sema::BuildBaseInitializer(QualType BaseType, TypeSourceInfo *BaseTInfo,
   }
 
   InitializedEntity BaseEntity =
-    InitializedEntity::InitializeBase(Context, BaseSpec, VirtualBaseSpec);
+    InitializedEntity::InitializeBase(Context, BaseSpec, VirtualBaseSpec != nullptr);
   InitializationKind Kind =
       InitList ? InitializationKind::CreateDirectList(BaseLoc)
                : InitializationKind::CreateDirect(BaseLoc, InitRange.getBegin(),
@@ -16340,7 +16340,7 @@ void Sema::FinalizeVarWithDestructor(VarDecl *VD, CXXRecordDecl *ClassDecl) {
   if (Destructor->isConstexpr()) {
     bool HasConstantInit = false;
     if (VD->getInit() && !VD->getInit()->isValueDependent())
-      HasConstantInit = VD->evaluateValue();
+      HasConstantInit = VD->evaluateValue() != nullptr;
     SmallVector<PartialDiagnosticAt, 8> Notes;
     if (!VD->evaluateDestruction(Notes) && VD->isConstexpr() &&
         HasConstantInit) {
@@ -17846,7 +17846,7 @@ Decl *Sema::BuildStaticAssertDeclaration(SourceLocation StaticAssertLoc,
     if (!Failed && !Cond && !InTemplateDefinition) {
       SmallString<256> MsgBuffer;
       llvm::raw_svector_ostream Msg(MsgBuffer);
-      bool HasMessage = AssertMessage;
+      bool HasMessage = AssertMessage != nullptr;
       if (AssertMessage) {
         std::string Str;
         HasMessage = EvaluateAsString(AssertMessage, Str, Context,

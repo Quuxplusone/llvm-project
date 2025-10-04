@@ -1342,7 +1342,7 @@ bool LoopVectorizationLegality::canVectorizeFPMath(
   if (!EnableStrictReductions ||
       any_of(getInductionVars(), [&](auto &Induction) -> bool {
         InductionDescriptor IndDesc = Induction.second;
-        return IndDesc.getExactFPMathInst();
+        return IndDesc.getExactFPMathInst() != nullptr;
       }))
     return false;
 

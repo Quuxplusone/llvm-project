@@ -134,7 +134,7 @@ public:
              GlobalRecord::Kind GV = GlobalRecord::Kind::Unknown) const;
 
   // Determine if library attributes were assigned.
-  bool hasBinaryAttrs() const { return BA.get(); }
+  bool hasBinaryAttrs() const { return BA.get() != nullptr; }
 
   // Determine if record slice is unassigned.
   bool empty() const {

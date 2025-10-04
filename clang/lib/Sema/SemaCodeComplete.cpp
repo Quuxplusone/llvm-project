@@ -8544,7 +8544,7 @@ void SemaCodeCompletion::CodeCompleteObjCInstanceMessage(
       if (ReceiverType->isObjCClassType())
         return CodeCompleteObjCClassMessage(
             S, ParsedType::make(Context.getObjCInterfaceType(IFace)), SelIdents,
-            AtArgumentExpression, Super);
+            AtArgumentExpression, Super != nullptr);
 
       ReceiverType =
           Context.getObjCObjectPointerType(Context.getObjCInterfaceType(IFace));

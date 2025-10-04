@@ -902,7 +902,7 @@ MemDepResult MemoryDependenceResults::getNonLocalInfoForBlock(
   bool isInvariantLoad = false;
 
   if (LoadInst *LI = dyn_cast_or_null<LoadInst>(QueryInst))
-    isInvariantLoad = LI->getMetadata(LLVMContext::MD_invariant_load);
+    isInvariantLoad = LI->hasMetadata(LLVMContext::MD_invariant_load);
 
   // Do a binary search to see if we already have an entry for this block in
   // the cache set.  If so, find it.
@@ -1049,7 +1049,7 @@ bool MemoryDependenceResults::getNonLocalPointerDepFromBB(
 
   bool isInvariantLoad = false;
   if (LoadInst *LI = dyn_cast_or_null<LoadInst>(QueryInst))
-    isInvariantLoad = LI->getMetadata(LLVMContext::MD_invariant_load);
+    isInvariantLoad = LI->hasMetadata(LLVMContext::MD_invariant_load);
 
   // Get the NLPI for CacheKey, inserting one into the map if it doesn't
   // already have one.

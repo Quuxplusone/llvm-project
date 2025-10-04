@@ -30,7 +30,7 @@ public:
     : MostDerivedTypeName(MDTN), Offset(Offset), SubobjectTypeName(STN) {}
 
   /// Determine whether the object had a valid dynamic type.
-  bool isValid() const { return MostDerivedTypeName; }
+  bool isValid() const { return MostDerivedTypeName != nullptr; }
   /// Get the name of the most-derived type of the object.
   const char *getMostDerivedTypeName() const { return MostDerivedTypeName; }
   /// Get the offset from the most-derived type to this base class.

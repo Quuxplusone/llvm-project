@@ -1533,7 +1533,7 @@ public:
     if (!Data.getOpaqueValue())
       getMostRecentDecl();
 
-    return Data.getPointer();
+    return Data.getPointer() != nullptr;
   }
 
   /// Retrieve the definition of this class, or NULL if this class
@@ -2243,7 +2243,7 @@ public:
     if (!Data.getOpaqueValue())
       getMostRecentDecl();
 
-    return Data.getPointer();
+    return Data.getPointer() != nullptr;
   }
 
   /// Retrieve the definition of this protocol, if any.

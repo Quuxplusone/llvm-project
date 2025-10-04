@@ -9507,7 +9507,7 @@ bool Sema::RequireCompleteTypeImpl(SourceLocation Loc, QualType T,
         runWithSufficientStackSpace(Loc, [&] {
           Diagnosed = InstantiateClassTemplateSpecialization(
               Loc, ClassTemplateSpec, TSK_ImplicitInstantiation,
-              /*Complain=*/Diagnoser, ClassTemplateSpec->hasStrictPackMatch());
+              /*Complain=*/!!Diagnoser, ClassTemplateSpec->hasStrictPackMatch());
         });
         Instantiated = true;
       }
@@ -9523,7 +9523,7 @@ bool Sema::RequireCompleteTypeImpl(SourceLocation Loc, QualType T,
             Diagnosed = InstantiateClass(Loc, RD, Pattern,
                                          getTemplateInstantiationArgs(RD),
                                          TSK_ImplicitInstantiation,
-                                         /*Complain=*/Diagnoser);
+                                         /*Complain=*/!!Diagnoser);
           });
           Instantiated = true;
         }

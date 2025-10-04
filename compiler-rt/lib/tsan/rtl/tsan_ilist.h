@@ -169,7 +169,7 @@ template <typename Base, INode Base::*Node, typename Elem>
 bool IList<Base, Node, Elem>::Queued(Elem* e) const {
   INode* n = ToNode(e);
   DCHECK_EQ(!n->next_, !n->prev_);
-  return n->next_;
+  return n->next_ != nullptr;
 }
 
 template <typename Base, INode Base::*Node, typename Elem>

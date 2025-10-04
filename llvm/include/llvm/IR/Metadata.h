@@ -927,6 +927,7 @@ public:
 
   Metadata *get() const { return MD; }
   operator Metadata *() const { return get(); }
+  explicit operator bool() const { return get() != nullptr; }
   Metadata *operator->() const { return get(); }
   Metadata &operator*() const { return *get(); }
 
@@ -1667,7 +1668,7 @@ public:
       std::enable_if_t<!std::is_convertible<U *, T *>::value> * = nullptr)
       : N(Other.get()) {}
 
-  explicit operator bool() const { return get(); }
+  explicit operator bool() const { return bool(get()); }
   explicit operator MDTuple *() const { return get(); }
 
   MDTuple *get() const { return const_cast<MDTuple *>(N); }

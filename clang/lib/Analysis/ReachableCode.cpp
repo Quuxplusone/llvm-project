@@ -101,7 +101,7 @@ static bool isDeadReturn(const CFGBlock *B, const Stmt *S) {
             ParentMap PM(const_cast<Expr *>(RE));
             // If 'S' is in the ParentMap, it is a subexpression of
             // the return statement.
-            return PM.getParent(S);
+            return PM.getParent(S) != nullptr;
           }
         }
         break;

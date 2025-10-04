@@ -705,7 +705,7 @@ private:
 
     ~ExprResult() { assert(!ExtraDep && "unhandled ExtraDep"); }
 
-    operator bool() const { return Expr; }
+    explicit operator bool() const { return Expr != nullptr; }
 
     static ExprResult none() { return {nullptr, nullptr, nullptr}; }
     static ExprResult some(const Expression *Expr, Value *ExtraDep = nullptr) {

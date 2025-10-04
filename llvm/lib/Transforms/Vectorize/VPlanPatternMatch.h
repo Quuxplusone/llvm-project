@@ -263,7 +263,7 @@ private:
     if constexpr (std::is_same_v<RecipeTy, VPScalarIVStepsRecipe> ||
                   std::is_same_v<RecipeTy, VPCanonicalIVPHIRecipe> ||
                   std::is_same_v<RecipeTy, VPDerivedIVRecipe>)
-      return DefR;
+      return DefR != nullptr;
     else
       return DefR && DefR->getOpcode() == Opcode;
   }

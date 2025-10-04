@@ -243,7 +243,7 @@ llvm::UnrollAndJamLoop(Loop *L, unsigned Count, unsigned TripCount,
                                     /*UseEpilogRemainder*/ true,
                                     UnrollRemainder, /*ForgetAllSCEV*/ false,
                                     LI, SE, DT, AC, TTI, true,
-                                    SCEVCheapExpansionBudget, EpilogueLoop)) {
+                                    SCEVCheapExpansionBudget, EpilogueLoop != nullptr)) {
       LLVM_DEBUG(dbgs() << "Won't unroll-and-jam; remainder loop could not be "
                            "generated when assuming runtime trip count\n");
       return LoopUnrollResult::Unmodified;

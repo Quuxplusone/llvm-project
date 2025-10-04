@@ -96,7 +96,7 @@ struct Value_match {
   template <typename MatchContext> bool match(const MatchContext &, SDValue N) {
     if (MatchVal)
       return MatchVal == N;
-    return N.getNode();
+    return N.getNode() != nullptr;
   }
 };
 

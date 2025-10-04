@@ -466,7 +466,7 @@ public:
 
   void setIntrinsic(const CodeGenIntrinsic *I) { IntrinInfo = I; }
   const CodeGenIntrinsic *getIntrinsic() const { return IntrinInfo; }
-  bool isIntrinsic() const { return IntrinInfo; }
+  bool isIntrinsic() const { return IntrinInfo != nullptr; }
 
   bool hasVariadicDefs() const;
   bool isVariadic() const override;

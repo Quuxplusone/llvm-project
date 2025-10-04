@@ -459,7 +459,7 @@ public:
     return isReachableFromEntry(getNode(A));
   }
 
-  bool isReachableFromEntry(const DomTreeNodeBase<NodeT> *A) const { return A; }
+  bool isReachableFromEntry(const DomTreeNodeBase<NodeT> *A) const { return static_cast<bool>(A); }
 
   /// dominates - Returns true iff A dominates B.  Note that this is not a
   /// constant time operation!

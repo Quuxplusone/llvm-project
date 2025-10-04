@@ -403,7 +403,7 @@ public:
 
   /// Returns true if the loop has exactly one uncountable early exit, i.e. an
   /// uncountable exit that isn't the latch block.
-  bool hasUncountableEarlyExit() const { return UncountableExitingBB; }
+  bool hasUncountableEarlyExit() const { return UncountableExitingBB != nullptr; }
 
   /// Returns the uncountable early exiting block, if there is exactly one.
   BasicBlock *getUncountableEarlyExitingBlock() const {

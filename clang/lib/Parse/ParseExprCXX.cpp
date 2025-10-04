@@ -1910,7 +1910,7 @@ Parser::ParseCXXCondition(StmtResult *InitStmt, SourceLocation Loc,
   };
 
   // Determine what kind of thing we have.
-  switch (isCXXConditionDeclarationOrInitStatement(InitStmt, FRI)) {
+  switch (isCXXConditionDeclarationOrInitStatement(InitStmt != nullptr, FRI != nullptr)) {
   case ConditionOrInitStatement::Expression: {
     // If this is a for loop, we're entering its condition.
     ForConditionScope.enter(/*IsConditionVariable=*/false);

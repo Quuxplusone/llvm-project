@@ -56,6 +56,7 @@ public:
 
   Metadata *get() const { return MD; }
   operator Metadata *() const { return get(); }
+  explicit operator bool() const { return get() != nullptr; }
   Metadata *operator->() const { return get(); }
   Metadata &operator*() const { return *get(); }
 
@@ -125,6 +126,7 @@ public:
 
   T *get() const { return (T *)Ref.get(); }
   operator T *() const { return get(); }
+  explicit operator bool() const { return get() != nullptr; }
   T *operator->() const { return get(); }
   T &operator*() const { return *get(); }
 

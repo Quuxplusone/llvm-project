@@ -1274,7 +1274,7 @@ void SelectionDAGBuilder::visitDbgInfo(const Instruction &I) {
   // be important as it does so deterministcally and ordering between
   // DbgLabelRecords and DbgVariableRecords is immaterial (other than for MIR/IR
   // printing).
-  bool SkipDbgVariableRecords = DAG.getFunctionVarLocs();
+  bool SkipDbgVariableRecords = DAG.getFunctionVarLocs() != nullptr;
   // Is there is any debug-info attached to this instruction, in the form of
   // DbgRecord non-instruction debug-info records.
   for (DbgRecord &DR : I.getDbgRecordRange()) {
@@ -3755,7 +3755,7 @@ void SelectionDAGBuilder::visitSelect(const User &I) {
     Flags.copyFMF(*FPOp);
 
   Flags.setUnpredictable(
-      cast<SelectInst>(I).getMetadata(LLVMContext::MD_unpredictable));
+      cast<SelectInst>(I).hasMetadata(LLVMContext::MD_unpredictable));
 
   // Min/max matching is only viable if all output VTs are the same.
   if (all_equal(ValueVTs)) {
@@ -10838,7 +10838,7 @@ void SelectionDAGBuilder::visitPatchpoint(const CallBase &CB,
   assert(CallEnd->getOpcode() == ISD::CALLSEQ_END &&
          "Expected a callseq node.");
   SDNode *Call = CallEnd->getOperand(0).getNode();
-  bool HasGlue = Call->getGluedNode();
+  bool HasGlue = Call->getGluedNode() != nullptr;
 
   // Replace the target specific call node with the patchable intrinsic.
   SmallVector<SDValue, 8> Ops;

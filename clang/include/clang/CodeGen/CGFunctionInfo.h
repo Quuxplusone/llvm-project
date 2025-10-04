@@ -786,7 +786,7 @@ public:
   }
 
   /// Return true if this function uses inalloca arguments.
-  bool usesInAlloca() const { return ArgStruct; }
+  bool usesInAlloca() const { return ArgStruct != nullptr; }
 
   /// Get the struct type used to represent all the arguments in memory.
   llvm::StructType *getArgStruct() const { return ArgStruct; }

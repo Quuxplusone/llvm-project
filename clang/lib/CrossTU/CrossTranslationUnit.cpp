@@ -230,7 +230,7 @@ static bool hasBodyOrInit(const FunctionDecl *D, const FunctionDecl *&DefD) {
   return D->hasBody(DefD);
 }
 static bool hasBodyOrInit(const VarDecl *D, const VarDecl *&DefD) {
-  return D->getAnyInitializer(DefD);
+  return D->getAnyInitializer(DefD) != nullptr;
 }
 template <typename T> static bool hasBodyOrInit(const T *D) {
   const T *Unused;

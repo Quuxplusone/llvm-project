@@ -1026,7 +1026,7 @@ class TemplateDiff {
       }
 
       /// Return true if the iterator is non-singular.
-      bool isValid() const { return TST; }
+      bool isValid() const { return TST != nullptr; }
 
       /// isEnd - Returns true if the iterator is one past the end.
       bool isEnd() const {

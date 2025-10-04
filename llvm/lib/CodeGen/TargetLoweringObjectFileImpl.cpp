@@ -717,7 +717,7 @@ calcUniqueIDUpdateFlagsAndSize(const GlobalObject *GO, StringRef SectionName,
 
   // A section can have at most one associated section. Put each global with
   // MD_associated in a unique section.
-  const bool Associated = GO->getMetadata(LLVMContext::MD_associated);
+  const bool Associated = GO->getMetadata(LLVMContext::MD_associated) != nullptr;
   if (Associated) {
     Flags |= ELF::SHF_LINK_ORDER;
     return NextUniqueID++;

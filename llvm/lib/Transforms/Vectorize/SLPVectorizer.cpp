@@ -1203,7 +1203,7 @@ public:
   bool hasCandidateOpcode(unsigned Opcode) const {
     return MainOp.hasCandidateOpcode(Opcode);
   }
-  bool hasAltOp() const { return AltOp.I; }
+  bool hasAltOp() const { return AltOp.I != nullptr; }
   unsigned getAltOpcode() const {
     return hasAltOp() ? AltOp.getOpcode() : getMainOpcode();
   }

@@ -1820,7 +1820,7 @@ namespace {
             S.getCurFunctionDecl(/*AllowLambda=*/true), FD);
     }
 
-    explicit operator bool() const { return FD; }
+    explicit operator bool() const { return FD != nullptr; }
 
     int Compare(Sema &S, const UsualDeallocFnInfo &Other,
                 ImplicitDeallocationParameters TargetIDP) const {

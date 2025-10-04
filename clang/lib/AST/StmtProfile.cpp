@@ -212,13 +212,13 @@ namespace {
       Hash.AddDeclarationName(Name, TreatAsDecl);
     }
     void VisitIdentifierInfo(const IdentifierInfo *II) override {
-      ID.AddBoolean(II);
+      ID.AddBoolean(II != nullptr);
       if (II) {
         Hash.AddIdentifierInfo(II);
       }
     }
     void VisitDecl(const Decl *D) override {
-      ID.AddBoolean(D);
+      ID.AddBoolean(D != nullptr);
       if (D) {
         Hash.AddDecl(D);
       }

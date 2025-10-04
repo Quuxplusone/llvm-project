@@ -10719,8 +10719,8 @@ getMorePartialOrderingConstrained(Sema &S, FunctionDecl *Fn1, FunctionDecl *Fn2,
   // C++ [temp.constr.order]:
   //   A non-template function F1 is more partial-ordering-constrained than a
   //   non-template function F2 if:
-  bool Cand1IsSpecialization = Fn1->getPrimaryTemplate();
-  bool Cand2IsSpecialization = Fn2->getPrimaryTemplate();
+  bool Cand1IsSpecialization = Fn1->getPrimaryTemplate() != nullptr;
+  bool Cand2IsSpecialization = Fn2->getPrimaryTemplate() != nullptr;
 
   if (Cand1IsSpecialization || Cand2IsSpecialization)
     return nullptr;

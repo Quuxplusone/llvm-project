@@ -5017,7 +5017,7 @@ void AssemblyWriter::writeAllAttributeGroups() {
 
 void AssemblyWriter::printUseListOrder(const Value *V,
                                        const std::vector<unsigned> &Shuffle) {
-  bool IsInFunction = Machine.getFunction();
+  bool IsInFunction = Machine.getFunction() != nullptr;
   if (IsInFunction)
     Out << "  ";
 

@@ -1220,7 +1220,7 @@ public:
                         StringRef &PDBFileName) const;
 
   bool isRelocatableObject() const override;
-  bool is64() const { return PE32PlusHeader; }
+  bool is64() const { return PE32PlusHeader != nullptr; }
 
   StringRef mapDebugSectionName(StringRef Name) const override;
 

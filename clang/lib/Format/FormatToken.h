@@ -1798,7 +1798,7 @@ struct AdditionalKeywords {
                  VerilogExtraKeywords.end();
     default:
       // getIdentifierInfo returns non-null for both identifiers and keywords.
-      return Tok.Tok.getIdentifierInfo();
+      return Tok.Tok.getIdentifierInfo() != nullptr;
     }
   }
 

@@ -42,7 +42,7 @@ public:
 
   void setSelectionRange(SourceRange R) { SelectionRange = R; }
 
-  bool hasASTContext() const { return AST; }
+  bool hasASTContext() const { return AST != nullptr; }
 
   ASTContext &getASTContext() const {
     assert(AST && "no AST!");

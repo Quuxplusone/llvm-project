@@ -433,7 +433,7 @@ static bool canHaveUnrollRemainder(const Loop *L) {
         return true;
       if (auto *CB = dyn_cast<CallBase>(&I))
         if (CB->isConvergent())
-          return CB->getConvergenceControlToken();
+          return CB->getConvergenceControlToken() != nullptr;
     }
   }
   return true;

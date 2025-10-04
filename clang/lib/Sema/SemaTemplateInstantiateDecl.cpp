@@ -44,7 +44,7 @@ static bool isDeclWithinFunction(const Decl *D) {
     return true;
 
   if (DC->isRecord())
-    return cast<CXXRecordDecl>(DC)->isLocalClass();
+    return cast<CXXRecordDecl>(DC)->isLocalClass() != nullptr;
 
   return false;
 }
@@ -4115,7 +4115,7 @@ Decl *TemplateDeclInstantiator::instantiateUnresolvedUsingDecl(
   bool IsUsingIfExists = D->template hasAttr<UsingIfExistsAttr>();
   NamedDecl *UD = SemaRef.BuildUsingDeclaration(
       /*Scope*/ nullptr, D->getAccess(), D->getUsingLoc(),
-      /*HasTypename*/ TD, TypenameLoc, SS, NameInfo, EllipsisLoc,
+      /*HasTypename*/ TD != nullptr, TypenameLoc, SS, NameInfo, EllipsisLoc,
       ParsedAttributesView(),
       /*IsInstantiation*/ true, IsUsingIfExists);
   if (UD) {
@@ -4266,7 +4266,7 @@ Decl *TemplateDeclInstantiator::VisitOMPDeclareReductionDecl(
         cast<DeclRefExpr>(NewDRD->getCombinerOut())->getDecl());
     auto *ThisContext = dyn_cast_or_null<CXXRecordDecl>(Owner);
     Sema::CXXThisScopeRAII ThisScope(SemaRef, ThisContext, Qualifiers(),
-                                     ThisContext);
+                                     ThisContext != nullptr);
     SubstCombiner = SemaRef.SubstExpr(Combiner, TemplateArgs).get();
     SemaRef.OpenMP().ActOnOpenMPDeclareReductionCombinerEnd(NewDRD,
                                                             SubstCombiner);
@@ -4349,7 +4349,7 @@ TemplateDeclInstantiator::VisitOMPDeclareMapperDecl(OMPDeclareMapperDecl *D) {
       cast<DeclRefExpr>(MapperVarRef.get())->getDecl());
   auto *ThisContext = dyn_cast_or_null<CXXRecordDecl>(Owner);
   Sema::CXXThisScopeRAII ThisScope(SemaRef, ThisContext, Qualifiers(),
-                                   ThisContext);
+                                   ThisContext != nullptr);
   // Instantiate map clauses.
   for (OMPClause *C : D->clauselists()) {
     auto *OldC = cast<OMPMapClause>(C);
@@ -5517,7 +5517,7 @@ void Sema::InstantiateFunctionDefinition(SourceLocation PointOfInstantiation,
   // definitions should be visible within this instantiation.
   if (DiagnoseUninstantiableTemplate(
           PointOfInstantiation, Function,
-          Function->getInstantiatedFromMemberFunction(), PatternDecl,
+          Function->getInstantiatedFromMemberFunction() != nullptr, PatternDecl,
           PatternDef, TSK,
           /*Complain*/ DefinitionRequired, &Unreachable)) {
     if (DefinitionRequired)
@@ -6868,7 +6868,7 @@ NamedDecl *Sema::FindInstantiatedDecl(SourceLocation Loc, NamedDecl *D,
     // declarations here.
     bool NeedInstantiate = false;
     if (CXXRecordDecl *RD = dyn_cast<CXXRecordDecl>(D))
-      NeedInstantiate = RD->isLocalClass();
+      NeedInstantiate = RD->isLocalClass() != nullptr;
     else if (isa<TypedefNameDecl>(D) &&
              isa<CXXDeductionGuideDecl>(D->getDeclContext()))
       NeedInstantiate = true;

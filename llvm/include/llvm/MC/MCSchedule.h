@@ -332,12 +332,12 @@ struct MCSchedModel {
 
   const MCExtraProcessorInfo *ExtraProcessorInfo;
 
-  bool hasExtraProcessorInfo() const { return ExtraProcessorInfo; }
+  bool hasExtraProcessorInfo() const { return ExtraProcessorInfo != nullptr; }
 
   unsigned getProcessorID() const { return ProcID; }
 
   /// Does this machine model include instruction-level scheduling.
-  bool hasInstrSchedModel() const { return SchedClassTable; }
+  bool hasInstrSchedModel() const { return SchedClassTable != nullptr; }
 
   const MCExtraProcessorInfo &getExtraProcessorInfo() const {
     assert(hasExtraProcessorInfo() &&

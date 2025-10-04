@@ -908,7 +908,7 @@ public:
       return *It;
     return nullptr;
   }
-  bool hasMSPropertyAttr() const { return getMSPropertyAttr(); }
+  bool hasMSPropertyAttr() const { return getMSPropertyAttr() != nullptr; }
 
 private:
   VecTy AttrList;

@@ -163,7 +163,7 @@ public:
   const VPRecipeBase *getDefiningRecipe() const;
 
   /// Returns true if this VPValue is defined by a recipe.
-  bool hasDefiningRecipe() const { return getDefiningRecipe(); }
+  bool hasDefiningRecipe() const { return getDefiningRecipe() != nullptr; }
 
   /// Returns true if this VPValue is a live-in, i.e. defined outside the VPlan.
   bool isLiveIn() const { return !hasDefiningRecipe(); }

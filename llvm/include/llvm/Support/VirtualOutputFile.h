@@ -100,7 +100,7 @@ public:
   /// calling \a discard().
   Expected<std::unique_ptr<raw_pwrite_stream>> createProxy();
 
-  bool hasOpenProxy() const { return OpenProxy; }
+  bool hasOpenProxy() const { return OpenProxy != nullptr; }
 
   /// Take the implementation.
   ///

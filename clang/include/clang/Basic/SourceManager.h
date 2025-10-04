@@ -100,7 +100,7 @@ inline bool isModuleMap(CharacteristicKind CK) {
 /// for the line numbers.
 class LineOffsetMapping {
 public:
-  explicit operator bool() const { return Storage; }
+  explicit operator bool() const { return Storage != nullptr; }
   unsigned size() const {
     assert(Storage);
     return Storage[0];

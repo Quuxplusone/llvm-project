@@ -69,7 +69,7 @@ public:
     return callback(callable, std::forward<Params>(params)...);
   }
 
-  explicit operator bool() const { return callback; }
+  explicit operator bool() const { return callback != nullptr; }
 
   bool operator==(const function_ref<Ret(Params...)> &Other) const {
     return callable == Other.callable;

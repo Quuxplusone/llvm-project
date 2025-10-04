@@ -139,7 +139,7 @@ static bool hasDefinition(const ObjCObjectPointerType *ObjPtr) {
   if (!Decl)
     return false;
 
-  return Decl->getDefinition();
+  return Decl->getDefinition() != nullptr;
 }
 
 // TODO: consider checking explicit casts?

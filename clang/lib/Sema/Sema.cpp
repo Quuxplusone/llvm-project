@@ -1947,7 +1947,7 @@ public:
     // lead to explosion of diagnostics since each user is visited at most
     // twice.
     if (ShouldEmitRootNode || InOMPDeviceContext)
-      emitDeferredDiags(FD, Caller);
+      emitDeferredDiags(FD, Caller != nullptr);
     // Do not revisit a function if the function body has been completely
     // visited before.
     if (!Done.insert(FD).second)
@@ -2214,7 +2214,7 @@ void Sema::checkTypeSupport(QualType Ty, SourceLocation Loc, ValueDecl *D) {
       else
         PD << "expression";
 
-      if (Diag(Loc, PD, FD)
+      if (Diag(Loc, PD, FD != nullptr)
           << false /*show bit size*/ << 0 << Ty << false /*return*/
           << TI.getTriple().str()) {
         if (D)
@@ -2233,7 +2233,7 @@ void Sema::checkTypeSupport(QualType Ty, SourceLocation Loc, ValueDecl *D) {
       else
         PD << "expression";
 
-      if (Diag(Loc, PD, FD)
+      if (Diag(Loc, PD, FD != nullptr)
           << false /*show bit size*/ << 0 << Ty << true /*return*/
           << TI.getTriple().str()) {
         if (D)

@@ -253,6 +253,7 @@ public:
   ///   if (CanQual<PointerType> Ptr = T->getAs<PointerType>()) { ... }
   /// @endcode
   operator const T*() const { return this->Stored.getTypePtrOrNull(); }
+  explicit operator bool() const { return this->Stored.getTypePtrOrNull() != nullptr; }
 
   /// Try to convert the given canonical type to a specific structural
   /// type.

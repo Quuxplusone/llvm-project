@@ -2094,8 +2094,8 @@ Error MetadataLoader::MetadataLoaderImpl::parseOneMetadata(
         GET_OR_DISTINCT(DITemplateTypeParameter,
                         (Context, getMDString(Record[1]),
                          getDITypeRefOrNull(Record[2]),
-                         (Record.size() == 4) ? getMDOrNull(Record[3])
-                                              : getMDOrNull(false))),
+                         ((Record.size() == 4) ? getMDOrNull(Record[3])
+                                              : getMDOrNull(false)) != nullptr)),
         NextMetadataNo);
     NextMetadataNo++;
     break;
@@ -2111,9 +2111,8 @@ Error MetadataLoader::MetadataLoaderImpl::parseOneMetadata(
             DITemplateValueParameter,
             (Context, Record[1], getMDString(Record[2]),
              getDITypeRefOrNull(Record[3]),
-             (Record.size() == 6) ? getMDOrNull(Record[4]) : getMDOrNull(false),
-             (Record.size() == 6) ? getMDOrNull(Record[5])
-                                  : getMDOrNull(Record[4]))),
+             ((Record.size() == 6) ? getMDOrNull(Record[4]) : getMDOrNull(false)) != nullptr,
+             (Record.size() == 6) ? getMDOrNull(Record[5]) : getMDOrNull(Record[4]))),
         NextMetadataNo);
     NextMetadataNo++;
     break;

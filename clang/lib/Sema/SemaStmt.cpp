@@ -2084,7 +2084,7 @@ namespace {
           break;
       }
       DRE = dyn_cast<DeclRefExpr>(UO->getSubExpr());
-      return DRE;
+      return DRE != nullptr;
     }
 
     if (CXXOperatorCallExpr *Call = dyn_cast<CXXOperatorCallExpr>(Statement)) {
@@ -2100,7 +2100,7 @@ namespace {
           break;
       }
       DRE = dyn_cast<DeclRefExpr>(Call->getArg(0));
-      return DRE;
+      return DRE != nullptr;
     }
 
     return false;

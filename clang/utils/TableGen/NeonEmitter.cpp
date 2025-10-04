@@ -1586,7 +1586,7 @@ Intrinsic::DagEmitter::emitDagCast(const DagInit *DI, bool IsBitCast) {
           Intr.Variables[std::string(DI->getArgNameStr(ArgIdx))].getType();
     } else {
       const auto *SI = dyn_cast<StringInit>(DI->getArg(ArgIdx));
-      assert_with_loc(SI, "Expected string type or $Name for cast type");
+      assert_with_loc(SI != nullptr, "Expected string type or $Name for cast type");
 
       if (SI->getAsUnquotedString() == "R") {
         castToType = Intr.getReturnType();
@@ -1855,7 +1855,7 @@ Intrinsic::DagEmitter::emitDagArg(const Init *Arg, std::string ArgName) {
 
   assert(Arg && "Neither ArgName nor Arg?!");
   const auto *DI = dyn_cast<DagInit>(Arg);
-  assert_with_loc(DI, "Arguments must either be DAGs or names!");
+  assert_with_loc(DI != nullptr, "Arguments must either be DAGs or names!");
 
   return emitDag(DI);
 }

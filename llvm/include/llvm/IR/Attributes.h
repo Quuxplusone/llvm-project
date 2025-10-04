@@ -220,7 +220,7 @@ public:
   LLVM_ABI bool isConstantRangeListAttribute() const;
 
   /// Return true if the attribute is any kind of attribute.
-  bool isValid() const { return pImpl; }
+  bool isValid() const { return pImpl != nullptr; }
 
   /// Return true if the attribute is present.
   LLVM_ABI bool hasAttribute(AttrKind Val) const;

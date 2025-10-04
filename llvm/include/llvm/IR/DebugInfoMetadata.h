@@ -77,7 +77,7 @@ public:
   DITypeRefArray() = default;
   DITypeRefArray(const MDTuple *N) : N(N) {}
 
-  explicit operator bool() const { return get(); }
+  explicit operator bool() const { return get() != nullptr; }
   explicit operator MDTuple *() const { return get(); }
 
   MDTuple *get() const { return const_cast<MDTuple *>(N); }

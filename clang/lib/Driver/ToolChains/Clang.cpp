@@ -1212,7 +1212,7 @@ static bool checkRemarksOptions(const Driver &D, const ArgList &Args,
   // which means more than one remark file is being generated.
   bool hasMultipleInvocations = ::hasMultipleInvocations(Triple, Args);
   bool hasExplicitOutputFile =
-      Args.getLastArg(options::OPT_foptimization_record_file_EQ);
+      Args.getLastArg(options::OPT_foptimization_record_file_EQ) != nullptr;
   if (hasMultipleInvocations && hasExplicitOutputFile) {
     D.Diag(diag::err_drv_invalid_output_with_multiple_archs)
         << "-foptimization-record-file";

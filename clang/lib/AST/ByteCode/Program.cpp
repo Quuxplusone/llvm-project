@@ -256,7 +256,7 @@ UnsignedOrNone Program::createGlobal(const DeclTy &D, QualType Ty,
   // Create a descriptor for the global.
   Descriptor *Desc;
   const bool IsConst = Ty.isConstQualified();
-  const bool IsTemporary = D.dyn_cast<const Expr *>();
+  const bool IsTemporary = D.dyn_cast<const Expr *>() != nullptr;
   const bool IsVolatile = Ty.isVolatileQualified();
   if (OptPrimType T = Ctx.classify(Ty))
     Desc = createDescriptor(D, *T, nullptr, Descriptor::GlobalMD, IsConst,

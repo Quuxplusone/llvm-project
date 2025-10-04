@@ -855,6 +855,9 @@ public:
     operator CFGBlock*() const {
       return getReachableBlock();
     }
+    explicit operator bool() const {
+      return getReachableBlock() != nullptr;
+    }
 
     CFGBlock& operator *() const {
       return *getReachableBlock();

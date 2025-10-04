@@ -45,7 +45,7 @@ struct ChainedOriginDepotNode {
     const ChainedOriginDepotNode *node_ = nullptr;
     u32 id_ = 0;
     Handle(const ChainedOriginDepotNode *node, u32 id) : node_(node), id_(id) {}
-    bool valid() const { return node_; }
+    bool valid() const { return node_ != nullptr; }
     u32 id() const { return id_; }
     int here_id() const { return node_->here_id; }
     int prev_id() const { return node_->prev_id; }

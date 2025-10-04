@@ -2147,7 +2147,7 @@ public:
   const AssociatedConstraint &getTrailingRequiresClause() const;
 
   /// Whether this is a generic lambda.
-  bool isGenericLambda() const { return getTemplateParameterList(); }
+  bool isGenericLambda() const { return getTemplateParameterList() != nullptr; }
 
   /// Retrieve the body of the lambda. This will be most of the time
   /// a \p CompoundStmt, but can also be \p CoroutineBodyStmt wrapping

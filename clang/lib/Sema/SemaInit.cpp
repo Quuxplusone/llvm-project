@@ -5744,7 +5744,7 @@ static void TryValueInitialization(Sema &S,
     // things (such as whether an explicit default constructor can be called).
     Expr *InitListAsExpr = InitList;
     MultiExprArg Args(&InitListAsExpr, InitList ? 1 : 0);
-    bool InitListSyntax = InitList;
+    bool InitListSyntax = InitList != nullptr;
 
     // FIXME: Instead of creating a CXXConstructExpr of array type here,
     // wrap a class-typed CXXConstructExpr in an ArrayInitLoopExpr.

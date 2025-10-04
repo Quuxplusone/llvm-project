@@ -7058,7 +7058,7 @@ ConstantAddress CodeGenModule::GetAddrOfGlobalTemporary(
     InitialValue = emitter->emitForInitializer(*Value, AddrSpace,
                                                MaterializedType);
     Constant =
-        MaterializedType.isConstantStorage(getContext(), /*ExcludeCtor*/ Value,
+        MaterializedType.isConstantStorage(getContext(), /*ExcludeCtor*/ Value != nullptr,
                                            /*ExcludeDtor*/ false);
     Type = InitialValue->getType();
   } else {

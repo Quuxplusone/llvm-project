@@ -140,7 +140,7 @@ public:
                       std::function<bool(const IntrinsicInst *)>>>
   getMarkers() const {
     std::function<bool(const IntrinsicInst *)> NotNull(
-        [](const IntrinsicInst *I) -> bool { return I; });
+        [](const IntrinsicInst *I) { return bool(I); });
     return make_filter_range(Instructions, NotNull);
   }
 
