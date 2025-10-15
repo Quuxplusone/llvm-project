@@ -24,15 +24,15 @@ class GetAlloc : public base_type {
   test_allocator_statistics* stats;
 
 public:
-  explicit GetAlloc(test_allocator_statistics& stats_, const int* begin, const int* end)
+  TEST_CONSTEXPR_CXX26 explicit GetAlloc(test_allocator_statistics& stats_, const int* begin, const int* end)
       : base_type(begin, end, test_allocator<int>(&stats_)), stats(&stats_) {}
-  void check() {
+  TEST_CONSTEXPR_CXX26 void check() {
     assert(size() == 4);
     assert(stats->alloc_count > 0);
   }
 };
 
-int main(int, char**) {
+TEST_CONSTEXPR_CXX26 bool test() {
   const int a[] = {4, 3, 2, 1};
   test_allocator_statistics stats{};
   GetAlloc queue(stats, a, a + 4);
@@ -45,6 +45,15 @@ int main(int, char**) {
   assert(queue.front() == 1);
   queue.pop();
   assert(queue.empty());
+
+  return true;
+}
+
+int main(int, char**) {
+  test();
+#if TEST_STD_VER >= 26
+  static_assert(test());
+#endif
 
   return 0;
 }

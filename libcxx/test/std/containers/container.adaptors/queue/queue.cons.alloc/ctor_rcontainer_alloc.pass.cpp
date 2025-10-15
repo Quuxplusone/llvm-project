@@ -21,7 +21,7 @@
 #include "MoveOnly.h"
 
 template <class C>
-C make(int n) {
+TEST_CONSTEXPR_CXX26 C make(int n) {
   C c;
   for (int i = 0; i < n; ++i)
     c.push_back(MoveOnly(i));
@@ -36,17 +36,26 @@ struct test : public std::queue<T, C> {
   typedef test_allocator<MoveOnly> allocator_type;
   typedef typename base::container_type container_type;
 
-  explicit test(const allocator_type& a) : base(a) {}
-  test(const container_type& container, const allocator_type& a) : base(container, a) {}
-  test(container_type&& container, const allocator_type& a) : base(std::move(container), a) {}
-  test(test&& q, const allocator_type& a) : base(std::move(q), a) {}
-  allocator_type get_allocator() { return this->c.get_allocator(); }
+  TEST_CONSTEXPR_CXX26 explicit test(const allocator_type& a) : base(a) {}
+  TEST_CONSTEXPR_CXX26 test(const container_type& container, const allocator_type& a) : base(container, a) {}
+  TEST_CONSTEXPR_CXX26 test(container_type&& container, const allocator_type& a) : base(std::move(container), a) {}
+  TEST_CONSTEXPR_CXX26 test(test&& q, const allocator_type& a) : base(std::move(q), a) {}
+  TEST_CONSTEXPR_CXX26 allocator_type get_allocator() { return this->c.get_allocator(); }
 };
 
-int main(int, char**) {
+TEST_CONSTEXPR_CXX26 bool run_test() {
   test<MoveOnly> q(make<C>(5), test_allocator<MoveOnly>(4));
   assert(q.get_allocator() == test_allocator<MoveOnly>(4));
   assert(q.size() == 5);
+
+  return true;
+}
+
+int main(int, char**) {
+  run_test();
+#if TEST_STD_VER >= 26
+  static_assert(run_test());
+#endif
 
   return 0;
 }
