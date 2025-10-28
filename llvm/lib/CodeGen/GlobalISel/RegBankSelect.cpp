@@ -862,8 +862,10 @@ RegBankSelect::RepairingPlacement::RepairingPlacement(
              "Do not know where to split");
     // Split each outcoming edges.
     MachineBasicBlock &Src = *MI.getParent();
-    for (auto &Succ : Src.successors())
+    for (auto &Succ : Src.successors()) {
+      assert(false && "FOUND THE SUCC PROBLEM BOSS");
       addInsertPoint(Src, Succ);
+    }
   }
 }
 
