@@ -274,7 +274,7 @@ public:
 
   /// Lookup the ValueTy for the \p Key, or create a default constructed value
   /// if the key is not in the map.
-  ValueTy &operator[](StringRef Key) { return try_emplace(Key).first->second; }
+  [[nodiscard]] ValueTy &operator[](StringRef Key) { return try_emplace(Key).first->second; }
 
   /// contains - Return true if the element is in the map, false otherwise.
   [[nodiscard]] bool contains(StringRef Key) const {

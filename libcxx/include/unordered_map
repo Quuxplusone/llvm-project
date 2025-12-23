@@ -203,8 +203,8 @@ public:
     template<typename K>
         pair<const_iterator, const_iterator> equal_range(const K& k) const; // C++20
 
-    mapped_type& operator[](const key_type& k);
-    mapped_type& operator[](key_type&& k);
+    [[__nodiscard__]] mapped_type& operator[](const key_type& k);
+    [[__nodiscard__]] mapped_type& operator[](key_type&& k);
 
     mapped_type&       at(const key_type& k);
     const mapped_type& at(const key_type& k) const;
@@ -1263,9 +1263,9 @@ public:
   }
 #  endif // _LIBCPP_STD_VER >= 20
 
-  _LIBCPP_HIDE_FROM_ABI mapped_type& operator[](const key_type& __k);
+  _LIBCPP_HIDE_FROM_ABI [[__nodiscard__]] mapped_type& operator[](const key_type& __k);
 #  ifndef _LIBCPP_CXX03_LANG
-  _LIBCPP_HIDE_FROM_ABI mapped_type& operator[](key_type&& __k);
+  _LIBCPP_HIDE_FROM_ABI [[__nodiscard__]] mapped_type& operator[](key_type&& __k);
 #  endif
 
   [[__nodiscard__]] _LIBCPP_HIDE_FROM_ABI mapped_type& at(const key_type& __k);
