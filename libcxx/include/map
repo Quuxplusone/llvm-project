@@ -122,8 +122,8 @@ public:
     constexpr size_type max_size() const noexcept;
 
     // element access:
-    constexpr mapped_type& operator[](const key_type& k);
-    constexpr mapped_type& operator[](key_type&& k);
+    [[__nodiscard__]] constexpr mapped_type& operator[](const key_type& k);
+    [[__nodiscard__]] constexpr mapped_type& operator[](key_type&& k);
 
           constexpr mapped_type& at(const key_type& k);
     constexpr const mapped_type& at(const key_type& k) const;
@@ -1147,9 +1147,9 @@ public:
     return __tree_.max_size();
   }
 
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](const key_type& __k);
+  [[__nodiscard__]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](const key_type& __k);
 #  ifndef _LIBCPP_CXX03_LANG
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](key_type&& __k);
+  [[__nodiscard__]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](key_type&& __k);
 #  endif
 
   template <class _Arg,

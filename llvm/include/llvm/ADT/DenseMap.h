@@ -415,11 +415,11 @@ public:
     return Removed;
   }
 
-  ValueT &operator[](const KeyT &Key) {
+  [[nodiscard]] ValueT &operator[](const KeyT &Key) {
     return lookupOrInsertIntoBucket(Key).first->second;
   }
 
-  ValueT &operator[](KeyT &&Key) {
+  [[nodiscard]] ValueT &operator[](KeyT &&Key) {
     return lookupOrInsertIntoBucket(std::move(Key)).first->second;
   }
 

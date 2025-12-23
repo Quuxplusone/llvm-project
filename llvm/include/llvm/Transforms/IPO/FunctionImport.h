@@ -276,7 +276,7 @@ public:
     ImportListsTy(size_t Size)
         : ImportIDs(), EmptyList(ImportIDs), ListsImpl(Size) {}
 
-    ImportMapTy &operator[](StringRef DestMod) {
+    [[nodiscard]] ImportMapTy &operator[](StringRef DestMod) {
       return ListsImpl.try_emplace(DestMod, ImportIDs).first->second;
     }
 
