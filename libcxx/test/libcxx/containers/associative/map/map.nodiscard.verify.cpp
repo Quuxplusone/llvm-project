@@ -55,8 +55,8 @@ void test() {
 
   int key = 0;
 
-  m[key];            // no-warning
-  m[std::move(key)]; // no-warning
+  m[key];            // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
+  m[std::move(key)]; // expected-warning {{ignoring return value of function declared with 'nodiscard' attribute}}
 
 #if TEST_STD_VER >= 14
   std::map<std::string, int, std::less<>> strMap;

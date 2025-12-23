@@ -97,7 +97,7 @@ public:
     std::swap(Vector, RHS.Vector);
   }
 
-  ValueT &operator[](const KeyT &Key) {
+  [[nodiscard]] ValueT &operator[](const KeyT &Key) {
     return try_emplace_impl(Key).first->second;
   }
 
