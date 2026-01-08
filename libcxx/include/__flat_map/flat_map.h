@@ -62,6 +62,7 @@
 #include <__utility/pair.h>
 #include <__utility/scope_guard.h>
 #include <__vector/vector.h>
+#include <__vector/vector_bool.h>
 #include <initializer_list>
 #include <stdexcept>
 
@@ -87,11 +88,15 @@ class flat_map {
 
   static_assert(is_same_v<_Key, typename _KeyContainer::value_type>);
   static_assert(is_same_v<_Tp, typename _MappedContainer::value_type>);
-  static_assert(!is_same_v<_KeyContainer, std::vector<bool>>, "vector<bool> is not a sequence container");
-  static_assert(!is_same_v<_MappedContainer, std::vector<bool>>, "vector<bool> is not a sequence container");
+  //static_assert(!is_same_v<_KeyContainer, std::vector<bool>>, "vector<bool> is not a sequence container");
+  //static_assert(!is_same_v<_MappedContainer, std::vector<bool>>, "vector<bool> is not a sequence container");
 
   template <bool _Const>
   using __iterator _LIBCPP_NODEBUG = __key_value_iterator<flat_map, _KeyContainer, _MappedContainer, _Const>;
+
+  using __key_const_reference    = iter_reference_t<typename _KeyContainer::const_iterator>;
+  using __mapped_reference       = iter_reference_t<typename _MappedContainer::iterator>;
+  using __mapped_const_reference = iter_reference_t<typename _MappedContainer::const_iterator>;
 
 public:
   // types
@@ -99,8 +104,8 @@ public:
   using mapped_type            = _Tp;
   using value_type             = pair<key_type, mapped_type>;
   using key_compare            = __type_identity_t<_Compare>;
-  using reference              = pair<const key_type&, mapped_type&>;
-  using const_reference        = pair<const key_type&, const mapped_type&>;
+  using reference              = pair<__key_const_reference, __mapped_reference>;
+  using const_reference        = pair<__key_const_reference, __mapped_const_reference>;
   using size_type              = size_t;
   using difference_type        = ptrdiff_t;
   using iterator               = __iterator<false>; // see [container.requirements]
@@ -465,13 +470,13 @@ public:
   }
 
   // [flat.map.access], element access
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](const key_type& __x)
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_reference operator[](const key_type& __x)
     requires is_constructible_v<mapped_type>
   {
     return try_emplace(__x).first->second;
   }
 
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](key_type&& __x)
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_reference operator[](key_type&& __x)
     requires is_constructible_v<mapped_type>
   {
     return try_emplace(std::move(__x)).first->second;
@@ -480,11 +485,11 @@ public:
   template <class _Kp>
     requires(__is_compare_transparent && is_constructible_v<key_type, _Kp> && is_constructible_v<mapped_type> &&
              !is_convertible_v<_Kp &&, const_iterator> && !is_convertible_v<_Kp &&, iterator>)
-  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& operator[](_Kp&& __x) {
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_reference operator[](_Kp&& __x) {
     return try_emplace(std::forward<_Kp>(__x)).first->second;
   }
 
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& at(const key_type& __x) {
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_reference at(const key_type& __x) {
     auto __it = find(__x);
     if (__it == end()) {
       std::__throw_out_of_range("flat_map::at(const key_type&): Key does not exist");
@@ -492,7 +497,7 @@ public:
     return __it->second;
   }
 
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const mapped_type& at(const key_type& __x) const {
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_const_reference at(const key_type& __x) const {
     auto __it = find(__x);
     if (__it == end()) {
       std::__throw_out_of_range("flat_map::at(const key_type&) const: Key does not exist");
@@ -502,7 +507,7 @@ public:
 
   template <class _Kp>
     requires __is_compare_transparent
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 mapped_type& at(const _Kp& __x) {
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_reference at(const _Kp& __x) {
     auto __it = find(__x);
     if (__it == end()) {
       std::__throw_out_of_range("flat_map::at(const K&): Key does not exist");
@@ -512,7 +517,7 @@ public:
 
   template <class _Kp>
     requires __is_compare_transparent
-  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 const mapped_type& at(const _Kp& __x) const {
+  [[nodiscard]] _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __mapped_const_reference at(const _Kp& __x) const {
     auto __it = find(__x);
     if (__it == end()) {
       std::__throw_out_of_range("flat_map::at(const K&) const: Key does not exist");
@@ -672,21 +677,21 @@ public:
   }
 
   template <class _Mapped>
-    requires is_assignable_v<mapped_type&, _Mapped> && is_constructible_v<mapped_type, _Mapped>
+    requires is_assignable_v<__mapped_reference, _Mapped> && is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<iterator, bool>
   insert_or_assign(const key_type& __key, _Mapped&& __obj) {
     return __insert_or_assign(__key, std::forward<_Mapped>(__obj));
   }
 
   template <class _Mapped>
-    requires is_assignable_v<mapped_type&, _Mapped> && is_constructible_v<mapped_type, _Mapped>
+    requires is_assignable_v<__mapped_reference, _Mapped> && is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<iterator, bool>
   insert_or_assign(key_type&& __key, _Mapped&& __obj) {
     return __insert_or_assign(std::move(__key), std::forward<_Mapped>(__obj));
   }
 
   template <class _Kp, class _Mapped>
-    requires __is_compare_transparent && is_constructible_v<key_type, _Kp> && is_assignable_v<mapped_type&, _Mapped> &&
+    requires __is_compare_transparent && is_constructible_v<key_type, _Kp> && is_assignable_v<__mapped_reference, _Mapped> &&
              is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 pair<iterator, bool>
   insert_or_assign(_Kp&& __key, _Mapped&& __obj) {
@@ -694,21 +699,21 @@ public:
   }
 
   template <class _Mapped>
-    requires is_assignable_v<mapped_type&, _Mapped> && is_constructible_v<mapped_type, _Mapped>
+    requires is_assignable_v<__mapped_reference, _Mapped> && is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator
   insert_or_assign(const_iterator __hint, const key_type& __key, _Mapped&& __obj) {
     return __insert_or_assign(__hint, __key, std::forward<_Mapped>(__obj));
   }
 
   template <class _Mapped>
-    requires is_assignable_v<mapped_type&, _Mapped> && is_constructible_v<mapped_type, _Mapped>
+    requires is_assignable_v<__mapped_reference, _Mapped> && is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator
   insert_or_assign(const_iterator __hint, key_type&& __key, _Mapped&& __obj) {
     return __insert_or_assign(__hint, std::move(__key), std::forward<_Mapped>(__obj));
   }
 
   template <class _Kp, class _Mapped>
-    requires __is_compare_transparent && is_constructible_v<key_type, _Kp> && is_assignable_v<mapped_type&, _Mapped> &&
+    requires __is_compare_transparent && is_constructible_v<key_type, _Kp> && is_assignable_v<__mapped_reference, _Mapped> &&
              is_constructible_v<mapped_type, _Mapped>
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 iterator
   insert_or_assign(const_iterator __hint, _Kp&& __key, _Mapped&& __obj) {
@@ -1138,8 +1143,8 @@ private:
   struct __key_equiv {
     _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 __key_equiv(key_compare __c) : __comp_(__c) {}
     _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX26 bool
-    operator()(const_reference __x, const_reference __y) const {
-      return !__comp_(std::get<0>(__x), std::get<0>(__y)) && !__comp_(std::get<0>(__y), std::get<0>(__x));
+    operator()(const auto& __x, const auto& __y) const {
+      return !__comp_(std::get<0>(__x), std::get<0>(__y));
     }
     key_compare __comp_;
   };
