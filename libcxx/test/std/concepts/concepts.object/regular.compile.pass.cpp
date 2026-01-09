@@ -144,7 +144,7 @@ static_assert(!std::regular<deleted_assignment_from_const_rvalue>);
 static_assert(!std::regular<std::runtime_error>);
 static_assert(
     !std::regular<std::tuple<std::runtime_error, std::overflow_error> >);
-static_assert(!std::regular<std::nullopt_t>);
+static_assert(std::regular<std::nullopt_t>);
 static_assert(!std::regular<no_copy_constructor>);
 static_assert(!std::regular<no_copy_assignment>);
 static_assert(std::is_copy_assignable_v<no_copy_assignment_mutable> &&
