@@ -111,7 +111,7 @@ static_assert(!std::semiregular<deleted_assignment_from_const_rvalue>);
 static_assert(!std::semiregular<std::runtime_error>);
 static_assert(
     !std::semiregular<std::tuple<std::runtime_error, std::overflow_error> >);
-static_assert(!std::semiregular<std::nullopt_t>);
+static_assert(std::semiregular<std::nullopt_t>);
 static_assert(!std::semiregular<no_copy_constructor>);
 static_assert(!std::semiregular<no_copy_assignment>);
 static_assert(std::is_copy_assignable_v<no_copy_assignment_mutable>);

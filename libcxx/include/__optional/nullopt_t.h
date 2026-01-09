@@ -25,10 +25,7 @@ _LIBCPP_PUSH_MACROS
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 struct nullopt_t {
-  struct __secret_tag {
-    explicit __secret_tag() = default;
-  };
-  _LIBCPP_HIDE_FROM_ABI constexpr explicit nullopt_t(__secret_tag, __secret_tag) noexcept {}
+  _LIBCPP_HIDE_FROM_ABI explicit nullopt_t() = default;
 
 #  if _LIBCPP_STD_VER >= 20
 
@@ -46,7 +43,7 @@ struct nullopt_t {
 #  endif // _LIBCPP_STD_VER >= 20
 };
 
-inline constexpr nullopt_t nullopt{nullopt_t::__secret_tag{}, nullopt_t::__secret_tag{}};
+inline constexpr nullopt_t nullopt;
 
 _LIBCPP_END_NAMESPACE_STD
 
