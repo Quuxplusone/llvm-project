@@ -13,6 +13,7 @@
 
 #include <stack>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 
@@ -25,10 +26,10 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
 }
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  std::stack<int> q1      = make<std::stack<int> >(5);
-  std::stack<int> q2      = make<std::stack<int> >(10);
-  std::stack<int> q1_save = q1;
-  std::stack<int> q2_save = q2;
+  std::stack<int, std::list<int> > q1      = make<std::stack<int, std::list<int> > >(5);
+  std::stack<int, std::list<int> > q2      = make<std::stack<int, std::list<int> > >(10);
+  std::stack<int, std::list<int> > q1_save = q1;
+  std::stack<int, std::list<int> > q2_save = q2;
   swap(q1, q2);
   assert(q1 == q2_save);
   assert(q2 == q1_save);

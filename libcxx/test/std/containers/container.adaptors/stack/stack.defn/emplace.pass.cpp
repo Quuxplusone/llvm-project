@@ -16,6 +16,7 @@
 
 #include <stack>
 #include <cassert>
+#include <list>
 #include <vector>
 
 #include "test_macros.h"
@@ -37,10 +38,10 @@ TEST_CONSTEXPR_CXX26 void test_return_type() {
 }
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  test_return_type<std::stack<int> >();
+  test_return_type<std::stack<int, std::list<int> > >();
   test_return_type<std::stack<int, std::vector<int> > >();
 
-  std::stack<Emplaceable> q;
+  std::stack<Emplaceable, std::list<Emplaceable>> q;
 #if TEST_STD_VER > 14
   typedef Emplaceable T;
   T& r1 = q.emplace(1, 2.5);

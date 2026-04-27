@@ -14,6 +14,7 @@
 
 #include <stack>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "MoveOnly.h"
@@ -21,7 +22,7 @@
 TEST_CONSTEXPR_CXX26 bool test()
 {
   {
-    std::stack<int> q;
+    std::stack<int, std::list<int>> q;
     ASSERT_SAME_TYPE(decltype(q.displace_top()), int);
     q.push(1);
     assert(q.displace_top() == 1);
@@ -36,7 +37,7 @@ TEST_CONSTEXPR_CXX26 bool test()
   }
 #if TEST_STD_VER >= 11
   {
-    std::stack<MoveOnly> q;
+    std::stack<MoveOnly, std::list<MoveOnly>> q;
     ASSERT_SAME_TYPE(decltype(q.displace_top()), MoveOnly);
     q.push(1);
     assert(q.displace_top() == MoveOnly(1));

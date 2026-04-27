@@ -13,12 +13,13 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "test_allocator.h"
 
-struct test : private std::queue<int, std::deque<int, test_allocator<int> > > {
-  typedef std::queue<int, std::deque<int, test_allocator<int> > > base;
+struct test : private std::queue<int, std::list<int, test_allocator<int> > > {
+  typedef std::queue<int, std::list<int, test_allocator<int> > > base;
 
   TEST_CONSTEXPR_CXX26 explicit test(const test_allocator<int>& a) : base(a) {}
   TEST_CONSTEXPR_CXX26 test(const container_type& container, const test_allocator<int>& a) : base(container, a) {}

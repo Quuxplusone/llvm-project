@@ -15,10 +15,11 @@
 
 #include <cassert>
 #include <queue>
+#include <list>
 
 #include "test_allocator.h"
 
-using base_type = std::queue<int, std::deque<int, test_allocator<int>>>;
+using base_type = std::queue<int, std::list<int, test_allocator<int>>>;
 
 class GetAlloc : public base_type {
   test_allocator_statistics* stats;
