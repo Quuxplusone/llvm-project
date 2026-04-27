@@ -14,6 +14,7 @@
 #include <queue>
 #include <cassert>
 #include <cstddef>
+#include <list>
 
 #include "test_macros.h"
 #include "test_allocator.h"
@@ -26,7 +27,7 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
   return c;
 }
 
-typedef std::deque<int, test_allocator<int> > C;
+typedef std::list<int, test_allocator<int> > C;
 
 struct test : public std::queue<int, C> {
   typedef std::queue<int, C> base;
@@ -46,7 +47,7 @@ TEST_CONSTEXPR_CXX26 bool run_test() {
   assert(q.get_allocator() == test_allocator<int>(4));
   assert(q.size() == 5);
   for (C::size_type i = 0; i < d.size(); ++i) {
-    assert(q.front() == d[i]);
+    assert(q.front() == int(i));
     q.pop();
   }
 

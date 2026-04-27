@@ -24,9 +24,11 @@
 #include "test_container_comparisons.h"
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  assert((test_sequence_container_adaptor_spaceship<std::queue, std::deque>()));
   assert((test_sequence_container_adaptor_spaceship<std::queue, std::list>()));
-  assert((test_sequence_container_adaptor_spaceship<std::queue, nasty_list>()));
+  if (!std::is_constant_evaluated()) {
+    assert((test_sequence_container_adaptor_spaceship<std::queue, std::deque>()));
+    assert((test_sequence_container_adaptor_spaceship<std::queue, nasty_list>()));
+  }
 
   return true;
 }

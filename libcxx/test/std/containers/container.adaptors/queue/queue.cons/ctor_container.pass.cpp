@@ -13,6 +13,7 @@
 #include <queue>
 #include <cassert>
 #include <cstddef>
+#include <list>
 
 #include "test_macros.h"
 #if TEST_STD_VER >= 11
@@ -28,13 +29,13 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
 }
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  typedef std::deque<int> Container;
-  typedef std::queue<int> Q;
+  typedef std::list<int> Container;
+  typedef std::queue<int, Container> Q;
   Container d = make<Container>(5);
   Q q(d);
   assert(q.size() == 5);
   for (std::size_t i = 0; i < d.size(); ++i) {
-    assert(q.front() == d[i]);
+    assert(q.front() == int(i));
     q.pop();
   }
 

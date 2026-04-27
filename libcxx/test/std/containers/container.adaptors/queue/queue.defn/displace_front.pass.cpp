@@ -14,6 +14,7 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "MoveOnly.h"
@@ -21,7 +22,7 @@
 TEST_CONSTEXPR_CXX26 bool test()
 {
   {
-    std::queue<int> q;
+    std::queue<int, std::list<int>> q;
     ASSERT_SAME_TYPE(decltype(q.displace_front()), int);
     q.push(1);
     assert(q.displace_front() == 1);
@@ -36,7 +37,7 @@ TEST_CONSTEXPR_CXX26 bool test()
   }
 #if TEST_STD_VER >= 11
   {
-    std::queue<MoveOnly> q;
+    std::queue<MoveOnly, std::list<MoveOnly>> q;
     ASSERT_SAME_TYPE(decltype(q.displace_front()), MoveOnly);
     q.push(1);
     assert(q.displace_front() == MoveOnly(1));
@@ -56,7 +57,7 @@ TEST_CONSTEXPR_CXX26 bool test()
 int main(int, char**)
 {
   test();
-#if 0 && TEST_STD_VER >= 26 // to be enabled when constexpr deque arrives
+#if TEST_STD_VER >= 26
   static_assert(test());
 #endif
 

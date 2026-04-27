@@ -16,6 +16,7 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "MoveOnly.h"
@@ -32,9 +33,9 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
 }
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  typedef std::deque<MoveOnly> Container;
-  typedef std::queue<MoveOnly> Q;
-  Q q(make<std::deque<MoveOnly> >(5));
+  typedef std::list<MoveOnly> Container;
+  typedef std::queue<MoveOnly, Container> Q;
+  Q q(make<Container>(5));
   assert(q.size() == 5);
 
 #if TEST_STD_VER >= 11

@@ -40,7 +40,7 @@ TEST_CONSTEXPR_CXX26 bool test() {
   test_return_type<std::queue<int> >();
   test_return_type<std::queue<int, std::list<int> > >();
 
-  std::queue<Emplaceable> q;
+  std::queue<Emplaceable, std::list<Emplaceable>> q;
 #if TEST_STD_VER > 14
   typedef Emplaceable T;
   T& r1 = q.emplace(1, 2.5);

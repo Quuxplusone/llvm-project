@@ -12,6 +12,7 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 
@@ -24,8 +25,8 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
 }
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  std::queue<int> q(make<std::deque<int> >(5));
-  std::queue<int> q2;
+  std::queue<int, std::list<int> > q(make<std::list<int> >(5));
+  std::queue<int, std::list<int> > q2;
   q2 = q;
   assert(q2 == q);
 

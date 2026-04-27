@@ -12,11 +12,12 @@
 
 #include <stack>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  std::stack<int> q;
+  std::stack<int, std::list<int> > q;
   q.push(1);
   assert(q.size() == 1);
   assert(q.top() == 1);

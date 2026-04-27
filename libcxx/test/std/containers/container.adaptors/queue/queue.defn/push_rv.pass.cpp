@@ -14,12 +14,13 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "MoveOnly.h"
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  std::queue<MoveOnly> q;
+  std::queue<MoveOnly, std::list<MoveOnly>> q;
   q.push(MoveOnly(1));
   assert(q.size() == 1);
   assert(q.front() == MoveOnly(1));

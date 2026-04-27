@@ -13,6 +13,7 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 #include "test_allocator.h"
@@ -25,7 +26,7 @@ TEST_CONSTEXPR_CXX26 C make(int n) {
   return c;
 }
 
-typedef std::deque<int, test_allocator<int> > C;
+typedef std::list<int, test_allocator<int> > C;
 
 template <class T>
 struct test : public std::queue<T, C> {

@@ -12,16 +12,17 @@
 
 #include <queue>
 #include <cassert>
+#include <list>
 
 #include "test_macros.h"
 
 TEST_CONSTEXPR_CXX26 bool test() {
-  std::queue<int> q;
+  std::queue<int, std::list<int> > q;
   assert(q.size() == 0);
   q.push(1);
   q.push(2);
   q.push(3);
-  const std::queue<int>& cqr = q;
+  const std::queue<int, std::list<int> >& cqr = q;
   const int& cir             = cqr.front();
   assert(cir == 1);
 

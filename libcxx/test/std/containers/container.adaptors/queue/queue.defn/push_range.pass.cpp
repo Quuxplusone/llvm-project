@@ -13,15 +13,19 @@
 //   void push_range(R&& rg); // C++23
 
 #include <queue>
+#include <list>
 
 #include "../../push_range_container_adaptors.h"
 #include "test_macros.h"
 
+template<class T>
+using std_queue = std::queue<T, std::list<T>>;
+
 TEST_CONSTEXPR_CXX26 bool test() {
   for_all_iterators_and_allocators<int, const int*>([]<class Iter, class Sent, class Alloc>() {
-    test_push_range<std::queue<int, std::deque<int, Alloc>>, Iter, Sent>();
+    test_push_range<std::queue<int, std::list<int, Alloc>>, Iter, Sent>();
   });
-  test_push_range_move_only<std::queue>();
+  test_push_range_move_only<std_queue>();
   test_push_range_inserter_choice<std::queue, int>();
 
   static_assert(test_constraints_push_range<std::queue, int, double>());
