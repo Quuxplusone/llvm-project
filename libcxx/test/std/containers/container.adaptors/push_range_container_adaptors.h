@@ -177,12 +177,12 @@ struct Container {
   int size_                     = 0;
   value_type buffer_[Capacity]  = {};
 
-  iterator begin() { return buffer_; }
-  iterator end() { return buffer_ + size_; }
-  size_type size() const { return size_; }
+  TEST_CONSTEXPR_CXX26 iterator begin() { return buffer_; }
+  TEST_CONSTEXPR_CXX26 iterator end() { return buffer_ + size_; }
+  TEST_CONSTEXPR_CXX26 size_type size() const { return size_; }
 
   template <class U>
-  void push_back(U val)
+  TEST_CONSTEXPR_CXX26 void push_back(U val)
     requires(Inserter >= InserterChoice::PushBack)
   {
     inserter_choice = InserterChoice::PushBack;
@@ -191,7 +191,7 @@ struct Container {
   }
 
   template <std::ranges::input_range Range>
-  void append_range(Range&& range)
+  TEST_CONSTEXPR_CXX26 void append_range(Range&& range)
     requires(Inserter >= InserterChoice::AppendRange)
   {
     assert(size() + std::ranges::distance(range) <= Capacity);
@@ -208,7 +208,7 @@ struct Container {
 };
 
 template <template <class...> class AdaptorT, class T>
-void test_push_range_inserter_choice(bool is_result_heapified = false) {
+TEST_CONSTEXPR_CXX26 void test_push_range_inserter_choice(bool is_result_heapified = false) {
   { // `append_range` is preferred if available.
     using BaseContainer = Container<T, InserterChoice::AppendRange>;
     using Adaptor       = AdaptorT<T, BaseContainer>;
