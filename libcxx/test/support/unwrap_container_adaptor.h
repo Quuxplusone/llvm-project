@@ -14,14 +14,14 @@ template <class Adaptor>
 struct UnwrapAdaptor : Adaptor {
   UnwrapAdaptor() = default;
 
-  UnwrapAdaptor(Adaptor&& adaptor) : Adaptor(std::move(adaptor)) {}
+  constexpr UnwrapAdaptor(Adaptor&& adaptor) : Adaptor(std::move(adaptor)) {}
   // `c` is a protected member variable of the base class.
-  decltype(auto) get_container() {
+  constexpr decltype(auto) get_container() {
     return (UnwrapAdaptor::c); // Put into parentheses to make sure the function returns a reference.
   }
 
   // TODO: make this work pre-C++20.
-  decltype(auto) get_comparator()
+  constexpr decltype(auto) get_comparator()
   requires requires {
     UnwrapAdaptor::c;
   } {
