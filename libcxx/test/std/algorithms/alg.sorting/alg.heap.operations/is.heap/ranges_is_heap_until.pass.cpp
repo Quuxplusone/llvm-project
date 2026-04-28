@@ -10,11 +10,11 @@
 
 // <algorithm>
 
-// template<random_access_iterator I, sentinel_for<I> S, class Proj = identity,
+// template<forward_iterator I, sentinel_for<I> S, class Proj = identity,
 //          indirect_strict_weak_order<projected<I, Proj>> Comp = ranges::less>
 //   constexpr I is_heap_until(I first, S last, Comp comp = {}, Proj proj = {});                // Since C++20
 //
-// template<random_access_range R, class Proj = identity,
+// template<forward_range R, class Proj = identity,
 //          indirect_strict_weak_order<projected<iterator_t<R>, Proj>> Comp = ranges::less>
 //   constexpr borrowed_iterator_t<R>
 //     is_heap_until(R&& r, Comp comp = {}, Proj proj = {});                                    // Since C++20
@@ -40,9 +40,8 @@ concept HasIsHeapUntilIter =
 
 static_assert(HasIsHeapUntilIter<int*, int*, std::ranges::less>);
 
-// !random_access_iterator<I>
-static_assert(!HasIsHeapUntilIter<RandomAccessIteratorNotDerivedFrom>);
-static_assert(!HasIsHeapUntilIter<RandomAccessIteratorBadIndex>);
+// !forward_iterator<I>
+static_assert(!HasIsHeapUntilIter<ForwardIteratorNotDerivedFrom>);
 
 // !sentinel_for<S, I>
 static_assert(!HasIsHeapUntilIter<int*, SentinelForNotSemiregular>);
@@ -66,9 +65,8 @@ using R = UncheckedRange<T>;
 
 static_assert(HasIsHeapUntilRange<R<int*>>);
 
-// !random_access_range<R>
-static_assert(!HasIsHeapUntilRange<RandomAccessRangeNotDerivedFrom>);
-static_assert(!HasIsHeapUntilRange<RandomAccessRangeBadIndex>);
+// !forward_range<R>
+static_assert(!HasIsHeapUntilRange<ForwardRangeNotDerivedFrom>);
 
 // !indirect_strict_weak_order<Comp, projected<iterator_t<R>, Proj>>
 static_assert(!HasIsHeapUntilRange<R<NoComparator*>>);
@@ -119,6 +117,8 @@ constexpr void test_iter() {
 }
 
 constexpr void test_iterators() {
+  test_iter<forward_iterator<int*>>();
+  test_iter<bidirectional_iterator<int*>>();
   test_iter<random_access_iterator<int*>>();
   test_iter<contiguous_iterator<int*>>();
   test_iter<int*>();

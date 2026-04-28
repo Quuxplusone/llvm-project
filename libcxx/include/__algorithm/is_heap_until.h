@@ -20,40 +20,36 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-template <class _Compare, class _RandomAccessIterator>
-_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _RandomAccessIterator
-__is_heap_until(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare&& __comp) {
-  typedef typename iterator_traits<_RandomAccessIterator>::difference_type difference_type;
-  difference_type __len      = __last - __first;
-  difference_type __p        = 0;
-  difference_type __c        = 1;
-  _RandomAccessIterator __pp = __first;
-  while (__c < __len) {
-    _RandomAccessIterator __cp = __first + __c;
-    if (__comp(*__pp, *__cp))
-      return __cp;
-    ++__c;
-    ++__cp;
-    if (__c == __len)
-      return __last;
-    if (__comp(*__pp, *__cp))
-      return __cp;
-    ++__p;
-    ++__pp;
-    __c = 2 * __p + 1;
+template <class _Compare, class _ForwardIterator, class _Sentinel>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _ForwardIterator
+__is_heap_until(_ForwardIterator __first, _Sentinel __last, _Compare&& __comp) {
+  _ForwardIterator __child = __first;
+  if (__child == __last) {
+    return __child;
   }
-  return __last;
+  while (true) {
+    ++__child;
+    if (__child == __last || __comp(*__first, *__child)) {
+      break;
+    }
+    ++__child;
+    if (__child == __last || __comp(*__first, *__child)) {
+      break;
+    }
+    ++__first;
+  }
+  return __child;
 }
 
-template <class _RandomAccessIterator, class _Compare>
-[[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _RandomAccessIterator
-is_heap_until(_RandomAccessIterator __first, _RandomAccessIterator __last, _Compare __comp) {
+template <class _ForwardIterator, class _Compare>
+[[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _ForwardIterator
+is_heap_until(_ForwardIterator __first, _ForwardIterator __last, _Compare __comp) {
   return std::__is_heap_until(__first, __last, static_cast<__comp_ref_type<_Compare> >(__comp));
 }
 
-template <class _RandomAccessIterator>
-[[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _RandomAccessIterator
-is_heap_until(_RandomAccessIterator __first, _RandomAccessIterator __last) {
+template <class _ForwardIterator>
+[[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _ForwardIterator
+is_heap_until(_ForwardIterator __first, _ForwardIterator __last) {
   return std::__is_heap_until(__first, __last, __less<>());
 }
 

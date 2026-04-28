@@ -39,13 +39,12 @@ struct __is_heap_until {
   template <class _Iter, class _Sent, class _Proj, class _Comp>
   _LIBCPP_HIDE_FROM_ABI constexpr static _Iter
   __is_heap_until_fn_impl(_Iter __first, _Sent __last, _Comp& __comp, _Proj& __proj) {
-    auto __last_iter        = ranges::next(__first, __last);
     auto&& __projected_comp = std::__make_projected(__comp, __proj);
 
-    return std::__is_heap_until(std::move(__first), std::move(__last_iter), __projected_comp);
+    return std::__is_heap_until(std::move(__first), std::move(__last), __projected_comp);
   }
 
-  template <random_access_iterator _Iter,
+  template <forward_iterator _Iter,
             sentinel_for<_Iter> _Sent,
             class _Proj                                               = identity,
             indirect_strict_weak_order<projected<_Iter, _Proj>> _Comp = ranges::less>
@@ -54,7 +53,7 @@ struct __is_heap_until {
     return __is_heap_until_fn_impl(std::move(__first), std::move(__last), __comp, __proj);
   }
 
-  template <random_access_range _Range,
+  template <forward_range _Range,
             class _Proj                                                            = identity,
             indirect_strict_weak_order<projected<iterator_t<_Range>, _Proj>> _Comp = ranges::less>
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr borrowed_iterator_t<_Range>

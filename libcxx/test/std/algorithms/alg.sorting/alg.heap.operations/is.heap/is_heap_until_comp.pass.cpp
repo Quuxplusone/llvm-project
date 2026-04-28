@@ -8,7 +8,7 @@
 
 // <algorithm>
 
-// template<RandomAccessIterator Iter, StrictWeakOrder<auto, Iter::value_type> Compare>
+// template<ForwardIterator Iter, StrictWeakOrder<auto, Iter::value_type> Compare>
 //   requires CopyConstructible<Compare>
 //   constexpr bool   // constexpr after C++17
 //   is_heap_until(Iter first, Iter last, Compare comp);
@@ -32,7 +32,7 @@ TEST_CONSTEXPR bool test_constexpr() {
 
 void test()
 {
-    typedef random_access_iterator<int *> RI;
+    typedef forward_iterator<int *> RI;
     int i1[] = {0, 0};
     assert(std::is_heap_until(i1, i1, std::greater<int>()) == i1);
     assert(std::is_heap_until(i1, i1+1, std::greater<int>()) == i1+1);
