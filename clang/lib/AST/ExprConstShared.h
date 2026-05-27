@@ -15,6 +15,7 @@
 #define LLVM_CLANG_LIB_AST_EXPRCONSTSHARED_H
 
 #include "clang/Basic/BuiltinTraits.h"
+#include "clang/AST/CharUnits.h"
 #include <cstdint>
 #include <optional>
 
@@ -27,7 +28,8 @@ namespace clang {
 class QualType;
 class LangOptions;
 class ASTContext;
-class CharUnits;
+class APValue;
+class ConstantArrayType;
 class Expr;
 class CallExpr;
 } // namespace clang
@@ -79,6 +81,12 @@ void HandleComplexComplexDiv(llvm::APFloat A, llvm::APFloat B, llvm::APFloat C,
 CharUnits GetAlignOfExpr(const ASTContext &Ctx, const Expr *E,
                          UnaryExprOrTypeTrait ExprKind);
 
+/// Whether two APValues could be merged into a single storage location by
+/// the implementation (the relation [intro.object]/9 cares about for
+/// initializer_list backing arrays and string literals).
+bool AreAPValuesPotentiallyMergeable(const APValue &LHS, const APValue &RHS,
+                                     const ASTContext &Ctx);
+
 /// Convert a builtin ID to the canonical x86 builtin ID the constant evaluators
 /// dispatch on in their x86 target-specific cases.
 ///
@@ -110,4 +118,23 @@ std::optional<llvm::APFloat>
 EvalScalarMinMaxFp(const llvm::APFloat &A, const llvm::APFloat &B,
                    std::optional<llvm::APSInt> RoundingMode, bool IsMin);
 
-#endif
+/// Where an lvalue into an array element lives: the element index within the
+/// array (or the array length for a one-past-the-end pointer), and the byte
+/// offset from the start of that element.
+struct ArraySubobjectLocation {
+  uint64_t Index;
+  CharUnits OffsetInElement;
+};
+
+/// Computes the array-element location designated by an lvalue whose first
+/// path entry indexes into ArrayType with the given Index and whose
+/// byte offset from the array base is LValueOffset. IsValidOnePastEnd
+/// must be true iff the lvalue is a valid one-past-the-end position of the
+/// array (which the caller determines from its own lvalue representation).
+/// Returns std::nullopt if the lvalue does not designate an element,
+/// one-past-the-end position, or subobject of an element.
+std::optional<ArraySubobjectLocation> computeArraySubobjectLocation(
+    const ASTContext &Ctx, const ConstantArrayType *ArrayType, uint64_t Index,
+    CharUnits LValueOffset, bool IsValidOnePastEnd);
+
+#endif // LLVM_CLANG_LIB_AST_EXPRCONSTSHARED_H

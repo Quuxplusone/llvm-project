@@ -2361,6 +2361,7 @@ void ASTStmtReader::VisitFunctionParmPackExpr(FunctionParmPackExpr *E) {
 
 void ASTStmtReader::VisitMaterializeTemporaryExpr(MaterializeTemporaryExpr *E) {
   VisitExpr(E);
+  E->setBackingArrayForInitializerList(Record.readInt());
   bool HasMaterialzedDecl = Record.readInt();
   if (HasMaterialzedDecl)
     E->State = cast<LifetimeExtendedTemporaryDecl>(Record.readDecl());

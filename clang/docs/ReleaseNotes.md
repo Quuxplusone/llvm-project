@@ -142,6 +142,7 @@ features cannot lower the translation-unit ABI level;
   implementation of [P2830R10](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2025/p2830r10.html) (Constexpr Type Ordering).
 
 - Clang now supports [P3533R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2025/p3533r2.html) (constexpr virtual inheritance).
+- Clang now supports [P2752R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2752r3.html) 'Static storage for braced initializers'. (#GH104487)
 
 #### C++23 Feature Support
 
