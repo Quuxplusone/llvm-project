@@ -123,8 +123,22 @@ inline const bool __can_add_pointer<_Tp, __void_t<_Tp*> > = true;
 #  define _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI
 #endif
 
+template <class _Tp, class _Dp, bool = __can_add_pointer<_Tp> >
+struct __unique_ptr_be_trivially_relocatable {
+  using deleter_type _LIBCPP_NODEBUG = _Dp;
+  using pointer _LIBCPP_NODEBUG = __pointer<_Tp, deleter_type>;
+  static const bool value = __libcpp_is_trivially_relocatable<pointer>::value &&
+                            __libcpp_is_trivially_relocatable<deleter_type>::value;
+};
+
+template <class _Tp, class _Dp>
+struct __unique_ptr_be_trivially_relocatable<_Tp, _Dp, false> {
+  static const bool value = false;
+};
+
 template <class _Tp, class _Dp = default_delete<_Tp> >
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI unique_ptr {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value))
+      _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI unique_ptr {
   static_assert(__can_add_pointer<_Tp>, "unique_ptr<T, D> requires T* to be a valid type");
   static_assert(!is_rvalue_reference<_Dp>::value, "the specified deleter type cannot be an rvalue reference");
 
@@ -383,7 +397,7 @@ private:
 };
 
 template <class _Tp, class _Dp>
-class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI unique_ptr<_Tp[], _Dp> {
+class _LIBCPP_UNIQUE_PTR_TRIVIAL_ABI _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__unique_ptr_be_trivially_relocatable<_Tp, _Dp>::value)) unique_ptr<_Tp[], _Dp> {
 public:
   typedef _Tp element_type;
   typedef _Dp deleter_type;

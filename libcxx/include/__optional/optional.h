@@ -287,7 +287,8 @@ using __optional_sfinae_assign_base_t _LIBCPP_NODEBUG =
                           (is_move_constructible_v<_Tp> && is_move_assignable_v<_Tp>)>;
 
 template <class _Tp>
-class _LIBCPP_DECLSPEC_EMPTY_BASES optional
+class _LIBCPP_DECLSPEC_EMPTY_BASES
+      _LIBCPP_TRIVIALLY_RELOCATABLE_IF(__libcpp_is_trivially_relocatable<_Tp>::value || is_reference_v<_Tp>) optional
     : public __optional_move_assign_base<_Tp>,
       private __optional_sfinae_ctor_base_t<_Tp>,
       private __optional_sfinae_assign_base_t<_Tp> {

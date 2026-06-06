@@ -49,6 +49,7 @@
 #include <__type_traits/is_const.h>
 #include <__type_traits/is_nothrow_constructible.h>
 #include <__type_traits/is_same.h>
+#include <__type_traits/is_trivially_relocatable.h>
 #include <__type_traits/remove_reference.h>
 #include <__utility/as_const.h>
 #include <__utility/exception_guard.h>
@@ -71,7 +72,10 @@ _LIBCPP_PUSH_MACROS
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Key, class _Compare = less<_Key>, class _KeyContainer = vector<_Key>>
-class flat_set {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(
+  __libcpp_is_trivially_relocatable<_KeyContainer>::value &&
+  __libcpp_is_trivially_relocatable<_Compare>::value
+) flat_set {
   template <class, class, class>
   friend class flat_set;
 

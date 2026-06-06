@@ -469,6 +469,15 @@ private:
   friend class __split_buffer_size_layout;
 };
 
+template<class _Tp, class _Allocator>
+struct __split_buffer_be_trivially_relocatable {
+  using allocator_type    = _Allocator;
+  using __alloc_traits    = allocator_traits<allocator_type>;
+  using pointer           = typename __alloc_traits::pointer;
+  static const bool value = __is_trivially_relocatable_v<pointer> &&
+                            __is_trivially_relocatable_v<allocator_type>;
+};
+
 // `__split_buffer` is a contiguous array data structure. It may hold spare capacity at both ends of
 // the sequence. This allows for a `__split_buffer` to grow from both the front and the back without
 // relocating its contents until it runs out of room. This characteristic sets it apart from
@@ -553,7 +562,8 @@ private:
 //    };
 //
 template <class _Tp, class _Allocator, template <class, class, class> class _Layout>
-class __split_buffer : _Layout<__split_buffer<_Tp, _Allocator, _Layout>, _Tp, _Allocator> {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__split_buffer_be_trivially_relocatable<_Tp, _Allocator>::value))
+      __split_buffer : _Layout<__split_buffer<_Tp, _Allocator, _Layout>, _Tp, _Allocator> {
   using __base_type _LIBCPP_NODEBUG = _Layout<__split_buffer<_Tp, _Allocator, _Layout>, _Tp, _Allocator>;
 
 public:
@@ -590,7 +600,7 @@ public:
   // - allocator_type: may be trivially relocatable, so it's checked
   // __split_buffer doesn't have any self-references, so it's trivially relocatable if its members are.
   using __trivially_relocatable _LIBCPP_NODEBUG =
-      __conditional_t<__is_trivially_relocatable_v<pointer> && __is_trivially_relocatable_v<allocator_type>,
+      __conditional_t<__split_buffer_be_trivially_relocatable<_Tp, _Allocator>::value,
                       __split_buffer,
                       void>;
 

@@ -272,6 +272,7 @@ template <class T, class Container, class Compare>
 #  include <__ranges/concepts.h>
 #  include <__ranges/container_compatible_range.h>
 #  include <__ranges/from_range.h>
+#  include <__type_traits/is_trivially_relocatable.h>
 #  include <__utility/forward.h>
 #  include <deque>
 #  include <vector>
@@ -299,7 +300,7 @@ template <class _Tp, class _Container>
 _LIBCPP_HIDE_FROM_ABI bool operator<(const queue<_Tp, _Container>& __x, const queue<_Tp, _Container>& __y);
 
 template <class _Tp, class _Container /*= deque<_Tp>*/>
-class queue {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Container>::value)) queue {
 public:
   typedef _Container container_type;
   typedef typename container_type::value_type value_type;
@@ -516,7 +517,8 @@ template <class _Tp, class _Container, class _Alloc>
 struct uses_allocator<queue<_Tp, _Container>, _Alloc> : public uses_allocator<_Container, _Alloc> {};
 
 template <class _Tp, class _Container, class _Compare>
-class priority_queue {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__libcpp_is_trivially_relocatable<_Container>::value && __libcpp_is_trivially_relocatable<_Compare>::value))
+      priority_queue {
 public:
   typedef _Container container_type;
   typedef _Compare value_compare;

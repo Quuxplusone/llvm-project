@@ -85,8 +85,20 @@ _LIBCPP_PUSH_MACROS
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+template <class _Allocator>
+struct __vector_be_trivially_relocatable {
+    typedef allocator_traits<_Allocator> __alloc_traits;
+    typedef typename __alloc_traits::pointer pointer;
+
+    static const bool value =
+        __libcpp_is_trivially_relocatable<pointer>::value &&
+        __libcpp_is_trivially_relocatable<_Allocator>::value &&
+        __allocator_pocma_models_relocatable<_Allocator>::value;
+};
+
 template <class _Tp, class _Allocator /* = allocator<_Tp> */>
-class _LIBCPP_WARN_UNUSED vector {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF((__vector_be_trivially_relocatable<_Allocator>::value))
+      _LIBCPP_WARN_UNUSED vector {
   using __base_type _LIBCPP_NODEBUG  = __vector_layout<_Tp, _Allocator>;
   using __bound_type _LIBCPP_NODEBUG = typename __base_type::__bound_type;
   using _SplitBuffer _LIBCPP_NODEBUG = typename __base_type::_SplitBuffer;
