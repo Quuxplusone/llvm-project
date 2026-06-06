@@ -10,6 +10,7 @@
 #define _LIBCPP___ALGORITHM_SWAP_RANGES_H
 
 #include <__algorithm/copy_move_common.h>
+#include <__algorithm/in_out_result.h>
 #include <__algorithm/iterator_operations.h>
 #include <__algorithm/specialized_algorithms.h>
 #include <__cstddef/size_t.h>
