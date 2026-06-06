@@ -69,7 +69,10 @@ _LIBCPP_PUSH_MACROS
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Key, class _Compare = less<_Key>, class _KeyContainer = vector<_Key>>
-class flat_multiset {
+class _LIBCPP_TRIVIALLY_RELOCATABLE_IF(
+  __libcpp_is_trivially_relocatable<_KeyContainer>::value &&
+  __libcpp_is_trivially_relocatable<_Compare>::value
+) flat_multiset {
   template <class, class, class>
   friend class flat_multiset;
 

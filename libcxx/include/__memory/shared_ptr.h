@@ -261,7 +261,7 @@ inline const bool __shared_ptr_nullptr_deleter_ctor_reqs_v =
 #endif
 
 template <class _Tp>
-class _LIBCPP_SHARED_PTR_TRIVIAL_ABI shared_ptr {
+class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TRIVIALLY_RELOCATABLE shared_ptr {
   struct __nullptr_sfinae_tag {};
 
 public:
@@ -1130,7 +1130,7 @@ template <class _Dp, class _Tp>
 #endif // _LIBCPP_HAS_RTTI
 
 template <class _Tp>
-class _LIBCPP_SHARED_PTR_TRIVIAL_ABI weak_ptr {
+class _LIBCPP_SHARED_PTR_TRIVIAL_ABI _LIBCPP_TRIVIALLY_RELOCATABLE weak_ptr {
 public:
 #if _LIBCPP_STD_VER >= 17
   typedef remove_extent_t<_Tp> element_type;
