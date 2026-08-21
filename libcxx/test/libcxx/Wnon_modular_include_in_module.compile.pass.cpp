@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// REQUIRES: target={{.*}}-apple-{{.*}}
+// REQUIRES: target={{.*}}-justskipit-{{.*}}
 // UNSUPPORTED: c++03
 
 // This test ensures that libc++ supports being compiled with modules enabled and with
